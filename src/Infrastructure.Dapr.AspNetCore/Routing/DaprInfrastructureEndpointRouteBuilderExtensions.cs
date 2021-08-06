@@ -1,0 +1,61 @@
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing;
+using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Text.Json;
+
+namespace Microsoft.AspNetCore.Builder
+{
+  /// <summary>
+  /// Class that contains extension methods for <see cref="IEndpointRouteBuilder"/>.
+  /// </summary>
+  public static class DaprInfrastructureEndpointRouteBuilderExtensions
+  {
+    /// <summary>
+    /// Adds endpoints for the handlers configured with <see cref="DaprInfrastructureBuilderExtensions.AddHandlers"/>. 
+    /// </summary>
+    /// <param name="endpoints">The endpoint builder</param>
+    public static void MapHandlers(this IEndpointRouteBuilder endpoints)
+    {
+      if (endpoints is null) throw new ArgumentNullException(nameof(endpoints));
+
+      IHandlerConfiguration? handlerConfiguration = endpoints.ServiceProvider.GetService<IHandlerConfiguration>();
+      if (handlerConfiguration is null)
+      {
+        throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddHandlers)} to the Dapr infrastructure builder.");
+      }
+
+      endpoints.MapSubscribeHandler();
+
+      DaprConfiguration? configuration = endpoints.ServiceProvider.GetService<DaprConfiguration>();
+      string? defaultBus = configuration?.Service?.Messaging?.DefaultBus;
+
+      JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+      {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+      };
+
+      foreach (HandlerIdentity identity in handlerConfiguration.HandlerMap.Keys)
+      {
+        string? busName = identity.BusName ?? defaultBus;
+        if (busName is null) // TODO: Log warning
+          continue;
+
+        MessageRequestDelegate requestDelegate = CreateRequestDelegate(identity.MessageType, handlerConfiguration.HandlerMap[identity], serializerOptions);
+
+        endpoints.MapPost($"/pubsub/{busName}/{identity.DaprTopic}", requestDelegate.ExecuteAsync)
+                 .WithTopic(busName, identity.DaprTopic);
+      }
+    }
+
+    // Exposed as internal for testing purposes
+    internal static MessageRequestDelegate CreateRequestDelegate(Type messageType, Type handlerType, JsonSerializerOptions serializerOptions)
+    {
+      Type requestDelegateType = typeof(MessageRequestDelegate<>).MakeGenericType(messageType);
+
+      return (MessageRequestDelegate)Activator.CreateInstance(requestDelegateType, new object[2] { handlerType, serializerOptions })!;
+    }
+  }
+}

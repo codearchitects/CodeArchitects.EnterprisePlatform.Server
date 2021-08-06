@@ -1,0 +1,12 @@
+*.vs/
+**/[Bb]in
+**/[Oo]bj
+
+# storm
+ca-cli.error.log
+repo.lock
+coverage.opencover.xml
+.sonarqube
+.scannerwork
+.ca
+.storm_build

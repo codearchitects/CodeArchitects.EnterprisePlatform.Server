@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.Client" Version="1.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
+    <ProjectReference Include="..\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
