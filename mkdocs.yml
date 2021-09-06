@@ -1,0 +1,9 @@
+site_name: Code Architects Enterprise Solution Framework
+site_url: https://example.com/
+theme: readthedocs
+nav:
+  - Home: index.md
+  - Messaging: messaging.md
+  - Messaging with Dapr: messaging-dapr.md
+  - State management: statemanagement.md
+  - State management with Dapr: statemanagement-dapr.md
