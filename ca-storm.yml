@@ -1,0 +1,27 @@
+version: 1
+
+components:
+  # packages
+  - name: CodeArchitects.Platform.Common
+    path: src\Common
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure
+    path: src\Infrastructure
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure.Dapr
+    path: src\Infrastructure.Dapr
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore
+    path: src\Infrastructure.Dapr.AspNetCore
+    type: dotnet-package
+
+  # tests
+  - name: CodeArchitects.Platform.Common.Tests
+    path: tests\Common.Tests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests
+    path: tests\Infrastructure.Dapr.AspNetCore.Tests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.Tests
+    path: tests\Infrastructure.Dapr.Tests
+    type: dotnet-test
