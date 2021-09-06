@@ -77,12 +77,12 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Fixtures
       };
     }
 
-    public static HandlerIdentity[] ExpectedIdentities => new HandlerIdentity[]
+    internal static MessageHandlerIdentity[] ExpectedIdentities => new MessageHandlerIdentity[]
     {
-      new HandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1, FakeMessage1Handler2, FakeMessage1And2Handler
-      new HandlerIdentity(null, FakeMessage1HandlerWithTopic.TopicName, typeof(FakeMessage1)), // Handlers: FakeMessage1HandlerWithTopic
-      new HandlerIdentity(FakeMessage1HandlerWithBusAndTopic.BusName, FakeMessage1HandlerWithBusAndTopic.TopicName, typeof(FakeMessage1)), // Handlers: FakeMessage1HandlerWithBusAndTopic
-      new HandlerIdentity(null, null, typeof(FakeMessage2)), // Handlers: FakeMessage2Handler, FakeMessage1And2Handler
+      new MessageHandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1, FakeMessage1Handler2, FakeMessage1And2Handler
+      new MessageHandlerIdentity(null, FakeMessage1HandlerWithTopic.TopicName, typeof(FakeMessage1)), // Handlers: FakeMessage1HandlerWithTopic
+      new MessageHandlerIdentity(FakeMessage1HandlerWithBusAndTopic.BusName, FakeMessage1HandlerWithBusAndTopic.TopicName, typeof(FakeMessage1)), // Handlers: FakeMessage1HandlerWithBusAndTopic
+      new MessageHandlerIdentity(null, null, typeof(FakeMessage2)), // Handlers: FakeMessage2Handler, FakeMessage1And2Handler
     };
   }
 }

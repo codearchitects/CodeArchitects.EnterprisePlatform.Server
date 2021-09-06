@@ -138,12 +138,29 @@ To start configuring the Dapr infrastructure, call the `AddDaprInfrastructure` e
 
 To empower your service with publishing capabilities, chain a `AddMessageBus` call to the infrastructure configuration method. This will inject an `IServiceResolver<IMessageBus>` and an `IServiceResolver<IMessageBus<DaprMetadata>>` as singleton services. Instances of `IMessageBus` (and `IMessageBus<DaprMetadata>`) are lazily created when needed and available as singletons. Furthermore, if a default bus is configured, a default `IMessageBus` (and `IMessageBus<DaprMetadata>`) will be added to the services: this is expecially useful when only a single message broker is used in the architecture.
 
-To register handlers, use the `AddHandlers` method, specifying the assemblies where your handlers are defined. If no assemblies are defined the caller assembly will be used.
+To register handlers, use the `AddMessageHandlers` method, specifying the assemblies where your handlers are defined. If no assemblies are defined the caller assembly will be used.
 
-An example of how you can configure both publishing and subscribing is shown below.
+An example of how you can configure services for both publishing and subscribing is shown below.
 
 ```c#
-services.AddDaprInfrastructure(cfg => cfg.AddServiceOptions(Configuration))
-    .AddMessageBus()
-    .AddHandlers();
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDaprInfrastructure(cfg => cfg.AddServiceOptions(Configuration))
+        .AddMessageBus()
+        .AddMessageHandlers();
+}
 ```
+
+The last step required to allow the microservice to receive messages is exposing the endpoints that the Dapr sidecar will call to deliver them. To do so, call the `MapMessageHandlers` method inside the endpoint configuration delegate.
+
+```c#
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapMessageHandlers();
+    });
+}
+```
+
+Note that `MapMessageHandlers` requires that handlers are registered as services, so it will throw if `AddMessageHandlers` was not called in the `ConfigureServices` method.

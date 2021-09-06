@@ -15,10 +15,10 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
     public void Constructor_ShouldCreateHandlerMap_WhenAssemblyIsValid()
     {
       // Arrange
-      HandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
+      MessageHandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
 
       // Act
-      HandlerConfiguration configuration = new HandlerConfiguration(new Assembly[] { HandlerAssembly.Valid.Instance });
+      MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(new Assembly[] { HandlerAssembly.Valid.Instance });
 
       // Assert
       configuration.HandlerMap.Keys.Should().BeEquivalentTo(expectedIdentities);
@@ -46,16 +46,16 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
         {
           typeof(FakeMessage2Handler) // Identities: (null, null, typeof(FakeMessage2))
         });
-      HandlerIdentity[] expectedIdentities = new HandlerIdentity[]
+      MessageHandlerIdentity[] expectedIdentities = new MessageHandlerIdentity[]
       {
-        new HandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1
-        new HandlerIdentity(null, null, typeof(FakeMessage2)), // Handlers: FakeMessage2Handler
+        new MessageHandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1
+        new MessageHandlerIdentity(null, null, typeof(FakeMessage2)), // Handlers: FakeMessage2Handler
       };
       Type expectedHandlerForIdentity0 = typeof(FakeMessage1Handler1);
       Type expectedHandlerForIdentity1 = typeof(FakeMessage2Handler);
 
       // Act
-      HandlerConfiguration configuration = new HandlerConfiguration(new Assembly[] { assembly1Mock.Object, assembly2Mock.Object });
+      MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(new Assembly[] { assembly1Mock.Object, assembly2Mock.Object });
 
       // Assert
       configuration.HandlerMap.Keys.Should().BeEquivalentTo(expectedIdentities);
@@ -67,10 +67,10 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
     public void Constructor_ShouldThrowServiceRegistrationException_WhenAssemblyIsInvalid()
     {
       // Arrange
-      HandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
+      MessageHandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
 
       // Act
-      Func<HandlerConfiguration> act = () => new HandlerConfiguration(new Assembly[] { HandlerAssembly.Invalid.Instance });
+      Func<MessageHandlerConfiguration> act = () => new MessageHandlerConfiguration(new Assembly[] { HandlerAssembly.Invalid.Instance });
 
       // Assert
       act.Should().Throw<ServiceRegistrationException>().Which.ImplementationTypes.Should().BeEquivalentTo(HandlerAssembly.Invalid.InvalidHandlerTypes);

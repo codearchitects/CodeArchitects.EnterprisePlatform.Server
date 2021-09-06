@@ -6,12 +6,12 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
   /// <summary>
   /// The configuration of the registered handlers.
   /// </summary>
-  public interface IHandlerConfiguration
+  internal interface IMessageHandlerConfiguration
   {
     /// <summary>
-    /// Represents an association between a <see cref="HandlerIdentity"/> and the handler type that corresponds to that identity,
+    /// Represents an association between a <see cref="MessageHandlerIdentity"/> and the handler type that corresponds to that identity,
     /// that is, the type that expose a handling method on the same message, subscribed to the same bus and topic.
     /// </summary>
-    IReadOnlyDictionary<HandlerIdentity, Type> HandlerMap { get; }
+    IReadOnlyDictionary<MessageHandlerIdentity, Type> HandlerMap { get; }
   }
 }

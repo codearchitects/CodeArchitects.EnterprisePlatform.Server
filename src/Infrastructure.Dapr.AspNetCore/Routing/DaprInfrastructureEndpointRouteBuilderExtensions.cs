@@ -14,17 +14,17 @@ namespace Microsoft.AspNetCore.Builder
   public static class DaprInfrastructureEndpointRouteBuilderExtensions
   {
     /// <summary>
-    /// Adds endpoints for the handlers configured with <see cref="DaprInfrastructureBuilderExtensions.AddHandlers"/>. 
+    /// Adds endpoints for the handlers configured with <see cref="DaprInfrastructureBuilderExtensions.AddMessageHandlers"/>. 
     /// </summary>
     /// <param name="endpoints">The endpoint builder</param>
-    public static void MapHandlers(this IEndpointRouteBuilder endpoints)
+    public static void MapMessageHandlers(this IEndpointRouteBuilder endpoints)
     {
       if (endpoints is null) throw new ArgumentNullException(nameof(endpoints));
 
-      IHandlerConfiguration? handlerConfiguration = endpoints.ServiceProvider.GetService<IHandlerConfiguration>();
+      IMessageHandlerConfiguration? handlerConfiguration = endpoints.ServiceProvider.GetService<IMessageHandlerConfiguration>();
       if (handlerConfiguration is null)
       {
-        throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddHandlers)} to the Dapr infrastructure builder.");
+        throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddMessageHandlers)} to the Dapr infrastructure builder.");
       }
 
       endpoints.MapSubscribeHandler();
@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.Builder
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
       };
 
-      foreach (HandlerIdentity identity in handlerConfiguration.HandlerMap.Keys)
+      foreach (MessageHandlerIdentity identity in handlerConfiguration.HandlerMap.Keys)
       {
         string? busName = identity.BusName ?? defaultBus;
         if (busName is null) // TODO: Log warning

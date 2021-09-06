@@ -45,14 +45,14 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <param name="builder">The builder instance.</param>
     /// <param name="assemblies">The assemblies to scan for handlers. If empty, the calling assembly will be used.</param>
     /// <returns>The same builder.</returns>
-    public static IDaprInfrastructureBuilder AddHandlers(this IDaprInfrastructureBuilder builder, params Assembly[] assemblies)
+    public static IDaprInfrastructureBuilder AddMessageHandlers(this IDaprInfrastructureBuilder builder, params Assembly[] assemblies)
     {
       if (assemblies.Length == 0)
       {
         assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
       }
-      HandlerConfiguration configuration = new HandlerConfiguration(assemblies.Distinct());
-      builder.Services.AddSingleton<IHandlerConfiguration>(configuration);
+      MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(assemblies.Distinct());
+      builder.Services.AddSingleton<IMessageHandlerConfiguration>(configuration);
 
       foreach (Type handlerImplementationType in configuration.HandlerMap.Values)
       {

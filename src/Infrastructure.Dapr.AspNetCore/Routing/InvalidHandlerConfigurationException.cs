@@ -5,7 +5,7 @@ using System;
 namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
 {
   /// <summary>
-  /// Exception that is thrown when the <see cref="IHandlerConfiguration"/> is invalid.
+  /// Exception that is thrown when the <see cref="IMessageHandlerConfiguration"/> is invalid.
   /// </summary>
   public class InvalidHandlerConfigurationException : Exception
   {

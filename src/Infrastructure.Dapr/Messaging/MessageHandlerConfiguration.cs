@@ -9,25 +9,25 @@ using System.Reflection;
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
 {
   /// <summary>
-  /// Implementation of <see cref="IHandlerConfiguration"/>.
+  /// Implementation of <see cref="IMessageHandlerConfiguration"/>.
   /// </summary>
-  public class HandlerConfiguration : IHandlerConfiguration
+  internal class MessageHandlerConfiguration : IMessageHandlerConfiguration
   {
-    private readonly Dictionary<HandlerIdentity, Type> _handlerMap;
+    private readonly Dictionary<MessageHandlerIdentity, Type> _handlerMap;
 
     /// <summary>
-    /// Creates an instance of <see cref="HandlerConfiguration"/>.
+    /// Creates an instance of <see cref="MessageHandlerConfiguration"/>.
     /// Scans the given assemblies for <see cref="IMessageHandler{TMessage}"/> implementations.
     /// </summary>
     /// <param name="assemblies">The assemblies to scan for handler types.</param>
-    public HandlerConfiguration(IEnumerable<Assembly> assemblies)
+    public MessageHandlerConfiguration(IEnumerable<Assembly> assemblies)
     {
       _handlerMap = CreateHandlerMap(assemblies);
     }
 
-    public IReadOnlyDictionary<HandlerIdentity, Type> HandlerMap => _handlerMap;
+    public IReadOnlyDictionary<MessageHandlerIdentity, Type> HandlerMap => _handlerMap;
 
-    private static Dictionary<HandlerIdentity, Type> CreateHandlerMap(IEnumerable<Assembly> assemblies)
+    private static Dictionary<MessageHandlerIdentity, Type> CreateHandlerMap(IEnumerable<Assembly> assemblies)
     {
       IEnumerable<Type> handlerConcreteTypes = assemblies
         .SelectMany(x => x.GetTypes())
@@ -36,7 +36,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
           !x.IsAbstract &&
           x.ImplementsGenericInterface(typeof(IMessageHandler<>)));
 
-      IEnumerable<IGrouping<HandlerIdentity, Type>> identityMap = handlerConcreteTypes
+      IEnumerable<IGrouping<MessageHandlerIdentity, Type>> identityMap = handlerConcreteTypes
         .SelectMany(concreteType => concreteType
           .GetHandlerIdentities()
           .Select(identity => (identity, concreteType)))
@@ -56,10 +56,10 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
 
   internal static class TypeExtensions
   {
-    public static IEnumerable<HandlerIdentity> GetHandlerIdentities(this Type concreteType)
+    public static IEnumerable<MessageHandlerIdentity> GetHandlerIdentities(this Type concreteType)
     {
       return concreteType.GetGenericInterfaces(typeof(IMessageHandler<>))
-        .Select(interfaceType => new HandlerIdentity(
+        .Select(interfaceType => new MessageHandlerIdentity(
           busName:     concreteType.GetCustomAttribute<SubscribeToBusAttribute>()?.BusName,
           topic:       concreteType.GetCustomAttribute<SubscribeToTopicAttribute>()?.Topic,
           messageType: interfaceType.GetGenericArguments()[0]

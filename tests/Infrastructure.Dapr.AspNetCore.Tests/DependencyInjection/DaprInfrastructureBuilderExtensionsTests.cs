@@ -141,11 +141,11 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Dependenc
       DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services);
 
       // Act
-      sut.AddHandlers(HandlerAssembly.Valid.Instance);
+      sut.AddMessageHandlers(HandlerAssembly.Valid.Instance);
 
       // Assert
       IServiceCollection services = sut.Services;
-      services.Where(x => x.ServiceType == typeof(IHandlerConfiguration)).Should()
+      services.Where(x => x.ServiceType == typeof(IMessageHandlerConfiguration)).Should()
         .HaveCount(1).And
         .ContainSingle(x => x.Lifetime == ServiceLifetime.Singleton);
     }
@@ -157,7 +157,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Dependenc
       DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services);
 
       // Act
-      sut.AddHandlers(HandlerAssembly.Valid.Instance);
+      sut.AddMessageHandlers(HandlerAssembly.Valid.Instance);
 
       // Assert
       IServiceCollection services = sut.Services;
