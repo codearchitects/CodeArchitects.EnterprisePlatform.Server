@@ -43,19 +43,11 @@ namespace Microsoft.AspNetCore.Builder
         if (busName is null) // TODO: Log warning
           continue;
 
-        MessageRequestDelegate requestDelegate = CreateRequestDelegate(identity.MessageType, handlerConfiguration.HandlerMap[identity], serializerOptions);
+        MessageRequestDelegate requestDelegate = MessageRequestDelegate.Create(identity.MessageType, handlerConfiguration.HandlerMap[identity], serializerOptions);
 
         endpoints.MapPost($"/pubsub/{busName}/{identity.DaprTopic}", requestDelegate.ExecuteAsync)
                  .WithTopic(busName, identity.DaprTopic);
       }
-    }
-
-    // Exposed as internal for testing purposes
-    internal static MessageRequestDelegate CreateRequestDelegate(Type messageType, Type handlerType, JsonSerializerOptions serializerOptions)
-    {
-      Type requestDelegateType = typeof(MessageRequestDelegate<>).MakeGenericType(messageType);
-
-      return (MessageRequestDelegate)Activator.CreateInstance(requestDelegateType, new object[2] { handlerType, serializerOptions })!;
     }
   }
 }

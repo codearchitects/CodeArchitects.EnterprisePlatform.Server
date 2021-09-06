@@ -16,7 +16,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
     /// </summary>
     /// <param name="handlerImplementationType">The type of the handler that will handle the received message.</param>
     /// <param name="serializerOptions">The serializer options.</param>
-    public MessageRequestDelegate(Type handlerImplementationType, JsonSerializerOptions serializerOptions)
+    protected MessageRequestDelegate(Type handlerImplementationType, JsonSerializerOptions serializerOptions)
     {
       if (!handlerImplementationType.IsAssignableTo(HandlerType))
         throw new InvalidHandlerConfigurationException(HandlerType, handlerImplementationType);
@@ -46,5 +46,19 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
     /// The specific <see cref="IMessageHandler{TMessage}"/> type.
     /// </summary>
     protected abstract Type HandlerType { get; }
+
+    /// <summary>
+    /// Creates an instance of <see cref="MessageRequestDelegate"/> that receives messages of the provided type.
+    /// </summary>
+    /// <param name="messageType">The type of the messages to handle by the delegate.</param>
+    /// <param name="handlerType">The message handler type.</param>
+    /// <param name="serializerOptions">The json serialization options.</param>
+    /// <returns></returns>
+    public static MessageRequestDelegate Create(Type messageType, Type handlerType, JsonSerializerOptions serializerOptions)
+    {
+      Type requestDelegateType = typeof(MessageRequestDelegate<>).MakeGenericType(messageType);
+
+      return (MessageRequestDelegate)Activator.CreateInstance(requestDelegateType, new object[2] { handlerType, serializerOptions })!;
+    }
   }
 }

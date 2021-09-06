@@ -20,5 +20,19 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Routing
       // Assert
       act.Should().ThrowExactly<InvalidHandlerConfigurationException>().Which.HandlerImplementationType.Should().Be(typeof(FakeMessage2Handler));
     }
+
+    [Fact]
+    public void Create_ShouldCreateMessageRequestDelegateOfTMessage()
+    {
+      // Arrange
+      Type messageType = typeof(FakeMessage1);
+      Type handlerType = typeof(FakeMessage1Handler1);
+
+      // Act
+      MessageRequestDelegate requestDelegate = MessageRequestDelegate.Create(messageType, handlerType, new JsonSerializerOptions());
+
+      // Assert
+      requestDelegate.Should().NotBeNull().And.BeOfType(typeof(MessageRequestDelegate<>).MakeGenericType(messageType));
+    }
   }
 }
