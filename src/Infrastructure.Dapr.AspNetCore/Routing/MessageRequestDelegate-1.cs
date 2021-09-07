@@ -19,8 +19,6 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
   internal sealed class MessageRequestDelegate<TMessage> : MessageRequestDelegate
     where TMessage : class
   {
-    private static readonly Type _handlerType = typeof(IMessageHandler<TMessage>);
-
     /// <summary>
     /// Creates an instance of <see cref="MessageRequestDelegate{TMessage}"/>.
     /// </summary>
@@ -31,7 +29,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
     {
     }
 
-    protected override Type HandlerType => _handlerType;
+    protected override Type HandlerType => typeof(IMessageHandler<TMessage>);
 
     public override async Task ExecuteAsync(HttpContext context)
     {
