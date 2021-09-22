@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Infrastructure.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Fixtures
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
 {
   public class FakeMessage1Handler1 : IMessageHandler<FakeMessage1>
   {

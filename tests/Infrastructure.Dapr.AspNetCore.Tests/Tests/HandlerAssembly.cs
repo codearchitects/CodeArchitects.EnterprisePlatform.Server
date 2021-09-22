@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Fixtures
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests
 {
   public static class HandlerAssembly
   {

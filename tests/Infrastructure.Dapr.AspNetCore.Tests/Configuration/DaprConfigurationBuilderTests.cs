@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using FluentAssertions;
@@ -11,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Configuration
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration
 {
   public class DaprConfigurationBuilderTests
   {

@@ -1,11 +1,10 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Fixtures;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests;
 using FluentAssertions;
 using System;
 using System.Text.Json;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Routing
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
 {
   public class MessageRequestDelegateTests
   {
