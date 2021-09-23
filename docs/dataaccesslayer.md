@@ -6,7 +6,7 @@ Repositories are classes or components that encapsulate the logic required to ac
 
 The CodeArchitects.Platform.Data package provides the interfaces that define the repository pattern. Let's have a look at the `IRepository` interface.
 
-First, we demand all entities being accessed via the repository to implement the `IEntity<TKey>` interface.
+First, we demand all entities being accessed via the repository to implement the `IEntity<TKey>` interface:
 
 ```c#
 public interface IEntity
@@ -21,7 +21,7 @@ public interface IEntity<TKey> : IEntity
 }
 ```
 
-The repository interface is the following.
+The repository interface is the following:
 
 ```c#
 public interface IRepository<TEntity, TKey>
@@ -41,13 +41,13 @@ The current implementation of this interface uses Entity Framework Core. You can
 
 ## The generic repository pattern
 
-The pattern we advice to implement is the generic repository pattern. To implement it, define a specialized repository interface for your entities, which will inherit from the generic interface. This specialized repository will define specific queries for its entity. Then do the same for the concrete implementation.
+The pattern we suggest to implement is the generic repository pattern. To implement it, define a specialized repository interface for your entities, which will inherit from the generic interface. This specialized repository will define specific queries for its entity. Then do the same for the concrete implementation.
 
 ![Generic repository](images/genericrepository.png)
 
 ### Example
 
-Suppose we have a `Product` entity.
+Suppose we have a `Product` entity:
 
 ```c#
 public class Product : IEntity<Guid>
@@ -60,7 +60,7 @@ public class Product : IEntity<Guid>
 }
 ```
 
-Its repository will expose a method to retrieve the top 10 selling products.
+Its repository will expose a method to retrieve the top 10 selling products:
 
 ```c#
 public interface IProductRepository : IRepository<Product, Guid>
@@ -69,7 +69,7 @@ public interface IProductRepository : IRepository<Product, Guid>
 }
 ```
 
-Then we can implement the specic concrete repository and have the basic methods already implemented.
+Then we can implement the specific concrete repository and have the basic methods already implemented:
 
 ```c#
 public class ProductRepository : Repository<Product, Guid>, IProductRepository
