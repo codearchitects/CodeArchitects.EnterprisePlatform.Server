@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -67,79 +65,42 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
     public virtual void Add(TEntity entity)
     {
-      _context.ChangeTracker.TrackGraph(entity, _context, node =>
+      _context.ChangeTracker.TrackGraph<object?>(entity, null, node =>
       {
-        if (node.Entry.State != EntityState.Detached)
+        if (node.Entry.State != EntityState.Detached || node.InboundNavigation is SkipNavigation navigation)
         {
           return false;
         }
-        if (!ReferenceEquals(node.Entry.Entity, entity) && node.InboundNavigation is SkipNavigation navigation)
-        {
-
-        }
 
         node.Entry.State = EntityState.Added;
-
         return true;
       });
     }
 
     public virtual void Update(TEntity entity)
     {
-      _context.ChangeTracker.TrackGraph(entity, _context, node =>
+      _context.ChangeTracker.TrackGraph<object?>(entity, null, node =>
       {
         if (node.Entry.State != EntityState.Detached)
         {
           return false;
         }
-        bool isRoot = ReferenceEquals(node.Entry.Entity, entity);
-        if (!isRoot && node.InboundNavigation is SkipNavigation navigation)
+        if (ReferenceEquals(node.Entry.Entity, entity))
         {
-          DbSet<Dictionary<string, object>> joinSet = node.NodeState.Set<Dictionary<string, object>>(navigation.JoinEntityType.Name);
-          string? entityForeignKeyName = null;
-          string? sourceEntityForeignKeyName = null;
-          object entityId = ((IEntity)node.Entry.Entity).Id;
-          object sourceEntityId = ((IEntity)node.SourceEntry.Entity).Id;
+          node.Entry.State = EntityState.Modified;
+          return true;
+        }
 
-          foreach (ForeignKey foreignKey in navigation.JoinEntityType.GetForeignKeys())
-          {
-            if (foreignKey.PrincipalEntityType.ClrType == node.SourceEntry.Metadata.ClrType)
-            {
-              sourceEntityForeignKeyName = foreignKey.Properties[0].Name;
-            }
-            else if (foreignKey.PrincipalEntityType.ClrType == node.Entry.Metadata.ClrType)
-            {
-              entityForeignKeyName = foreignKey.Properties[0].Name;
-            }
-          }
-          HashSet<object> existingIds = joinSet
-            .Where(x => x[sourceEntityForeignKeyName] == sourceEntityId)
-            .Select(x => x[entityForeignKeyName])
-            .ToHashSet();
-
-          if (!existingIds.Contains(entityId))
-          {
-            joinSet.Add(new Dictionary<string, object>
-            {
-              [entityForeignKeyName] = entityId,
-              [sourceEntityForeignKeyName] = sourceEntityId
-            });
-          }
-          node.Entry.State = EntityState.Unchanged;
-
+        if (node.InboundNavigation is SkipNavigation)
+        {
           return false;
         }
-        else
-        {
-          if (isRoot || node.NodeState.Find(node.Entry.Metadata.ClrType, ((IEntity)node.Entry.Entity).Id) is not null)
-          {
-            node.Entry.State = EntityState.Modified;
-          }
-          else
-          {
-            node.Entry.State = EntityState.Added;
-          }
-        }
+
+        object id = ((IEntity)node.Entry.Entity).Id;
+
+        node.Entry.State = id is null || Guid.Empty.Equals(id) || id is default(int) || id is default(long) || id is default(short)
+          ? EntityState.Added
+          : EntityState.Modified;
 
         return true;
       });
