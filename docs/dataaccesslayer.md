@@ -14,7 +14,7 @@ public interface IEntity
     object Id { get; }
 }
 
-public interface IEntity<TKey>
+public interface IEntity<TKey> : IEntity
     where TKey : IEquatable<TKey>
 {
     new TKey Id { get; }
@@ -55,6 +55,8 @@ public class Product : IEntity<Guid>
     public Guid Id { get; set; }
     public decimal Price { get; set; }
     public int SaleCount { get; set; }
+
+    object IEntity.Id => Id;
 }
 ```
 
