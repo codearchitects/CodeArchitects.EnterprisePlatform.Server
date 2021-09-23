@@ -43,6 +43,8 @@ The current implementation of this interface uses Entity Framework Core. You can
 
 The pattern we advice to implement is the generic repository pattern. To implement it, define a specialized repository interface for your entities, which will inherit from the generic interface. This specialized repository will define specific queries for its entity. Then do the same for the concrete implementation.
 
+![Generic repository](images/genericrepository.png)
+
 ### Example
 
 Suppose we have a `Product` entity.
@@ -61,7 +63,7 @@ Its repository will expose a method to retrieve the top 10 selling products.
 ```c#
 public interface IProductRepository : IRepository<Product, Guid>
 {
-    Task<IEnumerable<Product>> GetTopSellingProductsAsync();
+    IEnumerable<Product> GetTopSellingProducts();
 }
 ```
 
@@ -70,7 +72,7 @@ Then we can implement the specic concrete repository and have the basic methods 
 ```c#
 public class ProductRepository : Repository<Product, Guid>, IProductRepository
 {
-    public Task<IEnumerable<Product>> GetTopSellingProductsAsync()
+    public IEnumerable<Product> GetTopSellingProducts()
     {
         return Query()
             .OrderBy(x => x.SaleCount)
