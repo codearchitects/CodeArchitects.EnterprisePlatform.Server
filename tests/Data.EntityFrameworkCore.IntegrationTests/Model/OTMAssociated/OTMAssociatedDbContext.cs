@@ -20,7 +20,9 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMAssociated
       {
         entity
           .HasMany(x => x.Secondaries)
-          .WithOne(x => x.Primary);
+          .WithOne(x => x.Primary)
+          .IsRequired(false)
+          .OnDelete(DeleteBehavior.SetNull);
       });
       modelBuilder.Entity<Secondary>();
     }

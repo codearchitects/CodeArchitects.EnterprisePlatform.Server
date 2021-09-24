@@ -2,6 +2,6 @@
 {
   public abstract class DataSeed
   {
-    public abstract void Init(ISeeder seeder);
+    public abstract void Seed(ISeeder seeder);
   }
 }

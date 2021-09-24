@@ -12,6 +12,8 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
     public static void Seed<TDataSeed>(this IServiceScope scope)
       where TDataSeed : DataSeed
     {
+      if (scope is null) throw new ArgumentNullException(nameof(scope));
+
       IServiceProvider services = scope.ServiceProvider;
 
       Type contextType =
@@ -20,20 +22,26 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
         typeof(DbContext);
 
       DbContext context = (DbContext)services.GetRequiredService(contextType);
-      Seeder seeder = new Seeder(context);
-      TDataSeed dataSeed = CreationHelpers.CreateFromServices<TDataSeed>(services);
-
-      dataSeed.Init(seeder);
-      context.SaveChanges();
+      
+      SeedCore<TDataSeed>(context, services);
     }
 
     public static void Seed<TDataSeed>(this DbContext context, IServiceProvider services)
       where TDataSeed : DataSeed
     {
+      if (context is null) throw new ArgumentNullException(nameof(context));
+      if (services is null) throw new ArgumentNullException(nameof(services));
+
+      SeedCore<TDataSeed>(context, services);
+    }
+
+    private static void SeedCore<TDataSeed>(DbContext context, IServiceProvider services)
+      where TDataSeed : DataSeed
+    {
       Seeder seeder = new Seeder(context);
       TDataSeed dataSeed = CreationHelpers.CreateFromServices<TDataSeed>(services);
 
-      dataSeed.Init(seeder);
+      dataSeed.Seed(seeder);
       context.SaveChanges();
     }
   }

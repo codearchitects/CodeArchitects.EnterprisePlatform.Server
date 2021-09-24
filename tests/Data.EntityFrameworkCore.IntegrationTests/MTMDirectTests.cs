@@ -2,7 +2,6 @@
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Utils;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using Xunit;
 using Xunit.Abstractions;

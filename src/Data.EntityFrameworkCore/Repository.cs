@@ -9,29 +9,15 @@ using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 {
-  public class Repository<TEntity, TKey> : IIncludeableRepository<TEntity, TKey>
+  public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
     where TKey : IEquatable<TKey>
   {
     private readonly DbContext _context;
-    private readonly IQueryable<TEntity>? _queryable;
-
-    private Repository(DbContext context, DbSet<TEntity> entities, Expression<Func<TEntity, object?>>[] paths)
-    {
-      _context = context;
-      Entities = entities;
-      IQueryable<TEntity> queryable = entities;
-      foreach (Expression<Func<TEntity, object?>> path in paths)
-      {
-        queryable = queryable.Include(path);
-      }
-      _queryable = queryable;
-    }
 
     public Repository(DbContext context)
+      : this(context, context.Set<TEntity>())
     {
-      _context = context;
-      Entities = context.Set<TEntity>();
     }
 
     public Repository(DbContext context, DbSet<TEntity> entities)
@@ -42,35 +28,38 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
     protected DbSet<TEntity> Entities { get; }
 
-    public IRepository<TEntity, TKey> Include(params Expression<Func<TEntity, object?>>[] paths)
+    public IQueryable<TEntity> Query(params Expression<Func<TEntity, object?>>[] paths)
     {
-      return new Repository<TEntity, TKey>(_context, Entities, paths); // TODO: Considerare object pooling
+      IQueryable<TEntity> result = Entities;
+      foreach (Expression<Func<TEntity, object?>> include in paths)
+      {
+        result = result.Include(include);
+      }
+      return result;
     }
 
-    public IQueryable<TEntity> Query()
+    public virtual TEntity? Find(TKey id, params Expression<Func<TEntity, object?>>[] paths)
     {
-      return _queryable ?? Entities;
+      return paths.Length == 0
+        ? Entities.Find(new object[] { id })
+        : Query(paths).FirstOrDefault(x => x.Id.Equals(id));
     }
 
-    public TEntity? Find(TKey id)
+    public virtual ValueTask<TEntity?> FindAsync(TKey id, Expression<Func<TEntity, object?>>[]? paths = null, CancellationToken cancellationToken = default)
     {
-      return _queryable is null ? Entities.Find(id) : _queryable.SingleOrDefault(x => x.Id.Equals(id));
-    }
-
-    public ValueTask<TEntity?> FindAsync(TKey id, CancellationToken cancellationToken = default)
-    {
-      return (_queryable is null
+      return (paths is null || paths.Length == 0
         ? Entities.FindAsync(new object[] { id }, cancellationToken)
-        : new ValueTask<TEntity>(_queryable.SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken)))!;
+        : new ValueTask<TEntity>(Query(paths).FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken)))!;
     }
 
     public virtual void Add(TEntity entity)
     {
+      // TODO: Add ObjectState support
       _context.ChangeTracker.TrackGraph(entity, entity, HandleNodeOnAdd);
 
       static bool HandleNodeOnAdd(EntityEntryGraphNode<TEntity> node)
       {
-        if (node.Entry.State != EntityState.Detached || node.InboundNavigation is SkipNavigation)
+        if (node.Entry.State != EntityState.Detached || node.InboundNavigation is SkipNavigation || node.InboundNavigation is Navigation navigation && navigation.IsOnDependent)
         {
           return false;
         }
@@ -82,6 +71,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
     public virtual void Update(TEntity entity)
     {
+      // TODO: Add ObjectState support
       _context.ChangeTracker.TrackGraph(entity, entity, HandleNodeOnUpdate);
 
       static bool HandleNodeOnUpdate(EntityEntryGraphNode<TEntity> node)
@@ -96,7 +86,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
           return true;
         }
 
-        if (node.InboundNavigation is SkipNavigation)
+        if (node.InboundNavigation is SkipNavigation || node.InboundNavigation is Navigation navigation && navigation.IsOnDependent)
         {
           return false;
         }
@@ -104,7 +94,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
         if (node.Entry.Entity is IEntity entity)
         {
           object id = entity.Id;
-          bool added =
+          bool added = // TODO: Temporary solution
              id is null                                  ||
             (id is Guid  guid   && guid   == Guid.Empty) ||
             (id is int   @int   && @int   == default)    ||
@@ -113,11 +103,6 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
           node.Entry.State = added ? EntityState.Added : EntityState.Modified;
           return true;
-        }
-        else if (node.Entry.Entity is IAssociation)
-        {
-          node.Entry.State = EntityState.Added;
-          return false;
         }
         else
         {
