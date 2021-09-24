@@ -1,13 +1,12 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using CodeArchitects.Platform.Infrastructure.Dapr.Tests.Fixtures;
+using CodeArchitects.Platform.Infrastructure.Dapr.Tests;
 using FluentAssertions;
 using Moq;
 using System;
 using System.Reflection;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
 {
   public class HandlerConfigurationTests
   {

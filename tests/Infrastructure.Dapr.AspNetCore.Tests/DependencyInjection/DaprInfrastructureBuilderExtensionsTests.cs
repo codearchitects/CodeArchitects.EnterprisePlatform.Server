@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.Fixtures;
+using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests;
 using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Messaging;
@@ -12,7 +11,7 @@ using System;
 using System.Linq;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.DependencyInjection
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection
 {
   public class DaprInfrastructureBuilderExtensionsTests
   {

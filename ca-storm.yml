@@ -5,6 +5,12 @@ components:
   - name: CodeArchitects.Platform.Common
     path: src\Common
     type: dotnet-package
+  - name: CodeArchitects.Platform.Data
+    path: src\Data
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore
+    path: src\Data.EntityFrameworkCore
+    type: dotnet-package
   - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
     type: dotnet-package
@@ -25,3 +31,4 @@ components:
   - name: CodeArchitects.Platform.Infrastructure.Dapr.Tests
     path: tests\Infrastructure.Dapr.Tests
     type: dotnet-test
+  # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)

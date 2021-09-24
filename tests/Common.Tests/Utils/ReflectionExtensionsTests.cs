@@ -1,10 +1,8 @@
-﻿using CodeArchitects.Platform.Common.Utils;
-using FluentAssertions;
-using Moq;
+﻿using FluentAssertions;
 using System;
 using Xunit;
 
-namespace CodeArchitects.Platform.Common.Tests.Utils
+namespace CodeArchitects.Platform.Common.Utils
 {
   public class ReflectionExtensionsTests
   {

@@ -1,11 +1,10 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using CodeArchitects.Platform.Infrastructure.Messaging;
+﻿using CodeArchitects.Platform.Infrastructure.Messaging;
 using Dapr.Client;
 using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
 {
   public class DaprMessageBusResolverTests
   {

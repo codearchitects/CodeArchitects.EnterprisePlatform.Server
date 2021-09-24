@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using CodeArchitects.Platform.Infrastructure.Dapr.Tests.Fixtures;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.Tests;
 using Dapr.Client;
 using Moq;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.Messaging
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
 {
   public class DaprMessageBusTests
   {

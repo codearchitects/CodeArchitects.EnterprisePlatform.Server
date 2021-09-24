@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+
+    <RootNamespace>CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

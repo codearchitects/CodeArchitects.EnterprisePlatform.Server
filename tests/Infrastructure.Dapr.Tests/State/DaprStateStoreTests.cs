@@ -1,11 +1,10 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.State;
-using Dapr.Client;
+﻿using Dapr.Client;
 using Moq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests.State
+namespace CodeArchitects.Platform.Infrastructure.Dapr.State
 {
   public class DaprStateStoreTests
   {
