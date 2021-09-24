@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMNonOwned;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMAssociated;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Utils;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +8,17 @@ using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 {
-  public class OTMNonOwnedTests : EFCoreIntegrationTest<OTMNonOwnedDbContext>
+  public class OTMAssociatedTests : EFCoreIntegrationTest<OTMAssociatedDbContext>
   {
     private readonly Repository<Primary, Guid> _sut;
 
-    public OTMNonOwnedTests(ITestOutputHelper output)
+    public OTMAssociatedTests(ITestOutputHelper output)
       : base(output)
     {
       _sut = new Repository<Primary, Guid>(Context, Context.Primaries);
     }
 
-    protected override OTMNonOwnedDbContext CreateContext(DbContextOptions<OTMNonOwnedDbContext> options) => new OTMNonOwnedDbContext(options);
+    protected override OTMAssociatedDbContext CreateContext(DbContextOptions<OTMAssociatedDbContext> options) => new OTMAssociatedDbContext(options);
 
     [Theory]
     [InlineData(true)]

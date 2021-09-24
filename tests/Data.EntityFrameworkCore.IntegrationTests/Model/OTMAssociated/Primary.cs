@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTM
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMAssociated
 {
   public class Primary : Entity
   {

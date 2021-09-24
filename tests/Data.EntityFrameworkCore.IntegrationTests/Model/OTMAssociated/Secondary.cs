@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTONonOwned
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMAssociated
 {
   public class Secondary : Entity
   {

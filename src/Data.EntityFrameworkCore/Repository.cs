@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Linq;
@@ -65,27 +66,31 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
     public virtual void Add(TEntity entity)
     {
-      _context.ChangeTracker.TrackGraph<object?>(entity, null, node =>
+      _context.ChangeTracker.TrackGraph(entity, entity, HandleNodeOnAdd);
+
+      static bool HandleNodeOnAdd(EntityEntryGraphNode<TEntity> node)
       {
-        if (node.Entry.State != EntityState.Detached || node.InboundNavigation is SkipNavigation navigation)
+        if (node.Entry.State != EntityState.Detached || node.InboundNavigation is SkipNavigation)
         {
           return false;
         }
 
         node.Entry.State = EntityState.Added;
         return true;
-      });
+      }
     }
 
     public virtual void Update(TEntity entity)
     {
-      _context.ChangeTracker.TrackGraph<object?>(entity, null, node =>
+      _context.ChangeTracker.TrackGraph(entity, entity, HandleNodeOnUpdate);
+
+      static bool HandleNodeOnUpdate(EntityEntryGraphNode<TEntity> node)
       {
         if (node.Entry.State != EntityState.Detached)
         {
           return false;
         }
-        if (ReferenceEquals(node.Entry.Entity, entity))
+        if (ReferenceEquals(node.Entry.Entity, node.NodeState))
         {
           node.Entry.State = EntityState.Modified;
           return true;
@@ -96,14 +101,29 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
           return false;
         }
 
-        object id = ((IEntity)node.Entry.Entity).Id;
+        if (node.Entry.Entity is IEntity entity)
+        {
+          object id = entity.Id;
+          bool added =
+             id is null                                  ||
+            (id is Guid  guid   && guid   == Guid.Empty) ||
+            (id is int   @int   && @int   == default)    ||
+            (id is long  @long  && @long  == default)    ||
+            (id is short @short && @short == default);
 
-        node.Entry.State = id is null || Guid.Empty.Equals(id) || id is default(int) || id is default(long) || id is default(short)
-          ? EntityState.Added
-          : EntityState.Modified;
-
-        return true;
-      });
+          node.Entry.State = added ? EntityState.Added : EntityState.Modified;
+          return true;
+        }
+        else if (node.Entry.Entity is IAssociation)
+        {
+          node.Entry.State = EntityState.Added;
+          return false;
+        }
+        else
+        {
+          return false;
+        }
+      }
     }
 
     public virtual void Delete(TEntity entity)

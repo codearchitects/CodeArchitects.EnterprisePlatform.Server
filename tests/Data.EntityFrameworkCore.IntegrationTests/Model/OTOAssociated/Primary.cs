@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTONonOwned
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTOAssociated
 {
   public class Primary : Entity
   {

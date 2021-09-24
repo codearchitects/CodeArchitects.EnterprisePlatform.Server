@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTONonOwned;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTOOwned;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Utils;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +8,17 @@ using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 {
-  public class OTONonOwnedTests : EFCoreIntegrationTest<OTONonOwnedDbContext>
+  public class OTOOwnedTests : EFCoreIntegrationTest<OTOOwnedDbContext>
   {
     private readonly Repository<Primary, Guid> _sut;
 
-    public OTONonOwnedTests(ITestOutputHelper output)
+    public OTOOwnedTests(ITestOutputHelper output)
       : base(output)
     {
       _sut = new Repository<Primary, Guid>(Context, Context.Primaries);
     }
 
-    protected override OTONonOwnedDbContext CreateContext(DbContextOptions<OTONonOwnedDbContext> options) => new OTONonOwnedDbContext(options);
+    protected override OTOOwnedDbContext CreateContext(DbContextOptions<OTOOwnedDbContext> options) => new OTOOwnedDbContext(options);
 
     [Theory]
     [InlineData(true)]
@@ -45,7 +45,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void Add_ShouldAddPrimaryAndCreateRelationship_WhenSecondaryIsNotNull(bool hasId)
+    public void Add_ShouldAddPrimaryAndSecondary_WhenSecondaryIsNotNull(bool hasId)
     {
       // Arrange
       Secondary secondary0 = new Secondary
@@ -53,25 +53,18 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
         Id = hasId ? Guid.NewGuid() : Guid.Empty,
         Name = "Secondary0"
       };
-      Context.Add(secondary0);
-      Context.SaveChangesAndClearTracking();
-      Guid secondary0Id = secondary0.Id;
-
-      Secondary secondary0Disconnected = new Secondary
-      {
-        Id = secondary0Id
-      };
       Primary primary0 = new Primary
       {
         Id = hasId ? Guid.NewGuid() : Guid.Empty,
         Name = "Primary0",
-        Secondary = secondary0Disconnected
+        Secondary = secondary0
       };
 
       // Act
       _sut.Add(primary0);
       Context.SaveChangesAndClearTracking();
       Guid primary0Id = primary0.Id;
+      Guid secondary0Id = secondary0.Id;
 
       // Assert
       Context.Primaries.Include(x => x.Secondary).Should().HaveCount(1)
@@ -115,7 +108,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
     }
 
     [Fact]
-    public void Update_ShouldUpdatePrimaryAndIgnoreSecondary_WhenSecondaryHasExistingId()
+    public void Update_ShouldUpdatePrimaryAndSecondary_WhenSecondaryHasExistingId()
     {
       // Arrange
       Secondary secondary0 = new Secondary
@@ -151,11 +144,11 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
       // Assert
       Context.Primaries.Include(x => x.Secondary).Should().HaveCount(1)
         .And.ContainSingle(x => x.Id == primary0Id && x.Name == "Updated Primary0")
-        .Which.Secondary!.Should().Match<Secondary>(x => x.Id == secondary0Id && x.Name == "Secondary0");
+        .Which.Secondary!.Should().Match<Secondary>(x => x.Id == secondary0Id && x.Name == "Updated Secondary0");
     }
 
     [Fact]
-    public void Delete_ShouldDeletePrimaryOnly()
+    public void Delete_ShouldDeletePrimaryAndSecondary()
     {
       // Arrange
       Secondary secondary0 = new Secondary
@@ -170,7 +163,6 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
       Context.Add(primary0);
       Context.SaveChangesAndClearTracking();
       Guid primary0Id = primary0.Id;
-      Guid secondary0Id = secondary0.Id;
 
       Primary disconnectedPrimary0 = new Primary
       {
@@ -183,7 +175,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
       // Assert
       Context.Primaries.Should().BeEmpty();
-      Context.Secondaries.Should().HaveCount(1).And.ContainSingle(x => x.Id == secondary0Id);
+      Context.Secondaries.Should().BeEmpty();
     }
   }
 }

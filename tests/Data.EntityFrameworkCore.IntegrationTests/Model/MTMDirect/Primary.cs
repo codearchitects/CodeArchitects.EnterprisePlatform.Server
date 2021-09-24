@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMNonOwned
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMDirect
 {
   public class Primary : Entity
   {

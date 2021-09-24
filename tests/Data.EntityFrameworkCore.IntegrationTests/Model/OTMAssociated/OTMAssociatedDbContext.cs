@@ -2,11 +2,11 @@
 
 #nullable disable
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMNonOwned
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMAssociated
 {
-  public class OTMNonOwnedDbContext : DbContext
+  public class OTMAssociatedDbContext : DbContext
   {
-    public OTMNonOwnedDbContext(DbContextOptions<OTMNonOwnedDbContext> options)
+    public OTMAssociatedDbContext(DbContextOptions<OTMAssociatedDbContext> options)
       : base(options)
     {
     }

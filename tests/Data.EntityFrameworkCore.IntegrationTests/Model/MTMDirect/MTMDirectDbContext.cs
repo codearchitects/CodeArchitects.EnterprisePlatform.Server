@@ -2,11 +2,11 @@
 
 #nullable disable
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTM
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMDirect
 {
-  public class MTMDbContext : DbContext
+  public class MTMDirectDbContext : DbContext
   {
-    public MTMDbContext(DbContextOptions<MTMDbContext> options)
+    public MTMDirectDbContext(DbContextOptions<MTMDirectDbContext> options)
       : base(options)
     {
     }
