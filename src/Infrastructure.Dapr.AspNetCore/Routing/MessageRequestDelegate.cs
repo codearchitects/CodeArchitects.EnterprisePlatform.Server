@@ -18,7 +18,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Routing
     /// <param name="serializerOptions">The serializer options.</param>
     protected MessageRequestDelegate(Type handlerImplementationType, JsonSerializerOptions serializerOptions)
     {
-      if (!handlerImplementationType.IsAssignableTo(HandlerType))
+      if (!HandlerType.IsAssignableFrom(handlerImplementationType))
         throw new InvalidHandlerConfigurationException(HandlerType, handlerImplementationType);
 
       SerializerOptions = serializerOptions;
