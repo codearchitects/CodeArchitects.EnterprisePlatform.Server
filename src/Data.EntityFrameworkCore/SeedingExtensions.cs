@@ -18,7 +18,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
       Type contextType =
         typeof(TDataSeed).GetCustomAttribute<SeedingContextAttribute>()?.ContextType ??
-        typeof(TDataSeed).Assembly.GetTypes().SingleOrDefault(x => x.IsAssignableTo(typeof(DbContext))) ??
+        typeof(TDataSeed).Assembly.GetTypes().SingleOrDefault(x => typeof(DbContext).IsAssignableFrom(x)) ??
         typeof(DbContext);
 
       DbContext context = (DbContext)services.GetRequiredService(contextType);
