@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
 using FluentAssertions;
 using System;
 using System.Text.Json;
