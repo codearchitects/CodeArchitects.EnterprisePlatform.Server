@@ -1,9 +1,8 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using Moq;
+﻿using Moq;
 using System;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes
 {
   public static class HandlerAssembly
   {
@@ -32,13 +31,13 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
         }
       }
 
-      public static readonly Type HandlerForIdentity0 = typeof(FakeMessage1Handler1);
+      public static Type HandlerForIdentity0 => typeof(FakeMessage1Handler1);
 
-      public static readonly Type HandlerForIdentity1 = typeof(FakeMessage1HandlerWithTopic);
+      public static Type HandlerForIdentity1 => typeof(FakeMessage1HandlerWithTopic);
 
-      public static readonly Type HandlerForIdentity2 = typeof(FakeMessage1HandlerWithBusAndTopic);
+      public static Type HandlerForIdentity2 => typeof(FakeMessage1HandlerWithBusAndTopic);
 
-      public static readonly Type HandlerForIdentity3 = typeof(FakeMessage2Handler);
+      public static Type HandlerForIdentity3 => typeof(FakeMessage2Handler);
     }
 
     public static class Invalid

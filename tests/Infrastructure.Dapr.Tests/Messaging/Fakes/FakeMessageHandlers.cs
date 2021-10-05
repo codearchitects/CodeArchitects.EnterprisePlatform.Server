@@ -1,9 +1,8 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using CodeArchitects.Platform.Infrastructure.Messaging;
+﻿using CodeArchitects.Platform.Infrastructure.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes
 {
   public class FakeMessage1Handler1 : IMessageHandler<FakeMessage1>
   {

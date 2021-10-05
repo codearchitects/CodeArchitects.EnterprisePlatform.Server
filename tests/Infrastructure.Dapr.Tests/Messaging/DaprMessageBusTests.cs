@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Tests;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes;
 using Dapr.Client;
 using Moq;
 using System.Collections.Generic;
