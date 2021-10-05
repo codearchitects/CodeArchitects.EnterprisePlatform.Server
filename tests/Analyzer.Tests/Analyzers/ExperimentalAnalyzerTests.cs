@@ -80,6 +80,35 @@ namespace Test
     }
 
     [Fact]
+    public async Task ExperimentalGenericClassDeclaration_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass<T> { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+      ExperimentalClass<int> experimentalClass = default;
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
     public async Task DeclarationAndConstructor_ShouldTriggerSingleCAESP001()
     {
       // Arrange
@@ -154,6 +183,35 @@ namespace Test
     public static void Main(string[] args)
     {
       ExperimentalStruct experimentalStruct = default;
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalGenericStructDeclaration_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public struct ExperimentalStruct<T> { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+      ExperimentalStruct<int> experimentalStruct = default;
     }
   }
 }
@@ -294,6 +352,38 @@ namespace Test
     public static void Main(string[] args)
     {
       ExperimentalDelegate @delegate = () => { };
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalParameterDeclaration_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+    }
+
+    public static void Method(ExperimentalClass param)
+    {
     }
   }
 }
