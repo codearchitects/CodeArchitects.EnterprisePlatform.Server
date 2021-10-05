@@ -11,13 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr", "src\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj", "{B0807A3B-2050-4C6A-8014-014E23D9949D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Common.Tests", "tests\Common.Tests\CodeArchitects.Platform.Common.Tests.csproj", "{B85236B3-9869-44A1-90B2-88097EE43A5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Common.UnitTests", "tests\Common.UnitTests\CodeArchitects.Platform.Common.UnitTests.csproj", "{B85236B3-9869-44A1-90B2-88097EE43A5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.Tests", "tests\Infrastructure.Dapr.Tests\CodeArchitects.Platform.Infrastructure.Dapr.Tests.csproj", "{49307120-7D26-4410-BD0B-06D06228D504}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.UnitTests", "tests\Infrastructure.Dapr.UnitTests\CodeArchitects.Platform.Infrastructure.Dapr.UnitTests.csproj", "{49307120-7D26-4410-BD0B-06D06228D504}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore", "src\Infrastructure.Dapr.AspNetCore\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.csproj", "{B08EDB00-4687-4F1F-8F36-3A19C93068E6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests", "tests\Infrastructure.Dapr.AspNetCore.Tests\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests.csproj", "{F9E459CD-7B23-475A-97EB-3D8E98A02D02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests", "tests\Infrastructure.Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests.csproj", "{F9E459CD-7B23-475A-97EB-3D8E98A02D02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data", "src\Data\CodeArchitects.Platform.Data.csproj", "{C22CC44C-9092-4AB2-9103-1C66E6C3AB38}"
 EndProject
@@ -25,9 +25,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{18EE6C51-9749-414C-B643-765D75F1354B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks", "Benchmarks\CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks\CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks.csproj", "{DEC6C8E6-2974-4183-A484-2304D9660AE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks", "Benchmarks\Data.EntityFrameworkCore.Benchmarks\CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks.csproj", "{DEC6C8E6-2974-4183-A484-2304D9660AE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests", "tests\Data.EntityFrameworkCore.IntegrationTests\CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application", "src\Application\CodeArchitects.Platform.Application.csproj", "{D41F7716-18DF-47DF-82AF-8A5CF4613408}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application.UnitTests", "tests\Application.UnitTests\CodeArchitects.Platform.Application.UnitTests.csproj", "{521269E7-1BCB-41AD-8307-FC72BC4792F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{646C726C-D374-4213-B169-EB07E0130DEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.CodeAnalysis", "src\CodeAnalysis\CodeArchitects.Platform.CodeAnalysis.csproj", "{69CAE493-4596-4875-9345-D3524FBD47C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer", "src\Analyzer\CodeArchitects.Platform.Analyzer.csproj", "{197B5E82-359B-4F12-93B5-7EE541433D77}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer.Tests", "tests\Analyzer.Tests\CodeArchitects.Platform.Analyzer.Tests.csproj", "{40038BD9-FA12-47EA-8DF4-2F43F9050E82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +91,26 @@ Global
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D41F7716-18DF-47DF-82AF-8A5CF4613408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D41F7716-18DF-47DF-82AF-8A5CF4613408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D41F7716-18DF-47DF-82AF-8A5CF4613408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D41F7716-18DF-47DF-82AF-8A5CF4613408}.Release|Any CPU.Build.0 = Release|Any CPU
+		{521269E7-1BCB-41AD-8307-FC72BC4792F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{521269E7-1BCB-41AD-8307-FC72BC4792F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{521269E7-1BCB-41AD-8307-FC72BC4792F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{521269E7-1BCB-41AD-8307-FC72BC4792F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69CAE493-4596-4875-9345-D3524FBD47C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69CAE493-4596-4875-9345-D3524FBD47C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69CAE493-4596-4875-9345-D3524FBD47C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69CAE493-4596-4875-9345-D3524FBD47C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{197B5E82-359B-4F12-93B5-7EE541433D77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{197B5E82-359B-4F12-93B5-7EE541433D77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{197B5E82-359B-4F12-93B5-7EE541433D77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{197B5E82-359B-4F12-93B5-7EE541433D77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +121,10 @@ Global
 		{F9E459CD-7B23-475A-97EB-3D8E98A02D02} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{DEC6C8E6-2974-4183-A484-2304D9660AE3} = {18EE6C51-9749-414C-B643-765D75F1354B}
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{521269E7-1BCB-41AD-8307-FC72BC4792F2} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{69CAE493-4596-4875-9345-D3524FBD47C8} = {646C726C-D374-4213-B169-EB07E0130DEF}
+		{197B5E82-359B-4F12-93B5-7EE541433D77} = {646C726C-D374-4213-B169-EB07E0130DEF}
+		{40038BD9-FA12-47EA-8DF4-2F43F9050E82} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

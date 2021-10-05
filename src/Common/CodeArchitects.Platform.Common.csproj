@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CodeAnalysis\CodeArchitects.Platform.CodeAnalysis.csproj" />
+  </ItemGroup>
+
 </Project>
