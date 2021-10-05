@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Infrastructure.Messaging
@@ -7,6 +8,7 @@ namespace CodeArchitects.Platform.Infrastructure.Messaging
   /// Extension to the <see cref="IMessageBus"/> interface with metadata support.
   /// </summary>
   /// <typeparam name="TMetadata">The metadata type of this bus.</typeparam>
+  [Experimental]
   public interface IMessageBus<in TMetadata> : IMessageBus
     where TMetadata : class
   {
