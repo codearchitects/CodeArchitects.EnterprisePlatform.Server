@@ -2,6 +2,12 @@ version: 1
 
 components:
   # packages
+  - name: CodeArchitects.Platform.Analyzer
+    path: src\Analyzer
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Application
+    path: src\Application
+    type: dotnet-package
   - name: CodeArchitects.Platform.Common
     path: src\Common
     type: dotnet-package
@@ -22,13 +28,19 @@ components:
     type: dotnet-package
 
   # tests
-  - name: CodeArchitects.Platform.Common.Tests
-    path: tests\Common.Tests
+  - name: CodeArchitects.Platform.Analyzer.Tests
+    path: tests\Analyzer.Tests
     type: dotnet-test
-  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests
-    path: tests\Infrastructure.Dapr.AspNetCore.Tests
+  - name: CodeArchitects.Platform.Application.UnitTests
+    path: tests\Application.UnitTests
     type: dotnet-test
-  - name: CodeArchitects.Platform.Infrastructure.Dapr.Tests
-    path: tests\Infrastructure.Dapr.Tests
+  - name: CodeArchitects.Platform.Common.UnitTests
+    path: tests\Common.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
+    path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.UnitTests
+    path: tests\Infrastructure.Dapr.UnitTests
     type: dotnet-test
   # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)
