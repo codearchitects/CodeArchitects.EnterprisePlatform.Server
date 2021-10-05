@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CodeArchitects.Platform.Application.SignalR;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Application.SignalR
+namespace Microsoft.AspNetCore.Builder
 {
   /// <summary>
   /// Extension methods for <see cref="IEndpointRouteBuilder"/>.

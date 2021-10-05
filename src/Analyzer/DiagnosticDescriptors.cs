@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Analyzer
     public static readonly DiagnosticDescriptor CAESP001 = new DiagnosticDescriptor(
       DiagnosticIds.CAESP001,
       "Experimental feature",
-      "This is an experimental API. It may be changed or removed in future versions.",
+      "This is an experimental feature. It may be changed or removed in future versions.",
       "CodeAnalysis",
       DiagnosticSeverity.Warning,
       isEnabledByDefault: true);

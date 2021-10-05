@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
+﻿using CodeArchitects.Platform.Application.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Application.SignalR
+namespace Microsoft.Extensions.DependencyInjection
 {
   /// <summary>
   /// Extension methods for <see cref="ISignalRServerBuilder"/>.

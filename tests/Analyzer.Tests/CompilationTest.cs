@@ -25,16 +25,10 @@ namespace CodeArchitects.Platform.Analyzer.Tests
       DocumentId documentId = DocumentId.CreateNewId(projectId);
 
       solution = solution
-          .AddProject(
-            projectId,
-            "TestProject",
-            "TestProject",
-            LanguageNames.CSharp)
-          .WithProjectOutputRefFilePath(projectId, "test/outputRefFilePath")
-          .WithProjectOutputFilePath(projectId, "test/outputFilePath")
-          .AddDocument(documentId,
-            "Program.cs",
-            code);
+        .AddProject(projectId, "TestProject", "TestProject", LanguageNames.CSharp)
+        .WithProjectOutputRefFilePath(projectId, "test/outputRefFilePath")
+        .WithProjectOutputFilePath(projectId, "test/outputFilePath")
+        .AddDocument(documentId, "Program.cs", code);
 
       Project project = solution.GetProject(projectId)!;
       
