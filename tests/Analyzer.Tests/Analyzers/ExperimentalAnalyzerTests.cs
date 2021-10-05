@@ -80,6 +80,36 @@ namespace Test
     }
 
     [Fact]
+    public async Task ExperimentalClassInheritance_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass { }
+
+  public class Derived : ExperimentalClass { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
     public async Task ExperimentalGenericClassDeclaration_ShouldTriggerCAESP001()
     {
       // Arrange
@@ -96,6 +126,36 @@ namespace Test
     public static void Main(string[] args)
     {
       ExperimentalClass<int> experimentalClass = default;
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalGenericClassInheritance_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass<T> { }
+
+  public class Derived : ExperimentalClass<int> { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
     }
   }
 }
