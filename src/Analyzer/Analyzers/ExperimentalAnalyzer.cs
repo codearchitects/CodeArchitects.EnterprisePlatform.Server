@@ -22,12 +22,32 @@ namespace CodeArchitects.Platform.Analyzer.Analyzers
       context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
       context.RegisterSyntaxNodeAction(AnalyzeIdentifierNameNode, SyntaxKind.IdentifierName);
+      context.RegisterSyntaxNodeAction(AnalyzeGenericNameNode, SyntaxKind.GenericName);
       context.RegisterSyntaxNodeAction(AnalyzeObjectCreationNode, SyntaxKind.ObjectCreationExpression);
     }
 
     private void AnalyzeIdentifierNameNode(SyntaxNodeAnalysisContext context)
     {
       if (context.Node is not IdentifierNameSyntax node)
+      {
+        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
+      }
+
+      bool isExperimental = context.SemanticModel
+        .GetSymbolInfo(node)
+        .Symbol?
+        .GetAttributes()
+        .Any(x => x.AttributeClass?.ToString() == _experimentalAttributeName)
+        ?? false;
+
+      if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
+      {
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
+      }
+    }
+    private void AnalyzeGenericNameNode(SyntaxNodeAnalysisContext context)
+    {
+      if (context.Node is not GenericNameSyntax node)
       {
         throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
       }
