@@ -44,11 +44,22 @@ namespace CodeArchitects.Platform.Analyzer.Analyzers
       if (interfaceSymbol is null)
         return;
 
-      foreach (IMethodSymbol methodSymbol in interfaceSymbol.GetMembers().Where(x => x.Kind == SymbolKind.Method).Cast<IMethodSymbol>())
+      foreach (ISymbol symbol in interfaceSymbol.GetMembers().Where(x => x.Kind is SymbolKind.Method or SymbolKind.Property))
       {
-        if (_iQueryableRegex.IsMatch(methodSymbol.ReturnType.ToString()))
+        ITypeSymbol? type = symbol switch
         {
-          Location? location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();
+          IMethodSymbol methodSymbol when methodSymbol.MethodKind is
+            not MethodKind.PropertyGet and
+            not MethodKind.PropertySet   => methodSymbol.ReturnType,
+          IPropertySymbol propertySymbol => propertySymbol.Type,
+          _                              => null
+        };
+
+        if (type is null) continue;
+
+        if (_iQueryableRegex.IsMatch(type.ToString()))
+        {
+          Location? location = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();
           if (location is not null)
           {
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP002, location));

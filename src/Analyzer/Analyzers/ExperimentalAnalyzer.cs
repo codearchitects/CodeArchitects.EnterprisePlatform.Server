@@ -49,7 +49,7 @@ namespace CodeArchitects.Platform.Analyzer.Analyzers
     {
       if (context.Node is not GenericNameSyntax node)
       {
-        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
+        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
       }
 
       bool isExperimental = context.SemanticModel
