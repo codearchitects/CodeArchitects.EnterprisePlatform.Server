@@ -82,7 +82,7 @@ namespace Test
     }
 
     [Fact]
-    public async Task InterfaceThatExposesIQueryable_ShouldTriggerCAESP002()
+    public async Task InterfaceThatExposesIQueryableAsMethod_ShouldTriggerCAESP002()
     {
       // Arrange
       const string code = @"
@@ -109,7 +109,38 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP002);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
+    }
+
+    [Fact]
+    public async Task InterfaceThatExposesIQueryableAsProperty_ShouldTriggerCAESP002()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.Data;
+using System.Linq;
+
+namespace Test
+{
+  public class Entity : IEntity<int>
+  {
+    public int Id { get; }
+    object IEntity.Id => Id;
+  }
+
+  public interface IEntityRepository : IRepository<Entity, int>
+  {
+    Entity MyQuery();
+    IQueryable<Entity> Query { get; }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
     }
 
     [Fact]
@@ -132,7 +163,7 @@ namespace Test
   {
     Entity MyQuery();
     IQueryable<Entity> Query1();
-    IQueryable<Entity> Query2();
+    IQueryable<Entity> Query2 { get; }
     IQueryable<Entity> Query3();
   }
 }
