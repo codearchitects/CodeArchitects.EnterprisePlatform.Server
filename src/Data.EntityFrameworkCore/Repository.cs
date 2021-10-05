@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 {
+  [Experimental]
   public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
     where TEntity : class, IEntity<TKey>
     where TKey : IEquatable<TKey>
@@ -28,28 +28,14 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore
 
     protected DbSet<TEntity> Entities { get; }
 
-    public IQueryable<TEntity> Query(params Expression<Func<TEntity, object?>>[] paths)
+    public virtual TEntity? Find(TKey id)
     {
-      IQueryable<TEntity> result = Entities;
-      foreach (Expression<Func<TEntity, object?>> include in paths)
-      {
-        result = result.Include(include);
-      }
-      return result;
+      return Entities.Find(new object[] { id });
     }
 
-    public virtual TEntity? Find(TKey id, params Expression<Func<TEntity, object?>>[] paths)
+    public virtual ValueTask<TEntity?> FindAsync(TKey id, CancellationToken cancellationToken = default)
     {
-      return paths.Length == 0
-        ? Entities.Find(new object[] { id })
-        : Query(paths).FirstOrDefault(x => x.Id.Equals(id));
-    }
-
-    public virtual ValueTask<TEntity?> FindAsync(TKey id, Expression<Func<TEntity, object?>>[]? paths = null, CancellationToken cancellationToken = default)
-    {
-      return (paths is null || paths.Length == 0
-        ? Entities.FindAsync(new object[] { id }, cancellationToken)
-        : new ValueTask<TEntity>(Query(paths).FirstOrDefaultAsync(x => x.Id.Equals(id), cancellationToken)))!;
+      return Entities.FindAsync(new object[] { id }, cancellationToken)!;
     }
 
     public virtual void Add(TEntity entity)
