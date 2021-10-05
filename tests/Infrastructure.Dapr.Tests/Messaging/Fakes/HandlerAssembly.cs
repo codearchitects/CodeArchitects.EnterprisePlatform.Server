@@ -1,15 +1,14 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
-using Moq;
+﻿using Moq;
 using System;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes
 {
   public static class HandlerAssembly
   {
     public static class Valid
     {
-      public static Type[] HandlerTypes => new Type[]
+      public static readonly Type[] HandlerTypes = new Type[]
       {
         typeof(FakeMessage1Handler1), // Identities: (null, null, typeof(FakeMessage1))
         typeof(FakeMessage1HandlerWithTopic), // Identities: (null, TopicName, typeof(FakeMessage1))
@@ -43,7 +42,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
 
     public static class Invalid
     {
-      public static Type[] HandlerTypes => new Type[]
+      public static readonly Type[] HandlerTypes = new Type[]
       {
         typeof(FakeMessage1Handler1), // Identities: (null, null, typeof(FakeMessage1))
         typeof(FakeMessage1Handler2), // Identities: (null, null, typeof(FakeMessage1))
@@ -68,7 +67,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
         }
       }
 
-      public static Type[] InvalidHandlerTypes => new Type[]
+      public static readonly Type[] InvalidHandlerTypes = new Type[]
       {
         typeof(FakeMessage1Handler1),
         typeof(FakeMessage1Handler2),
@@ -77,7 +76,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Tests
       };
     }
 
-    internal static MessageHandlerIdentity[] ExpectedIdentities => new MessageHandlerIdentity[]
+    internal static readonly MessageHandlerIdentity[] ExpectedIdentities = new MessageHandlerIdentity[]
     {
       new MessageHandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1, FakeMessage1Handler2, FakeMessage1And2Handler
       new MessageHandlerIdentity(null, FakeMessage1HandlerWithTopic.TopicName, typeof(FakeMessage1)), // Handlers: FakeMessage1HandlerWithTopic

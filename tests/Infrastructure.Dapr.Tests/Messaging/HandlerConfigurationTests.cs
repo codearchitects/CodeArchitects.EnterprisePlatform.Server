@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.Infrastructure.Dapr.Tests;
+using CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes;
 using FluentAssertions;
 using Moq;
 using System;

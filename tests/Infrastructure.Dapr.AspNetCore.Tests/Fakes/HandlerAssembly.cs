@@ -3,7 +3,7 @@ using Moq;
 using System;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Tests
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes
 {
   public static class HandlerAssembly
   {
