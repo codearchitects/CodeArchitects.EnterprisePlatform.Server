@@ -76,7 +76,37 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalClassInheritance_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass { }
+
+  public class Derived : ExperimentalClass { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -105,7 +135,37 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalGenericClassInheritance_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass<T> { }
+
+  public class Derived : ExperimentalClass<int> { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -163,7 +223,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -192,7 +252,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -221,7 +281,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -256,7 +316,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -294,7 +354,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -361,7 +421,7 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
 
     [Fact]
@@ -393,7 +453,39 @@ namespace Test
       ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
       // Assert
-      diagnostics.Should().Contain(x => x.Id == DiagnosticIds.CAESP001);
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
+    }
+
+    [Fact]
+    public async Task ExperimentalGenericParameterDeclaration_ShouldTriggerCAESP001()
+    {
+      // Arrange
+      const string code = @"
+using CodeArchitects.Platform.CodeAnalysis;
+
+namespace Test
+{
+  [Experimental]
+  public class ExperimentalClass<T> { }
+
+  public static class Program
+  {
+    public static void Main(string[] args)
+    {
+    }
+
+    public static void Method(ExperimentalClass<int> param)
+    {
+    }
+  }
+}
+";
+
+      // Act
+      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+
+      // Assert
+      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP001);
     }
   }
 }
