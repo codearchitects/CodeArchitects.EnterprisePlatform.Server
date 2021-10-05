@@ -10,6 +10,9 @@ using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+  /// <summary>
+  /// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
+  /// </summary>
   public static class DaprInfrastructureBuilderExtensions
   {
     /// <summary>

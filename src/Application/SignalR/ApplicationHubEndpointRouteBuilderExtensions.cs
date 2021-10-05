@@ -9,8 +9,16 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Application.SignalR
 {
+  /// <summary>
+  /// Extension methods for <see cref="IEndpointRouteBuilder"/>.
+  /// </summary>
   public static class ApplicationHubEndpointRouteBuilderExtensions
   {
+    /// <summary>
+    /// Adds endpoints for the hubs configured with <see cref="ApplicationSignalRServerBuilderExtensions.AddHubs(ISignalRServerBuilder, Assembly[])"/>. 
+    /// </summary>
+    /// <param name="endpoints">The endpoint builder.</param>
+    /// <param name="configureOptions">A callback to configure dispatcher options.</param>
     public static void MapHubs(this IEndpointRouteBuilder endpoints, Action<HttpConnectionDispatcherOptions>? configureOptions = null)
     {
       HubConfiguration configuration = endpoints.ServiceProvider.GetRequiredService<HubConfiguration>();
@@ -25,7 +33,7 @@ namespace CodeArchitects.Platform.Application.SignalR
           continue;
         }
 
-        MapHubDelegate.Create(hubType).Invoke(endpoints, hubEndpoint.Pattern, configureOptions);
+        MapHubDelegate.Create(hubType).Invoke(endpoints, hubEndpoint.Endpoint, configureOptions);
       }
     }
 

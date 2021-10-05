@@ -3,8 +3,17 @@ using Microsoft.Extensions.Configuration;
 
 namespace CodeArchitects.Platform.Application.SignalR
 {
+  /// <summary>
+  /// Extension methods for <see cref="HttpConnectionDispatcherOptions"/>.
+  /// </summary>
   public static class HttpConnectionDispatcherOptionsExtensions
   {
+    /// <summary>
+    /// Configures the transport type using the SignalR.Transport section of the application configuration.
+    /// </summary>
+    /// <param name="options">The dispatcher options.</param>
+    /// <param name="configuration">The application configuration instance.</param>
+    /// <returns>The same options.</returns>
     public static HttpConnectionDispatcherOptions ConfigureTransports(this HttpConnectionDispatcherOptions options, IConfiguration configuration)
     {
       IConfigurationSection signalR = configuration.GetSection("SignalR");

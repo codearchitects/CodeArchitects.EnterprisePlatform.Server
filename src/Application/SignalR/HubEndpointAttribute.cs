@@ -2,14 +2,20 @@
 
 namespace CodeArchitects.Platform.Application.SignalR
 {
+  /// <summary>
+  /// Specifies the hub endpoint.
+  /// </summary>
   [AttributeUsage(AttributeTargets.Class)]
   public class HubEndpointAttribute : Attribute
   {
-    public HubEndpointAttribute(string pattern)
+    public HubEndpointAttribute(string endpoint)
     {
-      Pattern = pattern;
+      Endpoint = endpoint;
     }
 
-    public string Pattern { get; }
+    /// <summary>
+    /// The hub endpoint.
+    /// </summary>
+    public string Endpoint { get; }
   }
 }

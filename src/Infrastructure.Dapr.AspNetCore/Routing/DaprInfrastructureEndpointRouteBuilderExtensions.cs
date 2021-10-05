@@ -9,14 +9,14 @@ using System.Text.Json;
 namespace Microsoft.AspNetCore.Builder
 {
   /// <summary>
-  /// Class that contains extension methods for <see cref="IEndpointRouteBuilder"/>.
+  /// Extension methods for <see cref="IEndpointRouteBuilder"/>.
   /// </summary>
   public static class DaprInfrastructureEndpointRouteBuilderExtensions
   {
     /// <summary>
     /// Adds endpoints for the handlers configured with <see cref="DaprInfrastructureBuilderExtensions.AddMessageHandlers"/>. 
     /// </summary>
-    /// <param name="endpoints">The endpoint builder</param>
+    /// <param name="endpoints">The endpoint builder.</param>
     public static void MapMessageHandlers(this IEndpointRouteBuilder endpoints)
     {
       if (endpoints is null) throw new ArgumentNullException(nameof(endpoints));

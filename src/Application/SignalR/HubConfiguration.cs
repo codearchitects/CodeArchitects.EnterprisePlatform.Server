@@ -22,7 +22,7 @@ namespace CodeArchitects.Platform.Application.SignalR
 
     private static Type GetHubInterface(Type hubType)
     {
-      return hubType.GetInterfaces().Single(x => x == hubType.BaseType!.GenericTypeArguments[0]);
+      return hubType.BaseType!.GenericTypeArguments[0];
     }
   }
 }
