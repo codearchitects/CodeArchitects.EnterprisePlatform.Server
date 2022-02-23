@@ -1,24 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-#nullable disable
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTOAssociated;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTOAssociated
+public class OTOAssociatedDbContext : DbContext
 {
-  public class OTOAssociatedDbContext : DbContext
+  public OTOAssociatedDbContext(DbContextOptions<OTOAssociatedDbContext> options)
+    : base(options)
   {
-    public OTOAssociatedDbContext(DbContextOptions<OTOAssociatedDbContext> options)
-      : base(options)
-    {
-    }
+  }
 
-    public DbSet<Primary> Primaries { get; set; }
-    public DbSet<Secondary> Secondaries { get; set; }
+  public DbSet<Primary> Primaries { get; set; } = default!;
+  public DbSet<Secondary> Secondaries { get; set; } = default!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-      modelBuilder.Entity<Primary>();
-      
-      modelBuilder.Entity<Secondary>();
-    }
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Primary>();
+
+    modelBuilder.Entity<Secondary>();
   }
 }

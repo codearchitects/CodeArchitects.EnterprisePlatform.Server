@@ -1,13 +1,12 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CodeArchitects.Platform.Analyzer.Utils
+namespace CodeArchitects.Platform.Analyzer.Utils;
+
+internal static class CodeAnalysisExtensions
 {
-  internal static class CodeAnalysisExtensions
+  public static string? GetFullName(this ExpressionSyntax expression, SemanticModel semanticModel)
   {
-    public static string? GetFullName(this ExpressionSyntax expression, SemanticModel semanticModel)
-    {
-      return semanticModel.GetSymbolInfo(expression).Symbol?.ToString();
-    }
+    return semanticModel.GetSymbolInfo(expression).Symbol?.ToString();
   }
 }

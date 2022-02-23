@@ -5,44 +5,46 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
+
+public static class SeedingExtensions
 {
-  public static class SeedingExtensions
+  public static void Seed<TDataSeed>(this IServiceScope scope)
+    where TDataSeed : DataSeed
   {
-    public static void Seed<TDataSeed>(this IServiceScope scope)
-      where TDataSeed : DataSeed
-    {
-      if (scope is null) throw new ArgumentNullException(nameof(scope));
+    if (scope is null)
+      throw new ArgumentNullException(nameof(scope));
 
-      IServiceProvider services = scope.ServiceProvider;
+    IServiceProvider services = scope.ServiceProvider;
 
-      Type contextType =
-        typeof(TDataSeed).GetCustomAttribute<SeedingContextAttribute>()?.ContextType ??
-        typeof(TDataSeed).Assembly.GetTypes().SingleOrDefault(x => typeof(DbContext).IsAssignableFrom(x)) ??
-        typeof(DbContext);
+    Type contextType =
+      typeof(TDataSeed).GetCustomAttribute<SeedingContextAttribute>()?.ContextType ??
+      typeof(TDataSeed).Assembly.GetTypes().SingleOrDefault(x => typeof(DbContext).IsAssignableFrom(x)) ??
+      typeof(DbContext);
 
-      DbContext context = (DbContext)services.GetRequiredService(contextType);
-      
-      SeedCore<TDataSeed>(context, services);
-    }
+    DbContext context = (DbContext)services.GetRequiredService(contextType);
 
-    public static void Seed<TDataSeed>(this DbContext context, IServiceProvider services)
-      where TDataSeed : DataSeed
-    {
-      if (context is null) throw new ArgumentNullException(nameof(context));
-      if (services is null) throw new ArgumentNullException(nameof(services));
+    SeedCore<TDataSeed>(context, services);
+  }
 
-      SeedCore<TDataSeed>(context, services);
-    }
+  public static void Seed<TDataSeed>(this DbContext context, IServiceProvider services)
+    where TDataSeed : DataSeed
+  {
+    if (context is null)
+      throw new ArgumentNullException(nameof(context));
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
 
-    private static void SeedCore<TDataSeed>(DbContext context, IServiceProvider services)
-      where TDataSeed : DataSeed
-    {
-      Seeder seeder = new Seeder(context);
-      TDataSeed dataSeed = CreationHelpers.CreateFromServices<TDataSeed>(services);
+    SeedCore<TDataSeed>(context, services);
+  }
 
-      dataSeed.Seed(seeder);
-      context.SaveChanges();
-    }
+  private static void SeedCore<TDataSeed>(DbContext context, IServiceProvider services)
+    where TDataSeed : DataSeed
+  {
+    Seeder seeder = new Seeder(context);
+    TDataSeed dataSeed = CreationHelpers.CreateFromServices<TDataSeed>(services);
+
+    dataSeed.Seed(seeder);
+    context.SaveChanges();
   }
 }

@@ -1,8 +1,7 @@
-﻿namespace CodeArchitects.Platform.Data
+﻿namespace CodeArchitects.Platform.Data;
+
+// TODO: Use the ORM's object model instead
+public interface IEntity
 {
-  // TODO: Use the ORM's object model instead
-  public interface IEntity
-  {
-    object Id { get; }
-  }
+  object Id { get; }
 }

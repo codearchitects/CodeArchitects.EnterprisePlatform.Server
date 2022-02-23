@@ -4,31 +4,30 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.State
+namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
+
+public class DaprStateStoreResolverTests
 {
-  public class DaprStateStoreResolverTests
+  private readonly Mock<DaprClient> _daprClientMock;
+  private readonly DaprStateStoreResolver _sut;
+
+  public DaprStateStoreResolverTests()
   {
-    private readonly Mock<DaprClient> _daprClientMock;
-    private readonly DaprStateStoreResolver _sut;
+    _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
+    _sut = new DaprStateStoreResolver(_daprClientMock.Object);
+  }
 
-    public DaprStateStoreResolverTests()
-    {
-      _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-      _sut = new DaprStateStoreResolver(_daprClientMock.Object);
-    }
+  [Fact]
+  public void Resolve_ShouldCreateStoreOnlyOnce()
+  {
+    // Arrange
+    const string storeName = nameof(storeName);
 
-    [Fact]
-    public void Resolve_ShouldCreateStoreOnlyOnce()
-    {
-      // Arrange
-      const string storeName = nameof(storeName);
+    // Act
+    IStateStore store1 = _sut.Resolve(storeName);
+    IStateStore store2 = _sut.Resolve(storeName);
 
-      // Act
-      IStateStore store1 = _sut.Resolve(storeName);
-      IStateStore store2 = _sut.Resolve(storeName);
-
-      // Assert
-      store1.Should().BeSameAs(store2);
-    }
+    // Assert
+    store1.Should().BeSameAs(store2);
   }
 }

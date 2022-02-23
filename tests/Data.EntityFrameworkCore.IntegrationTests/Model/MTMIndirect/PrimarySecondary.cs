@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
+
+public class PrimarySecondary
 {
-  public class PrimarySecondary
-  {
-    public Guid PrimaryId { get; set; }
-    public Guid SecondaryId { get; set; }
-  }
+  public Guid PrimaryId { get; set; }
+  public Guid SecondaryId { get; set; }
 }

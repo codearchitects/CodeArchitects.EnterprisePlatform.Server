@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure", "src\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj", "{54743C88-11C2-4761-8536-B56218604416}"
 EndProject
@@ -22,10 +22,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data", "src\Data\CodeArchitects.Platform.Data.csproj", "{C22CC44C-9092-4AB2-9103-1C66E6C3AB38}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore", "src\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj", "{63326C5E-B857-4D2C-BA60-46151F434AA0}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{18EE6C51-9749-414C-B643-765D75F1354B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks", "Benchmarks\Data.EntityFrameworkCore.Benchmarks\CodeArchitects.Platform.Data.EntityFrameworkCore.Benchmarks.csproj", "{DEC6C8E6-2974-4183-A484-2304D9660AE3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests", "tests\Data.EntityFrameworkCore.IntegrationTests\CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
 EndProject
@@ -83,10 +79,6 @@ Global
 		{63326C5E-B857-4D2C-BA60-46151F434AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63326C5E-B857-4D2C-BA60-46151F434AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63326C5E-B857-4D2C-BA60-46151F434AA0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEC6C8E6-2974-4183-A484-2304D9660AE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEC6C8E6-2974-4183-A484-2304D9660AE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEC6C8E6-2974-4183-A484-2304D9660AE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEC6C8E6-2974-4183-A484-2304D9660AE3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -119,7 +111,6 @@ Global
 		{B85236B3-9869-44A1-90B2-88097EE43A5C} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{49307120-7D26-4410-BD0B-06D06228D504} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{F9E459CD-7B23-475A-97EB-3D8E98A02D02} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
-		{DEC6C8E6-2974-4183-A484-2304D9660AE3} = {18EE6C51-9749-414C-B643-765D75F1354B}
 		{6AF2FD6E-664E-4917-99D2-FD7CB38369F8} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{521269E7-1BCB-41AD-8307-FC72BC4792F2} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{69CAE493-4596-4875-9345-D3524FBD47C8} = {646C726C-D374-4213-B169-EB07E0130DEF}

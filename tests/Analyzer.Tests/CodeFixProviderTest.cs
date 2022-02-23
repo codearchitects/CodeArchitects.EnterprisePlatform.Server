@@ -9,41 +9,40 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeArchitects.Platform.Analyzer.Tests
+namespace CodeArchitects.Platform.Analyzer.Tests;
+
+public abstract class CodeFixProviderTest : CompilationTest
 {
-  public abstract class CodeFixProviderTest : CompilationTest
+  protected abstract Type CodeFixProviderType { get; }
+
+  public async Task<string> GetFixedCodeAsync(string code, string diagnosticId)
   {
-    protected abstract Type CodeFixProviderType { get; }
+    CompilationData data = await GetCompilationDataAsync(code);
+    data.Deconstruct(out AdhocWorkspace workspace, out _, out _, out Document document, out ImmutableArray<Diagnostic> diagnostics);
+    Diagnostic diagnostic = diagnostics.Single(x => x.Id == diagnosticId);
 
-    public async Task<string> GetFixedCodeAsync(string code, string diagnosticId)
+    CodeFixProvider codeFixProvider = (CodeFixProvider)Activator.CreateInstance(CodeFixProviderType)!;
+
+    CodeAction? registeredCodeAction = null;
+    CodeFixContext context = new CodeFixContext(document, diagnostic, (codeAction, diagnostics) =>
     {
-      CompilationData data = await GetCompilationDataAsync(code);
-      data.Deconstruct(out AdhocWorkspace workspace, out _, out _, out Document document, out ImmutableArray<Diagnostic> diagnostics);
-      Diagnostic diagnostic = diagnostics.Single(x => x.Id == diagnosticId);
+      if (registeredCodeAction != null)
+        throw new Exception("Code action was registered more than once");
 
-      CodeFixProvider codeFixProvider = (CodeFixProvider)Activator.CreateInstance(CodeFixProviderType)!;
+      registeredCodeAction = codeAction;
+    }, CancellationToken.None);
 
-      CodeAction? registeredCodeAction = null;
-      CodeFixContext context = new CodeFixContext(document, diagnostic, (codeAction, diagnostics) =>
-      {
-        if (registeredCodeAction != null)
-          throw new Exception("Code action was registered more than once");
+    await codeFixProvider.RegisterCodeFixesAsync(context);
 
-        registeredCodeAction = codeAction;
-      }, CancellationToken.None);
+    if (registeredCodeAction == null)
+      throw new Exception("Code action was not registered");
 
-      await codeFixProvider.RegisterCodeFixesAsync(context);
-
-      if (registeredCodeAction == null)
-        throw new Exception("Code action was not registered");
-
-      ImmutableArray<CodeActionOperation> operations = await registeredCodeAction.GetOperationsAsync(CancellationToken.None);
-      foreach (CodeActionOperation operation in operations)
-      {
-        operation.Apply(workspace, CancellationToken.None);
-      }
-
-      return (await workspace.CurrentSolution.GetDocument(document.Id)!.GetTextAsync()).ToString();
+    ImmutableArray<CodeActionOperation> operations = await registeredCodeAction.GetOperationsAsync(CancellationToken.None);
+    foreach (CodeActionOperation operation in operations)
+    {
+      operation.Apply(workspace, CancellationToken.None);
     }
+
+    return (await workspace.CurrentSolution.GetDocument(document.Id)!.GetTextAsync()).ToString();
   }
 }
