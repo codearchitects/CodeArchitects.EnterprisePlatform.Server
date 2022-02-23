@@ -4,89 +4,88 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.State
+namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
+
+public class DaprStateStoreTests
 {
-  public class DaprStateStoreTests
+  private const string s_storeName = nameof(s_storeName);
+
+  private readonly Mock<DaprClient> _daprClientMock;
+  private readonly DaprStateStore _sut;
+
+  public DaprStateStoreTests()
   {
-    private const string StoreName = nameof(StoreName);
+    _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
+    _sut = new DaprStateStore(_daprClientMock.Object, s_storeName);
+  }
 
-    private readonly Mock<DaprClient> _daprClientMock;
-    private readonly DaprStateStore _sut;
+  [Fact]
+  public async Task GetAsync_ShouldCallGetStateAsyncExacltyOnceWithCorrectParameters()
+  {
+    // Arrange
+    const string key = nameof(key);
+    _daprClientMock
+      .Setup(x => x.GetStateAsync<StateStub>(
+        s_storeName,                    // storeName
+        key,                            // key
+        null,                           // consistencyMode
+        null,                           // metadata
+        It.IsAny<CancellationToken>())) // cancellationToken
+      .ReturnsAsync(new StateStub());
 
-    public DaprStateStoreTests()
-    {
-      _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-      _sut = new DaprStateStore(_daprClientMock.Object, StoreName);
-    }
+    // Act
+    await _sut.GetAsync<StateStub>(key, default);
 
-    [Fact]
-    public async Task GetAsync_ShouldCallGetStateAsyncExacltyOnceWithCorrectParameters()
-    {
-      // Arrange
-      const string key = nameof(key);
-      _daprClientMock
-        .Setup(x => x.GetStateAsync<StateStub>(
-          StoreName,                      // storeName
-          key,                            // key
-          null,                           // consistencyMode
-          null,                           // metadata
-          It.IsAny<CancellationToken>())) // cancellationToken
-        .ReturnsAsync(new StateStub());
+    // Assert
+    _daprClientMock.Verify(x => x.GetStateAsync<StateStub>(s_storeName, key, null, null, default), Times.Once());
+  }
 
-      // Act
-      await _sut.GetAsync<StateStub>(key, default);
+  [Fact]
+  public async Task SaveAsync_ShouldCallSaveStateAsyncExacltyOnceWithCorrectParameters()
+  {
+    // Arrange
+    const string key = nameof(key);
+    StateStub state = new StateStub();
+    _daprClientMock
+      .Setup(x => x.SaveStateAsync(
+        s_storeName,                    // storeName
+        key,                            // key
+        state,                          // value
+        null,                           // consistencyMode
+        null,                           // metadata
+        It.IsAny<CancellationToken>())) // cancellationToken
+      .Returns(Task.CompletedTask);
 
-      // Assert
-      _daprClientMock.Verify(x => x.GetStateAsync<StateStub>(StoreName, key, null, null, default), Times.Once());
-    }
+    // Act
+    await _sut.SaveAsync(key, state, default);
 
-    [Fact]
-    public async Task SaveAsync_ShouldCallSaveStateAsyncExacltyOnceWithCorrectParameters()
-    {
-      // Arrange
-      const string key = nameof(key);
-      StateStub state = new StateStub();
-      _daprClientMock
-        .Setup(x => x.SaveStateAsync(
-          StoreName,                      // storeName
-          key,                            // key
-          state,                          // value
-          null,                           // consistencyMode
-          null,                           // metadata
-          It.IsAny<CancellationToken>())) // cancellationToken
-        .Returns(Task.CompletedTask);
+    // Assert
+    _daprClientMock.Verify(x => x.SaveStateAsync(s_storeName, key, state, null, null, default), Times.Once());
+  }
 
-      // Act
-      await _sut.SaveAsync(key, state, default);
+  [Fact]
+  public async Task DeleteAsync_ShouldCallDeleteStateAsyncExacltyOnceWithCorrectParameters()
+  {
+    // Arrange
+    const string key = nameof(key);
+    _daprClientMock
+      .Setup(x => x.DeleteStateAsync(
+        s_storeName,                    // storeName
+        key,                            // key
+        null,                           // consistencyMode
+        null,                           // metadata
+        It.IsAny<CancellationToken>())) // cancellationToken
+      .Returns(Task.CompletedTask);
 
-      // Assert
-      _daprClientMock.Verify(x => x.SaveStateAsync(StoreName, key, state, null, null, default), Times.Once());
-    }
+    // Act
+    await _sut.DeleteAsync(key, default);
 
-    [Fact]
-    public async Task DeleteAsync_ShouldCallDeleteStateAsyncExacltyOnceWithCorrectParameters()
-    {
-      // Arrange
-      const string key = nameof(key);
-      _daprClientMock
-        .Setup(x => x.DeleteStateAsync(
-          StoreName,                      // storeName
-          key,                            // key
-          null,                           // consistencyMode
-          null,                           // metadata
-          It.IsAny<CancellationToken>())) // cancellationToken
-        .Returns(Task.CompletedTask);
+    // Assert
+    _daprClientMock.Verify(x => x.DeleteStateAsync(s_storeName, key, null, null, default), Times.Once());
+  }
 
-      // Act
-      await _sut.DeleteAsync(key, default);
-
-      // Assert
-      _daprClientMock.Verify(x => x.DeleteStateAsync(StoreName, key, null, null, default), Times.Once());
-    }
-
-    private class StateStub
-    {
-      public int Property { get; set; }
-    }
+  private class StateStub
+  {
+    public int Property { get; set; }
   }
 }

@@ -1,7 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data
+﻿namespace CodeArchitects.Platform.Data;
+
+public abstract class DataSeed
 {
-  public abstract class DataSeed
-  {
-    public abstract void Seed(ISeeder seeder);
-  }
+  public abstract void Seed(ISeeder seeder);
 }

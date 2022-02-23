@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMOwned
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMOwned;
+
+public class Primary : Entity
 {
-  public class Primary : Entity
-  {
-    public string? Name { get; set; }
-    public ICollection<Secondary>? Secondaries { get; set; }
-  }
+  public string? Name { get; set; }
+  public ICollection<Secondary>? Secondaries { get; set; }
 }

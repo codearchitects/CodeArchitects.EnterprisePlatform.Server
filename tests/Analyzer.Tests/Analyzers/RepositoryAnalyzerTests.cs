@@ -10,28 +10,28 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace CodeArchitects.Platform.Analyzer.Tests.Analyzers
-{
-  public class RepositoryAnalyzerTests : AnalyzerTest
-  {
-    protected override Type AnalyzerType => typeof(RepositoryAnalyzer);
+namespace CodeArchitects.Platform.Analyzer.Tests.Analyzers;
 
-    protected override IEnumerable<Type> ReferencedAssemblyMarkers => new Type[]
-    {
+public class RepositoryAnalyzerTests : AnalyzerTest
+{
+  protected override Type AnalyzerType => typeof(RepositoryAnalyzer);
+
+  protected override IEnumerable<Type> ReferencedAssemblyMarkers => new Type[]
+  {
       typeof(IRepository<,>),
       typeof(IQueryable<>)
-    };
+  };
 
-    protected override IEnumerable<Assembly> ReferencedAsseblies => new Assembly[]
-    {
+  protected override IEnumerable<Assembly> ReferencedAsseblies => new Assembly[]
+  {
       Assembly.Load("System.Runtime")
-    };
+  };
 
-    [Fact]
-    public async Task EmptyCode_ShouldNotTriggerCAESP002()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task EmptyCode_ShouldNotTriggerCAESP002()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 
 namespace Test
@@ -45,18 +45,18 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAESP002);
-    }
+    // Assert
+    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAESP002);
+  }
 
-    [Fact]
-    public async Task InterfaceThatDoesNotExposeIQueryable_ShouldNotTriggerCAESP002()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task InterfaceThatDoesNotExposeIQueryable_ShouldNotTriggerCAESP002()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 
 namespace Test
@@ -74,18 +74,18 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAESP002);
-    }
+    // Assert
+    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAESP002);
+  }
 
-    [Fact]
-    public async Task InterfaceThatExposesIQueryableAsMethod_ShouldTriggerCAESP002()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task InterfaceThatExposesIQueryableAsMethod_ShouldTriggerCAESP002()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 using System.Linq;
 
@@ -105,18 +105,18 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
-    }
+    // Assert
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
+  }
 
-    [Fact]
-    public async Task InterfaceThatExposesIQueryableAsProperty_ShouldTriggerCAESP002()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task InterfaceThatExposesIQueryableAsProperty_ShouldTriggerCAESP002()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 using System.Linq;
 
@@ -136,18 +136,18 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
-    }
+    // Assert
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
+  }
 
-    [Fact]
-    public async Task InterfaceThatExposesIQueryableNTimes_ShouldTriggerCAESP002NTimes()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task InterfaceThatExposesIQueryableNTimes_ShouldTriggerCAESP002NTimes()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 using System.Linq;
 
@@ -169,18 +169,18 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Where(x => x.Id == DiagnosticIds.CAESP002).Should().HaveCount(3);
-    }
+    // Assert
+    diagnostics.Where(x => x.Id == DiagnosticIds.CAESP002).Should().HaveCount(3);
+  }
 
-    [Fact]
-    public async Task ClassThatExposesIQueryable_ShouldNotTriggerCAESP002()
-    {
-      // Arrange
-      const string code = @"
+  [Fact]
+  public async Task ClassThatExposesIQueryable_ShouldNotTriggerCAESP002()
+  {
+    // Arrange
+    const string code = @"
 using CodeArchitects.Platform.Data;
 using System.Linq;
 
@@ -209,11 +209,10 @@ namespace Test
 }
 ";
 
-      // Act
-      ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
+    // Act
+    ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
-      // Assert
-      diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
-    }
+    // Assert
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAESP002);
   }
 }

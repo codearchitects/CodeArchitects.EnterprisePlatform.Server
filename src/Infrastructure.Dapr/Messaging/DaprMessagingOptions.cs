@@ -1,13 +1,12 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging
+﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
+
+/// <summary>
+/// Provides messaging configuration options.
+/// </summary>
+public class DaprMessagingOptions
 {
   /// <summary>
-  /// Provides messaging configuration options.
+  /// The default bus name.
   /// </summary>
-  public class DaprMessagingOptions
-  {
-    /// <summary>
-    /// The default bus name.
-    /// </summary>
-    public string? DefaultBus { get; init; }
-  }
+  public string? DefaultBus { get; init; }
 }

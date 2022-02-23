@@ -1,13 +1,12 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Configuration
+﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+
+/// <summary>
+/// Provides configuration options for the Dapr infrastructure.
+/// </summary>
+public class DaprConfiguration
 {
   /// <summary>
-  /// Provides configuration options for the Dapr infrastructure.
+  /// Service-specific configuration options.
   /// </summary>
-  public class DaprConfiguration
-  {
-    /// <summary>
-    /// Service-specific configuration options.
-    /// </summary>
-    public ServiceOptions? Service { get; set; }
-  }
+  public ServiceOptions? Service { get; set; }
 }
