@@ -45,6 +45,7 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
       context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
     }
   }
+
   private void AnalyzeGenericNameNode(SyntaxNodeAnalysisContext context)
   {
     if (context.Node is not GenericNameSyntax node)

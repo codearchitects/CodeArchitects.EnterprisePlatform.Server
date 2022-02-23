@@ -50,9 +50,9 @@ public class RepositoryAnalyzer : DiagnosticAnalyzer
       {
         IMethodSymbol methodSymbol when methodSymbol.MethodKind is
           not MethodKind.PropertyGet and
-          not MethodKind.PropertySet => methodSymbol.ReturnType,
+          not MethodKind.PropertySet   => methodSymbol.ReturnType,
         IPropertySymbol propertySymbol => propertySymbol.Type,
-        _ => null
+        _                              => null
       };
 
       if (type is null)
