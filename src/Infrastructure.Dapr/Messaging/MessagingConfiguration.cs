@@ -4,7 +4,6 @@ using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -16,7 +15,7 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 /// </summary>
 internal class MessagingConfiguration : IMessagingConfiguration
 {
-  private MessagingConfiguration(IReadOnlyDictionary<MessageHandlerIdentity, ImplementationPair> handlerMap, ICollection<Type> messageTypes)
+  private MessagingConfiguration(IReadOnlyDictionary<MessageHandlerIdentity, ImplementationPair> handlerMap, IReadOnlyCollection<Type> messageTypes)
   {
     HandlerMap = handlerMap;
     MessageTypes = messageTypes;
@@ -24,7 +23,7 @@ internal class MessagingConfiguration : IMessagingConfiguration
 
   public IReadOnlyDictionary<MessageHandlerIdentity, ImplementationPair> HandlerMap { get; }
 
-  public ICollection<Type> MessageTypes { get; }
+  public IReadOnlyCollection<Type> MessageTypes { get; }
 
   /// <summary>
   /// Scans the given assemblies for <see cref="IMessageHandler{TMessage}"/> implementations and creates an instance of <see cref="MessagingConfiguration"/>.
@@ -35,13 +34,7 @@ internal class MessagingConfiguration : IMessagingConfiguration
   public static MessagingConfiguration Create(IEnumerable<Assembly> assemblies, DaprMessagingOptions? options)
   {
     IEnumerable<Type> allTypes = assemblies.SelectMany(assembly => assembly.GetTypes());
-
-    ImmutableHashSet<Type>.Builder messageTypesBuilder = ImmutableHashSet.CreateBuilder<Type>(); // Since we are forced to use ICollection instead of IReadOnlyCollection, we will make sure to throw if some piece of code tries to mutate the collection
-    foreach (Type type in allTypes.Where(type => type.IsDefined(typeof(MessageAttribute))))
-    {
-      messageTypesBuilder.Add(type);
-    }
-
+    HashSet<Type> messageTypes = allTypes.Where(type => type.IsDefined(typeof(MessageAttribute))).ToHashSet();
     IEnumerable<Type> handlerConcreteTypes = allTypes.Where(type => !type.IsInterface && !type.IsAbstract && IsMessageHandler(type));
 
     IEnumerable<IGrouping<MessageHandlerIdentity, ImplementationPair>> identityMap = handlerConcreteTypes
@@ -54,10 +47,10 @@ internal class MessagingConfiguration : IMessagingConfiguration
 
     foreach (ImplementationPair pair in handlerMap.Values)
     {
-      messageTypesBuilder.Add(pair.InterfaceType.GetGenericArguments()[0]);
+      messageTypes.Add(pair.InterfaceType.GetGenericArguments()[0]);
     }
 
-    return new MessagingConfiguration(handlerMap, messageTypesBuilder.ToImmutable());
+    return new MessagingConfiguration(handlerMap, messageTypes);
   }
 
   private static IEnumerable<(MessageHandlerIdentity Identity, Type InterfaceType)> GetHandlerIdentities(Type concreteType, DaprMessagingOptions? options)
@@ -85,7 +78,7 @@ internal class MessagingConfiguration : IMessagingConfiguration
         if (messageType.IsGenericType)
           throw new NotSupportedException($"Generic message types are not suported. Message type was '{messageType.GetGenericTypeDefinition().FullName}'.");
         if (messageType.IsValueType)
-          throw new InvalidOperationException($"Message types must be reference types. Message type was '{messageType.FullName}'.");
+          throw new NotSupportedException($"Message types must be reference types. Message type was '{messageType.FullName}'.");
 
         MessageHandlerIdentity identity = new MessageHandlerIdentity(
           BusName: methodAttribute?.BusName ?? typeAttribute?.BusName ?? bindings?.BusName ?? options?.DefaultBus,
@@ -111,7 +104,9 @@ internal class MessagingConfiguration : IMessagingConfiguration
     }
     catch (InvalidOperationException)
     {
-      throw new ServiceRegistrationException($"Attempt to register more than one handler of the same message type, on the same message bus and topic.", grouping.Select(pair => pair.ImplementationType).ToArray());
+      throw new ServiceRegistrationException(
+        message: "Attempt to register more than one handler of the same message type, on the same message bus and topic.",
+        implementationTypes: grouping.Select(pair => pair.ImplementationType).ToArray());
     }
   }
 }

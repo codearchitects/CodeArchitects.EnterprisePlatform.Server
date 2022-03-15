@@ -2,7 +2,6 @@
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
@@ -23,5 +22,5 @@ internal interface IMessagingConfiguration
   /// <remarks>
   /// This collection will include all message types decorated with the <see cref="MessageAttribute"/> and/or type arguments of all registered <see cref="IMessageHandler{TMessage}"/> interfaces.
   /// </remarks>
-  ICollection<Type> MessageTypes { get; } // IReadOnlyCollection does not expose a 'Contains' method but this should be immutable
+  IReadOnlyCollection<Type> MessageTypes { get; }
 }

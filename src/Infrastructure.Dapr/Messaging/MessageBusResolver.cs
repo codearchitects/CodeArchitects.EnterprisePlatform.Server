@@ -12,7 +12,7 @@ internal class MessageBusResolver : IServiceResolver<IMessageBus>
   private readonly ConcurrentDictionary<string, MessageBus> _messageBusses;
 
   /// <summary>
-  /// Constructs a <see cref="DaprMessageBusResolver"/> instance.
+  /// Constructs a <see cref="MessageBusResolver"/> instance.
   /// </summary>
   /// <param name="dapr">The Dapr client.</param>
   public MessageBusResolver(DaprClient dapr)

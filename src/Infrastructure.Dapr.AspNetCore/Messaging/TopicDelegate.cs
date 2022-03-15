@@ -6,10 +6,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -17,30 +15,10 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 
 internal class TopicDelegate
 {
-  private static readonly MethodInfo s_handleMessageNoResultMethod;
-  private static readonly MethodInfo s_handleMessageWithResultMethod;
-
-  static TopicDelegate()
-  {
-    s_handleMessageNoResultMethod = typeof(TopicDelegate).GetMethod(
-      name: nameof(HandleMessageNoResult),
-      bindingAttr: BindingFlags.Static | BindingFlags.NonPublic,
-      binder: null,
-      types: new Type[2] { typeof(HttpContext), typeof(JObject) },
-      modifiers: null) ?? throw new MissingMethodException(nameof(TopicDelegate), nameof(HandleMessageNoResult));
-
-    s_handleMessageWithResultMethod = typeof(TopicDelegate).GetMethod(
-      name: nameof(HandleMessageWithResult),
-      bindingAttr: BindingFlags.Static | BindingFlags.NonPublic,
-      binder: null,
-      types: new Type[2] { typeof(HttpContext), typeof(JObject) },
-      modifiers: null) ?? throw new MissingMethodException(nameof(TopicDelegate), nameof(HandleMessageWithResult));
-  }
-  
   private readonly Dictionary<string, HandlerDelegate> _delegates;
   private readonly IReadOnlyDictionary<string, Type> _messageTypes;
 
-  private TopicDelegate(Dictionary<string, HandlerDelegate> delegates, IReadOnlyDictionary<string, Type> messageTypes)
+  public TopicDelegate(Dictionary<string, HandlerDelegate> delegates, IReadOnlyDictionary<string, Type> messageTypes)
   {
     _delegates = delegates;
     _messageTypes = messageTypes;
@@ -50,7 +28,7 @@ internal class TopicDelegate
   {
     using StreamReader streamReader = new StreamReader(context.Request.Body);
     using JsonTextReader jsonReader = new JsonTextReader(streamReader);
-    ILogger? logger = context.RequestServices.GetService<ILoggerFactory>()?.CreateLogger("CAEP-Messaging");
+    ILogger? logger = context.RequestServices.GetService<ILoggerFactory>()?.CreateLogger(Constants.LoggingCategory);
 
     switch (context.Request.ContentType)
     {
@@ -70,7 +48,7 @@ internal class TopicDelegate
     JObject cloudEventObject = await JObject.LoadAsync(jsonReader, context.RequestAborted);
     bool hasData = cloudEventObject.ContainsKey("data");
     bool hasDataBase64 = cloudEventObject.ContainsKey("data_base64");
-    
+
     if (hasData && hasDataBase64)
     {
       logger?.LogError("Both 'data' and 'data_base64' properties were set in CloudEvent envelope.");
@@ -151,9 +129,9 @@ internal class TopicDelegate
       logger?.LogError($"Cannot deserialize message of type '{messageName}' to type '{ex.MessageType.FullName}'.", ex);
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
     }
-    catch (Exception ex)
+    catch
     {
-      logger?.LogError("Error in executing a message handling action.", ex);
+      logger?.LogError("Error in executing a message handling action.");
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
     }
   }
@@ -181,55 +159,4 @@ internal class TopicDelegate
     handlerDelegate = null;
     return false;
   }
-
-  public static TopicDelegate Create(IEnumerable<TopicDelegateData> topicData, ICollection<Type> messageTypes)
-  {
-    IReadOnlyDictionary<string, Type> messageTypeDictionary = messageTypes
-      .ToDictionary(type => type.GetCustomAttribute<MessageAttribute>()?.MessageName ?? type.Name);
-
-    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
-    foreach ((Type messageType, Type? resultType, Type handlerType) in topicData)
-    {
-      Debug.Assert(!messageType.IsGenericType, "Message types were supposed to be non-generic.");
-      Debug.Assert(!messageType.IsValueType, "Message types were supposed to be reference types.");
-
-      string messageName = messageType.GetCustomAttribute<MessageAttribute>()?.MessageName ?? messageType.Name;
-
-      MethodInfo method = resultType is not null
-        ? s_handleMessageWithResultMethod.MakeGenericMethod(messageType, resultType, handlerType)
-        : s_handleMessageNoResultMethod.MakeGenericMethod(messageType, handlerType);
-      HandlerDelegate @delegate = (HandlerDelegate)Delegate.CreateDelegate(typeof(HandlerDelegate), method);
-
-      delegates.Add(messageName, @delegate); // This should not throw because of duplicate keys: it would mean we have duplicate MessageHandlerIdentities.
-    }
-
-    return new TopicDelegate(delegates, messageTypeDictionary);
-  }
-
-  private static async Task HandleMessageNoResult<TMessage, THandler>(HttpContext context, JObject messageObject)
-    where TMessage : class
-    where THandler : class, IMessageHandler<TMessage>
-  {
-    TMessage message = messageObject.ToObject<TMessage>() ?? throw new InvalidMessageTypeException(typeof(TMessage));
-
-    IMessageHandler<TMessage> handler = context.RequestServices.GetRequiredService<THandler>();
-    await handler.HandleAsync(message, context.RequestAborted);
-    
-    // TODO: Invoke bindings
-  }
-
-  private static async Task HandleMessageWithResult<TMessage, TResult, THandler>(HttpContext context, JObject messageObject)
-    where TMessage : class
-    where TResult : class
-    where THandler : class, IMessageHandler<TMessage, TResult>
-  {
-    TMessage message = messageObject.ToObject<TMessage>() ?? throw new InvalidMessageTypeException(typeof(TMessage));
-
-    IMessageHandler<TMessage, TResult> handler = context.RequestServices.GetRequiredService<THandler>();
-    TResult result = await handler.HandleAsync(message, context.RequestAborted);
-    
-    // TODO: Invoke bindings
-  }
-
-  private delegate Task HandlerDelegate(HttpContext context, JObject messageJson);
 }

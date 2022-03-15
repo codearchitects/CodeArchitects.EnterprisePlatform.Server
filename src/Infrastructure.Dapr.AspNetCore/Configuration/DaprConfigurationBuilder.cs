@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 

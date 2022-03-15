@@ -1,11 +1,11 @@
 ﻿using CodeArchitects.Platform.Common.Internals;
 using CodeArchitects.Platform.Common.Ioc;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
+using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using CodeArchitects.Platform.Infrastructure.State;
-using System;
 using System.Linq;
 using System.Reflection;
 
@@ -51,8 +51,13 @@ public static class DaprInfrastructureBuilderExtensions
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
+
     MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration?.Service?.Messaging);
+    TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
+
+    builder.Services.AddSingleton<MessageHandlerServiceMarker>();
     builder.Services.AddSingleton<IMessagingConfiguration>(configuration);
+    builder.Services.AddSingleton<ITopicDelegateFactory>(factory);
 
     foreach (ImplementationPair pair in configuration.HandlerMap.Values)
     {

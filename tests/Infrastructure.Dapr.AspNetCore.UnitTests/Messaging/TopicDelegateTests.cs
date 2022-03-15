@@ -1,12 +1,12 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
-using CodeArchitects.Platform.Infrastructure.Messaging;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,27 +16,27 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 
 public class TopicDelegateTests
 {
-  private readonly Mock<IMessageHandler<Message1>> _handler1Mock;
-  private readonly Mock<IMessageHandler<Message2, string>> _handler2Mock;
-  private readonly Mock<IMessageHandler<Message3>> _handler3Mock;
+  private readonly Mock<HandlerDelegate> _delegate1Mock;
+  private readonly Mock<HandlerDelegate> _delegate2Mock;
+  private readonly Mock<HandlerDelegate> _delegate3Mock;
   private readonly Mock<IServiceProvider> _serviceProviderMock;
   private readonly Mock<HttpContext> _httpContextMock;
 
   public TopicDelegateTests()
   {
-    _handler1Mock = new Mock<IMessageHandler<Message1>>(MockBehavior.Strict);
-    _handler1Mock
-      .Setup(x => x.HandleAsync(It.IsAny<Message1>(), It.IsAny<CancellationToken>()))
+    _delegate1Mock = new Mock<HandlerDelegate>(MockBehavior.Strict);
+    _delegate1Mock
+      .Setup(x => x(It.IsAny<HttpContext>(), It.IsAny<JObject>()))
       .Returns(Task.CompletedTask);
 
-    _handler2Mock = new Mock<IMessageHandler<Message2, string>>(MockBehavior.Strict);
-    _handler2Mock
-      .Setup(x => x.HandleAsync(It.IsAny<Message2>(), It.IsAny<CancellationToken>()))
-      .Returns(Task.FromResult(string.Empty));
+    _delegate2Mock = new Mock<HandlerDelegate>(MockBehavior.Strict);
+    _delegate2Mock
+      .Setup(x => x(It.IsAny<HttpContext>(), It.IsAny<JObject>()))
+      .Returns(Task.CompletedTask);
 
-    _handler3Mock = new Mock<IMessageHandler<Message3>>(MockBehavior.Strict);
-    _handler3Mock
-      .Setup(x => x.HandleAsync(It.IsAny<Message3>(), It.IsAny<CancellationToken>()))
+    _delegate3Mock = new Mock<HandlerDelegate>(MockBehavior.Strict);
+    _delegate3Mock
+      .Setup(x => x(It.IsAny<HttpContext>(), It.IsAny<JObject>()))
       .Returns(Task.CompletedTask);
 
     Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>(MockBehavior.Strict);
@@ -45,15 +45,6 @@ public class TopicDelegateTests
       .Setup(x => x.CreateLogger("CAEP-Messaging"))
       .Returns(loggerMock.Object);
     _serviceProviderMock = new Mock<IServiceProvider>(MockBehavior.Strict);
-    _serviceProviderMock
-      .Setup(x => x.GetService(Handler1.GetType()))
-      .Returns(Handler1);
-    _serviceProviderMock
-      .Setup(x => x.GetService(Handler2.GetType()))
-      .Returns(Handler2);
-    _serviceProviderMock
-      .Setup(x => x.GetService(Handler3.GetType()))
-      .Returns(Handler3);
     _serviceProviderMock
       .Setup(x => x.GetService(typeof(ILoggerFactory)))
       .Returns(loggerFactoryMock.Object);
@@ -69,14 +60,11 @@ public class TopicDelegateTests
       .Returns(CancellationToken.None);
   }
 
-  private IMessageHandler<Message1> Handler1 => _handler1Mock.Object;
-  private IMessageHandler<Message2, string> Handler2 => _handler2Mock.Object;
-  private IMessageHandler<Message3> Handler3 => _handler3Mock.Object;
+  private HandlerDelegate Delegate1 => _delegate1Mock.Object;
+  private HandlerDelegate Delegate2 => _delegate2Mock.Object;
+  private HandlerDelegate Delegate3 => _delegate3Mock.Object;
   private IServiceProvider ServiceProvider => _serviceProviderMock.Object;
   private HttpContext HttpContext => _httpContextMock.Object;
-  private TopicDelegateData Handler1Data => new TopicDelegateData(typeof(Message1), null, Handler1.GetType());
-  private TopicDelegateData Handler2Data => new TopicDelegateData(typeof(Message2), typeof(string), Handler2.GetType());
-  private TopicDelegateData Handler3Data => new TopicDelegateData(typeof(Message3), null, Handler3.GetType());
 
   [Fact]
   public async Task ExecuteAsync_ShouldCallCorrectHandlerWithCorrectMessage_WhenHandlerHasNoResultAndMessageIsCloudEvent()
@@ -106,13 +94,23 @@ public class TopicDelegateTests
     _httpContextMock
       .Setup(x => x.Request.ContentType)
       .Returns("application/cloudevents+json");
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler1Data }, new[] { typeof(Message1) });
+
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message1"] = Delegate1
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message1"] = typeof(Message1)
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler1Mock.Verify(x => x.HandleAsync(It.Is<Message1>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122"), It.IsAny<CancellationToken>()), Times.Once);
+    _delegate1Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122")), Times.Once);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -145,13 +143,22 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/cloudevents+json");
 
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler2Data }, new[] { typeof(Message2) });
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message2"] = Delegate2
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message2"] = typeof(Message2)
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler2Mock.Verify(x => x.HandleAsync(It.Is<Message2>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122"), It.IsAny<CancellationToken>()), Times.Once);
+    _delegate2Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122")), Times.Once);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -173,13 +180,22 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/json");
 
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler1Data }, new[] { typeof(Message1) });
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message1"] = Delegate1
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message1"] = typeof(Message1)
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler1Mock.Verify(x => x.HandleAsync(It.Is<Message1>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122"), It.IsAny<CancellationToken>()), Times.Once);
+    _delegate1Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122")), Times.Once);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -201,13 +217,22 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/json");
 
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler2Data }, new[] { typeof(Message2) });
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message2"] = Delegate2
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message2"] = typeof(Message2)
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler2Mock.Verify(x => x.HandleAsync(It.Is<Message2>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122"), It.IsAny<CancellationToken>()), Times.Once);
+    _delegate2Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122")), Times.Once);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -229,15 +254,18 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/json");
 
-    TopicDelegate sut = TopicDelegate.Create(Enumerable.Empty<TopicDelegateData>(), Type.EmptyTypes);
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>();
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler1Mock.Verify(x => x.HandleAsync(It.IsAny<Message1>(), It.IsAny<CancellationToken>()), Times.Never);
-    _handler2Mock.Verify(x => x.HandleAsync(It.IsAny<Message2>(), It.IsAny<CancellationToken>()), Times.Never);
-    _handler3Mock.Verify(x => x.HandleAsync(It.IsAny<Message3>(), It.IsAny<CancellationToken>()), Times.Never);
+    _delegate1Mock.Verify(x => x(_httpContextMock.Object, It.IsAny<JObject>()), Times.Never);
+    _delegate2Mock.Verify(x => x(_httpContextMock.Object, It.IsAny<JObject>()), Times.Never);
+    _delegate3Mock.Verify(x => x(_httpContextMock.Object, It.IsAny<JObject>()), Times.Never);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -260,14 +288,25 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/json");
 
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler1Data, Handler3Data }, new[] { typeof(Message1), typeof(Message3) });
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message1"] = Delegate1,
+      ["Message3"] = Delegate3
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message1"] = typeof(Message1),
+      ["Message3"] = typeof(Message3),
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler1Mock.Verify(x => x.HandleAsync(It.IsAny<Message1>(), It.IsAny<CancellationToken>()), Times.Never);
-    _handler3Mock.Verify(x => x.HandleAsync(It.Is<Message3>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122" && x.Prop == "propvalue"), It.IsAny<CancellationToken>()), Times.Once);
+    _delegate1Mock.Verify(x => x(_httpContextMock.Object, It.IsAny<JObject>()), Times.Never);
+    _delegate3Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122" && x.Value<string>("prop") == "propvalue")), Times.Once);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 
@@ -290,14 +329,24 @@ public class TopicDelegateTests
       .Setup(x => x.Request.ContentType)
       .Returns("application/json");
 
-    TopicDelegate sut = TopicDelegate.Create(new[] { Handler1Data }, new[] { typeof(Message1), typeof(Message3) });
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>
+    {
+      ["Message1"] = Delegate1
+    };
+    Dictionary<string, Type> messageTypes = new Dictionary<string, Type>
+    {
+      ["Message1"] = typeof(Message1),
+      ["Message3"] = typeof(Message3),
+    };
+
+    TopicDelegate sut = new TopicDelegate(delegates, messageTypes);
 
     // Act
     await sut.ExecuteAsync(_httpContextMock.Object);
 
     // Assert
-    _handler1Mock.Verify(x => x.HandleAsync(It.Is<Message1>(x => x.Id.ToString() == "27a3e578-d9bc-412b-9a4f-1218b78fd122"), It.IsAny<CancellationToken>()), Times.Once);
-    _handler3Mock.Verify(x => x.HandleAsync(It.IsAny<Message3>(), It.IsAny<CancellationToken>()), Times.Never);
+    _delegate1Mock.Verify(x => x(_httpContextMock.Object, It.Is<JObject>(x => x.Value<string>("id") == "27a3e578-d9bc-412b-9a4f-1218b78fd122" && x.Value<string>("prop") == "propvalue")), Times.Once);
+    _delegate3Mock.Verify(x => x(_httpContextMock.Object, It.IsAny<JObject>()), Times.Never);
     HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
   }
 

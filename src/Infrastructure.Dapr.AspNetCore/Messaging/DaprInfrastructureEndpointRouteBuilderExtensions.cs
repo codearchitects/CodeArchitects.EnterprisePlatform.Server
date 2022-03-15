@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Internals;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,12 +22,13 @@ public static class DaprInfrastructureEndpointRouteBuilderExtensions
   {
     if (endpoints is null)
       throw new ArgumentNullException(nameof(endpoints));
-    
-    IMessagingConfiguration? messagingConfiguration = endpoints.ServiceProvider.GetService<IMessagingConfiguration>();
-    if (messagingConfiguration is null)
-    {
+
+    if (endpoints.ServiceProvider.GetService<MessageHandlerServiceMarker>() is null)
       throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddMessageHandlers)} to the Dapr infrastructure builder.");
-    }
+
+    IMessagingConfiguration messagingConfiguration = endpoints.ServiceProvider.GetRequiredService<IMessagingConfiguration>();
+    ITopicDelegateFactory delegateFactory = endpoints.ServiceProvider.GetRequiredService<ITopicDelegateFactory>();
+
     ILoggerFactory? loggerFactory = endpoints.ServiceProvider.GetService<ILoggerFactory>();
     ILogger? logger = loggerFactory?.CreateLogger(Constants.LoggingCategory);
 
@@ -46,19 +46,7 @@ public static class DaprInfrastructureEndpointRouteBuilderExtensions
         continue;
       }
 
-      IEnumerable<TopicDelegateData> topicData = identityGroup.Select(identity =>
-      {
-        ImplementationPair pair = messagingConfiguration.HandlerMap[identity];
-        Type messageType = identity.MessageType;
-        Type[] interfaceArguments = pair.InterfaceType.GetGenericArguments();
-        Type? resultType = interfaceArguments.Length == 2
-          ? interfaceArguments[1]
-          : null;
-
-        return new TopicDelegateData(messageType, resultType, pair.ImplementationType);
-      });
-
-      TopicDelegate @delegate = TopicDelegate.Create(topicData, messagingConfiguration.MessageTypes);
+      TopicDelegate @delegate = delegateFactory.CreateDelegate(identityGroup);
 
       endpoints
         .MapPost($"/pubsub/{busName}/{topic}", @delegate.ExecuteAsync)
