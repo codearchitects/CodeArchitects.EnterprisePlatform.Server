@@ -6,40 +6,26 @@ using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
-public class DaprMessageBusResolverTests
+public class MessageBusResolverTests
 {
   private readonly Mock<DaprClient> _daprClientMock;
-  private readonly DaprMessageBusResolver _sut;
+  private readonly MessageBusResolver _sut;
 
-  public DaprMessageBusResolverTests()
+  public MessageBusResolverTests()
   {
     _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-    _sut = new DaprMessageBusResolver(_daprClientMock.Object);
+    _sut = new MessageBusResolver(_daprClientMock.Object);
   }
 
   [Fact]
   public void Resolve_ShouldCreateBusOnlyOnce()
   {
     // Arrange
-    const string busName = nameof(busName);
+    const string busName = "busName";
 
     // Act
     IMessageBus bus1 = _sut.Resolve(busName);
     IMessageBus bus2 = _sut.Resolve(busName);
-
-    // Assert
-    bus1.Should().BeSameAs(bus2);
-  }
-
-  [Fact]
-  public void Resolve_WithMetadataShouldCreateBusOnlyOnce()
-  {
-    // Arrange
-    const string busName = nameof(busName);
-
-    // Act
-    IMessageBus<DaprMetadata> bus1 = _sut.Resolve(busName);
-    IMessageBus<DaprMetadata> bus2 = _sut.Resolve(busName);
 
     // Assert
     bus1.Should().BeSameAs(bus2);

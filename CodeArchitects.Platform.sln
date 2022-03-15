@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore", "src\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj", "{63326C5E-B857-4D2C-BA60-46151F434AA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests", "tests\Data.EntityFrameworkCore.IntegrationTests\CodeArchitects.Platform.Data.EntityFrameworkCore.IntegrationTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests", "tests\Data.EntityFrameworkCore.FunctionalTests\CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application", "src\Application\CodeArchitects.Platform.Application.csproj", "{D41F7716-18DF-47DF-82AF-8A5CF4613408}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer", "src\Analyzer\CodeArchitects.Platform.Analyzer.csproj", "{197B5E82-359B-4F12-93B5-7EE541433D77}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer.Tests", "tests\Analyzer.Tests\CodeArchitects.Platform.Analyzer.Tests.csproj", "{40038BD9-FA12-47EA-8DF4-2F43F9050E82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.FunctionalTests", "tests\Infrastructure.Dapr.AspNetCore.FunctionalTests\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.FunctionalTests.csproj", "{ED8ECCD8-966B-485F-A98A-1E03960B894D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +105,10 @@ Global
 		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40038BD9-FA12-47EA-8DF4-2F43F9050E82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED8ECCD8-966B-485F-A98A-1E03960B894D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED8ECCD8-966B-485F-A98A-1E03960B894D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED8ECCD8-966B-485F-A98A-1E03960B894D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED8ECCD8-966B-485F-A98A-1E03960B894D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,6 +122,7 @@ Global
 		{69CAE493-4596-4875-9345-D3524FBD47C8} = {646C726C-D374-4213-B169-EB07E0130DEF}
 		{197B5E82-359B-4F12-93B5-7EE541433D77} = {646C726C-D374-4213-B169-EB07E0130DEF}
 		{40038BD9-FA12-47EA-8DF4-2F43F9050E82} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{ED8ECCD8-966B-485F-A98A-1E03960B894D} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

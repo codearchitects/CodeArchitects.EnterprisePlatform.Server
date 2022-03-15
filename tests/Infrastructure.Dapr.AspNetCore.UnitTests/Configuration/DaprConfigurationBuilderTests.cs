@@ -44,7 +44,20 @@ public class DaprConfigurationBuilderTests
       {
         Messaging = new DaprMessagingOptions
         {
-          DefaultBus = "DefaultBus"
+          DefaultBus = "DefaultBus",
+          Bindings = new Dictionary<string, DaprMessagingBindings>
+          {
+            ["Message1Handler"] = new DaprMessagingBindings
+            {
+              BusName = "BusName1",
+              Topic = "Topic1"
+            },
+            ["Message2Handler"] = new DaprMessagingBindings
+            {
+              BusName = "BusName2",
+              Topic = "Topic2"
+            }
+          }
         },
         State = new DaprStateOptions
         {
@@ -52,7 +65,36 @@ public class DaprConfigurationBuilderTests
         }
       }
     };
-    ConfigurationSectionStub section = new ConfigurationSectionStub(null, null, new { EspDapr = expectedConfiguration.Service });
+    ConfigurationSectionStub section = new ConfigurationSectionStub(null, null, new
+    {
+      Caep = new
+      {
+        Dapr = new
+        {
+          Messaging = new
+          {
+            DefaultBus = "DefaultBus",
+            Bindings = new
+            {
+              Message1Handler = new
+              {
+                BusName = "BusName1",
+                Topic = "Topic1"
+              },
+              Message2Handler = new
+              {
+                BusName = "BusName2",
+                Topic = "Topic2"
+              }
+            }
+          },
+          State = new
+          {
+            DefaultStore = "DefaultStore"
+          }
+        }
+      }
+    });
 
     // Act
     _sut.AddServiceOptions(section as IConfiguration);
@@ -141,7 +183,16 @@ public class DaprConfigurationBuilderTests
 
     public IConfigurationSection GetSection(string key)
     {
-      return _sections?.GetValueOrDefault(key) ?? null!;
+      return GetSection(key.Split(":"));
+    }
+
+    private IConfigurationSection GetSection(string[] segments)
+    {
+      if (segments.Length == 1)
+      {
+        return _sections?.GetValueOrDefault(segments[0]) ?? null!;
+      }
+      return GetSection(segments[..^1])?.GetSection(segments[^1]) ?? null!;
     }
   }
 }

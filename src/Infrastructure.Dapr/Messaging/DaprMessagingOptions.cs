@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
+﻿using System.Collections.Generic;
+
+namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
 /// <summary>
 /// Provides messaging configuration options.
@@ -8,5 +10,10 @@ public class DaprMessagingOptions
   /// <summary>
   /// The default bus name.
   /// </summary>
-  public string? DefaultBus { get; init; }
+  public string? DefaultBus { get; set; }
+
+  /// <summary>
+  /// Declarative bindings for the handlers.
+  /// </summary>
+  public Dictionary<string, DaprMessagingBindings>? Bindings { get; set; }
 }

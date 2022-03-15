@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 
@@ -20,7 +22,7 @@ internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
 
   /// <inheritdoc cref="IDaprConfigurationBuilder.AddServiceOptions(IConfiguration)"/>
   public DaprConfigurationBuilder AddServiceOptions(IConfiguration configuration)
-    => AddServiceOptions(configuration.GetSection(Constants.DefaultDaprConfigurationSectionKey));
+    => AddServiceOptions(configuration.GetSection("Caep:Dapr"));
 
   /// <summary>
   /// Builds a <see cref="DaprConfiguration"/> instance.

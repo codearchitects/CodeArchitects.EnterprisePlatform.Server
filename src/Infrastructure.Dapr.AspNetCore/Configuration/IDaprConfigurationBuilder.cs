@@ -16,7 +16,7 @@ public interface IDaprConfigurationBuilder
   IDaprConfigurationBuilder AddServiceOptions(IConfigurationSection serviceConfiguration);
 
   /// <summary>
-  /// Uses the Dapr service options (see <see cref="ServiceOptions"/>) defined in the <see cref="Constants.DefaultDaprConfigurationSectionKey"/> section of the given configuration.
+  /// Uses the Dapr service options (see <see cref="ServiceOptions"/>) defined in the default section (Caep:Dapr) of the given configuration.
   /// </summary>
   /// <param name="configuration">The application configuration instance.</param>
   /// <returns>The same builder so it can be further configured.</returns>
