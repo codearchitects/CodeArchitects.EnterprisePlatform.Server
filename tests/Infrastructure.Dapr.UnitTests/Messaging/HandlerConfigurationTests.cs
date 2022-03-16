@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
+using CodeArchitects.Platform.Common.Internals;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes;
+using CodeArchitects.Platform.Infrastructure.Messaging;
 using FluentAssertions;
 using Moq;
 using System;
@@ -10,68 +12,225 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
 public class HandlerConfigurationTests
 {
-  [Fact]
-  public void Constructor_ShouldCreateHandlerMap_WhenAssemblyIsValid()
+  private readonly Mock<Assembly> _assemblyMock;
+
+  public HandlerConfigurationTests()
   {
-    // Arrange
-    MessageHandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
-
-    // Act
-    MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(new Assembly[] { HandlerAssembly.Valid.Instance });
-
-    // Assert
-    configuration.HandlerMap.Keys.Should().BeEquivalentTo(expectedIdentities);
-    configuration.HandlerMap[expectedIdentities[0]].Should().Be(HandlerAssembly.Valid.HandlerForIdentity0);
-    configuration.HandlerMap[expectedIdentities[1]].Should().Be(HandlerAssembly.Valid.HandlerForIdentity1);
-    configuration.HandlerMap[expectedIdentities[2]].Should().Be(HandlerAssembly.Valid.HandlerForIdentity2);
-    configuration.HandlerMap[expectedIdentities[3]].Should().Be(HandlerAssembly.Valid.HandlerForIdentity3);
+    _assemblyMock = new Mock<Assembly>(MockBehavior.Strict);
   }
 
   [Fact]
-  public void Constructor_ShouldCreateHandlerMapFromAllAssemblies_WhenAssembliesAreValid()
+  public void Create_ShouldRegisterMessageHandler_WhenTypeHasAttribute()
   {
     // Arrange
-    Mock<Assembly> assembly1Mock = new Mock<Assembly>(behavior: MockBehavior.Strict);
-    assembly1Mock
+    Type handlerType = typeof(Message1Handler1);
+    _assemblyMock
       .Setup(x => x.GetTypes())
-      .Returns(new Type[]
-      {
-          typeof(FakeMessage1Handler1) // Identities: (null, null, typeof(FakeMessage1))
-      });
-    Mock<Assembly> assembly2Mock = new Mock<Assembly>(behavior: MockBehavior.Strict);
-    assembly2Mock
-      .Setup(x => x.GetTypes())
-      .Returns(new Type[]
-      {
-          typeof(FakeMessage2Handler) // Identities: (null, null, typeof(FakeMessage2))
-      });
-    MessageHandlerIdentity[] expectedIdentities = new MessageHandlerIdentity[]
-    {
-        new MessageHandlerIdentity(null, null, typeof(FakeMessage1)), // Handlers: FakeMessage1Handler1
-        new MessageHandlerIdentity(null, null, typeof(FakeMessage2)), // Handlers: FakeMessage2Handler
-    };
-    Type expectedHandlerForIdentity0 = typeof(FakeMessage1Handler1);
-    Type expectedHandlerForIdentity1 = typeof(FakeMessage2Handler);
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(null, MessageBus.DefaultTopic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(new Assembly[] { assembly1Mock.Object, assembly2Mock.Object });
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
 
     // Assert
-    configuration.HandlerMap.Keys.Should().BeEquivalentTo(expectedIdentities);
-    configuration.HandlerMap[expectedIdentities[0]].Should().Be(expectedHandlerForIdentity0);
-    configuration.HandlerMap[expectedIdentities[1]].Should().Be(expectedHandlerForIdentity1);
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
   }
 
   [Fact]
-  public void Constructor_ShouldThrowServiceRegistrationException_WhenAssemblyIsInvalid()
+  public void Create_ShouldRegisterMessageHandler_WhenMethodHasAttribute()
   {
     // Arrange
-    MessageHandlerIdentity[] expectedIdentities = HandlerAssembly.ExpectedIdentities;
+    Type handlerType = typeof(Message1Handler2);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(null, MessageBus.DefaultTopic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    Func<MessageHandlerConfiguration> act = () => new MessageHandlerConfiguration(new Assembly[] { HandlerAssembly.Invalid.Instance });
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
 
     // Assert
-    act.Should().Throw<ServiceRegistrationException>().Which.ImplementationTypes.Should().BeEquivalentTo(HandlerAssembly.Invalid.InvalidHandlerTypes);
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenTypeHasAttributeWithBusName()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1Handler3);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(Message1Handler3.BusName, MessageBus.DefaultTopic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenMethodHasAttributeWithBusName()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1Handler4);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(Message1Handler4.BusNameFromMethod, MessageBus.DefaultTopic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenTypeHasAttributeWithTopic()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1Handler5);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(null, Message1Handler5.Topic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenMethodHasAttributeWithTopic()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1Handler6);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(null, Message1Handler6.TopicFromMethod, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenItHasReturnValue()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1Handler7);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity = new MessageHandlerIdentity(null, MessageBus.DefaultTopic, typeof(Message1));
+    ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1, string>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
+    configuration.HandlerMap[expectedIdentity].Should().Be(expectedPair);
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessageHandler_WhenItHandlesMultipleMessages()
+  {
+    // Arrange
+    Type handlerType = typeof(Message1And2Handler);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    MessageHandlerIdentity expectedIdentity1 = new MessageHandlerIdentity(null, MessageBus.DefaultTopic, typeof(Message1));
+    MessageHandlerIdentity expectedIdentity2 = new MessageHandlerIdentity(null, MessageBus.DefaultTopic, typeof(Message2));
+    ImplementationPair expectedPair1 = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
+    ImplementationPair expectedPair2 = new ImplementationPair(typeof(IMessageHandler<Message2, string>), handlerType);
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().HaveCount(2)
+      .And.Contain(expectedIdentity1)
+      .And.Contain(expectedIdentity2);
+    configuration.HandlerMap[expectedIdentity1].Should().Be(expectedPair1);
+    configuration.HandlerMap[expectedIdentity2].Should().Be(expectedPair2);
+  }
+
+  [Fact]
+  public void Create_ShouldNotRegisterMessageHandler_WhenItDoesNotHaveAttributes()
+  {
+    // Arrange
+    Type handlerType = typeof(ThisHandlerShouldntBeRegistered);
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { handlerType });
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.HandlerMap.Keys.Should().BeEmpty();
+  }
+
+  [Fact]
+  public void Create_ShouldRegisterMessagesOfHandlersAndMessagesWithAttribute()
+  {
+    // Arrange
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(new Type[] { typeof(Message1And2Handler), typeof(Message3) });
+
+    // Act
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    configuration.MessageTypes.Should().HaveCount(3)
+      .And.Contain(typeof(Message1))
+      .And.Contain(typeof(Message2))
+      .And.Contain(typeof(Message3));
+  }
+
+  [Fact]
+  public void Create_ShouldThrowServiceRegistrationException_WhenMultipleHandlersHaveSameIdentity()
+  {
+    // Arrange
+    Type[] handlerTypes = new Type[] { typeof(Message1Handler1), typeof(Message1Handler7) };
+    _assemblyMock
+      .Setup(x => x.GetTypes())
+      .Returns(handlerTypes);
+
+    // Act
+    Func<MessagingConfiguration> act = () => MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, null);
+
+    // Assert
+    act.Should().Throw<ServiceRegistrationException>().Which.ImplementationTypes.Should().BeEquivalentTo(handlerTypes);
   }
 }

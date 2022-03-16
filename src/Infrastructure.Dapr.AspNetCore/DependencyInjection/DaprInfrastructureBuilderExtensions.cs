@@ -1,10 +1,11 @@
-﻿using CodeArchitects.Platform.Common.Ioc;
+﻿using CodeArchitects.Platform.Common.Internals;
+using CodeArchitects.Platform.Common.Ioc;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
+using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using CodeArchitects.Platform.Infrastructure.State;
-using System;
 using System.Linq;
 using System.Reflection;
 
@@ -16,17 +17,14 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class DaprInfrastructureBuilderExtensions
 {
   /// <summary>
-  /// Adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> and
-  /// <see cref="IMessageBus{TMetadata}"/> of <see cref="DaprMetadata"/> to the services.
-  /// If configured, also adds a default <see cref="IMessageBus"/> and
-  /// <see cref="IMessageBus{TMetadata}"/> of <see cref="DaprMetadata"/>.
+  /// Adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services.
+  /// If configured, also adds a default <see cref="IMessageBus"/>.
   /// </summary>
   /// <param name="builder">The builder instance.</param>
   /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddMessageBus(this IDaprInfrastructureBuilder builder)
   {
-    builder.Services.AddSingleton<IServiceResolver<IMessageBus>, DaprMessageBusResolver>();
-    builder.Services.AddSingleton<IServiceResolver<IMessageBus<DaprMetadata>>, DaprMessageBusResolver>();
+    builder.Services.AddSingleton<IServiceResolver<IMessageBus>, MessageBusResolver>();
 
     DaprMessagingOptions? options = builder.Configuration?.Service?.Messaging;
 
@@ -35,7 +33,6 @@ public static class DaprInfrastructureBuilderExtensions
       if (!string.IsNullOrWhiteSpace(options.DefaultBus))
       {
         builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus>>().Resolve(options.DefaultBus));
-        builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus<DaprMetadata>>>().Resolve(options.DefaultBus));
       }
     }
 
@@ -54,12 +51,17 @@ public static class DaprInfrastructureBuilderExtensions
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
-    MessageHandlerConfiguration configuration = new MessageHandlerConfiguration(assemblies.Distinct());
-    builder.Services.AddSingleton<IMessageHandlerConfiguration>(configuration);
 
-    foreach (Type handlerImplementationType in configuration.HandlerMap.Values)
+    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration?.Service?.Messaging);
+    TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
+
+    builder.Services.AddSingleton<MessageHandlerMarkerService>();
+    builder.Services.AddSingleton<IMessagingConfiguration>(configuration);
+    builder.Services.AddSingleton<ITopicDelegateFactory>(factory);
+
+    foreach (ImplementationPair pair in configuration.HandlerMap.Values)
     {
-      builder.Services.AddScoped(handlerImplementationType);
+      builder.Services.AddScoped(pair.ImplementationType);
     }
 
     return builder;

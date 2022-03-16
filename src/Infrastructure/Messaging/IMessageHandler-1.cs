@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace CodeArchitects.Platform.Infrastructure.Messaging;
 
 /// <summary>
-/// A class that handles <typeparamref name="TMessage"/> instances asynchronously.
+/// A class that handles messagees of type <typeparamref name="TMessage"/> and produces no result.
 /// </summary>
 /// <typeparam name="TMessage">The type of the handled message.</typeparam>
 public interface IMessageHandler<TMessage>

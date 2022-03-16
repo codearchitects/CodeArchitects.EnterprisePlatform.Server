@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeAnalysis\CodeArchitects.Platform.CodeAnalysis.csproj" />
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
   </ItemGroup>
 
 </Project>

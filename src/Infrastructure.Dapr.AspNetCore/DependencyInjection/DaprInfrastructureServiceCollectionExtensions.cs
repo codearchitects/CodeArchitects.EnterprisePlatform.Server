@@ -1,7 +1,7 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
+using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using System;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

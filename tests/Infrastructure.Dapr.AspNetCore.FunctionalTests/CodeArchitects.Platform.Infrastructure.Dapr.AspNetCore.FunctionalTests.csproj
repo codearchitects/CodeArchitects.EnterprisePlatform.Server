@@ -1,17 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    
+
     <IsPackable>false</IsPackable>
-    
-    <RootNamespace>CodeArchitects.Platform.Infrastructure.Dapr</RootNamespace>
+
+    <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".FunctionalTests", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj" />
+    <ProjectReference Include="..\..\src\Infrastructure.Dapr.AspNetCore\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>
