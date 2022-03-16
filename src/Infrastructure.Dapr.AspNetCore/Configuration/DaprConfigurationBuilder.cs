@@ -10,17 +10,22 @@ internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
 {
   private ServiceOptions? _serviceConfig;
 
-  /// <inheritdoc cref="IDaprConfigurationBuilder.AddServiceOptions(IConfigurationSection)"/>
-  public DaprConfigurationBuilder AddServiceOptions(IConfigurationSection serviceConfiguration)
+  public IDaprConfigurationBuilder AddServiceOptions(IConfigurationSection serviceConfiguration)
+  {
+    return AddServiceOptionsCore(serviceConfiguration);
+  }
+
+  public IDaprConfigurationBuilder AddServiceOptions(IConfiguration configuration)
+  {
+    return AddServiceOptionsCore(configuration.GetSection("Caep:Dapr"));
+  }
+
+  private IDaprConfigurationBuilder AddServiceOptionsCore(IConfigurationSection serviceConfiguration)
   {
     _serviceConfig = new ServiceOptions();
     serviceConfiguration.Bind(_serviceConfig);
     return this;
   }
-
-  /// <inheritdoc cref="IDaprConfigurationBuilder.AddServiceOptions(IConfiguration)"/>
-  public DaprConfigurationBuilder AddServiceOptions(IConfiguration configuration)
-    => AddServiceOptions(configuration.GetSection("Caep:Dapr"));
 
   /// <summary>
   /// Builds a <see cref="DaprConfiguration"/> instance.
@@ -33,10 +38,4 @@ internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
       Service = _serviceConfig
     };
   }
-
-  IDaprConfigurationBuilder IDaprConfigurationBuilder.AddServiceOptions(IConfigurationSection serviceConfiguration)
-    => AddServiceOptions(serviceConfiguration);
-
-  IDaprConfigurationBuilder IDaprConfigurationBuilder.AddServiceOptions(IConfiguration configuration)
-    => AddServiceOptions(configuration);
 }

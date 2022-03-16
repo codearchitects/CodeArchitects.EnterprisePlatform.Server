@@ -55,7 +55,7 @@ public static class DaprInfrastructureBuilderExtensions
     MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration?.Service?.Messaging);
     TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
 
-    builder.Services.AddSingleton<MessageHandlerServiceMarker>();
+    builder.Services.AddSingleton<MessageHandlerMarkerService>();
     builder.Services.AddSingleton<IMessagingConfiguration>(configuration);
     builder.Services.AddSingleton<ITopicDelegateFactory>(factory);
 

@@ -23,7 +23,7 @@ public static class DaprInfrastructureEndpointRouteBuilderExtensions
     if (endpoints is null)
       throw new ArgumentNullException(nameof(endpoints));
 
-    if (endpoints.ServiceProvider.GetService<MessageHandlerServiceMarker>() is null)
+    if (endpoints.ServiceProvider.GetService<MessageHandlerMarkerService>() is null)
       throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddMessageHandlers)} to the Dapr infrastructure builder.");
 
     IMessagingConfiguration messagingConfiguration = endpoints.ServiceProvider.GetRequiredService<IMessagingConfiguration>();

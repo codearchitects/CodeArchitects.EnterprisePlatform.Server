@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -15,12 +16,12 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
 
 internal class TopicDelegate
 {
-  private readonly Dictionary<string, HandlerDelegate> _delegates;
+  private readonly IDictionary<string, HandlerDelegate> _delegates;
   private readonly IReadOnlyDictionary<string, Type> _messageTypes;
 
-  public TopicDelegate(Dictionary<string, HandlerDelegate> delegates, IReadOnlyDictionary<string, Type> messageTypes)
+  public TopicDelegate(IReadOnlyDictionary<string, HandlerDelegate> delegates, IReadOnlyDictionary<string, Type> messageTypes)
   {
-    _delegates = delegates;
+    _delegates = new ConcurrentDictionary<string, HandlerDelegate>(delegates);
     _messageTypes = messageTypes;
   }
 
