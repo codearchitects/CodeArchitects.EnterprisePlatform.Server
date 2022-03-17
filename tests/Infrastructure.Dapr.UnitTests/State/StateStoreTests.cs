@@ -6,17 +6,17 @@ using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 
-public class DaprStateStoreTests
+public class StateStoreTests
 {
   private const string s_storeName = nameof(s_storeName);
 
   private readonly Mock<DaprClient> _daprClientMock;
-  private readonly DaprStateStore _sut;
+  private readonly StateStore _sut;
 
-  public DaprStateStoreTests()
+  public StateStoreTests()
   {
     _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-    _sut = new DaprStateStore(_daprClientMock.Object, s_storeName);
+    _sut = new StateStore(_daprClientMock.Object, s_storeName);
   }
 
   [Fact]

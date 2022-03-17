@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Infrastructure.State;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
 using FluentAssertions;
 using Moq;
@@ -6,15 +7,15 @@ using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 
-public class DaprStateStoreResolverTests
+public class StateStoreResolverTests
 {
   private readonly Mock<DaprClient> _daprClientMock;
-  private readonly DaprStateStoreResolver _sut;
+  private readonly StateStoreResolver _sut;
 
-  public DaprStateStoreResolverTests()
+  public StateStoreResolverTests()
   {
     _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-    _sut = new DaprStateStoreResolver(_daprClientMock.Object);
+    _sut = new StateStoreResolver(_daprClientMock.Object, new DaprConfiguration());
   }
 
   [Fact]

@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Configuration.Component;
+﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Configuration.Components;
 
 internal class ComponentSchema
 {

@@ -9,17 +9,17 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 /// <summary>
 /// Dapr implementation of <see cref="IStateStore"/>.
 /// </summary>
-public class DaprStateStore : IStateStore
+internal class StateStore : IStateStore
 {
   private readonly DaprClient _dapr;
   private readonly string _storeName;
 
   /// <summary>
-  /// Creates a new <see cref="DaprStateStore"/> instance.
+  /// Creates a new <see cref="StateStore"/> instance.
   /// </summary>
   /// <param name="dapr">The Dapr client object.</param>
   /// <param name="storeName">The name of the state store.</param>
-  public DaprStateStore(DaprClient dapr, string storeName)
+  public StateStore(DaprClient dapr, string storeName)
   {
     if (dapr is null)
       throw new ArgumentNullException(nameof(dapr));

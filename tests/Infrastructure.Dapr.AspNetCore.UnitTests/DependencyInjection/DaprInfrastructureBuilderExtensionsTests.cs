@@ -18,6 +18,7 @@ public class DaprInfrastructureBuilderExtensionsTests
   private readonly Mock<DaprClient> _daprClientMock;
   private readonly Mock<Assembly> _assemblyMock;
   private readonly ServiceCollection _services;
+  private readonly DaprConfiguration _configuration;
 
   public DaprInfrastructureBuilderExtensionsTests()
   {
@@ -25,13 +26,14 @@ public class DaprInfrastructureBuilderExtensionsTests
     _assemblyMock = new Mock<Assembly>(MockBehavior.Strict);
     _services = new ServiceCollection();
     _services.AddSingleton(_daprClientMock.Object);
+    _configuration = new DaprConfiguration();
   }
 
   [Fact]
   public void AddMessageBus_ShouldAddIServiceResolverOfIMessageBusAsSingleton()
   {
     // Arrange
-    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services);
+    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services, _configuration);
 
     // Act
     sut.AddMessageBus();
@@ -102,7 +104,7 @@ public class DaprInfrastructureBuilderExtensionsTests
     _assemblyMock
       .Setup(x => x.GetHashCode())
       .Returns(1);
-    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services);
+    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services, _configuration);
 
     // Act
     sut.AddMessageHandlers(_assemblyMock.Object);
@@ -123,7 +125,7 @@ public class DaprInfrastructureBuilderExtensionsTests
     _assemblyMock
       .Setup(x => x.GetHashCode())
       .Returns(1);
-    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services);
+    DaprInfrastructureBuilder sut = new DaprInfrastructureBuilder(_services, _configuration);
 
     // Act
     sut.AddMessageHandlers(_assemblyMock.Object);

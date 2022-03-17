@@ -32,7 +32,7 @@ internal class MessagingConfiguration : IMessagingConfiguration
   /// <param name="assemblies">The assemblies to scan for handler types.</param>
   /// <param name="options">The messaging options.</param>
   /// <returns>An instance of <see cref="MessagingConfiguration"/>.</returns>
-  public static MessagingConfiguration Create(IEnumerable<Assembly> assemblies, DaprConfiguration? configuration)
+  public static MessagingConfiguration Create(IEnumerable<Assembly> assemblies, DaprConfiguration configuration)
   {
     IEnumerable<Type> allTypes = assemblies.SelectMany(assembly => assembly.GetTypes());
     HashSet<Type> messageTypes = allTypes.Where(type => type.IsDefined(typeof(MessageAttribute))).ToHashSet();
@@ -54,9 +54,9 @@ internal class MessagingConfiguration : IMessagingConfiguration
     return new MessagingConfiguration(handlerMap, messageTypes);
   }
 
-  private static IEnumerable<(MessageHandlerIdentity Identity, Type InterfaceType)> GetHandlerIdentities(Type concreteType, DaprConfiguration? configuration)
+  private static IEnumerable<(MessageHandlerIdentity Identity, Type InterfaceType)> GetHandlerIdentities(Type concreteType, DaprConfiguration configuration)
   {
-    IReadOnlyDictionary<string, DaprMessagingBindings>? allBindings = configuration?.Service?.Messaging?.Bindings;
+    IReadOnlyDictionary<string, DaprMessagingBindings>? allBindings = configuration.Service?.Messaging?.Bindings;
 
     MessageHandlerAttribute? typeAttribute = concreteType.GetCustomAttribute<MessageHandlerAttribute>();
     return concreteType.GetGenericInterfaces(typeof(IMessageHandler<>), typeof(IMessageHandler<,>))

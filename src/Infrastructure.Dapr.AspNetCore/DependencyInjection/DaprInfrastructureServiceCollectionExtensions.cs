@@ -20,12 +20,14 @@ public static class DaprInfrastructureServiceCollectionExtensions
   /// <param name="services">The service collection to configure.</param>
   /// <param name="configuration">A Dapr configuration instance.</param>
   /// <returns>An <see cref="IDaprInfrastructureBuilder"/> that can be used to further configure the Dapr infrastructure services.</returns>
-  public static IDaprInfrastructureBuilder AddDaprInfrastructure(this IServiceCollection services, DaprConfiguration? configuration = null)
+  public static IDaprInfrastructureBuilder AddDaprInfrastructure(this IServiceCollection services, DaprConfiguration configuration)
   {
-    if (configuration is not null)
-    {
-      services.AddSingleton(configuration);
-    }
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+    if (configuration is null)
+      throw new ArgumentNullException(nameof(configuration));
+
+    services.AddSingleton(configuration);
     return new DaprInfrastructureBuilder(services, configuration);
   }
 
@@ -37,6 +39,11 @@ public static class DaprInfrastructureServiceCollectionExtensions
   /// <returns>An <see cref="IDaprInfrastructureBuilder"/> that can be used to further configure the Dapr infrastructure services.</returns>
   public static IDaprInfrastructureBuilder AddDaprInfrastructure(this IServiceCollection services, Action<IDaprConfigurationBuilder> configure)
   {
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+
     ApplicationOptionsFactory applicationOptionsFactory = new ApplicationOptionsFactory();
     DaprConfigurationBuilder builder = new DaprConfigurationBuilder(applicationOptionsFactory);
     configure(builder);
