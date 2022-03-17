@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration.Component;
+using CodeArchitects.Platform.Infrastructure.Dapr.Configuration.Components;
 using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.IO;

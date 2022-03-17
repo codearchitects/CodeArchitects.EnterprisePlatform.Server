@@ -2,11 +2,8 @@
 
 internal static class DaprConfigurationExtensions
 {
-  public static string? GetDefaultBus(this DaprConfiguration? configuration)
+  public static string? GetDefaultBus(this DaprConfiguration configuration)
   {
-    if (configuration is null)
-      return null;
-
     string? defaultBus = configuration.Service?.Messaging?.DefaultBus;
     if (defaultBus is not null)
       return defaultBus;
@@ -21,11 +18,8 @@ internal static class DaprConfigurationExtensions
     return null;
   }
 
-  public static string? GetDefaultStore(this DaprConfiguration? configuration)
+  public static string? GetDefaultStore(this DaprConfiguration configuration)
   {
-    if (configuration is null)
-      return null;
-
     string? defaultStore = configuration.Service?.State?.DefaultStore;
     if (defaultStore is not null)
       return defaultStore;

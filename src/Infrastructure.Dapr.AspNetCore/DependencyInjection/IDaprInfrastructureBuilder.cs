@@ -16,5 +16,5 @@ public interface IDaprInfrastructureBuilder
   /// <summary>
   /// The Dapr configuration.
   /// </summary>
-  DaprConfiguration? Configuration { get; }
+  DaprConfiguration Configuration { get; }
 }

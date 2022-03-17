@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Messaging;
 using Dapr.Client;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,12 +27,18 @@ internal class MessageBus : IMessageBus
   public Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
     where TMessage : class
   {
+    if (message is null)
+      throw new ArgumentException(nameof(message));
+
     return _dapr.PublishEventAsync(_name, DefaultTopic, MessageEnvelope.Create(message), cancellationToken);
   }
 
   public Task SendAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default)
     where TMessage : class
   {
+    if (message is null)
+      throw new ArgumentException(nameof(message));
+
     return _dapr.PublishEventAsync(_name, topic, MessageEnvelope.Create(message), cancellationToken);
   }
 }

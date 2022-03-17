@@ -13,7 +13,7 @@ internal class DaprInfrastructureBuilder : IDaprInfrastructureBuilder
   /// </summary>
   /// <param name="services">The service collection to configure.</param>
   /// <param name="configuration">The Dapr configuration object.</param>
-  public DaprInfrastructureBuilder(IServiceCollection services, DaprConfiguration? configuration = null)
+  public DaprInfrastructureBuilder(IServiceCollection services, DaprConfiguration configuration)
   {
     Services = services;
     Configuration = configuration;
@@ -21,5 +21,5 @@ internal class DaprInfrastructureBuilder : IDaprInfrastructureBuilder
 
   public IServiceCollection Services { get; }
 
-  public DaprConfiguration? Configuration { get; }
+  public DaprConfiguration Configuration { get; }
 }

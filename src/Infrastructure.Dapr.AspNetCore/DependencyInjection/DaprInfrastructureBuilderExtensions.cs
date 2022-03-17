@@ -7,6 +7,7 @@ using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using CodeArchitects.Platform.Infrastructure.State;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -25,6 +26,9 @@ public static class DaprInfrastructureBuilderExtensions
   /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddMessageBus(this IDaprInfrastructureBuilder builder)
   {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
     builder.Services.AddSingleton<IServiceResolver<IMessageBus>, MessageBusResolver>();
 
     string? defaultBus = builder.Configuration.GetDefaultBus();
@@ -45,6 +49,11 @@ public static class DaprInfrastructureBuilderExtensions
   /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddMessageHandlers(this IDaprInfrastructureBuilder builder, params Assembly[] assemblies)
   {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+    if (assemblies is null)
+      throw new ArgumentNullException(nameof(assemblies));
+
     if (assemblies.Length == 0)
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
@@ -73,7 +82,10 @@ public static class DaprInfrastructureBuilderExtensions
   /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddStateStore(this IDaprInfrastructureBuilder builder)
   {
-    builder.Services.AddSingleton<IServiceResolver<IStateStore>, DaprStateStoreResolver>();
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
+    builder.Services.AddSingleton<IServiceResolver<IStateStore>, StateStoreResolver>();
 
     string? defaultStore = builder.Configuration.GetDefaultStore();
 
