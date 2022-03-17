@@ -1,7 +1,9 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
 using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
+using Microsoft.Extensions.FileProviders;
 using System;
+using System.IO;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +12,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// </summary>
 public static class DaprInfrastructureServiceCollectionExtensions
 {
+  public const string DefaultComponentFolderPath = "/root/.caep/dapr/components";
+
   /// <summary>
   /// Adds basic Dapr infrastructure services to the <see cref="IServiceCollection"/>.
   /// </summary>
@@ -33,9 +37,20 @@ public static class DaprInfrastructureServiceCollectionExtensions
   /// <returns>An <see cref="IDaprInfrastructureBuilder"/> that can be used to further configure the Dapr infrastructure services.</returns>
   public static IDaprInfrastructureBuilder AddDaprInfrastructure(this IServiceCollection services, Action<IDaprConfigurationBuilder> configure)
   {
-    DaprConfigurationBuilder builder = new DaprConfigurationBuilder();
+    ApplicationOptionsFactory applicationOptionsFactory = new ApplicationOptionsFactory();
+    DaprConfigurationBuilder builder = new DaprConfigurationBuilder(applicationOptionsFactory);
     configure(builder);
-    DaprConfiguration configuration = builder.Build();
+
+    ServiceOptions? serviceOptions = builder.ServiceOptions;
+    string componentFolderPath = serviceOptions?.ComponentFolderPath ?? DefaultComponentFolderPath;
+    IFileProvider componentFolderProvider = Directory.Exists(componentFolderPath)
+      ? new PhysicalFileProvider(componentFolderPath)
+      : new NullFileProvider();
+
+    DaprConfiguration configuration = builder
+      .AddComponentFolderProvider(componentFolderProvider)
+      .Build();
+
     services.AddSingleton(configuration);
     return new DaprInfrastructureBuilder(services, configuration);
   }

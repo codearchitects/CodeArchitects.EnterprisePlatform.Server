@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging.Fakes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;

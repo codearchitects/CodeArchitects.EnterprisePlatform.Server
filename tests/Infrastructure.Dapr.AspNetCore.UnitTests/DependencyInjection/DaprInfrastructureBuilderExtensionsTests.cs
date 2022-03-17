@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
+using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging.Fakes;
 using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Messaging;
