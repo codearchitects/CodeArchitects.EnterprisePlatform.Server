@@ -9,6 +9,11 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 public class ServiceOptions
 {
   /// <summary>
+  /// Path to the Dapr component folder
+  /// </summary>
+  public string? ComponentFolderPath { get; set; }
+
+  /// <summary>
   /// The messaging options.
   /// </summary>
   public DaprMessagingOptions? Messaging { get; set; }

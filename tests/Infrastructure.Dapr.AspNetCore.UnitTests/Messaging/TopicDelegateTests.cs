@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
+﻿using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging.Fakes;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -42,7 +42,7 @@ public class TopicDelegateTests
     Mock<ILoggerFactory> loggerFactoryMock = new Mock<ILoggerFactory>(MockBehavior.Strict);
     Mock<ILogger> loggerMock = new Mock<ILogger>(MockBehavior.Loose);
     loggerFactoryMock
-      .Setup(x => x.CreateLogger("CAEP-Messaging"))
+      .Setup(x => x.CreateLogger(It.IsAny<string>()))
       .Returns(loggerMock.Object);
     _serviceProviderMock = new Mock<IServiceProvider>(MockBehavior.Strict);
     _serviceProviderMock

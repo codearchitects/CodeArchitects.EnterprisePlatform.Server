@@ -3,7 +3,9 @@ using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +16,22 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 
 public class DaprConfigurationBuilderTests
 {
+  private readonly Mock<IApplicationOptionsFactory> _applicationOptionsFactoryMock;
   private readonly DaprConfigurationBuilder _sut;
 
   public DaprConfigurationBuilderTests()
   {
-    _sut = new DaprConfigurationBuilder();
+    _applicationOptionsFactoryMock = new Mock<IApplicationOptionsFactory>(MockBehavior.Strict);
+    _sut = new DaprConfigurationBuilder(_applicationOptionsFactoryMock.Object);
   }
 
   [Fact]
   public void Build_ShouldYieldEmptyConfiguration_WhenCalledAlone()
   {
     // Arrange
+    _applicationOptionsFactoryMock
+      .Setup(x => x.FromFileProvider(It.IsAny<IFileProvider>()))
+      .Returns(null as ApplicationOptions);
     DaprConfiguration expectedConfiguration = new DaprConfiguration();
 
     // Act
@@ -38,6 +45,9 @@ public class DaprConfigurationBuilderTests
   public void AddServiceOptions_WithConfiguration_ShouldAddServiceOptions()
   {
     // Arrange
+    _applicationOptionsFactoryMock
+      .Setup(x => x.FromFileProvider(It.IsAny<IFileProvider>()))
+      .Returns(null as ApplicationOptions);
     DaprConfiguration expectedConfiguration = new DaprConfiguration
     {
       Service = new ServiceOptions
@@ -108,6 +118,9 @@ public class DaprConfigurationBuilderTests
   public void AddServiceOptions_WithConfigurationSection_ShouldAddServiceOptions()
   {
     // Arrange
+    _applicationOptionsFactoryMock
+      .Setup(x => x.FromFileProvider(It.IsAny<IFileProvider>()))
+      .Returns(null as ApplicationOptions);
     DaprConfiguration expectedConfiguration = new DaprConfiguration
     {
       Service = new ServiceOptions

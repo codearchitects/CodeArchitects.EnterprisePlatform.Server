@@ -6,7 +6,12 @@
 public class DaprConfiguration
 {
   /// <summary>
-  /// Service-specific configuration options.
+  /// Service configuration options.
   /// </summary>
   public ServiceOptions? Service { get; set; }
+
+  /// <summary>
+  /// Application configuration options.
+  /// </summary>
+  public ApplicationOptions? Application { get; set; }
 }

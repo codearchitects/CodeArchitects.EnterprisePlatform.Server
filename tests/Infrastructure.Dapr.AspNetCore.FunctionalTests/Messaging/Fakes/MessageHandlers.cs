@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Fakes;
+namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging.Fakes;
 
 [MessageHandler("messagebus")]
 public class Message1Handler : IMessageHandler<Message1>

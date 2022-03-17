@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Internals;
 using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using System;
 using System.Collections.Generic;
@@ -31,14 +32,14 @@ internal class MessagingConfiguration : IMessagingConfiguration
   /// <param name="assemblies">The assemblies to scan for handler types.</param>
   /// <param name="options">The messaging options.</param>
   /// <returns>An instance of <see cref="MessagingConfiguration"/>.</returns>
-  public static MessagingConfiguration Create(IEnumerable<Assembly> assemblies, DaprMessagingOptions? options)
+  public static MessagingConfiguration Create(IEnumerable<Assembly> assemblies, DaprConfiguration? configuration)
   {
     IEnumerable<Type> allTypes = assemblies.SelectMany(assembly => assembly.GetTypes());
     HashSet<Type> messageTypes = allTypes.Where(type => type.IsDefined(typeof(MessageAttribute))).ToHashSet();
     IEnumerable<Type> handlerConcreteTypes = allTypes.Where(type => !type.IsInterface && !type.IsAbstract && IsMessageHandler(type));
 
     IEnumerable<IGrouping<MessageHandlerIdentity, ImplementationPair>> identityMap = handlerConcreteTypes
-      .SelectMany(concreteType => GetHandlerIdentities(concreteType, options).Select(pair => (pair.Identity, pair.InterfaceType, concreteType)))
+      .SelectMany(concreteType => GetHandlerIdentities(concreteType, configuration).Select(pair => (pair.Identity, pair.InterfaceType, concreteType)))
       .GroupBy(x => x.Identity, x => new ImplementationPair(x.InterfaceType, x.concreteType));
 
     Dictionary<MessageHandlerIdentity, ImplementationPair> handlerMap = identityMap.ToDictionary(
@@ -53,9 +54,9 @@ internal class MessagingConfiguration : IMessagingConfiguration
     return new MessagingConfiguration(handlerMap, messageTypes);
   }
 
-  private static IEnumerable<(MessageHandlerIdentity Identity, Type InterfaceType)> GetHandlerIdentities(Type concreteType, DaprMessagingOptions? options)
+  private static IEnumerable<(MessageHandlerIdentity Identity, Type InterfaceType)> GetHandlerIdentities(Type concreteType, DaprConfiguration? configuration)
   {
-    IReadOnlyDictionary<string, DaprMessagingBindings>? allBindings = options?.Bindings;
+    IReadOnlyDictionary<string, DaprMessagingBindings>? allBindings = configuration?.Service?.Messaging?.Bindings;
 
     MessageHandlerAttribute? typeAttribute = concreteType.GetCustomAttribute<MessageHandlerAttribute>();
     return concreteType.GetGenericInterfaces(typeof(IMessageHandler<>), typeof(IMessageHandler<,>))
@@ -81,7 +82,7 @@ internal class MessagingConfiguration : IMessagingConfiguration
           throw new NotSupportedException($"Message types must be reference types. Message type was '{messageType.FullName}'.");
 
         MessageHandlerIdentity identity = new MessageHandlerIdentity(
-          BusName: methodAttribute?.BusName ?? typeAttribute?.BusName ?? bindings?.BusName ?? options?.DefaultBus,
+          BusName: methodAttribute?.BusName ?? typeAttribute?.BusName ?? bindings?.BusName ?? configuration.GetDefaultBus(),
           Topic: methodAttribute?.Topic ?? typeAttribute?.Topic ?? bindings?.Topic ?? MessageBus.DefaultTopic,
           MessageType: messageType
         );

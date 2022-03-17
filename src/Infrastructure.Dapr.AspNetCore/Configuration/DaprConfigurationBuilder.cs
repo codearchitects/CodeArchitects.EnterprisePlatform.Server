@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using System.Collections.Generic;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 
@@ -8,7 +10,16 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 /// </summary>
 internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
 {
-  private ServiceOptions? _serviceConfig;
+  private readonly IApplicationOptionsFactory _applicationOptionsFactory;
+  private readonly List<IFileProvider> _componentFolderProviders;
+
+  public DaprConfigurationBuilder(IApplicationOptionsFactory applicationOptionsFactory)
+  {
+    _applicationOptionsFactory = applicationOptionsFactory;
+    _componentFolderProviders = new List<IFileProvider>();
+  }
+
+  public ServiceOptions? ServiceOptions { get; private set; }
 
   public IDaprConfigurationBuilder AddServiceOptions(IConfigurationSection serviceConfiguration)
   {
@@ -20,10 +31,16 @@ internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
     return AddServiceOptionsCore(configuration.GetSection("Caep:Dapr"));
   }
 
+  public DaprConfigurationBuilder AddComponentFolderProvider(IFileProvider provider)
+  {
+    _componentFolderProviders.Add(provider);
+    return this;
+  }
+
   private IDaprConfigurationBuilder AddServiceOptionsCore(IConfigurationSection serviceConfiguration)
   {
-    _serviceConfig = new ServiceOptions();
-    serviceConfiguration.Bind(_serviceConfig);
+    ServiceOptions = new ServiceOptions();
+    serviceConfiguration.Bind(ServiceOptions);
     return this;
   }
 
@@ -33,9 +50,12 @@ internal class DaprConfigurationBuilder : IDaprConfigurationBuilder
   /// <returns>The built instance.</returns>
   public DaprConfiguration Build()
   {
+    CompositeFileProvider provider = new CompositeFileProvider(_componentFolderProviders);
+
     return new DaprConfiguration
     {
-      Service = _serviceConfig
+      Service = ServiceOptions,
+      Application = _applicationOptionsFactory.FromFileProvider(provider)
     };
   }
 }

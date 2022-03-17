@@ -40,6 +40,9 @@ components:
   - name: CodeArchitects.Platform.Common.UnitTests
     path: tests\Common.UnitTests
     type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.FunctionalTests
+    path: tests\Infrastructure.Dapr.AspNetCore.FunctionalTests
+    type: dotnet-test
   - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
     path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
     type: dotnet-test

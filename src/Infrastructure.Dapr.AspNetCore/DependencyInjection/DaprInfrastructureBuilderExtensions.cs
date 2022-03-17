@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Common.Ioc;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
+using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.Messaging;
@@ -26,14 +27,11 @@ public static class DaprInfrastructureBuilderExtensions
   {
     builder.Services.AddSingleton<IServiceResolver<IMessageBus>, MessageBusResolver>();
 
-    DaprMessagingOptions? options = builder.Configuration?.Service?.Messaging;
+    string? defaultBus = builder.Configuration.GetDefaultBus();
 
-    if (options is not null)
+    if (!string.IsNullOrWhiteSpace(defaultBus))
     {
-      if (!string.IsNullOrWhiteSpace(options.DefaultBus))
-      {
-        builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus>>().Resolve(options.DefaultBus));
-      }
+      builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus>>().Resolve(defaultBus));
     }
 
     return builder;
@@ -52,7 +50,7 @@ public static class DaprInfrastructureBuilderExtensions
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
 
-    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration?.Service?.Messaging);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration);
     TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
 
     builder.Services.AddSingleton<MessageHandlerMarkerService>();
@@ -77,14 +75,11 @@ public static class DaprInfrastructureBuilderExtensions
   {
     builder.Services.AddSingleton<IServiceResolver<IStateStore>, DaprStateStoreResolver>();
 
-    DaprStateOptions? options = builder.Configuration?.Service?.State;
+    string? defaultStore = builder.Configuration.GetDefaultStore();
 
-    if (options is not null)
+    if (!string.IsNullOrWhiteSpace(defaultStore))
     {
-      if (!string.IsNullOrWhiteSpace(options.DefaultStore))
-      {
-        builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IStateStore>>().Resolve(options.DefaultStore));
-      }
+      builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IStateStore>>().Resolve(defaultStore));
     }
 
     return builder;
