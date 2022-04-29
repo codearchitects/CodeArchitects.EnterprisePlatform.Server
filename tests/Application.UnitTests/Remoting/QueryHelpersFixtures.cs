@@ -5,7 +5,7 @@ using Xunit.Sdk;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
-internal static class QueryHelperFixtures
+internal static class QueryHelpersFixtures
 {
   public class SimpleTypesOrArraysDataAttribute : DataAttribute
   {

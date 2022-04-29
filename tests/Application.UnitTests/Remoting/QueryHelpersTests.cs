@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using System;
 using Xunit;
-using static CodeArchitects.Platform.Application.Remoting.QueryHelperFixtures;
+using static CodeArchitects.Platform.Application.Remoting.QueryHelpersFixtures;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
-public class QueryHelperTests
+public class QueryHelpersTests
 {
   [Theory]
   [SimpleTypesOrArraysData]

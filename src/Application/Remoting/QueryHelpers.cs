@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Web;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
@@ -227,9 +228,9 @@ internal static class QueryHelpers
     if (obj is null)
       return;
 
-    sb.Append(name);
+    sb.Append(HttpUtility.UrlEncode(name, Encoding.UTF8));
     sb.Append('=');
-    sb.Append(obj.ToString());
+    sb.Append(HttpUtility.UrlEncode(obj.ToString(), Encoding.UTF8));
   }
 
   private static void AppendMany(StringBuilder sb, string name, IEnumerable<object?> objs)
@@ -262,21 +263,11 @@ internal static class QueryHelpers
   private static bool IsSimpleType(Type type, int nesting)
   {
     bool isSimpleType =
-      type == typeof(bool)           ||
-      type == typeof(byte)           ||
-      type == typeof(char)           ||
-      type == typeof(short)          ||
-      type == typeof(int)            ||
-      type == typeof(long)           ||
-      type == typeof(ushort)         ||
-      type == typeof(uint)           ||
-      type == typeof(ulong)          ||
-      type == typeof(float)          ||
-      type == typeof(double)         ||
-      type == typeof(decimal)        ||
-      type == typeof(string)         ||
-      type == typeof(Guid)           ||
-      type == typeof(DateTime)       ||
+      type.IsPrimitive         ||
+      type == typeof(string)   ||
+      type == typeof(decimal)  ||
+      type == typeof(Guid)     ||
+      type == typeof(DateTime) ||
       type == typeof(DateTimeOffset);
 
     if (isSimpleType)
