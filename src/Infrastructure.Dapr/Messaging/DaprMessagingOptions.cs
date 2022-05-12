@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
@@ -15,5 +16,19 @@ public class DaprMessagingOptions
   /// <summary>
   /// Declarative bindings for the handlers.
   /// </summary>
-  public Dictionary<string, DaprMessagingBindings>? Bindings { get; set; }
+  public Dictionary<string, DaprMessagingBindings> Bindings { get; set; } = new();
+
+  /// <summary>
+  /// The names of all the message busses.
+  /// </summary>
+  public HashSet<string> BusNames { get; set; } = new();
+
+  internal string? GetDefaultBus()
+  {
+    return DefaultBus is not null
+      ? DefaultBus
+      : BusNames.Count == 1
+        ? BusNames.Single()
+        : null;
+  }
 }

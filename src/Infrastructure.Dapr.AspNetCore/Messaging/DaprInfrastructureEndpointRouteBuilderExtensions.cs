@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Builder;
 public static class DaprInfrastructureEndpointRouteBuilderExtensions
 {
   /// <summary>
-  /// Adds endpoints for the handlers configured with <see cref="DaprInfrastructureBuilderExtensions.AddMessageHandlers"/>. 
+  /// Adds endpoints for the handlers configured with <see cref="InfrastructureDaprInfrastructureBuilderExtensions.AddMessageHandlers"/>. 
   /// </summary>
   /// <param name="endpoints">The endpoint builder.</param>
   public static void MapMessageHandlers(this IEndpointRouteBuilder endpoints)
@@ -24,7 +24,7 @@ public static class DaprInfrastructureEndpointRouteBuilderExtensions
       throw new ArgumentNullException(nameof(endpoints));
 
     if (endpoints.ServiceProvider.GetService<MessageHandlerMarkerService>() is null)
-      throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(DaprInfrastructureBuilderExtensions.AddMessageHandlers)} to the Dapr infrastructure builder.");
+      throw new InvalidOperationException($"Message handlers have not been configured. Please chain a call to {nameof(InfrastructureDaprInfrastructureBuilderExtensions.AddMessageHandlers)} to the Dapr infrastructure builder.");
 
     IMessagingConfiguration messagingConfiguration = endpoints.ServiceProvider.GetRequiredService<IMessagingConfiguration>();
     ITopicDelegateFactory delegateFactory = endpoints.ServiceProvider.GetRequiredService<ITopicDelegateFactory>();

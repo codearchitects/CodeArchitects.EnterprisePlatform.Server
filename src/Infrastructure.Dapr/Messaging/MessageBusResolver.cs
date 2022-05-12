@@ -1,17 +1,17 @@
 ﻿using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using Dapr.Client;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 
 internal class MessageBusResolver : IServiceResolver<IMessageBus>
 {
   private readonly DaprClient _dapr;
-  private readonly DaprConfiguration _configuration;
+  private readonly DaprMessagingOptions _options;
+  private readonly ILogger<MessageBusResolver>? _logger;
   private readonly ConcurrentDictionary<string, MessageBus> _messageBusses;
 
   /// <summary>
@@ -19,10 +19,11 @@ internal class MessageBusResolver : IServiceResolver<IMessageBus>
   /// </summary>
   /// <param name="dapr">The Dapr client.</param>
   /// <param name="configuration">The Dapr configuration.</param>
-  public MessageBusResolver(DaprClient dapr, DaprConfiguration configuration)
+  public MessageBusResolver(DaprClient dapr, DaprMessagingOptions options, ILogger<MessageBusResolver>? logger)
   {
     _dapr = dapr;
-    _configuration = configuration;
+    _options = options;
+    _logger = logger;
     _messageBusses = new ConcurrentDictionary<string, MessageBus>();
   }
 
@@ -31,14 +32,16 @@ internal class MessageBusResolver : IServiceResolver<IMessageBus>
     if (string.IsNullOrWhiteSpace(name))
       throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
 
+    if (!_options.BusNames.Contains(name))
+    {
+      _logger?.LogWarning("Unknown message bus requested: '{0}'", name);
+    }
+
     return _messageBusses.GetOrAdd(name, CreateMessageBus);
   }
 
   private MessageBus CreateMessageBus(string busName)
   {
-    if (_configuration.Application?.MessageBusses is { } messageBusses && !messageBusses.Contains(busName))
-      throw new ArgumentException($"There is no message bus named '{busName}'.", nameof(busName));
-
     return new MessageBus(_dapr, busName);
   }
 }

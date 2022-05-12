@@ -1,13 +1,17 @@
 ﻿using CodeArchitects.Platform.Common.Internals;
 using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.DependencyInjection;
+using CodeArchitects.Platform.Dapr.AspNetCore.Components;
+using CodeArchitects.Platform.Dapr.AspNetCore.Configuration;
+using CodeArchitects.Platform.Dapr.AspNetCore.DependencyInjection;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Messaging;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using CodeArchitects.Platform.Infrastructure.State;
+using Dapr.Client;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -16,8 +20,11 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
 /// </summary>
-public static class DaprInfrastructureBuilderExtensions
+public static class InfrastructureDaprInfrastructureBuilderExtensions
 {
+  private const string s_messagingKey = "Messaging";
+  private const string s_stateKey = "State";
+
   /// <summary>
   /// Adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services.
   /// If configured, also adds a default <see cref="IMessageBus"/>.
@@ -29,9 +36,13 @@ public static class DaprInfrastructureBuilderExtensions
     if (builder is null)
       throw new ArgumentNullException(nameof(builder));
 
-    builder.Services.AddSingleton<IServiceResolver<IMessageBus>, MessageBusResolver>();
+    DaprMessagingOptions options = builder.DaprConfigurationBuilder.GetOrAdd<DaprMessagingOptions>(s_messagingKey, AddMessageBusNames);
+    string? defaultBus = options.GetDefaultBus();
 
-    string? defaultBus = builder.Configuration.GetDefaultBus();
+    builder.Services.AddSingleton<IServiceResolver<IMessageBus>>(delegate (IServiceProvider services)
+    {
+      return new MessageBusResolver(services.GetRequiredService<DaprClient>(), options, services.GetService<ILogger<MessageBusResolver>>());
+    });
 
     if (!string.IsNullOrWhiteSpace(defaultBus))
     {
@@ -59,7 +70,9 @@ public static class DaprInfrastructureBuilderExtensions
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
 
-    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), builder.Configuration);
+    DaprMessagingOptions options = builder.DaprConfigurationBuilder.GetOrAdd<DaprMessagingOptions>(s_messagingKey, AddMessageBusNames);
+
+    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), options);
     TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
 
     builder.Services.AddSingleton<MessageHandlerMarkerService>();
@@ -85,9 +98,13 @@ public static class DaprInfrastructureBuilderExtensions
     if (builder is null)
       throw new ArgumentNullException(nameof(builder));
 
-    builder.Services.AddSingleton<IServiceResolver<IStateStore>, StateStoreResolver>();
+    DaprStateOptions options = builder.DaprConfigurationBuilder.GetOrAdd<DaprStateOptions>(s_stateKey, AddStateStoreNames);
+    string? defaultStore = options.GetDefaultStore();
 
-    string? defaultStore = builder.Configuration.GetDefaultStore();
+    builder.Services.AddSingleton<IServiceResolver<IStateStore>>(delegate (IServiceProvider services)
+    {
+      return new StateStoreResolver(services.GetRequiredService<DaprClient>(), options, services.GetService<ILogger<StateStoreResolver>>());
+    });
 
     if (!string.IsNullOrWhiteSpace(defaultStore))
     {
@@ -95,5 +112,28 @@ public static class DaprInfrastructureBuilderExtensions
     }
 
     return builder;
+  }
+
+  private static IEnumerable<string> GetComponentNames(IEnumerable<ComponentSchema> components, string componentType)
+  {
+    return components
+      .Where(c => c.Spec.Type.StartsWith(componentType))
+      .Select(c => c.Metadata.Name);
+  }
+
+  private static void AddMessageBusNames(DaprMessagingOptions options, IDaprConfiguration configuration)
+  {
+    foreach (string busName in GetComponentNames(configuration.Components, "pubsub"))
+    {
+      options.BusNames.Add(busName);
+    }
+  }
+
+  private static void AddStateStoreNames(DaprStateOptions options, IDaprConfiguration configuration)
+  {
+    foreach (string storeName in GetComponentNames(configuration.Components, "state"))
+    {
+      options.StoreNames.Add(storeName);
+    }
   }
 }

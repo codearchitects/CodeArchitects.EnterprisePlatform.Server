@@ -1,10 +1,9 @@
 ﻿using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 
@@ -14,7 +13,8 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 internal class StateStoreResolver : IServiceResolver<IStateStore>
 {
   private readonly DaprClient _dapr;
-  private readonly DaprConfiguration _configuration;
+  private readonly DaprStateOptions _options;
+  private readonly ILogger<StateStoreResolver>? _logger;
   private readonly ConcurrentDictionary<string, StateStore> _stateStores;
 
   /// <summary>
@@ -22,10 +22,11 @@ internal class StateStoreResolver : IServiceResolver<IStateStore>
   /// </summary>
   /// <param name="dapr">The Dapr client.</param>
   /// <param name="configuration">The Dapr configuration.</param>
-  public StateStoreResolver(DaprClient dapr, DaprConfiguration configuration)
+  public StateStoreResolver(DaprClient dapr, DaprStateOptions options, ILogger<StateStoreResolver>? logger)
   {
     _dapr = dapr;
-    _configuration = configuration;
+    _options = options;
+    _logger = logger;
     _stateStores = new ConcurrentDictionary<string, StateStore>();
   }
 
@@ -34,14 +35,16 @@ internal class StateStoreResolver : IServiceResolver<IStateStore>
     if (string.IsNullOrWhiteSpace(name))
       throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
 
+    if (!_options.StoreNames.Contains(name))
+    {
+      _logger?.LogWarning("Unknown state store requested: '{0}'", name);
+    }
+
     return _stateStores.GetOrAdd(name, CreateStateStore);
   }
 
   private StateStore CreateStateStore(string storeName)
   {
-    if (_configuration.Application?.StateStores is { } stateStores && !stateStores.Contains(storeName))
-      throw new ArgumentException($"There is no message bus named '{storeName}'.", nameof(storeName));
-
     return new StateStore(_dapr, storeName);
   }
 }
