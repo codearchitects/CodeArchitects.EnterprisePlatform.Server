@@ -9,7 +9,7 @@ using System.Web;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
-internal static class QueryHelpers
+public static class QueryHelpers
 {
   private delegate void QueryDelegate(StringBuilder url, object? queryObject);
 
