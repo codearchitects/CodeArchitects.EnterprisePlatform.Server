@@ -1,7 +1,7 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
-using CodeArchitects.Platform.Infrastructure.Messaging;
+﻿using CodeArchitects.Platform.Infrastructure.Messaging;
 using Dapr.Client;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,7 +15,7 @@ public class MessageBusResolverTests
   public MessageBusResolverTests()
   {
     _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-    _sut = new MessageBusResolver(_daprClientMock.Object, new DaprConfiguration());
+    _sut = new MessageBusResolver(_daprClientMock.Object, new DaprMessagingOptions(), Mock.Of<ILogger<MessageBusResolver>>());
   }
 
   [Fact]

@@ -75,7 +75,9 @@ public sealed class TopicDelegateFixture : IDisposable
 
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddDaprInfrastructure(cfg => cfg.AddServiceOptions(Configuration))
+      services.AddDaprInfrastructure(Configuration)
+        .AddMessageBus()
+        .AddStateStore()
         .AddMessageHandlers(_handlersAssembly);
     }
 

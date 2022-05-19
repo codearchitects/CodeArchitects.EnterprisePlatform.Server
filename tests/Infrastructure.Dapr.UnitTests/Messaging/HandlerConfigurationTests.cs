@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Internals;
-using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.Messaging.Fakes;
 using CodeArchitects.Platform.Infrastructure.Messaging;
 using FluentAssertions;
@@ -14,12 +13,12 @@ namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 public class HandlerConfigurationTests
 {
   private readonly Mock<Assembly> _assemblyMock;
-  private readonly DaprConfiguration _configuration;
+  private readonly DaprMessagingOptions _options;
 
   public HandlerConfigurationTests()
   {
     _assemblyMock = new Mock<Assembly>(MockBehavior.Strict);
-    _configuration = new DaprConfiguration();
+    _options = new DaprMessagingOptions();
   }
 
   [Fact]
@@ -35,7 +34,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -55,7 +54,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -75,7 +74,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -95,7 +94,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -115,7 +114,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -135,7 +134,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -155,7 +154,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair = new ImplementationPair(typeof(IMessageHandler<Message1, string>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(1).And.Contain(expectedIdentity);
@@ -177,7 +176,7 @@ public class HandlerConfigurationTests
     ImplementationPair expectedPair2 = new ImplementationPair(typeof(IMessageHandler<Message2, string>), handlerType);
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().HaveCount(2)
@@ -197,7 +196,7 @@ public class HandlerConfigurationTests
       .Returns(new Type[] { handlerType });
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.HandlerMap.Keys.Should().BeEmpty();
@@ -212,7 +211,7 @@ public class HandlerConfigurationTests
       .Returns(new Type[] { typeof(Message1And2Handler), typeof(Message3) });
 
     // Act
-    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    MessagingConfiguration configuration = MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     configuration.MessageTypes.Should().HaveCount(3)
@@ -231,7 +230,7 @@ public class HandlerConfigurationTests
       .Returns(handlerTypes);
 
     // Act
-    Func<MessagingConfiguration> act = () => MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _configuration);
+    Func<MessagingConfiguration> act = () => MessagingConfiguration.Create(new Assembly[] { _assemblyMock.Object }, _options);
 
     // Assert
     act.Should().Throw<ServiceRegistrationException>().Which.ImplementationTypes.Should().BeEquivalentTo(handlerTypes);

@@ -1,7 +1,7 @@
-﻿using CodeArchitects.Platform.Infrastructure.Dapr.Configuration;
-using CodeArchitects.Platform.Infrastructure.State;
+﻿using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -15,7 +15,7 @@ public class StateStoreResolverTests
   public StateStoreResolverTests()
   {
     _daprClientMock = new Mock<DaprClient>(behavior: MockBehavior.Strict);
-    _sut = new StateStoreResolver(_daprClientMock.Object, new DaprConfiguration());
+    _sut = new StateStoreResolver(_daprClientMock.Object, new DaprStateOptions(), Mock.Of<ILogger<StateStoreResolver>>());
   }
 
   [Fact]
