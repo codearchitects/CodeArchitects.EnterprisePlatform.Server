@@ -23,6 +23,9 @@ components:
   - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
     type: dotnet-package
+  - name: CodeArchitects.Platform.Dapr.AspNetCore
+    path: src\Dapr.AspNetCore
+    type: dotnet-package
   - name: CodeArchitects.Platform.Infrastructure.Dapr
     path: src\Infrastructure.Dapr
     type: dotnet-package
@@ -34,6 +37,15 @@ components:
   - name: CodeArchitects.Platform.Analyzer.Tests
     path: tests\Analyzer.Tests
     type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.UnitTests
+    path: tests\Infrastructure.Dapr.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
+    path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
+    path: tests\Dapr.AspNetCore.UnitTests
+    type: dotnet-test
   - name: CodeArchitects.Platform.Application.UnitTests
     path: tests\Application.UnitTests
     type: dotnet-test
@@ -42,11 +54,5 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.FunctionalTests
     path: tests\Infrastructure.Dapr.AspNetCore.FunctionalTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
-    path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Infrastructure.Dapr.UnitTests
-    path: tests\Infrastructure.Dapr.UnitTests
     type: dotnet-test
   # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)
