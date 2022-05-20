@@ -7,6 +7,9 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr.AspNetCore")]
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests")]

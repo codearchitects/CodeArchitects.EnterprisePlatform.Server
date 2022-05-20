@@ -43,7 +43,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapr", "Dapr", "{279511E3-104D-4A68-BCE7-F9E97414ECDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Dapr.AspNetCore.UnitTests", "tests\Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Dapr.AspNetCore.UnitTests.csproj", "{2B50A958-7703-4230-A5E0-9F046B059A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dapr.AspNetCore.UnitTests", "tests\Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Dapr.AspNetCore.UnitTests.csproj", "{2B50A958-7703-4230-A5E0-9F046B059A54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging", "src\Messaging\CodeArchitects.Platform.Messaging.csproj", "{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.Dapr", "src\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj", "{C442D08B-B968-4DB1-9399-32F0B2D3B107}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.Dapr.AspNetCore", "src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj", "{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +129,18 @@ Global
 		{2B50A958-7703-4230-A5E0-9F046B059A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B50A958-7703-4230-A5E0-9F046B059A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B50A958-7703-4230-A5E0-9F046B059A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C442D08B-B968-4DB1-9399-32F0B2D3B107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C442D08B-B968-4DB1-9399-32F0B2D3B107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C442D08B-B968-4DB1-9399-32F0B2D3B107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C442D08B-B968-4DB1-9399-32F0B2D3B107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +159,8 @@ Global
 		{ED8ECCD8-966B-485F-A98A-1E03960B894D} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{6778695A-66DB-4AF3-984C-89AA1F70C5D5} = {279511E3-104D-4A68-BCE7-F9E97414ECDD}
 		{2B50A958-7703-4230-A5E0-9F046B059A54} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{C442D08B-B968-4DB1-9399-32F0B2D3B107} = {279511E3-104D-4A68-BCE7-F9E97414ECDD}
+		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC} = {279511E3-104D-4A68-BCE7-F9E97414ECDD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}
