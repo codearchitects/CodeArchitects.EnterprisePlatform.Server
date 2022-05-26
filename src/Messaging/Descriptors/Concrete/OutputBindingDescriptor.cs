@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
 
 internal record OutputBindingDescriptor(
   Type MetadataType,
-  object Metadata) : IOutputBindingDescriptor
+  object MetadataObject) : IOutputBindingDescriptor
 {
   public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method)
   {

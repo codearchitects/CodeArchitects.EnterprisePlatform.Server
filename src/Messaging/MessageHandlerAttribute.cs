@@ -4,7 +4,7 @@
 /// Specifies the class or a method is a message handler and will be triggered by messages.
 /// An optional bus name can be indicated, otherwise the default configured bus name will be used.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)] // TODO: Allow multiple, so a single class/method can handle multiple busses and topics
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
 public class MessageHandlerAttribute : Attribute, IHandlerMetadata
 {
   /// <summary>
@@ -17,10 +17,10 @@ public class MessageHandlerAttribute : Attribute, IHandlerMetadata
   /// <summary>
   /// Initializes a new instance of <see cref="MessageHandlerAttribute"/> specifying a bus name.
   /// </summary>
-  /// <param name="busName">The name of the bus.</param>
-  public MessageHandlerAttribute(string busName)
+  /// <param name="bus">The name of the bus.</param>
+  public MessageHandlerAttribute(string bus)
   {
-    Bus = busName;
+    Bus = bus;
   }
 
   /// <summary>

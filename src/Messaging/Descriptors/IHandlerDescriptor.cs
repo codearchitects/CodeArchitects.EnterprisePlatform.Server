@@ -3,5 +3,5 @@
 internal interface IHandlerDescriptor
 {
   Type ConcreteType { get; }
-  IReadOnlyCollection<IHandlerIdentityDescriptor> Identities { get; }
+  IReadOnlyCollection<IHandlerIdentityDescriptor> IdentityDescriptors { get; }
 }

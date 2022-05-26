@@ -2,9 +2,9 @@
 
 internal record HandlerDescriptor(
   Type ConcreteType,
-  IReadOnlyCollection<IHandlerIdentityDescriptor> Identities) : IHandlerDescriptor
+  IReadOnlyCollection<IHandlerIdentityDescriptor> IdentityDescriptors) : IHandlerDescriptor
 {
-  public static HandlerDescriptor Create(string? defaultBus, string defaultTopic, Type concreteType)
+  public static HandlerDescriptor Create(string? defaultBus, string? defaultTopic, Type concreteType)
   {
     IReadOnlyCollection<IHandlerIdentityDescriptor> identities = HandlerIdentityDescriptor.Create(defaultBus, defaultTopic, concreteType);
 

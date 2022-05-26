@@ -4,9 +4,9 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
 
 internal record HandlerIdentityDescriptor(
   Type InterfaceType,
-  IReadOnlyCollection<IOutputBindingDescriptor> OutputBindings,
-  string Bus,
-  string Topic) : IHandlerIdentityDescriptor
+  IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors,
+  string? Bus,
+  string? Topic) : IHandlerIdentityDescriptor
 {
   public Type MessageType => InterfaceType.GetGenericArguments()[0];
 
@@ -21,7 +21,7 @@ internal record HandlerIdentityDescriptor(
     }
   }
 
-  public static IReadOnlyCollection<HandlerIdentityDescriptor> Create(string? defaultBus, string defaultTopic, Type concreteType)
+  public static IReadOnlyCollection<HandlerIdentityDescriptor> Create(string? defaultBus, string? defaultTopic, Type concreteType)
   {
     IEnumerable<MessageHandlerAttribute> classAttributes = concreteType.GetCustomAttributes<MessageHandlerAttribute>();
 
@@ -41,12 +41,22 @@ internal record HandlerIdentityDescriptor(
         IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod);
 
         IEnumerable<MessageHandlerAttribute> methodAttributes = handlerMethod.GetCustomAttributes<MessageHandlerAttribute>();
-        foreach (MessageHandlerAttribute methodAttribute in methodAttributes)
+        if (!methodAttributes.Any())
         {
-          string? bus = methodAttribute.Bus ?? classAttribute.Bus ?? defaultBus;
-          if (bus is null)
-            continue; // TODO: Log warning
-          string topic = methodAttribute.Topic ?? classAttribute.Topic ?? defaultTopic;
+          AddIdentityDescriptor(null, null);
+        }
+        else
+        {
+          foreach (MessageHandlerAttribute methodAttribute in methodAttributes)
+          {
+            AddIdentityDescriptor(methodAttribute.Bus, methodAttribute.Topic);
+          }
+        }
+
+        void AddIdentityDescriptor(string? bus, string? topic)
+        {
+          bus ??= classAttribute.Bus ?? defaultBus;
+          topic ??= classAttribute.Topic ?? defaultTopic;
 
           HandlerIdentityDescriptor descriptor = new HandlerIdentityDescriptor(interfaceType, outputBindings, bus, topic);
           descriptors.Add(descriptor);

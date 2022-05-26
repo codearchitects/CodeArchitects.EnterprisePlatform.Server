@@ -5,7 +5,7 @@ internal interface IHandlerIdentityDescriptor
   Type InterfaceType { get; }
   Type MessageType { get; }
   Type? ResultType { get; }
-  IReadOnlyCollection<IOutputBindingDescriptor> OutputBindings { get; }
-  string Bus { get; }
-  string Topic { get; }
+  string? Bus { get; }
+  string? Topic { get; }
+  IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors { get; }
 }

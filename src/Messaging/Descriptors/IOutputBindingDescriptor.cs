@@ -3,5 +3,5 @@
 internal interface IOutputBindingDescriptor
 {
   Type MetadataType { get; }
-  object Metadata { get; }
+  object MetadataObject { get; }
 }
