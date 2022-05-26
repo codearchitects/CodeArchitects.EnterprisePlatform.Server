@@ -20,14 +20,14 @@ public static class HandlerDescriptorFixture
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
           .SetMessageType(typeof(Message1))
           .SetResultType(null)
-          .SetBus("override_bus")
-          .SetTopic("override_topic"))
+          .SetBus(StandardMessageHandlerInfo.Identity1Bus)
+          .SetTopic(StandardMessageHandlerInfo.Identity1Topic))
         .AddIdentityDescriptor(_ => _
           .SetInterfaceType(typeof(IMessageHandler<Message2, Message1>))
           .SetMessageType(typeof(Message2))
           .SetResultType(typeof(Message1))
-          .SetBus("bus")
-          .SetTopic("topic")
+          .SetBus(StandardMessageHandlerInfo.ClassBus)
+          .SetTopic(StandardMessageHandlerInfo.ClassTopic)
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(typeof(IFakeOutputMetadata1))
             .SetMetadataObject(StandardMessageHandlerInfo.Identity2MetadataObject)));
