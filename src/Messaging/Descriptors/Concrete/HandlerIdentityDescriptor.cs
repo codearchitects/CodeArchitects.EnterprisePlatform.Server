@@ -41,16 +41,16 @@ internal record HandlerIdentityDescriptor(
         IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod);
 
         IEnumerable<MessageHandlerAttribute> methodAttributes = handlerMethod.GetCustomAttributes<MessageHandlerAttribute>();
-        if (!methodAttributes.Any())
-        {
-          AddIdentityDescriptor(null, null);
-        }
-        else
+        if (methodAttributes.Any())
         {
           foreach (MessageHandlerAttribute methodAttribute in methodAttributes)
           {
             AddIdentityDescriptor(methodAttribute.Bus, methodAttribute.Topic);
           }
+        }
+        else
+        {
+          AddIdentityDescriptor(null, null);
         }
 
         void AddIdentityDescriptor(string? bus, string? topic)
