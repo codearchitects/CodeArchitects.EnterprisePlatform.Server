@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
 
 public static class HandlerDescriptorFixture
 {
-  internal class StandardHandlerDataAttribute : DataAttribute
+  internal class StandardMessageHandlerDataAttribute : DataAttribute
   {
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
@@ -19,7 +19,7 @@ public static class HandlerDescriptorFixture
         .AddIdentityDescriptor(_ => _
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
           .SetMessageType(typeof(Message1))
-          .SetResultType(null)
+          .SetResultType(typeof(void))
           .SetBus(StandardMessageHandlerInfo.Identity1Bus)
           .SetTopic(StandardMessageHandlerInfo.Identity1Topic))
         .AddIdentityDescriptor(_ => _
@@ -33,6 +33,28 @@ public static class HandlerDescriptorFixture
             .SetMetadataObject(StandardMessageHandlerInfo.Identity2MetadataObject)));
 
       yield return new[] { builder.Descriptor };
+    }
+  }
+
+  internal class NoBusAndTopicMessageHandlerDataAttribute : DataAttribute
+  {
+    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    {
+      string defaultBus = "defaultBus";
+      string defaultTopic = "defaultTopic";
+
+      HandlerDescriptorBuilder builder = new(MockBehavior.Strict);
+
+      builder
+        .SetConcreteType(typeof(NoBusAndTopicMessageHandler))
+        .AddIdentityDescriptor(_ => _
+          .SetInterfaceType(typeof(IMessageHandler<Message1>))
+          .SetMessageType(typeof(Message1))
+          .SetResultType(typeof(void))
+          .SetBus(defaultBus)
+          .SetTopic(defaultTopic));
+
+      yield return new object[] { defaultBus, defaultTopic, builder.Descriptor };
     }
   }
 }

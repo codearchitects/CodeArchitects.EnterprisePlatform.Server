@@ -6,7 +6,7 @@ internal interface IHandlerIdentityDescriptorBuilder
   
   IHandlerIdentityDescriptorBuilder SetMessageType(Type messageType);
   
-  IHandlerIdentityDescriptorBuilder SetResultType(Type? resultType);
+  IHandlerIdentityDescriptorBuilder SetResultType(Type resultType);
 
   IHandlerIdentityDescriptorBuilder SetBus(string? bus);
 

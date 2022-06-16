@@ -10,14 +10,14 @@ internal record HandlerIdentityDescriptor(
 {
   public Type MessageType => InterfaceType.GetGenericArguments()[0];
 
-  public Type? ResultType
+  public Type ResultType
   {
     get
     {
       Type[] genericArguments = InterfaceType.GetGenericArguments();
       return genericArguments.Length == 2
         ? genericArguments[1]
-        : null;
+        : typeof(void);
     }
   }
 

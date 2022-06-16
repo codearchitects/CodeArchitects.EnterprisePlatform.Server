@@ -38,7 +38,7 @@ internal class HandlerIdentityDescriptorBuilder : IHandlerIdentityDescriptorBuil
     return this;
   }
 
-  public IHandlerIdentityDescriptorBuilder SetResultType(Type? resultType)
+  public IHandlerIdentityDescriptorBuilder SetResultType(Type resultType)
   {
     _descriptorMock
       .Setup(x => x.ResultType)
