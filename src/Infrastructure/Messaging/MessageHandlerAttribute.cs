@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.Infrastructure.Messaging;
+﻿namespace CodeArchitects.Platform.Infrastructure.Messaging;
 
 /// <summary>
 /// Specifies the class or a method is a message handler and will be triggered by messages.

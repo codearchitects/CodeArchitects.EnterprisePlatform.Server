@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.Infrastructure.Messaging;
+﻿namespace CodeArchitects.Platform.Infrastructure.Messaging;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class MessageAttribute : Attribute

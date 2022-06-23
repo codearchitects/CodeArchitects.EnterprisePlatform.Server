@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace CodeArchitects.Platform.Infrastructure.Messaging;
+﻿namespace CodeArchitects.Platform.Infrastructure.Messaging;
 
 /// <summary>
 /// Interface for sending messages.

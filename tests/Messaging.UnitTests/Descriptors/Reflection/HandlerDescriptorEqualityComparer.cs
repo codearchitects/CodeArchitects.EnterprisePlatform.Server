@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 internal class HandlerDescriptorEqualityComparer :
   IEqualityComparer<IHandlerDescriptor>,
@@ -37,6 +37,9 @@ internal class HandlerDescriptorEqualityComparer :
       return false;
 
     if (x.InterfaceType != y.InterfaceType)
+      return false;
+
+    if (x.ConcreteType != y.ConcreteType)
       return false;
 
     if (x.MessageType != y.MessageType)

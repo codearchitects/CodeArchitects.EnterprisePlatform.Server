@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 internal record HandlerDescriptor(
   Type ConcreteType,

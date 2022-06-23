@@ -14,6 +14,11 @@ internal interface IHandlerIdentityDescriptor
   Type InterfaceType { get; }
 
   /// <summary>
+  /// The handler concrete type.
+  /// </summary>
+  Type ConcreteType { get; }
+
+  /// <summary>
   /// The type of the message being handled.
   /// </summary>
   Type MessageType { get; }
@@ -22,7 +27,19 @@ internal interface IHandlerIdentityDescriptor
   /// The type of the result the handler produces.
   /// </summary>
   Type ResultType { get; }
+
+  /// <summary>
+  /// The bus name.
+  /// </summary>
   string? Bus { get; }
+  
+  /// <summary>
+  /// The topic name.
+  /// </summary>
   string? Topic { get; }
+  
+  /// <summary>
+  /// The output bindings.
+  /// </summary>
   IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors { get; }
 }

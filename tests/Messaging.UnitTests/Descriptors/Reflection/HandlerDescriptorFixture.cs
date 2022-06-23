@@ -4,7 +4,7 @@ using Moq;
 using System.Reflection;
 using Xunit.Sdk;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 public static class HandlerDescriptorFixture
 {
@@ -18,12 +18,14 @@ public static class HandlerDescriptorFixture
         .SetConcreteType(typeof(StandardMessageHandler))
         .AddIdentityDescriptor(_ => _
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
+          .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message1))
           .SetResultType(typeof(void))
           .SetBus(StandardMessageHandlerInfo.Identity1Bus)
           .SetTopic(StandardMessageHandlerInfo.Identity1Topic))
         .AddIdentityDescriptor(_ => _
           .SetInterfaceType(typeof(IMessageHandler<Message2, Message1>))
+          .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message2))
           .SetResultType(typeof(Message1))
           .SetBus(StandardMessageHandlerInfo.ClassBus)
@@ -49,6 +51,7 @@ public static class HandlerDescriptorFixture
         .SetConcreteType(typeof(NoBusAndTopicMessageHandler))
         .AddIdentityDescriptor(_ => _
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
+          .SetConcreteType(typeof(NoBusAndTopicMessageHandler))
           .SetMessageType(typeof(Message1))
           .SetResultType(typeof(void))
           .SetBus(defaultBus)

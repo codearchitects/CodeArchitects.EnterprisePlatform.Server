@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Messaging.Bindings;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 internal record OutputBindingDescriptor(
   Type MetadataType,

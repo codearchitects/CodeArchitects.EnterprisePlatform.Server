@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace CodeArchitects.Platform.Infrastructure.Messaging;
+﻿namespace CodeArchitects.Platform.Infrastructure.Messaging;
 
 /// <summary>
 /// A class that handles messagees of type <typeparamref name="TMessage"/> and produces no result.

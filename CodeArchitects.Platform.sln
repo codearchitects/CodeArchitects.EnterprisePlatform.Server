@@ -51,7 +51,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Mes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.Dapr.AspNetCore", "src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj", "{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.UnitTests", "tests\Messaging.UnitTests\CodeArchitects.Platform.Messaging.UnitTests.csproj", "{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.UnitTests", "tests\Messaging.UnitTests\CodeArchitects.Platform.Messaging.UnitTests.csproj", "{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.AspNetCore", "src\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj", "{D507A572-3A15-4476-BA59-181B268D2614}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -147,6 +149,10 @@ Global
 		{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D507A572-3A15-4476-BA59-181B268D2614}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D507A572-3A15-4476-BA59-181B268D2614}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D507A572-3A15-4476-BA59-181B268D2614}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D507A572-3A15-4476-BA59-181B268D2614}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

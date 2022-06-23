@@ -2,9 +2,9 @@
 using FluentAssertions;
 using Xunit;
 
-using static CodeArchitects.Platform.Messaging.Descriptors.Concrete.HandlerDescriptorFixture;
+using static CodeArchitects.Platform.Messaging.Descriptors.Reflection.HandlerDescriptorFixture;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 public class HandlerDescriptorTests
 {

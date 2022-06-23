@@ -1,9 +1,10 @@
 ﻿using System.Reflection;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Concrete;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 internal record HandlerIdentityDescriptor(
   Type InterfaceType,
+  Type ConcreteType,
   IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors,
   string? Bus,
   string? Topic) : IHandlerIdentityDescriptor
@@ -58,7 +59,7 @@ internal record HandlerIdentityDescriptor(
           bus ??= classAttribute.Bus ?? defaultBus;
           topic ??= classAttribute.Topic ?? defaultTopic;
 
-          HandlerIdentityDescriptor descriptor = new HandlerIdentityDescriptor(interfaceType, outputBindings, bus, topic);
+          HandlerIdentityDescriptor descriptor = new HandlerIdentityDescriptor(interfaceType, concreteType, outputBindings, bus, topic);
           descriptors.Add(descriptor);
         }
       }

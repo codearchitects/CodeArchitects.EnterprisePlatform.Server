@@ -30,6 +30,14 @@ internal class HandlerIdentityDescriptorBuilder : IHandlerIdentityDescriptorBuil
     return this;
   }
 
+  public IHandlerIdentityDescriptorBuilder SetConcreteType(Type concreteType)
+  {
+    _descriptorMock
+      .Setup(x => x.ConcreteType)
+      .Returns(concreteType);
+    return this;
+  }
+
   public IHandlerIdentityDescriptorBuilder SetMessageType(Type messageType)
   {
     _descriptorMock

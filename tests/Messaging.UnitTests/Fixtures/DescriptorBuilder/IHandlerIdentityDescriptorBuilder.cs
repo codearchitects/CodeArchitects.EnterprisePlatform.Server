@@ -3,7 +3,9 @@
 internal interface IHandlerIdentityDescriptorBuilder
 {
   IHandlerIdentityDescriptorBuilder SetInterfaceType(Type interfaceType);
-  
+
+  IHandlerIdentityDescriptorBuilder SetConcreteType(Type concreteType);
+
   IHandlerIdentityDescriptorBuilder SetMessageType(Type messageType);
   
   IHandlerIdentityDescriptorBuilder SetResultType(Type resultType);
