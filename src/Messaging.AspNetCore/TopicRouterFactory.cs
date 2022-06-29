@@ -20,10 +20,10 @@ internal class TopicRouterFactory : ITopicRouterFactory
     _messageTypes = messageTypes;
   }
 
-  public TopicRouter CreateRouter(IEnumerable<IHandlerIdentityDescriptor> identityDescriptors)
+  public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> identityDescriptors)
   {
     Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
-    foreach (IHandlerIdentityDescriptor identityDescriptor in identityDescriptors)
+    foreach (IHandlerDescriptor identityDescriptor in identityDescriptors)
     {
       Type messageType = identityDescriptor.MessageType;
       string messageName = messageType.GetCustomAttribute<MessageAttribute>()?.MessageName ?? messageType.Name;

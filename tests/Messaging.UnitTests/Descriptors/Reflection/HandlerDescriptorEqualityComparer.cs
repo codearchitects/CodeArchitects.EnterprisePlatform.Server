@@ -3,13 +3,31 @@
 namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 internal class HandlerDescriptorEqualityComparer :
+  IEqualityComparer<IMessagingDescriptor>,
   IEqualityComparer<IHandlerDescriptor>,
-  IEqualityComparer<IHandlerIdentityDescriptor>,
-  IEqualityComparer<IOutputBindingDescriptor>
+  IEqualityComparer<IOutputBindingDescriptor>,
+  IEqualityComparer<HandlerDiagnostics>
 {
   public static readonly HandlerDescriptorEqualityComparer Instance = new();
 
   private HandlerDescriptorEqualityComparer() { }
+
+  public bool Equals(IMessagingDescriptor? x, IMessagingDescriptor? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!x.HandlerDescriptors.SequenceEqual(y.HandlerDescriptors, this))
+      return false;
+
+    if (!x.Diagnostics.SequenceEqual(y.Diagnostics, this))
+      return false;
+
+    return true;
+  }
 
   public bool Equals(IHandlerDescriptor? x, IHandlerDescriptor? y)
   {
@@ -19,21 +37,10 @@ internal class HandlerDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.ConcreteType != y.ConcreteType)
+    if (x.Bus != y.Bus)
       return false;
 
-    if (!x.IdentityDescriptors.SequenceEqual(y.IdentityDescriptors, this))
-      return false;
-
-    return true;
-  }
-
-  public bool Equals(IHandlerIdentityDescriptor? x, IHandlerIdentityDescriptor? y)
-  {
-    if (x is null)
-      return y is null;
-
-    if (y is null)
+    if (x.Topic != y.Topic)
       return false;
 
     if (x.InterfaceType != y.InterfaceType)
@@ -46,12 +53,6 @@ internal class HandlerDescriptorEqualityComparer :
       return false;
 
     if (x.ResultType != y.ResultType)
-      return false;
-
-    if (x.Bus != y.Bus)
-      return false;
-
-    if (x.Topic != y.Topic)
       return false;
 
     if (!x.OutputBindingDescriptors.SequenceEqual(y.OutputBindingDescriptors, this))
@@ -77,20 +78,23 @@ internal class HandlerDescriptorEqualityComparer :
     return true;
   }
 
-  public int GetHashCode([DisallowNull] IHandlerDescriptor obj)
+  public bool Equals(HandlerDiagnostics? x, HandlerDiagnostics? y)
   {
-    HashCode hashCode = new();
-    
-    hashCode.Add(obj.ConcreteType);
-    foreach (IHandlerIdentityDescriptor descriptor in obj.IdentityDescriptors)
-    {
-      hashCode.Add(descriptor, this);
-    }
+    if (x is null)
+      return y is null;
 
-    return hashCode.ToHashCode();
+    if (y is null)
+      return false;
+
+    return (x.Id, x.ConcreteType) == (y.Id, y.ConcreteType);
   }
 
-  public int GetHashCode([DisallowNull] IHandlerIdentityDescriptor obj)
+  public int GetHashCode([DisallowNull] IMessagingDescriptor obj)
+  {
+    throw new NotImplementedException();
+  }
+
+  public int GetHashCode([DisallowNull] IHandlerDescriptor obj)
   {
     HashCode hashCode = new();
 
@@ -110,5 +114,10 @@ internal class HandlerDescriptorEqualityComparer :
   public int GetHashCode([DisallowNull] IOutputBindingDescriptor obj)
   {
     return HashCode.Combine(obj.MetadataType, obj.MetadataObject);
+  }
+
+  public int GetHashCode([DisallowNull] HandlerDiagnostics obj)
+  {
+    return obj.Id.GetHashCode();
   }
 }

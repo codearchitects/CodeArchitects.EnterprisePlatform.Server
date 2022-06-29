@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Messaging.Fixtures;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Xunit;
 
 using static CodeArchitects.Platform.Messaging.Descriptors.Reflection.HandlerDescriptorFixture;
@@ -8,27 +7,16 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
 public class HandlerDescriptorTests
 {
-  [Theory, StandardMessageHandlerData]
-  internal void Create_ShouldCreateCorrectHandlerDescriptor_WhenBusAndTopicAreDefined(IHandlerDescriptor expected)
+  [Theory]
+  [StandardMessageHandlerData]
+  internal void Create_ShouldCreateCorrectHandlerDescriptor(IEnumerable<Type> concreteTypes, string? defaultBus, string? defaultTopic, IMessagingDescriptor expected)
   {
     // Arrange
 
     // Act
-    HandlerDescriptor actual = HandlerDescriptor.Create(null, null, typeof(StandardMessageHandler));
+    MessagingDescriptor actual = MessagingDescriptor.Create(concreteTypes, defaultBus, defaultTopic);
 
     // Assert
-    actual.Should().BeEquivalentTo(expected, x => x.Using<IHandlerDescriptor>(HandlerDescriptorEqualityComparer.Instance));
-  }
-
-  [Theory, NoBusAndTopicMessageHandlerData]
-  internal void Create_ShouldCreateCorrectHandlerDescriptor_WhenBusAndTopicAreNotDefined(string defaultBus, string defaultTopic, IHandlerDescriptor expected)
-  {
-    // Arrange
-
-    // Act
-    HandlerDescriptor actual = HandlerDescriptor.Create(defaultBus, defaultTopic, typeof(NoBusAndTopicMessageHandler));
-
-    // Assert
-    actual.Should().BeEquivalentTo(expected, x => x.Using<IHandlerDescriptor>(HandlerDescriptorEqualityComparer.Instance));
+    actual.Should().BeEquivalentTo(expected, x => x.Using<IMessagingDescriptor>(HandlerDescriptorEqualityComparer.Instance));
   }
 }

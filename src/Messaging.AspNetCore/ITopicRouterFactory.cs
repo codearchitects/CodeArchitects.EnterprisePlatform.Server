@@ -12,5 +12,5 @@ internal interface ITopicRouterFactory
   /// </summary>
   /// <param name="identityDescriptors">A collection of handler identities which share the same bus and topic.</param>
   /// <returns>The created <see cref="TopicRouter"/>.</returns>
-  TopicRouter CreateRouter(IEnumerable<IHandlerIdentityDescriptor> identityDescriptors);
+  TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> identityDescriptors);
 }

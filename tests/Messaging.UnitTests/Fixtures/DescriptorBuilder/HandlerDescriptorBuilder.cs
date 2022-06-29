@@ -7,20 +7,44 @@ internal class HandlerDescriptorBuilder : IHandlerDescriptorBuilder
 {
   private readonly MockBehavior _behavior;
   private readonly Mock<IHandlerDescriptor> _descriptorMock;
-  private readonly List<IHandlerIdentityDescriptor> _identityDescriptors;
+  private readonly List<IOutputBindingDescriptor> _outputBindingDescriptors;
 
   public HandlerDescriptorBuilder(MockBehavior behavior)
   {
     _behavior = behavior;
     _descriptorMock = new(behavior);
 
-    _identityDescriptors = new List<IHandlerIdentityDescriptor>();
+    _outputBindingDescriptors = new List<IOutputBindingDescriptor>();
     _descriptorMock
-      .Setup(x => x.IdentityDescriptors)
-      .Returns(_identityDescriptors);
+      .Setup(x => x.OutputBindingDescriptors)
+      .Returns(_outputBindingDescriptors);
   }
 
   public IHandlerDescriptor Descriptor => _descriptorMock.Object;
+
+  public IHandlerDescriptorBuilder SetBus(string bus)
+  {
+    _descriptorMock
+      .Setup(x => x.Bus)
+      .Returns(bus);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder SetTopic(string topic)
+  {
+    _descriptorMock
+      .Setup(x => x.Topic)
+      .Returns(topic);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder SetInterfaceType(Type interfaceType)
+  {
+    _descriptorMock
+      .Setup(x => x.InterfaceType)
+      .Returns(interfaceType);
+    return this;
+  }
 
   public IHandlerDescriptorBuilder SetConcreteType(Type concreteType)
   {
@@ -30,11 +54,27 @@ internal class HandlerDescriptorBuilder : IHandlerDescriptorBuilder
     return this;
   }
 
-  public IHandlerDescriptorBuilder AddIdentityDescriptor(Func<IHandlerIdentityDescriptorBuilder, IHandlerIdentityDescriptorBuilder> build)
+  public IHandlerDescriptorBuilder SetMessageType(Type messageType)
   {
-    HandlerIdentityDescriptorBuilder builder = new(_behavior);
+    _descriptorMock
+      .Setup(x => x.MessageType)
+      .Returns(messageType);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder SetResultType(Type resultType)
+  {
+    _descriptorMock
+      .Setup(x => x.ResultType)
+      .Returns(resultType);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder AddOutputBindingDescriptor(Func<IOutputBindingDescriptorBuilder, IOutputBindingDescriptorBuilder> build)
+  {
+    OutputBindingDescriptorBuilder builder = new(_behavior);
     build(builder);
-    _identityDescriptors.Add(builder.Descriptor);
+    _outputBindingDescriptors.Add(builder.Descriptor);
     return this;
   }
 }

@@ -1,12 +1,18 @@
-﻿using CodeArchitects.Platform.Messaging.Descriptors;
-
-namespace CodeArchitects.Platform.Messaging.Fixtures.DescriptorBuilder;
+﻿namespace CodeArchitects.Platform.Messaging.Fixtures.DescriptorBuilder;
 
 internal interface IHandlerDescriptorBuilder
 {
-  IHandlerDescriptor Descriptor { get; }
+  IHandlerDescriptorBuilder SetBus(string bus);
+
+  IHandlerDescriptorBuilder SetTopic(string topic);
+
+  IHandlerDescriptorBuilder SetInterfaceType(Type interfaceType);
 
   IHandlerDescriptorBuilder SetConcreteType(Type concreteType);
 
-  IHandlerDescriptorBuilder AddIdentityDescriptor(Func<IHandlerIdentityDescriptorBuilder, IHandlerIdentityDescriptorBuilder> build);
+  IHandlerDescriptorBuilder SetMessageType(Type messageType);
+  
+  IHandlerDescriptorBuilder SetResultType(Type resultType);
+
+  IHandlerDescriptorBuilder AddOutputBindingDescriptor(Func<IOutputBindingDescriptorBuilder, IOutputBindingDescriptorBuilder> build);
 }

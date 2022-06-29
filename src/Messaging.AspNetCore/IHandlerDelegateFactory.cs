@@ -12,5 +12,5 @@ internal interface IHandlerDelegateFactory
   /// </summary>
   /// <param name="identityDescriptor">The handler identity descriptor.</param>
   /// <returns>The created handler delegate.</returns>
-  HandlerDelegate CreateHandlerDelegate(IHandlerIdentityDescriptor identityDescriptor);
+  HandlerDelegate CreateHandlerDelegate(IHandlerDescriptor identityDescriptor);
 }

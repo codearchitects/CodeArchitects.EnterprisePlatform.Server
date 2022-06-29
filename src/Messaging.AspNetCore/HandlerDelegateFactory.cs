@@ -19,7 +19,7 @@ internal class HandlerDelegateFactory : IHandlerDelegateFactory
     _services = services;
   }
 
-  public HandlerDelegate CreateHandlerDelegate(IHandlerIdentityDescriptor identityDescriptor)
+  public HandlerDelegate CreateHandlerDelegate(IHandlerDescriptor identityDescriptor)
   {
     IReadOnlyList<OutputAction> outputActions = identityDescriptor.OutputBindingDescriptors
       .Select(descriptor => OutputAction.Create(descriptor.MetadataType, descriptor.MetadataObject, _services))
