@@ -21,9 +21,9 @@ public class StandardMessageHandler : IMessageHandler<Message1>, IMessageHandler
 }
 
 [MessageHandler]
-public class NoBusAndTopicMessageHandler : IMessageHandler<Message1>
+public class NoBusAndTopicMessageHandler : IMessageHandler<Message3>
 {
-  public Task HandleAsync(Message1 message, CancellationToken cancellationToken)
+  public Task HandleAsync(Message3 message, CancellationToken cancellationToken)
   {
     throw new NotImplementedException();
   }
@@ -68,6 +68,6 @@ public static class NoBusAndTopicMessageHandlerInfo
     HandlerMethod1 = typeof(NoBusAndTopicMessageHandler).GetMethod(
       name: nameof(NoBusAndTopicMessageHandler.HandleAsync),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      types: new[] { typeof(Message1), typeof(CancellationToken) }) ?? throw new MissingMethodException(typeof(NoBusAndTopicMessageHandler).Name, nameof(NoBusAndTopicMessageHandler.HandleAsync));
+      types: new[] { typeof(Message3), typeof(CancellationToken) }) ?? throw new MissingMethodException(typeof(NoBusAndTopicMessageHandler).Name, nameof(NoBusAndTopicMessageHandler.HandleAsync));
   }
 }

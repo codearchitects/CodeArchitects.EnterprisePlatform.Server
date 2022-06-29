@@ -6,6 +6,7 @@ internal class HandlerDescriptorEqualityComparer :
   IEqualityComparer<IMessagingDescriptor>,
   IEqualityComparer<IHandlerDescriptor>,
   IEqualityComparer<IOutputBindingDescriptor>,
+  IEqualityComparer<IMessageDescriptor>,
   IEqualityComparer<HandlerDiagnostics>
 {
   public static readonly HandlerDescriptorEqualityComparer Instance = new();
@@ -21,6 +22,9 @@ internal class HandlerDescriptorEqualityComparer :
       return false;
 
     if (!x.HandlerDescriptors.SequenceEqual(y.HandlerDescriptors, this))
+      return false;
+
+    if (!x.MessageDescriptors.SequenceEqual(y.MessageDescriptors, this))
       return false;
 
     if (!x.Diagnostics.SequenceEqual(y.Diagnostics, this))
@@ -89,9 +93,35 @@ internal class HandlerDescriptorEqualityComparer :
     return (x.Id, x.ConcreteType) == (y.Id, y.ConcreteType);
   }
 
+  public bool Equals(IMessageDescriptor? x, IMessageDescriptor? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    return (x.Name, x.Type) == (y.Name, y.Type);
+  }
+
   public int GetHashCode([DisallowNull] IMessagingDescriptor obj)
   {
-    throw new NotImplementedException();
+    HashCode hashCode = new();
+
+    foreach (IHandlerDescriptor handlerDescriptor in obj.HandlerDescriptors)
+    {
+      hashCode.Add(handlerDescriptor, this);
+    }
+    foreach (IMessageDescriptor messageDescriptor in obj.MessageDescriptors)
+    {
+      hashCode.Add(messageDescriptor, this);
+    }
+    foreach (HandlerDiagnostics diagnostics in obj.Diagnostics)
+    {
+      hashCode.Add(diagnostics, this);
+    }
+
+    return hashCode.ToHashCode();
   }
 
   public int GetHashCode([DisallowNull] IHandlerDescriptor obj)
@@ -119,5 +149,10 @@ internal class HandlerDescriptorEqualityComparer :
   public int GetHashCode([DisallowNull] HandlerDiagnostics obj)
   {
     return obj.Id.GetHashCode();
+  }
+
+  public int GetHashCode([DisallowNull] IMessageDescriptor obj)
+  {
+    return HashCode.Combine(obj.Name, obj.Type);
   }
 }

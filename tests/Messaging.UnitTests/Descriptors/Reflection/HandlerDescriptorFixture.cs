@@ -64,7 +64,10 @@ public static class HandlerDescriptorFixture
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
           .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message1))
-          .SetResultType(typeof(void)));
+          .SetResultType(typeof(void)))
+        .AddMessageDescriptor(_ => _
+          .SetName(Message1.MessageName)
+          .SetType(typeof(Message1)));
     }
 
     private static void AddStandardMessageHandler2(IMessagingDescriptorBuilder builder)
@@ -79,7 +82,10 @@ public static class HandlerDescriptorFixture
           .SetResultType(typeof(Message1))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(typeof(IFakeOutputMetadata1))
-            .SetMetadataObject(StandardMessageHandlerInfo.Identity2MetadataObject)));
+            .SetMetadataObject(StandardMessageHandlerInfo.Identity2MetadataObject)))
+        .AddMessageDescriptor(_ => _
+          .SetName(typeof(Message2).Name)
+          .SetType(typeof(Message2)));
     }
 
     private static void AddNoBusAndTopicMessageHandler1(IMessagingDescriptorBuilder builder, string defaultBus, string defaultTopic)
@@ -88,10 +94,13 @@ public static class HandlerDescriptorFixture
         .AddHandlerDescriptor(_ => _
           .SetBus(defaultBus)
           .SetTopic(defaultTopic)
-          .SetInterfaceType(typeof(IMessageHandler<Message1>))
+          .SetInterfaceType(typeof(IMessageHandler<Message3>))
           .SetConcreteType(typeof(NoBusAndTopicMessageHandler))
-          .SetMessageType(typeof(Message1))
-          .SetResultType(typeof(void)));
+          .SetMessageType(typeof(Message3))
+          .SetResultType(typeof(void)))
+        .AddMessageDescriptor(_ => _
+          .SetName(typeof(Message3).Name)
+          .SetType(typeof(Message3)));
     }
   }
 }

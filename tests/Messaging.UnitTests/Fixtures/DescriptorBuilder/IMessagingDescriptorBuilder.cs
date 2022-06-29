@@ -6,5 +6,7 @@ internal interface IMessagingDescriptorBuilder
 {
   IMessagingDescriptorBuilder AddHandlerDescriptor(Func<IHandlerDescriptorBuilder, IHandlerDescriptorBuilder> build);
 
+  IMessagingDescriptorBuilder AddMessageDescriptor(Func<IMessageDescriptorBuilder, IMessageDescriptorBuilder> build);
+
   IMessagingDescriptorBuilder SetDiagnostics(IReadOnlyCollection<HandlerDiagnostics> diagnostics);
 }
