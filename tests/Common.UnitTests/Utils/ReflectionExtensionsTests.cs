@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using System;
-using Xunit;
 
 namespace CodeArchitects.Platform.Common.Utils;
 

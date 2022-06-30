@@ -27,9 +27,17 @@ internal class HandlerDelegate<TMessage, THandler> : HandlerDelegate
 
   public override async Task HandleAsync(HttpContext context, JObject messageJson)
   {
-    TMessage message = messageJson.ToObject<TMessage>() ?? throw new InvalidMessageTypeException(typeof(TMessage));
+    TMessage message;
+    try
+    {
+      message = messageJson.ToObject<TMessage>()!;
+    }
+    catch
+    {
+      throw new InvalidMessageTypeException(typeof(TMessage));
+    }
 
-    IMessageHandler<TMessage> handler = context.RequestServices.GetRequiredService<THandler>();
+    THandler handler = context.RequestServices.GetRequiredService<THandler>();
     await handler.HandleAsync(message, context.RequestAborted);
 
     foreach (OutputAction action in _outputActions)

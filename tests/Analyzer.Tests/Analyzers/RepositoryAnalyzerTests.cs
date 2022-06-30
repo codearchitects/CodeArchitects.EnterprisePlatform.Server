@@ -8,7 +8,6 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace CodeArchitects.Platform.Analyzer.Tests.Analyzers;
 

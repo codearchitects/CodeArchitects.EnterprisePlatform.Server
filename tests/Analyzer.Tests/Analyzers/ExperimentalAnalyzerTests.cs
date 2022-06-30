@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace CodeArchitects.Platform.Analyzer.Tests.Analyzers;
 

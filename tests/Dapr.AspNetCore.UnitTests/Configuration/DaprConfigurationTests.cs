@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using static CodeArchitects.Platform.Dapr.AspNetCore.Configuration.DaprConfigurationFixture;
 
 namespace CodeArchitects.Platform.Dapr.AspNetCore.Configuration;

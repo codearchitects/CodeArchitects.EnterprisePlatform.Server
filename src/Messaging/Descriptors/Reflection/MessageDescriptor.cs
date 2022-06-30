@@ -2,6 +2,9 @@
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
+/// <summary>
+/// Implementation of <see cref="IMessageDescriptor"/>
+/// </summary>
 internal record MessageDescriptor(
   Type Type,
   string Name) : IMessageDescriptor

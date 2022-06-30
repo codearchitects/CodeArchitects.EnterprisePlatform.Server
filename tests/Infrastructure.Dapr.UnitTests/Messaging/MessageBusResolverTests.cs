@@ -3,7 +3,6 @@ using Dapr.Client;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 

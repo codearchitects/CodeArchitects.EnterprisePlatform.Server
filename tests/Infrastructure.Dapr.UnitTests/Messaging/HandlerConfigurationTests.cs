@@ -6,7 +6,6 @@ using FluentAssertions;
 using Moq;
 using System;
 using System.Reflection;
-using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 

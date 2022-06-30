@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
+/// <summary>
+/// Implementation of <see cref="IOutputBindingDescriptor"/>
+/// </summary>
 internal record OutputBindingDescriptor(
   Type MetadataType,
   object MetadataObject) : IOutputBindingDescriptor

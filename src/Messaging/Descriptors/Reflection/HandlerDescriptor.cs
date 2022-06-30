@@ -2,6 +2,9 @@
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
+/// <summary>
+/// Implementation of <see cref="IHandlerDescriptor"/>
+/// </summary>
 internal record HandlerDescriptor(
   string Bus,
   string Topic,

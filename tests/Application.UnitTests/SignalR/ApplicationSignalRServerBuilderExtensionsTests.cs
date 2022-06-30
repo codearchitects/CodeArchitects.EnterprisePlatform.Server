@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Collections.Generic;
-using Xunit;
 
 namespace CodeArchitects.Platform.Application.SignalR;
 

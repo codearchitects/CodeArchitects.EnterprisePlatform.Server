@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Xunit;
 
 using static CodeArchitects.Platform.Messaging.Descriptors.Reflection.HandlerDescriptorFixture;
 

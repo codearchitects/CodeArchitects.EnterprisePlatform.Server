@@ -3,7 +3,6 @@ using Dapr.Client;
 using Moq;
 using System.Threading;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
 

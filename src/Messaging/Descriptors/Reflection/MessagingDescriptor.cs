@@ -1,5 +1,8 @@
 ﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 
+/// <summary>
+/// Implementation of <see cref="IMessagingDescriptor"/>
+/// </summary>
 internal record MessagingDescriptor(
   IEnumerable<IHandlerDescriptor> HandlerDescriptors,
   IEnumerable<IMessageDescriptor> MessageDescriptors,
