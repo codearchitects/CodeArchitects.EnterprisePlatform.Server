@@ -53,7 +53,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Mes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.UnitTests", "tests\Messaging.UnitTests\CodeArchitects.Platform.Messaging.UnitTests.csproj", "{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.AspNetCore", "src\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj", "{D507A572-3A15-4476-BA59-181B268D2614}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.AspNetCore", "src\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj", "{D507A572-3A15-4476-BA59-181B268D2614}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.AspNetCore.UnitTests", "tests\Messaging.AspNetCore.UnitTests\CodeArchitects.Platform.Messaging.AspNetCore.UnitTests.csproj", "{77BF8CFC-E0AC-44A0-81B5-DEA429794283}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{D507A572-3A15-4476-BA59-181B268D2614}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D507A572-3A15-4476-BA59-181B268D2614}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D507A572-3A15-4476-BA59-181B268D2614}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77BF8CFC-E0AC-44A0-81B5-DEA429794283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77BF8CFC-E0AC-44A0-81B5-DEA429794283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77BF8CFC-E0AC-44A0-81B5-DEA429794283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77BF8CFC-E0AC-44A0-81B5-DEA429794283}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +180,7 @@ Global
 		{C442D08B-B968-4DB1-9399-32F0B2D3B107} = {279511E3-104D-4A68-BCE7-F9E97414ECDD}
 		{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC} = {279511E3-104D-4A68-BCE7-F9E97414ECDD}
 		{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{77BF8CFC-E0AC-44A0-81B5-DEA429794283} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

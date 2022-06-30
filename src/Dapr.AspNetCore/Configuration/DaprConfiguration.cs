@@ -9,15 +9,15 @@ internal class DaprConfiguration : IDaprConfiguration, IDaprConfigurationBuilder
 {
   private readonly IComponentReader _componentReader;
   private readonly IConfigurationSection _configuration;
-  private readonly ILoggerAccessor _loggerAccessor;
+  private readonly ILogger _logger;
   private readonly Dictionary<Type, object> _sections;
   private readonly List<ComponentSchema> _components;
 
-  public DaprConfiguration(IComponentReader componentReader, IConfigurationSection configuration, ILoggerAccessor loggerAccessor, Dictionary<Type, object> sections, List<ComponentSchema> components)
+  public DaprConfiguration(IComponentReader componentReader, IConfigurationSection configuration, ILogger logger, Dictionary<Type, object> sections, List<ComponentSchema> components)
   {
     _componentReader = componentReader;
     _configuration = configuration;
-    _loggerAccessor = loggerAccessor;
+    _logger = logger;
     _sections = sections;
     _components = components;
   }
@@ -28,8 +28,6 @@ internal class DaprConfiguration : IDaprConfiguration, IDaprConfigurationBuilder
 
   public void AddComponents(IFileProvider componentsFolder)
   {
-    ILogger logger = _loggerAccessor.Logger;
-
     IDirectoryContents contents = componentsFolder.GetDirectoryContents("/");
     if (!contents.Exists)
       return;
@@ -46,7 +44,7 @@ internal class DaprConfiguration : IDaprConfiguration, IDaprConfigurationBuilder
       }
       catch (Exception ex)
       {
-        logger.LogError(ex, "Could not read component in file {0}", file.PhysicalPath ?? file.Name);
+        _logger.LogError(ex, "Could not read component in file {0}", file.PhysicalPath ?? file.Name);
       }
     }
   }
@@ -70,11 +68,11 @@ internal class DaprConfiguration : IDaprConfiguration, IDaprConfigurationBuilder
       : null;
   }
 
-  public static DaprConfiguration Create(IComponentReader componentReader, IConfigurationSection configurationSection, ILoggerAccessor loggerAccessor)
+  public static DaprConfiguration Create(IComponentReader componentReader, IConfigurationSection configurationSection, ILogger logger)
   {
     Dictionary<Type, object> sections = new();
     List<ComponentSchema> components = new();
 
-    return new DaprConfiguration(componentReader, configurationSection, loggerAccessor, sections, components);
+    return new DaprConfiguration(componentReader, configurationSection, logger, sections, components);
   }
 }

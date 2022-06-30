@@ -15,3 +15,14 @@ public class Message2
 public class Message3
 {
 }
+
+[Message(MessageName)]
+public class Message4 : Message1
+{
+  public new const string MessageName = "msg4";
+}
+
+public class Message5 : Message3
+{
+
+}

@@ -5,7 +5,7 @@
 /// An optional bus name can be indicated, otherwise the default configured bus name will be used.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
-public class MessageHandlerAttribute : Attribute, IHandlerMetadata
+public class MessageHandlerAttribute : Attribute
 {
   /// <summary>
   /// Initializes a new instance of <see cref="MessageHandlerAttribute"/> without specifing a bus name.

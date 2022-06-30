@@ -13,7 +13,6 @@ public class DaprConfigurationTests
 {
   private readonly Mock<IComponentReader> _componentReaderMock;
   private readonly Mock<IConfigurationSection> _configurationMock;
-  private readonly Mock<ILoggerAccessor> _loggerAccessorMock;
   private readonly Dictionary<Type, object> _sections;
   private readonly List<ComponentSchema> _components;
   private readonly DaprConfiguration _sut;
@@ -22,15 +21,10 @@ public class DaprConfigurationTests
   {
     _componentReaderMock = new(MockBehavior.Strict);
     _configurationMock = new(MockBehavior.Strict);
-    _loggerAccessorMock = new(MockBehavior.Strict);
     _sections = new();
     _components = new();
 
-    _loggerAccessorMock
-      .Setup(x => x.Logger)
-      .Returns(Mock.Of<ILogger>());
-
-    _sut = new DaprConfiguration(_componentReaderMock.Object, _configurationMock.Object, _loggerAccessorMock.Object, _sections, _components);
+    _sut = new DaprConfiguration(_componentReaderMock.Object, _configurationMock.Object, Mock.Of<ILogger>(MockBehavior.Loose), _sections, _components);
   }
 
   [Fact]

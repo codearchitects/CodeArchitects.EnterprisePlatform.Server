@@ -12,6 +12,7 @@ public static class HandlerDescriptorFixture
   {
     public override IEnumerable<object?[]> GetData(MethodInfo testMethod)
     {
+      Type[] messageTypes = new[] { typeof(Message4), typeof(Message5) };
       Type[] concreteTypes;
       HandlerDiagnostics[] diagnostics;
       MessagingDescriptorBuilder builder;
@@ -22,12 +23,13 @@ public static class HandlerDescriptorFixture
       concreteTypes = new[] { typeof(StandardMessageHandler), typeof(NoBusAndTopicMessageHandler) };
       diagnostics = Array.Empty<HandlerDiagnostics>();
       builder = new(MockBehavior.Strict);
+      AddMessageDescriptors(builder);
       AddStandardMessageHandler1(builder);
       AddStandardMessageHandler2(builder);
       AddNoBusAndTopicMessageHandler1(builder, defaultBus, defaultTopic);
       builder.SetDiagnostics(diagnostics);
 
-      yield return new object?[] { concreteTypes, defaultBus, defaultTopic, builder.Descriptor };
+      yield return new object?[] { concreteTypes, messageTypes, defaultBus, defaultTopic, builder.Descriptor };
 
       // With defaultBus == null and defaultTopic == null
       concreteTypes = new[] { typeof(StandardMessageHandler), typeof(NoBusAndTopicMessageHandler) };
@@ -37,11 +39,12 @@ public static class HandlerDescriptorFixture
         HandlerDiagnostics.NullTopicOnHandler(typeof(NoBusAndTopicMessageHandler), NoBusAndTopicMessageHandlerInfo.HandlerMethod1)
       };
       builder = new(MockBehavior.Strict);
+      AddMessageDescriptors(builder);
       AddStandardMessageHandler1(builder);
       AddStandardMessageHandler2(builder);
       builder.SetDiagnostics(diagnostics);
 
-      yield return new object?[] { concreteTypes, null, null, builder.Descriptor };
+      yield return new object?[] { concreteTypes, messageTypes, null, null, builder.Descriptor };
 
       // For Id = 1 diagnostic
       concreteTypes = new[] { typeof(MultipleMessageHandlerAttributesHandler) };
@@ -52,7 +55,7 @@ public static class HandlerDescriptorFixture
       builder = new(MockBehavior.Strict);
       builder.SetDiagnostics(diagnostics);
 
-      yield return new object?[] { concreteTypes, null, null, builder.Descriptor };
+      yield return new object?[] { concreteTypes, Enumerable.Empty<Type>(), null, null, builder.Descriptor };
     }
 
     private static void AddStandardMessageHandler1(IMessagingDescriptorBuilder builder)
@@ -64,10 +67,7 @@ public static class HandlerDescriptorFixture
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
           .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message1))
-          .SetResultType(typeof(void)))
-        .AddMessageDescriptor(_ => _
-          .SetName(Message1.MessageName)
-          .SetType(typeof(Message1)));
+          .SetResultType(typeof(void)));
     }
 
     private static void AddStandardMessageHandler2(IMessagingDescriptorBuilder builder)
@@ -97,7 +97,21 @@ public static class HandlerDescriptorFixture
           .SetInterfaceType(typeof(IMessageHandler<Message3>))
           .SetConcreteType(typeof(NoBusAndTopicMessageHandler))
           .SetMessageType(typeof(Message3))
-          .SetResultType(typeof(void)))
+          .SetResultType(typeof(void)));
+    }
+
+    private static void AddMessageDescriptors(IMessagingDescriptorBuilder builder)
+    {
+      builder
+        .AddMessageDescriptor(_ => _
+          .SetName(Message4.MessageName)
+          .SetType(typeof(Message4)))
+        .AddMessageDescriptor(_ => _
+          .SetName(Message1.MessageName)
+          .SetType(typeof(Message1)))
+        .AddMessageDescriptor(_ => _
+          .SetName(typeof(Message5).Name)
+          .SetType(typeof(Message5)))
         .AddMessageDescriptor(_ => _
           .SetName(typeof(Message3).Name)
           .SetType(typeof(Message3)));

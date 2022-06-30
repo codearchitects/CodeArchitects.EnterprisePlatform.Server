@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Dapr.AspNetCore.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -48,9 +49,9 @@ public static class DaprServiceCollectionExtensions
   private static IDaprInfrastructureBuilder AddDaprInfrastructureCore(this IServiceCollection services, IConfiguration configuration, string key)
   {
     IConfigurationSection configurationSection = configuration.GetSection(key);
-    Func<ILoggerAccessor, DaprConfiguration> daprConfigurationFactory = delegate (ILoggerAccessor loggerAccessor)
+    Func<ILogger, DaprConfiguration> daprConfigurationFactory = delegate (ILogger logger)
     {
-      return DaprConfiguration.Create(new ComponentReader(), configurationSection, loggerAccessor);
+      return DaprConfiguration.Create(new ComponentReader(), configurationSection, logger);
     };
 
     DaprOptions options = new DaprOptions();

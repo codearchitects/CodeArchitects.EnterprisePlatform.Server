@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore;
 
@@ -14,17 +13,17 @@ namespace CodeArchitects.Platform.Messaging.AspNetCore;
 internal class TopicRouter
 {
   private readonly IDictionary<string, HandlerDelegate> _delegates;
-  private readonly IReadOnlyDictionary<string, Type> _messageTypes;
+  private readonly IMessageBiMap _messageMap;
 
   /// <summary>
   /// Creates a new <see cref="TopicRouter"/>.
   /// </summary>
-  /// <param name="delegates">The </param>
-  /// <param name="messageTypes"></param>
-  public TopicRouter(IDictionary<string, HandlerDelegate> delegates, IReadOnlyDictionary<string, Type> messageTypes)
+  /// <param name="delegates">Associates message names to the respective handler delegate.</param>
+  /// <param name="messageMap">Associates message names and message types.</param>
+  public TopicRouter(IDictionary<string, HandlerDelegate> delegates, IMessageBiMap messageMap)
   {
     _delegates = delegates;
-    _messageTypes = messageTypes;
+    _messageMap = messageMap;
   }
 
   public Task ExecuteAsync(HttpContext context)
@@ -136,7 +135,7 @@ internal class TopicRouter
 
   private bool TryGetFallbackDelegate(string messageName, [NotNullWhen(true)] out HandlerDelegate? @delegate)
   {
-    if (!_messageTypes.TryGetValue(messageName, out Type? messageType))
+    if (!_messageMap.TryGetValue(messageName, out Type? messageType))
     {
       @delegate = null;
       return false;
@@ -145,11 +144,9 @@ internal class TopicRouter
     messageType = messageType.BaseType;
     while (messageType is not null)
     {
-      string baseMessageName = messageType.GetCustomAttribute<MessageAttribute>()?.MessageName ?? messageType.Name;
+      string baseMessageName = _messageMap[messageType];
       if (_delegates.TryGetValue(baseMessageName, out @delegate))
-      {
         return true;
-      }
 
       messageType = messageType.BaseType;
     }

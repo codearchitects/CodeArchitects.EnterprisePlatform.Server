@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.Messaging.Descriptors;
+﻿using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
+using CodeArchitects.Platform.Messaging.Descriptors;
 using System.Collections.Concurrent;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore;
 
@@ -10,29 +10,28 @@ namespace CodeArchitects.Platform.Messaging.AspNetCore;
 internal class TopicRouterFactory : ITopicRouterFactory
 {
   private readonly IHandlerDelegateFactory _delegateFactory;
-  private readonly IReadOnlyDictionary<string, Type> _messageTypes;
+  private readonly IMessageBiMap _messageMap;
 
   public TopicRouterFactory(
     IHandlerDelegateFactory delegateFactory,
-    IReadOnlyDictionary<string, Type> messageTypes)
+    IMessageBiMap messageMap)
   {
     _delegateFactory = delegateFactory;
-    _messageTypes = messageTypes;
+    _messageMap = messageMap;
   }
 
-  public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> identityDescriptors)
+  public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> descriptors)
   {
     Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
-    foreach (IHandlerDescriptor identityDescriptor in identityDescriptors)
+    foreach (IHandlerDescriptor handlerDescriptor in descriptors)
     {
-      Type messageType = identityDescriptor.MessageType;
-      string messageName = messageType.GetCustomAttribute<MessageAttribute>()?.MessageName ?? messageType.Name;
-      HandlerDelegate @delegate = _delegateFactory.CreateHandlerDelegate(identityDescriptor);
+      string messageName = _messageMap[handlerDescriptor.MessageType];
+      HandlerDelegate @delegate = _delegateFactory.CreateHandlerDelegate(handlerDescriptor);
 
       if (!delegates.TryAdd(messageName, @delegate))
-        throw new InvalidOperationException($"Duplicate message {messageName} on bus '{identityDescriptor.Bus}' and topic '{identityDescriptor.Topic}'.");
+        throw new InvalidOperationException($"Duplicate message '{messageName}' handler on bus '{handlerDescriptor.Bus}' and topic '{handlerDescriptor.Topic}'.");
     }
 
-    return new TopicRouter(new ConcurrentDictionary<string, HandlerDelegate>(delegates), _messageTypes);
+    return new TopicRouter(new ConcurrentDictionary<string, HandlerDelegate>(delegates), _messageMap);
   }
 }

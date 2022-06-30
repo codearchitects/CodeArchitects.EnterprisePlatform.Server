@@ -32,19 +32,14 @@ internal class OutputAction<TMetadata> : OutputAction
     IOutputBinding<TMetadata>? binding = _services.GetService<IOutputBinding<TMetadata>>();
     if (binding is null)
     {
-      LogUnregisteredOutputBinding();
+      if (_services.TryGetLogger() is ILogger logger)
+      {
+        logger.LogWarning("No output binding was registered for metadata {OutputBindingMetadataType}. Please, register a service as IOutputBinding<{OutputBindingMetadataType}>.", typeof(TMetadata));
+      }
       return Task.CompletedTask;
     }
 
     OutputBindingContext<TMetadata, TMessage, TResult> context = new(_metadata, message, result);
     return binding.ExecuteAsync(context, cancellationToken);
-  }
-
-  private void LogUnregisteredOutputBinding()
-  {
-    if (_services.TryGetLogger() is not ILogger logger)
-      return;
-
-    logger.LogWarning("No output binding was registered for metadata {OutputBindingMetadataType}. Please, register a service as IOutputBinding<{OutputBindingMetadataType}>.", typeof(TMetadata));
   }
 }
