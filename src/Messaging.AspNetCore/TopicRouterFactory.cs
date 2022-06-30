@@ -23,13 +23,13 @@ internal class TopicRouterFactory : ITopicRouterFactory
   public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> descriptors)
   {
     Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
-    foreach (IHandlerDescriptor handlerDescriptor in descriptors)
+    foreach (IHandlerDescriptor descriptor in descriptors)
     {
-      string messageName = _messageMap[handlerDescriptor.MessageType];
-      HandlerDelegate @delegate = _delegateFactory.CreateHandlerDelegate(handlerDescriptor);
+      string messageName = _messageMap[descriptor.MessageType];
+      HandlerDelegate @delegate = _delegateFactory.CreateHandlerDelegate(descriptor);
 
       if (!delegates.TryAdd(messageName, @delegate))
-        throw new InvalidOperationException($"Duplicate message '{messageName}' handler on bus '{handlerDescriptor.Bus}' and topic '{handlerDescriptor.Topic}'.");
+        throw new InvalidOperationException($"Duplicate message '{messageName}' handler on bus '{descriptor.Bus}' and topic '{descriptor.Topic}'.");
     }
 
     return new TopicRouter(new ConcurrentDictionary<string, HandlerDelegate>(delegates), _messageMap);

@@ -3,8 +3,15 @@ using Moq;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 
-public class OutputActionTests
+public class OutputActionFactoryTests
 {
+  private readonly OutputActionFactory _sut;
+
+  public OutputActionFactoryTests()
+  {
+    _sut = new();
+  }
+
   [Fact]
   public void Create_ShouldCreateOutputActionOfMetadataType_WhenMetadataObjectIsInstanceOfMetadataType()
   {
@@ -12,7 +19,7 @@ public class OutputActionTests
     object @object = new();
 
     // Act
-    OutputAction action = OutputAction.Create(typeof(object), @object, Mock.Of<IServiceProvider>());
+    OutputAction action = _sut.CreateOutputAction(typeof(object), @object, Mock.Of<IServiceProvider>());
 
     // Assert
     action.Should().BeOfType<OutputAction<object>>();
@@ -25,7 +32,7 @@ public class OutputActionTests
     object @object = new();
 
     // Act
-    Func<OutputAction> act = () => OutputAction.Create(typeof(int), @object, Mock.Of<IServiceProvider>());
+    Func<OutputAction> act = () => _sut.CreateOutputAction(typeof(int), @object, Mock.Of<IServiceProvider>());
 
     // Assert
     act.Should().ThrowExactly<ArgumentException>();
