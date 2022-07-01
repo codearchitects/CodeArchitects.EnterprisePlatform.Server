@@ -7,5 +7,5 @@ public class OutputBindingConfig
   [Required]
   public string Name { get; set; } = default!;
 
-  public List<object> Arguments { get; set; } = new();
+  public Dictionary<string, object> Metadata { get; set; } = new();
 }
