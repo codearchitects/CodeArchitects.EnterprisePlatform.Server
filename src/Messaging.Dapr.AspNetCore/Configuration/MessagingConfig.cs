@@ -1,9 +1,9 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.Messaging;
+﻿namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
 
 /// <summary>
 /// Provides messaging configuration options.
 /// </summary>
-public class DaprMessagingOptions
+public class MessagingConfig
 {
   /// <summary>
   /// The default bus name.
@@ -13,18 +13,18 @@ public class DaprMessagingOptions
   /// <summary>
   /// Declarative bindings for the handlers.
   /// </summary>
-  public Dictionary<string, DaprMessagingBindings> Bindings { get; set; } = new();
+  public Dictionary<string, HandlerBindingsConfig> Bindings { get; set; } = new();
 
   /// <summary>
   /// The names of all the message busses.
   /// </summary>
-  public HashSet<string>? BusNames { get; set; }
+  public HashSet<string> BusNames { get; set; } = new();
 
   internal string? GetDefaultBus()
   {
     return DefaultBus is not null
       ? DefaultBus
-      : BusNames is { Count: 1 }
+      : BusNames.Count == 1
         ? BusNames.Single()
         : null;
   }

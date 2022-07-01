@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
     <ProjectReference Include="..\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj" />
   </ItemGroup>
 

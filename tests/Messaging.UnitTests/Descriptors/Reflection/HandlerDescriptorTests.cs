@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-
 using static CodeArchitects.Platform.Messaging.Descriptors.Reflection.HandlerDescriptorFixture;
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;

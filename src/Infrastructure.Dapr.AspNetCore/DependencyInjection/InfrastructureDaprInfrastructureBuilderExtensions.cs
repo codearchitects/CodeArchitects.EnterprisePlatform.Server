@@ -10,9 +10,6 @@ using CodeArchitects.Platform.Infrastructure.Messaging;
 using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -123,7 +120,11 @@ public static class InfrastructureDaprInfrastructureBuilderExtensions
 
   private static void AddMessageBusNames(DaprMessagingOptions options, IDaprConfiguration configuration)
   {
-    foreach (string busName in GetComponentNames(configuration.Components, "pubsub"))
+    if (configuration.Components is not { } components)
+      return;
+
+    options.BusNames ??= new();
+    foreach (string busName in GetComponentNames(components, "pubsub"))
     {
       options.BusNames.Add(busName);
     }
@@ -131,6 +132,10 @@ public static class InfrastructureDaprInfrastructureBuilderExtensions
 
   private static void AddStateStoreNames(DaprStateOptions options, IDaprConfiguration configuration)
   {
+    if (configuration.Components is not { } components)
+      return;
+
+    options.StoreNames ??= new();
     foreach (string storeName in GetComponentNames(configuration.Components, "state"))
     {
       options.StoreNames.Add(storeName);

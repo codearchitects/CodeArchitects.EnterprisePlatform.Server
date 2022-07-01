@@ -4,6 +4,6 @@ namespace CodeArchitects.Platform.Dapr.AspNetCore.Configuration;
 
 public interface IDaprConfiguration
 {
-  IReadOnlyList<ComponentSchema> Components { get; }
+  IReadOnlyList<ComponentSchema>? Components { get; }
   TSection? GetSection<TSection>() where TSection : class;
 }

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 
+[ExcludeFromCodeCoverage]
 internal class MessageBiMap : IMessageBiMap
 {
   private readonly Dictionary<string, Type> _nameToType;
