@@ -5,14 +5,23 @@ using System.Collections.Concurrent;
 
 namespace CodeArchitects.Platform.Messaging.Dapr;
 
+/// <summary>
+/// Creates and stores instances of the <see cref="MessageBus"/> class.
+/// </summary>
 internal class MessageBusResolver : IServiceResolver<IMessageBus>
 {
   private readonly DaprClient _dapr;
-  private readonly ILogger? _logger;
   private readonly IMessagingInfo _info;
+  private readonly ILogger _logger;
   private readonly ConcurrentDictionary<string, MessageBus> _messageBusses;
 
-  public MessageBusResolver(DaprClient dapr, ILogger? logger, IMessagingInfo info)
+  /// <summary>
+  /// Creates a new <see cref="MessageBusResolver"/> instance.
+  /// </summary>
+  /// <param name="dapr">The Dapr client.</param>
+  /// <param name="info">Info about messaging.</param>
+  /// <param name="logger">A logger instance.</param>
+  public MessageBusResolver(DaprClient dapr, IMessagingInfo info, ILogger logger)
   {
     _dapr = dapr;
     _logger = logger;
@@ -27,7 +36,7 @@ internal class MessageBusResolver : IServiceResolver<IMessageBus>
 
     if (!_info.IsBusKnown(name))
     {
-      _logger?.LogWarning("Unknown message bus requested: '{0}'", name);
+      _logger.LogWarning("Unknown message bus requested: '{0}'", name);
     }
 
     return _messageBusses.GetOrAdd(name, CreateMessageBus);

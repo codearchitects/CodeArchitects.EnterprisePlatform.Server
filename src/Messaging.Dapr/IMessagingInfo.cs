@@ -18,4 +18,10 @@ internal interface IMessagingInfo
   /// <param name="busName">The name of the bus.</param>
   /// <returns><c>true</c> if the bus is known, <c>false</c> otherwise.</returns>
   bool IsBusKnown(string busName);
+
+  /// <summary>
+  /// Gets the default bus.
+  /// </summary>
+  /// <returns>The name of the default bus.</returns>
+  string? GetDefaultBus();
 }

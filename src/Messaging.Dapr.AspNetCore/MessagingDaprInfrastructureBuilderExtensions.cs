@@ -1,46 +1,78 @@
-﻿using CodeArchitects.Platform.Common.Internals;
-using CodeArchitects.Platform.Common.Ioc;
-using CodeArchitects.Platform.Dapr.AspNetCore.Components;
-using CodeArchitects.Platform.Dapr.AspNetCore.Configuration;
-using CodeArchitects.Platform.Dapr.AspNetCore.DependencyInjection;
-using CodeArchitects.Platform.Messaging;
+﻿using CodeArchitects.Platform.Common.Ioc;
+using CodeArchitects.Platform.Dapr.AspNetCore;
+using CodeArchitects.Platform.Messaging.AspNetCore;
+using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
-using CodeArchitects.Platform.Messaging.Dapr;
-using CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 using CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+using CodeArchitects.Platform.Messaging.Descriptors;
+using CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 using Dapr.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
-/// <summary>
-/// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
-/// </summary>
 public static class MessagingDaprInfrastructureBuilderExtensions
 {
   private const string s_messagingKey = "Messaging";
-  private const string s_stateKey = "State";
 
-  /// <summary>
-  /// Adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services.
-  /// If configured, also adds a default <see cref="IMessageBus"/>.
-  /// </summary>
-  /// <param name="builder">The builder instance.</param>
-  /// <returns>The same builder.</returns>
-  public static IDaprInfrastructureBuilder AddMessageBus(this IDaprInfrastructureBuilder builder)
+  public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder)
   {
     if (builder is null)
       throw new ArgumentNullException(nameof(builder));
 
-    MessagingConfig config = builder.DaprConfigurationBuilder.GetOrAdd<MessagingConfig>(s_messagingKey, AddMessageBusNames);
-    string? defaultBus = config.GetDefaultBus();
+    return AddMessagingCore(builder, optionsBuilder => optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly()));
+  }
 
-    MessagingInfo info = new MessagingInfo(null, config);
+  public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+
+    return AddMessagingCore(builder, configure);
+  }
+
+  private static IDaprInfrastructureBuilder AddMessagingCore(IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
+  {
+    MessagingConfig config = new();
+    builder.Configuration.Bind(s_messagingKey, config);
+    builder.DaprServices.AddService(config);
+
+    DaprMessagingOptionsBuilder optionsBuilder = new(config);
+    if (configure is not null)
+    {
+      configure(optionsBuilder);
+    }
+    else
+    {
+      optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly());
+    }
+
+    MessageBiMap messageMap = new();
+    MessagingInfo info = MessagingInfo.Create(messageMap, builder.ComponentAccessor, config.DefaultBus);
+    string? defaultBus = info.GetDefaultBus();
+
+    MessagingDescriptor descriptor = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic);
+    foreach (HandlerDiagnostics diagnostics in descriptor.Diagnostics)
+    {
+      builder.Logger.LogWarning(diagnostics.MessageTemplate, diagnostics.MessageArguments);
+    }
+    builder.DaprServices.AddService<IMessagingDescriptor>(descriptor);
+
+    foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
+    {
+      messageMap.Add(messageDescriptor.Type, messageDescriptor.Name);
+    }
 
     builder.Services.AddSingleton<IServiceResolver<IMessageBus>>(delegate (IServiceProvider services)
     {
-      return new MessageBusResolver(services.GetRequiredService<DaprClient>(), services.TryGetLogger(), info);
+      DaprClient dapr = services.GetRequiredService<DaprClient>();
+      ILogger logger = services.CreateMessagingLogger();
+      return new MessageBusResolver(dapr, info, logger);
     });
 
     if (!string.IsNullOrWhiteSpace(defaultBus))
@@ -48,7 +80,35 @@ public static class MessagingDaprInfrastructureBuilderExtensions
       builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus>>().Resolve(defaultBus));
     }
 
+    builder.Services.AddSingleton<MessagingMarkerService>();
+    builder.Services.AddSingleton<ITopicRouterFactory>(delegate (IServiceProvider services)
+    {
+      OutputActionFactory outputActionFactory = new OutputActionFactory();
+      HandlerDelegateFactory delegateFactory = new HandlerDelegateFactory(services, outputActionFactory);
+      return new TopicRouterFactory(delegateFactory, messageMap);
+    });
+
     return builder;
+  }
+
+  #region Deprecated methods
+
+  /// <summary>
+  /// Adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services.
+  /// If configured, also adds a default <see cref="IMessageBus"/>.
+  /// </summary>
+  /// <param name="builder">The builder instance.</param>
+  /// <returns>The same builder.</returns>
+  [Obsolete($"{nameof(AddMessageBus)} is deprecated and will be removed in the next release. Use {nameof(AddMessaging)} instead.")]
+  public static IDaprInfrastructureBuilder AddMessageBus(this IDaprInfrastructureBuilder builder)
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
+    if (builder.Services.Any(descr => descr.ServiceType == typeof(MessagingMarkerService)))
+      return builder;
+
+    return builder.AddMessaging();
   }
 
   /// <summary>
@@ -57,6 +117,7 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   /// <param name="builder">The builder instance.</param>
   /// <param name="assemblies">The assemblies to scan for handlers. If empty, the calling assembly will be used.</param>
   /// <returns>The same builder.</returns>
+  [Obsolete($"{nameof(AddMessageHandlers)} is deprecated and will be removed in the next release. Use {nameof(AddMessaging)} instead.")]
   public static IDaprInfrastructureBuilder AddMessageHandlers(this IDaprInfrastructureBuilder builder, params Assembly[] assemblies)
   {
     if (builder is null)
@@ -64,44 +125,22 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     if (assemblies is null)
       throw new ArgumentNullException(nameof(assemblies));
 
+    if (builder.Services.Any(descr => descr.ServiceType == typeof(MessagingMarkerService)))
+      return builder;
+
     if (assemblies.Length == 0)
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
 
-    MessagingConfig config = builder.DaprConfigurationBuilder.GetOrAdd<MessagingConfig>(s_messagingKey, AddMessageBusNames);
-
-    MessagingConfiguration configuration = MessagingConfiguration.Create(assemblies.Distinct(), config);
-    TopicDelegateFactory factory = TopicDelegateFactory.Create(configuration);
-
-    builder.Services.AddSingleton<MessageHandlerMarkerService>();
-    builder.Services.AddSingleton<IMessagingConfiguration>(configuration);
-    builder.Services.AddSingleton<ITopicDelegateFactory>(factory);
-
-    foreach (ImplementationPair pair in configuration.HandlerMap.Values)
+    return builder.AddMessaging(optionsBuilder =>
     {
-      builder.Services.AddScoped(pair.ImplementationType);
-    }
-
-    return builder;
+      foreach (Assembly assembly in assemblies)
+      {
+        optionsBuilder.ScanAssembly(assembly);
+      }
+    });
   }
 
-  private static IEnumerable<string> GetComponentNames(IEnumerable<ComponentSchema> components, string componentType)
-  {
-    return components
-      .Where(c => c.Spec.Type.StartsWith(componentType))
-      .Select(c => c.Metadata.Name);
-  }
-
-  private static void AddMessageBusNames(MessagingConfig options, IDaprConfiguration configuration)
-  {
-    if (configuration.Components is not { } components)
-      return;
-
-    options.BusNames ??= new();
-    foreach (string busName in GetComponentNames(components, "pubsub"))
-    {
-      options.BusNames.Add(busName);
-    }
-  }
+  #endregion
 }

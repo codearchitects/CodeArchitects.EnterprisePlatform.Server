@@ -1,17 +1,20 @@
-﻿using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
-using CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+﻿using CodeArchitects.Platform.Dapr.AspNetCore.Components;
+using CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
+using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
 internal class MessagingInfo : IMessagingInfo
 {
   private readonly IMessageBiMap _messageMap;
-  private readonly MessagingConfig _config;
+  private readonly HashSet<string> _busNames;
+  private readonly string? _defaultBus;
 
-  public MessagingInfo(IMessageBiMap messageMap, MessagingConfig config)
+  public MessagingInfo(IMessageBiMap messageMap, HashSet<string> busNames, string? defaultBus)
   {
     _messageMap = messageMap;
-    _config = config;
+    _busNames = busNames;
+    _defaultBus = defaultBus;
   }
 
   public string GetMessageName(Type messageType)
@@ -24,6 +27,32 @@ internal class MessagingInfo : IMessagingInfo
 
   public bool IsBusKnown(string busName)
   {
-    return _config.BusNames?.Contains(busName) ?? true;
+    if (_defaultBus is not null && _defaultBus == busName)
+      return true;
+
+    if (_busNames is null)
+      return true;
+
+    return _busNames.Contains(busName);
+  }
+
+  public string? GetDefaultBus()
+  {
+    return _defaultBus is not null
+      ? _defaultBus
+      : _busNames.Count is 1
+        ? _busNames.First()
+        : null;
+  }
+
+  public static MessagingInfo Create(IMessageBiMap messageMap, IDaprComponentAccessor componentAccessor, string? defaultBus)
+  {
+    HashSet<string> busNames = new();
+    foreach (string busName in componentAccessor.Components.GetComponentNames("pubsub"))
+    {
+      busNames.Add(busName);
+    }
+
+    return new MessagingInfo(messageMap, busNames, defaultBus);
   }
 }

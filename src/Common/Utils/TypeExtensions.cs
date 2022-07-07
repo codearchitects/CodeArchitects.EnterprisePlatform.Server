@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace CodeArchitects.Platform.Common.Utils;
+﻿namespace CodeArchitects.Platform.Common.Utils;
 
 /// <summary>
 /// Extension methods for the <see cref="Type"/> class.
@@ -24,11 +20,16 @@ internal static class TypeExtensions
     if (!genericInterfaceType.IsInterface || !genericInterfaceType.IsGenericType)
       throw new ArgumentException("The interface type must be a generic interface.", nameof(genericInterfaceType));
 
-    return type
-      .GetInterfaces()
-      .Where(x => x.IsGenericType)
-      .Select(x => x.GetGenericTypeDefinition())
-      .Contains(genericInterfaceType);
+    foreach (Type interfaceType in type.GetInterfaces())
+    {
+      if (!interfaceType.IsGenericType)
+        continue;
+
+      if (interfaceType.GetGenericTypeDefinition() == genericInterfaceType)
+        return true;
+    }
+
+    return false;
   }
 
   /// <summary>
@@ -46,11 +47,21 @@ internal static class TypeExtensions
     if (!genericInterfaceType.IsInterface || !genericInterfaceType.IsGenericType)
       throw new ArgumentException("The interface type must be a generic interface.", nameof(genericInterfaceType));
 
-    return type
-      .GetInterfaces()
-      .Where(x => x.IsGenericType)
-      .Select(x => x.GetGenericTypeDefinition())
-      .Count(x => x == genericInterfaceType) == 1;
+    bool implementsInterface = false;
+    foreach (Type interfaceType in type.GetInterfaces())
+    {
+      if (!interfaceType.IsGenericType)
+        continue;
+
+      if (interfaceType.GetGenericTypeDefinition() == genericInterfaceType)
+      {
+        if (implementsInterface)
+          return false;
+        implementsInterface = true;
+      }
+    }
+
+    return implementsInterface;
   }
 
   /// <summary>

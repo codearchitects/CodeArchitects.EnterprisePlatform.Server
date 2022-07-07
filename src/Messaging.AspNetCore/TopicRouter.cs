@@ -30,7 +30,7 @@ internal class TopicRouter
   {
     using StreamReader streamReader = new StreamReader(context.Request.Body);
     using JsonTextReader jsonReader = new JsonTextReader(streamReader);
-    ILogger? logger = context.RequestServices.TryGetLogger();
+    ILogger logger = context.RequestServices.CreateMessagingLogger();
 
     switch (context.Request.ContentType)
     {
@@ -39,23 +39,40 @@ internal class TopicRouter
       case "application/json":
         return ProcessRawPayload(context, jsonReader, logger);
       default:
-        logger?.LogError($"Unsupported media type: '{context.Request.ContentType}'.");
+        logger.LogError($"Unsupported media type: '{context.Request.ContentType}'.");
         context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
         return Task.CompletedTask;
     };
   }
 
-  private async Task ProcessCloudEvent(HttpContext context, JsonReader jsonReader, ILogger? logger)
+  private Task ProcessCloudEvent(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
-    JObject cloudEventObject = await JObject.LoadAsync(jsonReader, context.RequestAborted);
+    JObject cloudEventObject;
+    try
+    {
+      cloudEventObject = JObject.Load(jsonReader);
+    }
+    catch (JsonReaderException ex)
+    {
+      logger.LogError(ex, "Could not deserialize message.");
+      context.Response.StatusCode = StatusCodes.Status400BadRequest;
+      return Task.CompletedTask;
+    }
+
+    if (!TryGetString(cloudEventObject, "type", out string? type))
+    {
+      logger.LogError("Cloud event was missing 'type' property or it has wrong type.");
+      context.Response.StatusCode = StatusCodes.Status400BadRequest;
+      return Task.CompletedTask;
+    }
+
     bool hasData = cloudEventObject.ContainsKey("data");
     bool hasDataBase64 = cloudEventObject.ContainsKey("data_base64");
-
     if (hasData && hasDataBase64)
     {
-      logger?.LogError("Both 'data' and 'data_base64' properties were set in CloudEvent envelope.");
+      logger.LogError("Both 'data' and 'data_base64' properties were set in CloudEvent envelope.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return;
+      return Task.CompletedTask;
     }
 
     if (hasData)
@@ -64,71 +81,77 @@ internal class TopicRouter
       if (dataToken.Type is not JTokenType.Object)
       {
         // TODO: Extend support
+        logger.LogError("The 'data' property of the CloudEvent envelope must be an object.");
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        return;
+        return Task.CompletedTask;
       }
 
-      await ExecuteAsync(context, (JObject)dataToken, logger);
+      return ExecuteAsync(context, (JObject)dataToken, type, logger);
     }
-    else if (hasDataBase64)
+    
+    if (hasDataBase64)
     {
       // TODO: Extend support
-      context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return;
+      logger.LogError("'data_base64' property of CloudEvent envelope is not supported yet.");
+      context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+      return Task.CompletedTask;
     }
-    else
-    {
-      logger?.LogError("Neither 'data' or 'data_base64' properties were set in CloudEvent envelope.");
-      context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return;
-    }
+
+    logger.LogError("Neither 'data' or 'data_base64' properties were set in CloudEvent envelope.");
+    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+    return Task.CompletedTask;
   }
 
-  private async Task ProcessRawPayload(HttpContext context, JsonReader jsonReader, ILogger? logger)
+  private Task ProcessRawPayload(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
-    JObject payloadObject = await JObject.LoadAsync(jsonReader, context.RequestAborted);
-    await ExecuteAsync(context, payloadObject, logger);
+    JObject messageObject;
+    try
+    {
+      messageObject = JObject.Load(jsonReader);
+    }
+    catch (JsonReaderException ex)
+    {
+      logger.LogError(ex, "Could not deserialize message.");
+      context.Response.StatusCode = StatusCodes.Status400BadRequest;
+      return Task.CompletedTask;
+    }
+
+    if (!TryGetString(messageObject, "$type", out string? type))
+    {
+      logger.LogError("Message was missing '$type' property or it has wrong type.");
+      context.Response.StatusCode = StatusCodes.Status400BadRequest;
+      return Task.CompletedTask;
+    }
+
+    return ExecuteAsync(context, messageObject, type, logger);
   }
 
-  private async Task ExecuteAsync(HttpContext context, JObject payloadObject, ILogger? logger)
+  private async Task ExecuteAsync(HttpContext context, JObject payloadObject, string type, ILogger logger)
   {
-    if (!TryGetProperty(payloadObject, "type", out JToken? typeToken) || typeToken.Type is not JTokenType.String || typeToken.Value<string>() is not { } messageName)
+    if (!_delegates.TryGetValue(type, out HandlerDelegate? @delegate))
     {
-      logger?.LogError("CAEP mesagge envelope was missing 'type' property or it has wrong type.");
-      context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return;
-    }
-    if (!TryGetProperty(payloadObject, "message", out JToken? messageToken) || messageToken.Type is not JTokenType.Object)
-    {
-      logger?.LogError("CAEP mesagge envelope was missing 'message' property.");
-      context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return;
-    }
-
-    if (!_delegates.TryGetValue(messageName, out HandlerDelegate? @delegate))
-    {
-      if (!TryGetFallbackDelegate(messageName, out @delegate))
+      if (!TryGetFallbackDelegate(type, out @delegate))
       {
-        logger?.LogWarning($"No handler was registered for message of type '{messageName}'.");
+        logger.LogWarning($"No handler was registered for message of type '{type}'.");
         context.Response.StatusCode = StatusCodes.Status200OK;
         return;
       }
-      _delegates.Add(messageName, @delegate);
+      _delegates.Add(type, @delegate);
     }
 
     try
     {
-      await @delegate.HandleAsync(context, (JObject)messageToken);
+      await @delegate.HandleAsync(context, payloadObject);
       context.Response.StatusCode = StatusCodes.Status200OK;
     }
     catch (InvalidMessageTypeException ex)
     {
-      logger?.LogError($"Cannot deserialize message of type '{messageName}' to type '{ex.MessageType.FullName}'.", ex);
+      logger.LogError($"Cannot deserialize message of type '{type}' to type '{ex.MessageType.FullName}'.", ex);
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
     }
     catch
     {
-      logger?.LogError("Error in executing a message handling action.");
+      logger.LogError("Error in executing a message handling action.");
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
     }
   }
@@ -155,15 +178,20 @@ internal class TopicRouter
     return false;
   }
 
-  private static bool TryGetProperty(JObject objectJson, string name, [NotNullWhen(true)] out JToken? property)
+  private static bool TryGetString(JObject jObject, string name, [NotNullWhen(true)] out string? value)
   {
-    if (!objectJson.ContainsKey(name))
+    JProperty? typeProperty = jObject.Property(name);
+
+    if (
+      typeProperty is null                       ||
+      typeProperty.Value is not JValue typeValue ||
+      typeValue.Value is not string str)
     {
-      property = null;
+      value = null;
       return false;
     }
 
-    property = objectJson.Property(name)!.Value;
+    value = str;
     return true;
   }
 }

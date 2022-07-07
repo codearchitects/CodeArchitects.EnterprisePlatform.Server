@@ -9,6 +9,7 @@ public class MessageBusResolverTests
 {
   private readonly Mock<ILogger> _loggerMock;
   private readonly Mock<IMessagingInfo> _infoMock;
+
   private readonly MessageBusResolver _sut;
 
   public MessageBusResolverTests()
@@ -20,7 +21,7 @@ public class MessageBusResolverTests
       .Setup(x => x.IsBusKnown(It.IsAny<string>()))
       .Returns(true);
 
-    _sut = new MessageBusResolver(Mock.Of<DaprClient>(), _loggerMock.Object, _infoMock.Object);
+    _sut = new MessageBusResolver(Mock.Of<DaprClient>(), _infoMock.Object, _loggerMock.Object);
   }
 
   [Fact]
@@ -79,23 +80,5 @@ public class MessageBusResolverTests
 
     // Assert
     _loggerMock.VerifyNoOtherCalls();
-  }
-
-  [Fact]
-  public void Resolve_ShouldNotThrow_WhenBusIsNotKnownAndLoggerIsNull()
-  {
-    // Arrange
-    string busName = "messagebus";
-    _infoMock
-      .Setup(x => x.IsBusKnown(busName))
-      .Returns(false);
-
-    MessageBusResolver sut = new MessageBusResolver(Mock.Of<DaprClient>(), null, _infoMock.Object);
-
-    // Act
-    Func<IMessageBus> act = () => sut.Resolve(busName);
-
-    // Assert
-    act.Should().NotThrow();
   }
 }
