@@ -7,14 +7,14 @@
 public class MessageAttribute : Attribute
 {
   /// <summary>
-  /// Creates a new <see cref="MessageAttribute"/> specifying without a message name.
+  /// Creates a new <see cref="MessageAttribute"/> instance specifying without a message name.
   /// </summary>
   public MessageAttribute()
   {
   }
 
   /// <summary>
-  /// Creates a new <see cref="MessageAttribute"/> specifying a message name.
+  /// Creates a new <see cref="MessageAttribute"/> instance specifying a message name.
   /// </summary>
   /// <param name="messageName">The name of the message.</param>
   public MessageAttribute(string messageName)

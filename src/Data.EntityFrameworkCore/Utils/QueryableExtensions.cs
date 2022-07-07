@@ -1,8 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Collections;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Utils;
 

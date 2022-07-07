@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Dapr.AspNetCore;
 using CodeArchitects.Platform.Messaging.AspNetCore;
 using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
-using CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using CodeArchitects.Platform.Messaging.Descriptors.Reflection;
 using Dapr.Client;

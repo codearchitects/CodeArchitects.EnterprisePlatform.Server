@@ -3,18 +3,29 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 
+/// <summary>
+/// Implementation of <see cref="IMessageBiMap"/>.
+/// </summary>
 [ExcludeFromCodeCoverage]
 internal class MessageBiMap : IMessageBiMap
 {
   private readonly Dictionary<string, Type> _nameToType;
   private readonly Dictionary<Type, string> _typeToName;
 
+  /// <summary>
+  /// Creates a new <see cref="MessageBiMap"/> instance.
+  /// </summary>
   public MessageBiMap()
   {
     _nameToType = new();
     _typeToName = new();
   }
 
+  /// <summary>
+  /// Configures the mapping between the type and name of a message.
+  /// </summary>
+  /// <param name="messageType">The type of the message.</param>
+  /// <param name="messageName">The name of the message.</param>
   public void Add(Type messageType, string messageName)
   {
     _nameToType.Add(messageName, messageType);

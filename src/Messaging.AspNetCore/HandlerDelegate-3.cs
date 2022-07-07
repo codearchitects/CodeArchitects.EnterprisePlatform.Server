@@ -19,7 +19,7 @@ internal class HandlerDelegate<TMessage, TResult, THandler> : HandlerDelegate
   private readonly IEnumerable<OutputAction> _outputActions;
 
   /// <summary>
-  /// Creates a new <see cref="HandlerDelegate{TMessage, TResult, THandler}"/>.
+  /// Creates a new <see cref="HandlerDelegate{TMessage, TResult, THandler}"/> instance.
   /// </summary>
   /// <param name="outputActions">The pipeline's output actions.</param>
   public HandlerDelegate(IEnumerable<OutputAction> outputActions)

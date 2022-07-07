@@ -12,7 +12,7 @@ internal class HandlerDelegateFactory : IHandlerDelegateFactory
   private readonly IOutputActionFactory _outputActionFactory;
 
   /// <summary>
-  /// Creates a new <see cref="HandlerDelegateFactory"/>.
+  /// Creates a new <see cref="HandlerDelegateFactory"/> instance.
   /// </summary>
   /// <param name="services">The service provider.</param>
   /// <param name="outputActionFactory">A factory of output actions.</param>

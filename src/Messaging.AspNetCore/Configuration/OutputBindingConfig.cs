@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+namespace CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 
 /// <summary>
 /// Configuration of an output action.

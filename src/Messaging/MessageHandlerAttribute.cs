@@ -8,14 +8,14 @@
 public class MessageHandlerAttribute : Attribute
 {
   /// <summary>
-  /// Initializes a new instance of <see cref="MessageHandlerAttribute"/> without specifing a bus name.
+  /// Initializes a new <see cref="MessageHandlerAttribute"/> instance without specifing a bus name.
   /// </summary>
   public MessageHandlerAttribute()
   {
   }
 
   /// <summary>
-  /// Initializes a new instance of <see cref="MessageHandlerAttribute"/> specifying a bus name.
+  /// Initializes a new <see cref="MessageHandlerAttribute"/> instance specifying a bus name.
   /// </summary>
   /// <param name="bus">The name of the bus.</param>
   public MessageHandlerAttribute(string bus)
@@ -24,7 +24,7 @@ public class MessageHandlerAttribute : Attribute
   }
 
   /// <summary>
-  /// Initializes a new instance of <see cref="MessageHandlerAttribute"/> specifying a bus name.
+  /// Initializes a new <see cref="MessageHandlerAttribute"/> instance specifying a bus name.
   /// </summary>
   /// <param name="bus">The name of the bus.</param>
   /// <param name="topic">The name of the topic.</param>

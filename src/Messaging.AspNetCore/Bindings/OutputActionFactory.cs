@@ -1,5 +1,8 @@
 ﻿namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 
+/// <summary>
+/// Implementation of <see cref="IOutputActionFactory"/>.
+/// </summary>
 internal class OutputActionFactory : IOutputActionFactory
 {
   public OutputAction CreateOutputAction(Type metadataType, object metadata, IServiceProvider services)

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+﻿using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;

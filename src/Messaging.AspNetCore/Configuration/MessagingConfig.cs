@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+﻿namespace CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 
 /// <summary>
 /// Provides messaging configuration options.

@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.Configuration;
+﻿namespace CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 
 /// <summary>
 /// Input and output bindings for a message handler.

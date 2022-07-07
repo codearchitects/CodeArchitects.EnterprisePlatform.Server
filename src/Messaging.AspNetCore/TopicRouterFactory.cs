@@ -12,6 +12,11 @@ internal class TopicRouterFactory : ITopicRouterFactory
   private readonly IHandlerDelegateFactory _delegateFactory;
   private readonly IMessageBiMap _messageMap;
 
+  /// <summary>
+  /// Creates a new <see cref="TopicRouterFactory"/> instance.
+  /// </summary>
+  /// <param name="delegateFactory">The handler delegate factory.</param>
+  /// <param name="messageMap">The message bidirectional map.</param>
   public TopicRouterFactory(
     IHandlerDelegateFactory delegateFactory,
     IMessageBiMap messageMap)

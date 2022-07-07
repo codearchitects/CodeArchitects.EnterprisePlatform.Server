@@ -6,7 +6,7 @@
 internal class InvalidMessageTypeException : Exception
 {
   /// <summary>
-  /// Creates a new <see cref="InvalidMessageTypeException"/>.
+  /// Creates a new <see cref="InvalidMessageTypeException"/> instance.
   /// </summary>
   /// <param name="messageType">The configured type.</param>
   public InvalidMessageTypeException(Type messageType)
