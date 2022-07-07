@@ -4,7 +4,7 @@ using Moq;
 using System.Reflection;
 using Xunit.Sdk;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 public static class HandlerDescriptorFixture
 {

@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using static CodeArchitects.Platform.Messaging.Descriptors.Reflection.HandlerDescriptorFixture;
+using static CodeArchitects.Platform.Messaging.Descriptors.Implementation.HandlerDescriptorFixture;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 public class HandlerDescriptorTests
 {

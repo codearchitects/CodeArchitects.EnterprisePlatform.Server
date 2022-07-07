@@ -5,7 +5,7 @@ using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.Descriptors;
-using CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

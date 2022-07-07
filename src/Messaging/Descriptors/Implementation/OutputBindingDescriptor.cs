@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Messaging.Bindings;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 /// <summary>
 /// Implementation of <see cref="IOutputBindingDescriptor"/>

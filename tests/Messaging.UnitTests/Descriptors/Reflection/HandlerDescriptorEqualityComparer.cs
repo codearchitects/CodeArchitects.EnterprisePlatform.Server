@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 internal class HandlerDescriptorEqualityComparer :
   IEqualityComparer<IMessagingDescriptor>,

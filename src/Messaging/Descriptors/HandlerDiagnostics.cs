@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Messaging.Descriptors;
 /// </summary>
 internal class HandlerDiagnostics
 {
-  private HandlerDiagnostics(int id, Type concreteType, string messageTemplate, params object?[] messageArguments)
+  public HandlerDiagnostics(int id, Type? concreteType, string messageTemplate, params object?[] messageArguments)
   {
     Id = id;
     ConcreteType = concreteType;
@@ -23,7 +23,7 @@ internal class HandlerDiagnostics
   /// <summary>
   /// The handler concrete type.
   /// </summary>
-  public Type ConcreteType { get; }
+  public Type? ConcreteType { get; }
 
   /// <summary>
   /// Format string of the diagnostics message in message template format.

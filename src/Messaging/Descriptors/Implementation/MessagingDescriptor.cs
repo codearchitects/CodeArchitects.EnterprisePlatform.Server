@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Reflection;
+﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 /// <summary>
 /// Implementation of <see cref="IMessagingDescriptor"/>
