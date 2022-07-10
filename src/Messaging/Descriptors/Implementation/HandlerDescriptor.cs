@@ -25,7 +25,7 @@ internal record HandlerDescriptor(
     }
   }
 
-  public static IEnumerable<HandlerDescriptor> Create(Type concreteType, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnostics)
+  public static IEnumerable<HandlerDescriptor> Create(Type concreteType, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnosticCollection)
   {
     IEnumerable<MessageHandlerAttribute> classAttributes = concreteType.GetCustomAttributes<MessageHandlerAttribute>();
     int classAttributesCount = classAttributes.Count();
@@ -39,7 +39,7 @@ internal record HandlerDescriptor(
 
       if (classAttributesCount > 1)
       {
-        diagnostics.Add(MultipleMessageHandlerAttributeOnClass(concreteType));
+        diagnosticCollection.Add(MultipleMessageHandlerAttributeOnClass(concreteType));
       }
     }
 
@@ -52,7 +52,7 @@ internal record HandlerDescriptor(
       InterfaceMapping mapping = concreteType.GetInterfaceMap(handlerInterfaceType);
       MethodInfo handlerMethod = mapping.TargetMethods[0];
 
-      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod, diagnostics);
+      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod, diagnosticCollection);
 
       IEnumerable<MessageHandlerAttribute> methodAttributes = handlerMethod.GetCustomAttributes<MessageHandlerAttribute>();
       if (!methodAttributes.Any())

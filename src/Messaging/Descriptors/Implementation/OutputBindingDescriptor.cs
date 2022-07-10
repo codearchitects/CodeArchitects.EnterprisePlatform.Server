@@ -10,7 +10,7 @@ internal record OutputBindingDescriptor(
   Type MetadataType,
   object MetadataObject) : IOutputBindingDescriptor
 {
-  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method, ICollection<HandlerDiagnostics> diagnostics)
+  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method, ICollection<HandlerDiagnostics> diagnosticCollection)
   {
     object[] returnAttributes = method.ReturnTypeCustomAttributes.GetCustomAttributes(false);
     Dictionary<Type, OutputBindingDescriptor> descriptors = new(returnAttributes.Length);
@@ -27,7 +27,7 @@ internal record OutputBindingDescriptor(
         OutputBindingDescriptor descriptor = new OutputBindingDescriptor(interfaceType, returnAttribute);
         if (descriptors.ContainsKey(descriptor.MetadataType))
         {
-          diagnostics.Add(DuplicateOutputBinding(method.DeclaringType));
+          diagnosticCollection.Add(DuplicateOutputBinding(method.DeclaringType));
           continue;
         }
 

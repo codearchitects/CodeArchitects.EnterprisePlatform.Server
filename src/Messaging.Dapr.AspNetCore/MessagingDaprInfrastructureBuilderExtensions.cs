@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
 using Castle.Components.DictionaryAdapter;
+using System.ComponentModel.DataAnnotations;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
@@ -40,6 +41,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
 
   private static IDaprInfrastructureBuilder AddMessagingCore(IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
+    ILogger logger = builder.Logger;
+
     MessagingConfig config = new();
     builder.Configuration.Bind(s_messagingKey, config);
     builder.DaprServices.AddService(config);
@@ -54,7 +57,16 @@ public static class MessagingDaprInfrastructureBuilderExtensions
       optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly());
     }
 
-    ILogger logger = builder.Logger;
+    ValidationContext validationContext = new(config);
+    List<ValidationResult> validationResults = new();
+    bool isConfigValid = Validator.TryValidateObject(config, validationContext, validationResults);
+    if (!isConfigValid)
+    {
+      foreach (ValidationResult validationResult in validationResults)
+      {
+        logger.LogWarning(validationResult.ErrorMessage);
+      }
+    }
 
     MessageBiMap messageMap = new();
     MessagingInfo info = MessagingInfo.Create(messageMap, builder.ComponentAccessor, config.DefaultBus);
@@ -62,10 +74,13 @@ public static class MessagingDaprInfrastructureBuilderExtensions
 
     List<HandlerDiagnostics> diagnosticCollection = new();
     ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), logger);
-    IMessagingDescriptor descriptor = MessagingDescriptor.Merge(
-      first: MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection),
-      second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
-      diagnosticCollection);
+    IMessagingDescriptor descriptorFromReflection = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection);
+    IMessagingDescriptor descriptor = isConfigValid
+      ? MessagingDescriptor.Merge(
+        first: descriptorFromReflection,
+        second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
+        diagnosticCollection: diagnosticCollection)
+      : descriptorFromReflection;
 
     foreach (HandlerDiagnostics diagnostics in diagnosticCollection)
     {

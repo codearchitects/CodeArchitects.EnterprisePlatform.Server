@@ -7,7 +7,7 @@ internal record MessagingDescriptor(
   IEnumerable<IHandlerDescriptor> HandlerDescriptors,
   IEnumerable<IMessageDescriptor> MessageDescriptors) : IMessagingDescriptor
 {
-  public static IMessagingDescriptor Create(IEnumerable<Type> concreteTypes, IEnumerable<Type> messageTypes, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnostics)
+  public static IMessagingDescriptor Create(IEnumerable<Type> concreteTypes, IEnumerable<Type> messageTypes, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnosticCollection)
   {
     List<IHandlerDescriptor> handlerDescriptors = new();
     Dictionary<Type, IMessageDescriptor> messageDescriptors = new();
@@ -19,7 +19,7 @@ internal record MessagingDescriptor(
 
     foreach (Type concreteType in concreteTypes)
     {
-      foreach (HandlerDescriptor handlerDescriptor in HandlerDescriptor.Create(concreteType, defaultBus, defaultTopic, diagnostics))
+      foreach (HandlerDescriptor handlerDescriptor in HandlerDescriptor.Create(concreteType, defaultBus, defaultTopic, diagnosticCollection))
       {
         handlerDescriptors.Add(handlerDescriptor);
         TryAddMessageDescriptor(handlerDescriptor.MessageType);
@@ -42,7 +42,7 @@ internal record MessagingDescriptor(
     }
   }
 
-  public static IMessagingDescriptor Merge(IMessagingDescriptor first, IMessagingDescriptor second, ICollection<HandlerDiagnostics> diagnostics)
+  public static IMessagingDescriptor Merge(IMessagingDescriptor first, IMessagingDescriptor second, ICollection<HandlerDiagnostics> diagnosticCollection)
   {
     Dictionary<Type, IMessageDescriptor> messageDescriptors = first.MessageDescriptors.ToDictionary(descr => descr.Type);
     foreach (IMessageDescriptor messageDescriptor in second.MessageDescriptors)
@@ -76,7 +76,7 @@ internal record MessagingDescriptor(
           {
             if (outputBindingDescriptors.ContainsKey(outputBindingDescriptor.MetadataType))
             {
-              diagnostics.Add(DuplicateOutputBinding(handlerDescriptor.ConcreteType));
+              diagnosticCollection.Add(DuplicateOutputBinding(handlerDescriptor.ConcreteType));
               continue;
             }
 
