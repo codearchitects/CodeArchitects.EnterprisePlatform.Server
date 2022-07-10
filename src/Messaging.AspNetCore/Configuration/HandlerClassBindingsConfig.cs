@@ -18,5 +18,5 @@ public class HandlerClassBindingsConfig
   /// <summary>
   /// Declarative bindings for the handler methods.
   /// </summary>
-  public Dictionary<string, List<HandlerBindingsConfig>> Methods { get; set; } = new();
+  public List<HandlerBindingsConfig> Methods { get; set; } = new();
 }

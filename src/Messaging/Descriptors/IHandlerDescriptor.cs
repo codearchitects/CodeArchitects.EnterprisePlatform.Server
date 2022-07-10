@@ -8,12 +8,12 @@ internal interface IHandlerDescriptor
   /// <summary>
   /// The bus name.
   /// </summary>
-  string Bus { get; }
+  string? Bus { get; }
 
   /// <summary>
   /// The topic name.
   /// </summary>
-  string Topic { get; }
+  string? Topic { get; }
 
   /// <summary>
   /// The handler interface type.

@@ -13,5 +13,5 @@ public class MessagingConfig
   /// <summary>
   /// Declarative bindings for the handlers.
   /// </summary>
-  public Dictionary<string, HandlerClassBindingsConfig> Bindings { get; set; } = new();
+  public Dictionary<string, HandlerClassBindingsConfig> Handlers { get; set; } = new();
 }

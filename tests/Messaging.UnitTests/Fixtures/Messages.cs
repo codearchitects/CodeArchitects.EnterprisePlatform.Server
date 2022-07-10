@@ -11,7 +11,6 @@ public class Message2
 {
 }
 
-
 public class Message3
 {
 }

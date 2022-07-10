@@ -5,14 +5,12 @@
 /// </summary>
 internal record MessagingDescriptor(
   IEnumerable<IHandlerDescriptor> HandlerDescriptors,
-  IEnumerable<IMessageDescriptor> MessageDescriptors,
-  IReadOnlyCollection<HandlerDiagnostics> Diagnostics) : IMessagingDescriptor
+  IEnumerable<IMessageDescriptor> MessageDescriptors) : IMessagingDescriptor
 {
-  public static MessagingDescriptor Create(IEnumerable<Type> concreteTypes, IEnumerable<Type> messageTypes, string? defaultBus, string? defaultTopic)
+  public static IMessagingDescriptor Create(IEnumerable<Type> concreteTypes, IEnumerable<Type> messageTypes, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnostics)
   {
     List<IHandlerDescriptor> handlerDescriptors = new();
     Dictionary<Type, IMessageDescriptor> messageDescriptors = new();
-    List<HandlerDiagnostics> diagnostics = new();
 
     foreach (Type messageType in messageTypes)
     {
@@ -28,7 +26,7 @@ internal record MessagingDescriptor(
       }
     }
 
-    return new MessagingDescriptor(handlerDescriptors, messageDescriptors.Values, diagnostics);
+    return new MessagingDescriptor(handlerDescriptors, messageDescriptors.Values);
 
     void TryAddMessageDescriptor(Type messageType)
     {
@@ -43,4 +41,71 @@ internal record MessagingDescriptor(
       }
     }
   }
+
+  public static IMessagingDescriptor Merge(IMessagingDescriptor first, IMessagingDescriptor second, ICollection<HandlerDiagnostics> diagnostics)
+  {
+    Dictionary<Type, IMessageDescriptor> messageDescriptors = first.MessageDescriptors.ToDictionary(descr => descr.Type);
+    foreach (IMessageDescriptor messageDescriptor in second.MessageDescriptors)
+    {
+      if (!messageDescriptors.ContainsKey(messageDescriptor.Type))
+      {
+        messageDescriptors.Add(messageDescriptor.Type, messageDescriptor);
+      }
+    }
+
+    HashSet<IHandlerDescriptor> checkedDescriptors = new();
+    IEnumerable<IHandlerDescriptor> allHandlerDescriptors = first.HandlerDescriptors.Concat(second.HandlerDescriptors);
+    List<IHandlerDescriptor> handlerDescriptors = new();
+
+    foreach (IHandlerDescriptor handlerDescriptor in allHandlerDescriptors)
+    {
+      if (checkedDescriptors.Contains(handlerDescriptor))
+        continue;
+
+      if (allHandlerDescriptors.Any(descr => IsSameHandler(handlerDescriptor, descr, checkedDescriptors)))
+      {
+        Dictionary<Type, IOutputBindingDescriptor> outputBindingDescriptors = handlerDescriptor.OutputBindingDescriptors.ToDictionary(descr => descr.MetadataType);
+        foreach (IHandlerDescriptor thisHandlerDescriptor in allHandlerDescriptors)
+        {
+          if (!IsSameHandler(handlerDescriptor, thisHandlerDescriptor, checkedDescriptors))
+            continue;
+
+          checkedDescriptors.Add(thisHandlerDescriptor);
+
+          foreach (IOutputBindingDescriptor outputBindingDescriptor in thisHandlerDescriptor.OutputBindingDescriptors)
+          {
+            if (outputBindingDescriptors.ContainsKey(outputBindingDescriptor.MetadataType))
+            {
+              diagnostics.Add(DuplicateOutputBinding(handlerDescriptor.ConcreteType));
+              continue;
+            }
+
+            outputBindingDescriptors.Add(outputBindingDescriptor.MetadataType, outputBindingDescriptor);
+          }
+        }
+
+        handlerDescriptors.Add(new HandlerDescriptor(handlerDescriptor.Bus, handlerDescriptor.Topic, handlerDescriptor.InterfaceType, handlerDescriptor.ConcreteType, outputBindingDescriptors.Values));
+      }
+      else
+      {
+        handlerDescriptors.Add(handlerDescriptor);
+      }
+    }
+
+    return new MessagingDescriptor(handlerDescriptors, messageDescriptors.Values);
+
+    static bool IsSameHandler(IHandlerDescriptor first, IHandlerDescriptor second, HashSet<IHandlerDescriptor> checkedDescriptors)
+    {
+      return
+        first != second &&
+        !checkedDescriptors.Contains(second) &&
+        first.ConcreteType == second.ConcreteType &&
+        first.InterfaceType == second.InterfaceType &&
+        first.Bus == second.Bus &&
+        first.Topic == second.Topic;
+    }
+  }
+
+  private static HandlerDiagnostics DuplicateOutputBinding(Type concreteType)
+    => new(concreteType, "Duplicate output binding of the same metadata found on handler {0}.", concreteType);
 }

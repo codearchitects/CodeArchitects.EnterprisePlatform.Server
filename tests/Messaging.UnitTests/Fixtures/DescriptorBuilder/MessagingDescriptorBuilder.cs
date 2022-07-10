@@ -42,12 +42,4 @@ internal class MessagingDescriptorBuilder : IMessagingDescriptorBuilder
     _messageDescriptors.Add(builder.Descriptor);
     return this;
   }
-
-  public IMessagingDescriptorBuilder SetDiagnostics(IReadOnlyCollection<HandlerDiagnostics> diagnostics)
-  {
-    _descriptorMock
-      .Setup(x => x.Diagnostics)
-      .Returns(diagnostics);
-    return this;
-  }
 }

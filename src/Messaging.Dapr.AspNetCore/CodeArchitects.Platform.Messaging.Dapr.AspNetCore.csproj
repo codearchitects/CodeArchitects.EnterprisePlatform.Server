@@ -13,8 +13,4 @@
     <ProjectReference Include="..\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="5.0.0" />
-  </ItemGroup>
-
 </Project>

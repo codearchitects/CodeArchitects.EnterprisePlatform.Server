@@ -27,9 +27,6 @@ internal class HandlerDescriptorEqualityComparer :
     if (!x.MessageDescriptors.SequenceEqual(y.MessageDescriptors, this))
       return false;
 
-    if (!x.Diagnostics.SequenceEqual(y.Diagnostics, this))
-      return false;
-
     return true;
   }
 
@@ -90,7 +87,7 @@ internal class HandlerDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    return (x.Id, x.ConcreteType) == (y.Id, y.ConcreteType);
+    return x.MessageTemplate == y.MessageTemplate;
   }
 
   public bool Equals(IMessageDescriptor? x, IMessageDescriptor? y)
@@ -115,10 +112,6 @@ internal class HandlerDescriptorEqualityComparer :
     foreach (IMessageDescriptor messageDescriptor in obj.MessageDescriptors)
     {
       hashCode.Add(messageDescriptor, this);
-    }
-    foreach (HandlerDiagnostics diagnostics in obj.Diagnostics)
-    {
-      hashCode.Add(diagnostics, this);
     }
 
     return hashCode.ToHashCode();
@@ -148,7 +141,7 @@ internal class HandlerDescriptorEqualityComparer :
 
   public int GetHashCode([DisallowNull] HandlerDiagnostics obj)
   {
-    return obj.Id.GetHashCode();
+    return obj.MessageTemplate.GetHashCode();
   }
 
   public int GetHashCode([DisallowNull] IMessageDescriptor obj)

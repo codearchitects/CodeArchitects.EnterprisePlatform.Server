@@ -24,9 +24,9 @@ internal class HandlerDelegateFactory : IHandlerDelegateFactory
 
   public HandlerDelegate CreateHandlerDelegate(IHandlerDescriptor descriptor)
   {
-    IReadOnlyList<OutputAction> outputActions = descriptor.OutputBindingDescriptors
-      .Select(descriptor => _outputActionFactory.CreateOutputAction(descriptor.MetadataType, descriptor.MetadataObject, _services))
-      .ToList();
+    IEnumerable<OutputAction> outputActions = descriptor.OutputBindingDescriptors is { Count: > 0 } outputBindingDescriptors
+      ? CreateOutputActions(outputBindingDescriptors)
+      : Enumerable.Empty<OutputAction>();
     Type resultType = descriptor.ResultType;
 
     Type handlerDelegateType = resultType == typeof(void)
@@ -34,5 +34,12 @@ internal class HandlerDelegateFactory : IHandlerDelegateFactory
       : typeof(HandlerDelegate<,,>).MakeGenericType(descriptor.MessageType, resultType, descriptor.ConcreteType);
 
     return (HandlerDelegate)Activator.CreateInstance(handlerDelegateType, new[] { outputActions })!;
+
+    IEnumerable<OutputAction> CreateOutputActions(IEnumerable<IOutputBindingDescriptor> outputBindingDescriptors)
+    {
+      return outputBindingDescriptors
+        .Select(descriptor => _outputActionFactory.CreateOutputAction(descriptor.MetadataType, descriptor.MetadataObject, _services))
+        .ToList();
+    }
   }
 }

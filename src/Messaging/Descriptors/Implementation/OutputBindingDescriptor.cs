@@ -10,10 +10,10 @@ internal record OutputBindingDescriptor(
   Type MetadataType,
   object MetadataObject) : IOutputBindingDescriptor
 {
-  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method)
+  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method, ICollection<HandlerDiagnostics> diagnostics)
   {
     object[] returnAttributes = method.ReturnTypeCustomAttributes.GetCustomAttributes(false);
-    List<OutputBindingDescriptor> descriptors = new List<OutputBindingDescriptor>(returnAttributes.Length);
+    Dictionary<Type, OutputBindingDescriptor> descriptors = new(returnAttributes.Length);
 
     foreach (object returnAttribute in returnAttributes)
     {
@@ -25,10 +25,19 @@ internal record OutputBindingDescriptor(
       foreach (Type interfaceType in outputMetadataInterfaceTypes)
       {
         OutputBindingDescriptor descriptor = new OutputBindingDescriptor(interfaceType, returnAttribute);
-        descriptors.Add(descriptor);
+        if (descriptors.ContainsKey(descriptor.MetadataType))
+        {
+          diagnostics.Add(DuplicateOutputBinding(method.DeclaringType));
+          continue;
+        }
+
+        descriptors.Add(descriptor.MetadataType, descriptor);
       }
     }
 
-    return descriptors;
+    return descriptors.Values;
   }
+
+  private static HandlerDiagnostics DuplicateOutputBinding(Type concreteType)
+    => new(concreteType, "Duplicate output binding of the same metadata found on handler {0}.", concreteType);
 }

@@ -20,21 +20,6 @@ public class StandardMessageHandler : IMessageHandler<Message1>, IMessageHandler
   }
 }
 
-[MessageHandler]
-public class NoBusAndTopicMessageHandler : IMessageHandler<Message3>
-{
-  public Task HandleAsync(Message3 message, CancellationToken cancellationToken)
-  {
-    throw new NotImplementedException();
-  }
-}
-
-[MessageHandler]
-[MessageHandler]
-public class MultipleMessageHandlerAttributesHandler
-{
-}
-
 [AttributeUsage(AttributeTargets.ReturnValue)]
 public class ReturnAttribute : Attribute, IOutputMetadata, IDummyInterface { }
 
@@ -56,18 +41,5 @@ public static class StandardMessageHandlerInfo
       types: new[] { typeof(Message2), typeof(CancellationToken) }) ?? throw new MissingMethodException(typeof(StandardMessageHandler).Name, nameof(StandardMessageHandler.HandleAsync));
 
     Identity2MetadataObject = (FakeOutputBinding1Attribute)handlerMethod2.ReturnTypeCustomAttributes.GetCustomAttributes(typeof(FakeOutputBinding1Attribute), false)[0];
-  }
-}
-
-public static class NoBusAndTopicMessageHandlerInfo
-{
-  public static readonly MethodInfo HandlerMethod1;
-
-  static NoBusAndTopicMessageHandlerInfo()
-  {
-    HandlerMethod1 = typeof(NoBusAndTopicMessageHandler).GetMethod(
-      name: nameof(NoBusAndTopicMessageHandler.HandleAsync),
-      bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      types: new[] { typeof(Message3), typeof(CancellationToken) }) ?? throw new MissingMethodException(typeof(NoBusAndTopicMessageHandler).Name, nameof(NoBusAndTopicMessageHandler.HandleAsync));
   }
 }

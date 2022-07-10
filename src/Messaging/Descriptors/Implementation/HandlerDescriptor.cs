@@ -6,8 +6,8 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 /// Implementation of <see cref="IHandlerDescriptor"/>
 /// </summary>
 internal record HandlerDescriptor(
-  string Bus,
-  string Topic,
+  string? Bus,
+  string? Topic,
   Type InterfaceType,
   Type ConcreteType,
   IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors) : IHandlerDescriptor
@@ -39,7 +39,7 @@ internal record HandlerDescriptor(
 
       if (classAttributesCount > 1)
       {
-        diagnostics.Add(HandlerDiagnostics.MultipleMessageHandlerAttributeOnClass(concreteType));
+        diagnostics.Add(MultipleMessageHandlerAttributeOnClass(concreteType));
       }
     }
 
@@ -52,7 +52,7 @@ internal record HandlerDescriptor(
       InterfaceMapping mapping = concreteType.GetInterfaceMap(handlerInterfaceType);
       MethodInfo handlerMethod = mapping.TargetMethods[0];
 
-      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod);
+      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod, diagnostics);
 
       IEnumerable<MessageHandlerAttribute> methodAttributes = handlerMethod.GetCustomAttributes<MessageHandlerAttribute>();
       if (!methodAttributes.Any())
@@ -62,20 +62,12 @@ internal record HandlerDescriptor(
 
       foreach (MessageHandlerAttribute methodAttribute in methodAttributes)
       {
-        string? bus = methodAttribute.Bus ?? defaultBus;
-        string? topic = methodAttribute.Topic ?? defaultTopic;
-
-        if (bus is not null && topic is not null)
-        {
-          yield return new HandlerDescriptor(bus, topic, handlerInterfaceType, concreteType, OutputBindingDescriptor.Create(handlerMethod));
-        }
-        else
-        {
-          if (bus is null)
-            diagnostics.Add(HandlerDiagnostics.NullBusOnHandler(concreteType, handlerMethod));
-          if (topic is null)
-            diagnostics.Add(HandlerDiagnostics.NullTopicOnHandler(concreteType, handlerMethod));
-        }
+        yield return new HandlerDescriptor(
+          Bus: methodAttribute.Bus ?? defaultBus,
+          Topic: methodAttribute.Topic ?? defaultTopic,
+          InterfaceType: handlerInterfaceType,
+          ConcreteType: concreteType,
+          OutputBindingDescriptors: outputBindings);
       }
     }
 
@@ -89,4 +81,7 @@ internal record HandlerDescriptor(
       return interfaceTypeDefinition == typeof(IMessageHandler<>) || interfaceTypeDefinition == typeof(IMessageHandler<,>);
     }
   }
+
+  private static HandlerDiagnostics MultipleMessageHandlerAttributeOnClass(Type concreteType)
+    => new(concreteType, $"Multiple {nameof(MessageHandlerAttribute)} found on type {{0}}", concreteType);
 }

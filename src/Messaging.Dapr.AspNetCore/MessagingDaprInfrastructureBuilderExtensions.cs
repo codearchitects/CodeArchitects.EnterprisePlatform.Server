@@ -11,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
+using Castle.Components.DictionaryAdapter;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
@@ -52,16 +54,24 @@ public static class MessagingDaprInfrastructureBuilderExtensions
       optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly());
     }
 
+    ILogger logger = builder.Logger;
+
     MessageBiMap messageMap = new();
     MessagingInfo info = MessagingInfo.Create(messageMap, builder.ComponentAccessor, config.DefaultBus);
     string? defaultBus = info.GetDefaultBus();
 
-    MessagingDescriptor descriptor = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic);
-    foreach (HandlerDiagnostics diagnostics in descriptor.Diagnostics)
+    List<HandlerDiagnostics> diagnosticCollection = new();
+    ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), logger);
+    IMessagingDescriptor descriptor = MessagingDescriptor.Merge(
+      first: MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection),
+      second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
+      diagnosticCollection);
+
+    foreach (HandlerDiagnostics diagnostics in diagnosticCollection)
     {
-      builder.Logger.LogWarning(diagnostics.MessageTemplate, diagnostics.MessageArguments);
+      logger.LogWarning(diagnostics.MessageTemplate, diagnostics.MessageArguments);
     }
-    builder.DaprServices.AddService<IMessagingDescriptor>(descriptor);
+    builder.DaprServices.AddService(descriptor);
 
     foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
     {

@@ -14,9 +14,4 @@ internal interface IMessagingDescriptor
   /// The descriptors of the messages the handlers handle.
   /// </summary>
   IEnumerable<IMessageDescriptor> MessageDescriptors { get; }
-
-  /// <summary>
-  /// A collection of diagnostics produced by the handler description.
-  /// </summary>
-  IReadOnlyCollection<HandlerDiagnostics> Diagnostics { get; }
 }
