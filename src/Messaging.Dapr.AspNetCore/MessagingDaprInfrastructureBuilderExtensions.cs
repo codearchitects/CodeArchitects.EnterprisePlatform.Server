@@ -1,21 +1,23 @@
-﻿using CodeArchitects.Platform.Common.Ioc;
+﻿using Castle.Components.DictionaryAdapter;
+using CodeArchitects.Platform.Common.Ioc;
 using CodeArchitects.Platform.Dapr.AspNetCore;
+using CodeArchitects.Platform.Messaging;
 using CodeArchitects.Platform.Messaging.AspNetCore;
 using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
-using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
+using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
+using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
+using CodeArchitects.Platform.Messaging.Dapr;
+using CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
-using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
-using Castle.Components.DictionaryAdapter;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
-namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class MessagingDaprInfrastructureBuilderExtensions
 {
@@ -26,7 +28,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     if (builder is null)
       throw new ArgumentNullException(nameof(builder));
 
-    return AddMessagingCore(builder, optionsBuilder => optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly()));
+    Assembly assembly = Assembly.GetCallingAssembly();
+    return AddMessagingCore(builder, optionsBuilder => optionsBuilder.ScanAssembly(assembly));
   }
 
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
@@ -77,9 +80,9 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     IMessagingDescriptor descriptorFromReflection = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection);
     IMessagingDescriptor descriptor = isConfigValid
       ? MessagingDescriptor.Merge(
-        first: descriptorFromReflection,
-        second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
-        diagnosticCollection: diagnosticCollection)
+          first: descriptorFromReflection,
+          second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
+          diagnosticCollection: diagnosticCollection)
       : descriptorFromReflection;
 
     foreach (HandlerDiagnostics diagnostics in diagnosticCollection)
@@ -91,6 +94,14 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
     {
       messageMap.Add(messageDescriptor.Type, messageDescriptor.Name);
+    }
+
+    IEnumerable<Type> handlerConcreteTypes = descriptor.HandlerDescriptors
+      .Select(descr => descr.ConcreteType)
+      .Distinct();
+    foreach (Type handlerConcreteType in handlerConcreteTypes)
+    {
+      builder.Services.AddScoped(handlerConcreteType);
     }
 
     builder.Services.AddSingleton<IServiceResolver<IMessageBus>>(delegate (IServiceProvider services)

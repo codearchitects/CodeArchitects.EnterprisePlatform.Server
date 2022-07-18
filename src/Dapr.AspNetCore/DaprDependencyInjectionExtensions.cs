@@ -1,8 +1,8 @@
-﻿using CodeArchitects.Platform.Dapr.AspNetCore.Services;
-using Microsoft.Extensions.DependencyInjection;
+﻿using CodeArchitects.Platform.Dapr.AspNetCore;
+using CodeArchitects.Platform.Dapr.AspNetCore.Services;
 using Microsoft.Extensions.FileProviders;
 
-namespace CodeArchitects.Platform.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Methods for adding Dapr infrastructure via dependency injection.

@@ -51,6 +51,8 @@ internal record HandlerDescriptor(
     {
       InterfaceMapping mapping = concreteType.GetInterfaceMap(handlerInterfaceType);
       MethodInfo handlerMethod = mapping.TargetMethods[0];
+      if (handlerMethod.IsDefined(typeof(DoesNotHandleAttribute)))
+        continue;
 
       IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod, diagnosticCollection);
 

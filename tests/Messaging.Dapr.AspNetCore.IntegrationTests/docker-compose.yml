@@ -1,0 +1,58 @@
+version: '3.4'
+
+services:
+  publisher:
+    image: ${DOCKER_REGISTRY-}publisher
+    build:
+      context: ../..
+      dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Publisher/Dockerfile
+    ports:
+      - 50000:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - rabbitmq
+
+  publisher-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:publisher
+    depends_on:
+      - publisher
+    command: ["./daprd",
+      "-app-id", "publisher",
+      "-app-port", "80",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+
+  subscriber:
+    image: ${DOCKER_REGISTRY-}subscriber
+    build:
+      context: ../..
+      dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Dockerfile
+    ports:
+      - 50001:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - rabbitmq
+
+  subscriber-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:subscriber
+    depends_on:
+      - subscriber
+    command: ["./daprd",
+      "-app-id", "subscriber",
+      "-app-port", "80",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+    
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672

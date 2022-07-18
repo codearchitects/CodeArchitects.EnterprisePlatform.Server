@@ -73,7 +73,7 @@ internal class DaprInfrastructureOptions :
     if (configuration is null)
       throw new ArgumentNullException(nameof(configuration));
 
-    _configurationSection = configuration.GetSection(DefaultServiceConfigurationPath);
+    ConfigurationSection = configuration.GetSection(DefaultServiceConfigurationPath);
     return this;
   }
 
@@ -82,7 +82,7 @@ internal class DaprInfrastructureOptions :
     if (configurationSection is null)
       throw new ArgumentNullException(nameof(configurationSection));
 
-    _configurationSection = configurationSection;
+    ConfigurationSection = configurationSection;
     return this;
   }
 
@@ -93,7 +93,7 @@ internal class DaprInfrastructureOptions :
     if (key is null)
       throw new ArgumentNullException(nameof(key));
 
-    _configurationSection = configuration.GetSection(key);
+    ConfigurationSection = configuration.GetSection(key);
     return this;
   }
 

@@ -4,6 +4,7 @@ using CodeArchitects.Platform.Messaging.Bindings;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
 
@@ -39,7 +40,7 @@ internal class ConfigurationDescriptorFactory
 
   private IEnumerable<IHandlerDescriptor> ProcessClassBindings(string handlerName, HandlerClassBindingsConfig classBinding, string? defaultBus, string? defaultTopic)
   {
-    Type? handlerType = Type.GetType(handlerName);
+    Type? handlerType = GetType(handlerName);
     if (handlerType is null)
     {
       _logger.LogWarning("Could not find handler type '{className}'.", handlerName);
@@ -63,14 +64,14 @@ internal class ConfigurationDescriptorFactory
 
   private IHandlerDescriptor? ProcessMethodBinding(Type handlerType, HandlerClassBindingsConfig classBinding, HandlerBindingsConfig binding, string? defaultBus, string? defaultTopic)
   {
-    Type? messageType = Type.GetType(binding.MessageName);
+    Type? messageType = GetType(binding.MessageName);
     if (messageType is null)
     {
       _logger.LogWarning("Could not find message type '{messageName}'.", binding.MessageName);
       return null;
     }
 
-    Type? resultType = binding.ResultName is null ? typeof(void) : Type.GetType(binding.ResultName);
+    Type? resultType = binding.ResultName is null ? typeof(void) : GetType(binding.ResultName);
     if (resultType is null)
     {
       _logger.LogWarning("Could not find result type '{resultName}'.", binding.ResultName);
@@ -108,7 +109,7 @@ internal class ConfigurationDescriptorFactory
   {
     foreach (OutputBindingConfig outputBinding in outputBindings)
     {
-      Type? metadataType = Type.GetType(outputBinding.Name);
+      Type? metadataType = GetType(outputBinding.Name);
       if (metadataType is null)
       {
         _logger.LogWarning("Could not find metadata type '{metadataName}'.", outputBinding.Name);
@@ -139,5 +140,16 @@ internal class ConfigurationDescriptorFactory
     }
 
     return messageDescriptors.Values;
+  }
+
+  private static Type? GetType(string fullyQualifiedName)
+  {
+    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+    {
+      if (assembly.GetType(fullyQualifiedName) is Type type)
+        return type;
+    }
+
+    return null;
   }
 }

@@ -1,9 +1,11 @@
 ﻿using CodeArchitects.Platform.Dapr.AspNetCore.Services;
 using CodeArchitects.Platform.Messaging.AspNetCore;
+using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 using CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Builder;
 
@@ -28,14 +30,26 @@ public static class MessagingDaprEndpointRouteBuilderExtensions
     IDaprInfrastructureServiceProvider daprServices = endpoints.ServiceProvider.GetRequiredService<IDaprInfrastructureServiceProvider>();
 
     ITopicRouterFactory delegateFactory = endpoints.ServiceProvider.GetRequiredService<ITopicRouterFactory>();
+    ILogger logger = endpoints.ServiceProvider.CreateMessagingLogger();
     IMessagingDescriptor messagingDescriptor = daprServices.GetService<IMessagingDescriptor>();
 
     var handlerDescriptorGroups = messagingDescriptor.HandlerDescriptors.GroupBy(descriptor => (descriptor.Bus, descriptor.Topic));
 
     foreach (var handlerDescriptorGroup in handlerDescriptorGroups)
     {
-      (string bus, string topic) = handlerDescriptorGroup.Key;
+      (string? bus, string? topic) = handlerDescriptorGroup.Key;
       TopicRouter router = delegateFactory.CreateRouter(handlerDescriptorGroup);
+
+      if (bus is null)
+      {
+        logger.LogWarning("Some handlers have been not been bound to a message bus, therefore they will not be mapped.");
+        continue;
+      }
+      if (topic is null)
+      {
+        logger.LogWarning("Some handlers have been not been bound to a topic, therefore they will not be mapped.");
+        continue;
+      }
 
       endpoints
         .MapPost($"/pubsub/{bus}/{topic}", router.ExecuteAsync)

@@ -45,25 +45,25 @@ internal class TopicRouter
     };
   }
 
-  private Task ProcessCloudEvent(HttpContext context, JsonReader jsonReader, ILogger logger)
+  private async Task ProcessCloudEvent(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
     JObject cloudEventObject;
     try
     {
-      cloudEventObject = JObject.Load(jsonReader);
+      cloudEventObject = await JObject.LoadAsync(jsonReader);
     }
     catch (JsonReaderException ex)
     {
       logger.LogError(ex, "Could not deserialize message.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return Task.CompletedTask;
+      return;
     }
 
     if (!TryGetString(cloudEventObject, "type", out string? type))
     {
       logger.LogError("Cloud event was missing 'type' property or it has wrong type.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return Task.CompletedTask;
+      return;
     }
 
     bool hasData = cloudEventObject.ContainsKey("data");
@@ -72,7 +72,7 @@ internal class TopicRouter
     {
       logger.LogError("Both 'data' and 'data_base64' properties were set in CloudEvent envelope.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return Task.CompletedTask;
+      return;
     }
 
     if (hasData)
@@ -83,10 +83,11 @@ internal class TopicRouter
         // TODO: Extend support
         logger.LogError("The 'data' property of the CloudEvent envelope must be an object.");
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        return Task.CompletedTask;
+        return;
       }
 
-      return ExecuteAsync(context, (JObject)dataToken, type, logger);
+      await ExecuteAsync(context, (JObject)dataToken, type, logger);
+      return;
     }
     
     if (hasDataBase64)
@@ -94,36 +95,35 @@ internal class TopicRouter
       // TODO: Extend support
       logger.LogError("'data_base64' property of CloudEvent envelope is not supported yet.");
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-      return Task.CompletedTask;
+      return;
     }
 
     logger.LogError("Neither 'data' or 'data_base64' properties were set in CloudEvent envelope.");
     context.Response.StatusCode = StatusCodes.Status400BadRequest;
-    return Task.CompletedTask;
   }
 
-  private Task ProcessRawPayload(HttpContext context, JsonReader jsonReader, ILogger logger)
+  private async Task ProcessRawPayload(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
     JObject messageObject;
     try
     {
-      messageObject = JObject.Load(jsonReader);
+      messageObject = await JObject.LoadAsync(jsonReader);
     }
     catch (JsonReaderException ex)
     {
       logger.LogError(ex, "Could not deserialize message.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return Task.CompletedTask;
+      return;
     }
 
     if (!TryGetString(messageObject, "$type", out string? type))
     {
       logger.LogError("Message was missing '$type' property or it has wrong type.");
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
-      return Task.CompletedTask;
+      return;
     }
 
-    return ExecuteAsync(context, messageObject, type, logger);
+    await ExecuteAsync(context, messageObject, type, logger);
   }
 
   private async Task ExecuteAsync(HttpContext context, JObject payloadObject, string type, ILogger logger)
@@ -149,9 +149,9 @@ internal class TopicRouter
       logger.LogError($"Cannot deserialize message of type '{type}' to type '{ex.MessageType.FullName}'.", ex);
       context.Response.StatusCode = StatusCodes.Status400BadRequest;
     }
-    catch
+    catch (Exception ex)
     {
-      logger.LogError("Error in executing a message handling action.");
+      logger.LogError(ex, "Error in executing a message handling action.");
       context.Response.StatusCode = StatusCodes.Status500InternalServerError;
     }
   }
