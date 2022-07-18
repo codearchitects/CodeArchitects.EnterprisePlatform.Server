@@ -38,8 +38,6 @@ public static class MessagingDaprEndpointRouteBuilderExtensions
     foreach (var handlerDescriptorGroup in handlerDescriptorGroups)
     {
       (string? bus, string? topic) = handlerDescriptorGroup.Key;
-      TopicRouter router = delegateFactory.CreateRouter(handlerDescriptorGroup);
-
       if (bus is null)
       {
         logger.LogWarning("Some handlers have been not been bound to a message bus, therefore they will not be mapped.");
@@ -51,6 +49,7 @@ public static class MessagingDaprEndpointRouteBuilderExtensions
         continue;
       }
 
+      TopicRouter router = delegateFactory.CreateRouter(handlerDescriptorGroup);
       endpoints
         .MapPost($"/pubsub/{bus}/{topic}", router.ExecuteAsync)
         .WithTopic(bus, topic);

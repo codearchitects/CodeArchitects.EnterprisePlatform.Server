@@ -16,4 +16,8 @@
     <ProjectReference Include="..\..\..\src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WithResult\" />
+  </ItemGroup>
+
 </Project>

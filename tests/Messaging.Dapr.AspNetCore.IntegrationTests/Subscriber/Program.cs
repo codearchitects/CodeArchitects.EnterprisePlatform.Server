@@ -1,5 +1,7 @@
+using CodeArchitects.Platform.Messaging.Bindings;
 using Microsoft.AspNetCore.Mvc;
-using Subscriber.NoResponse;
+using Subscriber;
+using Subscriber.WithResult;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +10,12 @@ builder.Services
     .SetConfiguration(builder.Configuration))
   .AddMessaging();
 
-builder.Services.AddSingleton<NoResponseAwaiter>();
+builder.Services.AddSingleton<MessageAwaiter>();
+builder.Services.AddSingleton<IOutputBinding<ITestOutputMetadata>, TestOutputBinding>();
 
 var app = builder.Build();
 
-app.MapGet("/noresponse/wait/{id}", async (Guid id, [FromQuery] int? millisecondsTimeout, [FromServices] NoResponseAwaiter awaiter, CancellationToken cancellationToken) =>
+app.MapGet("/wait/{id}", async (Guid id, [FromQuery] int? millisecondsTimeout, [FromServices] MessageAwaiter awaiter, CancellationToken cancellationToken) =>
 {
   Task task = awaiter.GetTask(id);
   Task timer = Task.Delay(millisecondsTimeout ?? 10000, cancellationToken);

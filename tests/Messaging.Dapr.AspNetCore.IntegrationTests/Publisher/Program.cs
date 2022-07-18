@@ -1,6 +1,6 @@
 using CodeArchitects.Platform.Messaging;
 using Microsoft.AspNetCore.Mvc;
-using Publisher.NoResponse;
+using Publisher;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +11,15 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapGet("/noresponse/{topic}/send/{id}", async (string topic, Guid id, [FromServices] IMessageBus bus, CancellationToken cancellationToken) =>
+app.MapGet("/noresult/{topic}/send/{id}", async (string topic, Guid id, [FromServices] IMessageBus bus, CancellationToken cancellationToken) =>
 {
-  await bus.SendAsync(topic, new NoResponseMessage(id), cancellationToken);
+  await bus.SendAsync(topic, new NoResultMessage(id), cancellationToken);
+  return Results.Ok();
+});
+
+app.MapGet("/withresult/{topic}/send/{id}", async (string topic, Guid id, [FromServices] IMessageBus bus, CancellationToken cancellationToken) =>
+{
+  await bus.SendAsync(topic, new WithResultMessage(id), cancellationToken);
   return Results.Ok();
 });
 

@@ -33,7 +33,8 @@ internal class OutputAction<TMetadata> : OutputAction
     if (binding is null)
     {
       ILogger logger = _services.CreateMessagingLogger();
-      logger.LogWarning("No output binding was registered for metadata {OutputBindingMetadataType}. Please, register a service as IOutputBinding<{OutputBindingMetadataType}>.", typeof(TMetadata));
+      Type outputBindingType = typeof(IOutputBinding<>).MakeGenericType(typeof(TMetadata));
+      logger.LogWarning("No output binding was registered for metadata {OutputBindingMetadataType}. Please, register a service as {OutputBindingType}.", typeof(TMetadata), outputBindingType);
 
       return Task.CompletedTask;
     }
