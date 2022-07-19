@@ -19,19 +19,43 @@ using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
+/// </summary>
 public static class MessagingDaprInfrastructureBuilderExtensions
 {
   private const string s_messagingKey = "Messaging";
 
+  /// <summary>
+  /// Adds messaging capabilities to the application via the Dapr pubsub API.
+  /// </summary>
+  /// <remarks>
+  /// This method adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services and,
+  /// if a default bus is configured, an <see cref="IMessageBus"/> also.
+  /// </remarks>
+  /// <param name="builder">The Dapr infrastructure builder.</param>
+  /// <returns></returns>
+  /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null.</exception>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder)
   {
     if (builder is null)
       throw new ArgumentNullException(nameof(builder));
 
-    Assembly assembly = Assembly.GetCallingAssembly();
-    return AddMessagingCore(builder, optionsBuilder => optionsBuilder.ScanAssembly(assembly));
+    return AddMessagingCore(builder, optionsBuilder => { });
   }
 
+  /// <summary>
+  /// Adds messaging capabilities to the application via the Dapr pubsub API.
+  /// </summary>
+  /// <remarks>
+  /// This method adds an <see cref="IServiceResolver{TService}"/> of <see cref="IMessageBus"/> to the services and,
+  /// if a default bus is configured, an <see cref="IMessageBus"/> also. The configuration action can be used to
+  /// configure messaging options and to register message handlers.
+  /// </remarks>
+  /// <param name="builder">The Dapr infrastructure builder.</param>
+  /// <param name="configure">An action that can be used to configure the messaging options.</param>
+  /// <returns>The builder.</returns>
+  /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="configure"/> is null.</exception>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
     if (builder is null)
@@ -51,14 +75,7 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     builder.DaprServices.AddService(config);
 
     DaprMessagingOptionsBuilder optionsBuilder = new(config);
-    if (configure is not null)
-    {
-      configure(optionsBuilder);
-    }
-    else
-    {
-      optionsBuilder.ScanAssembly(Assembly.GetCallingAssembly());
-    }
+    configure(optionsBuilder);
 
     ValidationContext validationContext = new(config);
     List<ValidationResult> validationResults = new();
