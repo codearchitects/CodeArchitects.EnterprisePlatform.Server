@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
-	  
+
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".UnitTests", ""))</RootNamespace>
   </PropertyGroup>
 
