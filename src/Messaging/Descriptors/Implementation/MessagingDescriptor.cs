@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
+﻿using System.Reflection;
+
+namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
 /// <summary>
 /// Implementation of <see cref="IMessagingDescriptor"/>
@@ -30,14 +32,19 @@ internal record MessagingDescriptor(
 
     void TryAddMessageDescriptor(Type messageType)
     {
-      while (messageType != typeof(object))
+      bool isAncestor = false;
+      while (messageType is not null)
       {
         if (!messageDescriptors.ContainsKey(messageType))
         {
+          if (isAncestor && !messageType.IsDefined(typeof(MessageAttribute)))
+            return;
+
           messageDescriptors.Add(messageType, MessageDescriptor.Create(messageType));
         }
 
         messageType = messageType.BaseType!;
+        isAncestor = true;
       }
     }
   }

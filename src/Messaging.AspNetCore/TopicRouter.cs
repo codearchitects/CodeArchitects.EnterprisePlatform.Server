@@ -167,8 +167,7 @@ internal class TopicRouter
     messageType = messageType.BaseType;
     while (messageType is not null)
     {
-      string baseMessageName = _messageMap[messageType];
-      if (_delegates.TryGetValue(baseMessageName, out @delegate))
+      if (_messageMap.TryGetValue(messageType, out string? baseMessageName) && _delegates.TryGetValue(baseMessageName, out @delegate))
         return true;
 
       messageType = messageType.BaseType;
