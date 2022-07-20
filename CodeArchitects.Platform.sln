@@ -3,71 +3,71 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure", "src\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj", "{54743C88-11C2-4761-8536-B56218604416}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{54743C88-11C2-4761-8536-B56218604416}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{2221E47A-0474-48FC-8840-E8E6CDAED427}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Common", "src\Common\CodeArchitects.Platform.Common.csproj", "{9B91B97B-D34F-4B60-9226-0EEAA96E2DDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "src\Common\Common.csproj", "{9B91B97B-D34F-4B60-9226-0EEAA96E2DDC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Common.UnitTests", "tests\Common.UnitTests\CodeArchitects.Platform.Common.UnitTests.csproj", "{B85236B3-9869-44A1-90B2-88097EE43A5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.UnitTests", "tests\Common.UnitTests\Common.UnitTests.csproj", "{B85236B3-9869-44A1-90B2-88097EE43A5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data", "src\Data\CodeArchitects.Platform.Data.csproj", "{C22CC44C-9092-4AB2-9103-1C66E6C3AB38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "src\Data\Data.csproj", "{C22CC44C-9092-4AB2-9103-1C66E6C3AB38}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore", "src\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj", "{63326C5E-B857-4D2C-BA60-46151F434AA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data.EntityFrameworkCore", "src\Data.EntityFrameworkCore\Data.EntityFrameworkCore.csproj", "{63326C5E-B857-4D2C-BA60-46151F434AA0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests", "tests\Data.EntityFrameworkCore.FunctionalTests\CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data.EntityFrameworkCore.FunctionalTests", "tests\Data.EntityFrameworkCore.FunctionalTests\Data.EntityFrameworkCore.FunctionalTests.csproj", "{6AF2FD6E-664E-4917-99D2-FD7CB38369F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application", "src\Application\CodeArchitects.Platform.Application.csproj", "{D41F7716-18DF-47DF-82AF-8A5CF4613408}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "src\Application\Application.csproj", "{D41F7716-18DF-47DF-82AF-8A5CF4613408}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application.UnitTests", "tests\Application.UnitTests\CodeArchitects.Platform.Application.UnitTests.csproj", "{521269E7-1BCB-41AD-8307-FC72BC4792F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "tests\Application.UnitTests\Application.UnitTests.csproj", "{521269E7-1BCB-41AD-8307-FC72BC4792F2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{646C726C-D374-4213-B169-EB07E0130DEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.CodeAnalysis", "src\CodeAnalysis\CodeArchitects.Platform.CodeAnalysis.csproj", "{69CAE493-4596-4875-9345-D3524FBD47C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeAnalysis", "src\CodeAnalysis\CodeAnalysis.csproj", "{69CAE493-4596-4875-9345-D3524FBD47C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer", "src\Analyzer\CodeArchitects.Platform.Analyzer.csproj", "{197B5E82-359B-4F12-93B5-7EE541433D77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analyzer", "src\Analyzer\Analyzer.csproj", "{197B5E82-359B-4F12-93B5-7EE541433D77}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Analyzer.Tests", "tests\Analyzer.Tests\CodeArchitects.Platform.Analyzer.Tests.csproj", "{40038BD9-FA12-47EA-8DF4-2F43F9050E82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analyzer.Tests", "tests\Analyzer.Tests\Analyzer.Tests.csproj", "{40038BD9-FA12-47EA-8DF4-2F43F9050E82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dapr.AspNetCore", "src\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj", "{6778695A-66DB-4AF3-984C-89AA1F70C5D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapr.AspNetCore", "src\Dapr.AspNetCore\Dapr.AspNetCore.csproj", "{6778695A-66DB-4AF3-984C-89AA1F70C5D5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapr", "Dapr", "{279511E3-104D-4A68-BCE7-F9E97414ECDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dapr.AspNetCore.UnitTests", "tests\Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Dapr.AspNetCore.UnitTests.csproj", "{2B50A958-7703-4230-A5E0-9F046B059A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapr.AspNetCore.UnitTests", "tests\Dapr.AspNetCore.UnitTests\Dapr.AspNetCore.UnitTests.csproj", "{2B50A958-7703-4230-A5E0-9F046B059A54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging", "src\Messaging\CodeArchitects.Platform.Messaging.csproj", "{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging", "src\Messaging\Messaging.csproj", "{2E3C34D8-D7C7-41C4-A9C5-0D38F9798878}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.Dapr", "src\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj", "{C442D08B-B968-4DB1-9399-32F0B2D3B107}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Dapr", "src\Messaging.Dapr\Messaging.Dapr.csproj", "{C442D08B-B968-4DB1-9399-32F0B2D3B107}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.Dapr.AspNetCore", "src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj", "{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Dapr.AspNetCore", "src\Messaging.Dapr.AspNetCore\Messaging.Dapr.AspNetCore.csproj", "{03E4EF17-FD2C-4D91-99A1-6FB8FC5F52BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.UnitTests", "tests\Messaging.UnitTests\CodeArchitects.Platform.Messaging.UnitTests.csproj", "{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.UnitTests", "tests\Messaging.UnitTests\Messaging.UnitTests.csproj", "{82BFC8E6-5642-40ED-B55E-FB3FB13D5C54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.AspNetCore", "src\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj", "{D507A572-3A15-4476-BA59-181B268D2614}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.AspNetCore", "src\Messaging.AspNetCore\Messaging.AspNetCore.csproj", "{D507A572-3A15-4476-BA59-181B268D2614}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.AspNetCore.UnitTests", "tests\Messaging.AspNetCore.UnitTests\CodeArchitects.Platform.Messaging.AspNetCore.UnitTests.csproj", "{77BF8CFC-E0AC-44A0-81B5-DEA429794283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.AspNetCore.UnitTests", "tests\Messaging.AspNetCore.UnitTests\Messaging.AspNetCore.UnitTests.csproj", "{77BF8CFC-E0AC-44A0-81B5-DEA429794283}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.Dapr.UnitTests", "tests\Messaging.Dapr.UnitTests\CodeArchitects.Platform.Messaging.Dapr.UnitTests.csproj", "{98749229-6110-439D-A07B-CCDEFCB5D0BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Dapr.UnitTests", "tests\Messaging.Dapr.UnitTests\Messaging.Dapr.UnitTests.csproj", "{98749229-6110-439D-A07B-CCDEFCB5D0BC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Messaging.Dapr.AspNetCore.UnitTests", "tests\Messaging.Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.UnitTests.csproj", "{4E021C93-CDA5-40C0-AFB9-6CDBD42A063A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Dapr.AspNetCore.UnitTests", "tests\Messaging.Dapr.AspNetCore.UnitTests\Messaging.Dapr.AspNetCore.UnitTests.csproj", "{4E021C93-CDA5-40C0-AFB9-6CDBD42A063A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr", "src\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj", "{B4288C4A-B64B-4983-A5B1-208EEB09FB87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Dapr", "src\Infrastructure.Dapr\Infrastructure.Dapr.csproj", "{B4288C4A-B64B-4983-A5B1-208EEB09FB87}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore", "src\Infrastructure.Dapr.AspNetCore\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.csproj", "{7CCEDDD2-D698-46F2-8D15-7E3F8624E840}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Dapr.AspNetCore", "src\Infrastructure.Dapr.AspNetCore\Infrastructure.Dapr.AspNetCore.csproj", "{7CCEDDD2-D698-46F2-8D15-7E3F8624E840}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.UnitTests", "tests\Infrastructure.Dapr.UnitTests\CodeArchitects.Platform.Infrastructure.Dapr.UnitTests.csproj", "{CAB77020-2682-4655-A552-CDC744E8F598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Dapr.UnitTests", "tests\Infrastructure.Dapr.UnitTests\Infrastructure.Dapr.UnitTests.csproj", "{CAB77020-2682-4655-A552-CDC744E8F598}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests", "tests\Infrastructure.Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests.csproj", "{0BC3B4BE-0629-40B4-BF1B-4287206A233F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Dapr.AspNetCore.UnitTests", "tests\Infrastructure.Dapr.AspNetCore.UnitTests\Infrastructure.Dapr.AspNetCore.UnitTests.csproj", "{0BC3B4BE-0629-40B4-BF1B-4287206A233F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{AE6B4AEB-0C5A-404B-A5BE-6BAED09F6A3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests", "tests\Messaging.Dapr.AspNetCore.IntegrationTests\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests.csproj", "{CBAEEDD2-10D0-460E-A23A-A0FDCA755997}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messaging.Dapr.AspNetCore.IntegrationTests", "tests\Messaging.Dapr.AspNetCore.IntegrationTests\Messaging.Dapr.AspNetCore.IntegrationTests.csproj", "{CBAEEDD2-10D0-460E-A23A-A0FDCA755997}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messaging.Dapr.AspNetCore", "Messaging.Dapr.AspNetCore", "{805E0015-6D86-4328-A1DD-1B90E346942E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Publisher", "tests\Messaging.Dapr.AspNetCore.IntegrationTests\Publisher\Publisher.csproj", "{564565B4-31CF-4442-8D0E-4066E53B1B76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subscriber", "tests\Messaging.Dapr.AspNetCore.IntegrationTests\Subscriber\Subscriber.csproj", "{A00A5C5D-9A7B-4AED-8EB7-2A06CAC51EF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Subscriber", "tests\Messaging.Dapr.AspNetCore.IntegrationTests\Subscriber\Subscriber.csproj", "{A00A5C5D-9A7B-4AED-8EB7-2A06CAC51EF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
