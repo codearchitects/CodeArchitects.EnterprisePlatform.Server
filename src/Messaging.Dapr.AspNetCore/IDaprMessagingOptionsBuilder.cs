@@ -35,4 +35,11 @@ public interface IDaprMessagingOptionsBuilder
   /// <param name="assembly">The assembly to scan.</param>
   /// <returns>The builder.</returns>
   IDaprMessagingOptionsBuilder ScanAssembly(Assembly assembly);
+
+  /// <summary>
+  /// Scans the assembly of the given type for registering messages and message handlers.
+  /// </summary>
+  /// <typeparam name="T">A marker type of the assembly.</typeparam>
+  /// <returns>The builder.</returns>
+  IDaprMessagingOptionsBuilder ScanAssemblyOfType<T>();
 }

@@ -11,6 +11,7 @@ public class Message2
 {
 }
 
+[Message]
 public class Message3
 {
 }
@@ -21,6 +22,7 @@ public class Message4 : Message1
   public new const string MessageName = "msg4";
 }
 
+[Message]
 public class Message5 : Message3
 {
 

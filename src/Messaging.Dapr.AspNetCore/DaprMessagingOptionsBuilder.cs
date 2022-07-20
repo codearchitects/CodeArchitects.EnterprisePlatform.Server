@@ -23,12 +23,17 @@ internal class DaprMessagingOptionsBuilder : IDaprMessagingOptionsBuilder
 
   public IDaprMessagingOptionsBuilder Configure(Action<MessagingConfig> configure)
   {
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+
     configure(_config);
     return this;
   }
 
   public IDaprMessagingOptionsBuilder AddHandler(Type handlerType)
   {
+    if (handlerType is null)
+      throw new ArgumentNullException(nameof(handlerType));
     if (!handlerType.ImplementsGenericInterface(typeof(IMessageHandler<>)) && !handlerType.ImplementsGenericInterface(typeof(IMessageHandler<,>)))
       throw new ArgumentException($"'{nameof(handlerType)}' must be a type implementing the IMessageHandler interface", nameof(handlerType));
 
@@ -39,12 +44,18 @@ internal class DaprMessagingOptionsBuilder : IDaprMessagingOptionsBuilder
 
   public IDaprMessagingOptionsBuilder AddMessage(Type messageType)
   {
+    if (messageType is null)
+      throw new ArgumentNullException(nameof(messageType));
+
     _messageTypes.Add(messageType);
     return this;
   }
 
   public IDaprMessagingOptionsBuilder ScanAssembly(Assembly assembly)
   {
+    if (assembly is null)
+      throw new ArgumentNullException(nameof(assembly));
+
     foreach (Type type in assembly.GetTypes())
     {
       if (type.IsDefined(typeof(MessageHandlerAttribute)))
@@ -61,5 +72,10 @@ internal class DaprMessagingOptionsBuilder : IDaprMessagingOptionsBuilder
     }
 
     return this;
+  }
+
+  public IDaprMessagingOptionsBuilder ScanAssemblyOfType<T>()
+  {
+    return ScanAssembly(typeof(T).Assembly);
   }
 }

@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
   .AddDaprInfrastructure(opt => opt
     .SetConfiguration(builder.Configuration))
-  .AddMessaging();
+  .AddMessaging(opt => opt.ScanAssemblyOfType<Program>());
 
 builder.Services.AddSingleton<MessageAwaiter>();
 builder.Services.AddSingleton<IOutputBinding<ITestOutputMetadata>, TestOutputBinding>();
