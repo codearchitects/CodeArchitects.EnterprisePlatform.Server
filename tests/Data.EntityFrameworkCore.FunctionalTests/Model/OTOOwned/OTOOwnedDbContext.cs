@@ -18,7 +18,7 @@ public class OTOOwnedDbContext : DbContext
     {
       entity
         .HasOne(x => x.Secondary)
-        .WithOne(x => x.Primary!)
+        .WithOne(x => x!.Primary!)
         .HasForeignKey<Secondary>();
     });
 

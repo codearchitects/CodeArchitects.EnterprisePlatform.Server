@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Application")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data")]

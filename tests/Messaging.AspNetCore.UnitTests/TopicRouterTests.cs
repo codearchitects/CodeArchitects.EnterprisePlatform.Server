@@ -223,8 +223,8 @@ public class TopicRouterTests
       .Setup(x => x.TryGetValue("MyMessage", out messageType))
       .Returns(true);
     _messageMapMock
-      .Setup(x => x[typeof(Message1)])
-      .Returns(baseMessageName);
+      .Setup(x => x.TryGetValue(typeof(Message1), out baseMessageName!))
+      .Returns(true);
 
     _contextMock
       .Setup(x => x.Request.Body)
@@ -240,7 +240,7 @@ public class TopicRouterTests
     context.Response.StatusCode.Should().Be(statusCode);
     _delegatesMock.Verify(x => x.TryGetValue("MyMessage", out delegate1));
     _messageMapMock.Verify(x => x.TryGetValue("MyMessage", out messageType));
-    _messageMapMock.Verify(x => x[typeof(Message1)]);
+    _messageMapMock.Verify(x => x.TryGetValue(typeof(Message1), out baseMessageName!));
     _delegatesMock.Verify(x => x.TryGetValue(baseMessageName, out delegate2));
     _delegatesMock.Verify(x => x.Add("MyMessage", delegate2));
     _delegatesMock.VerifyNoOtherCalls();
@@ -274,9 +274,10 @@ public class TopicRouterTests
     _messageMapMock
       .Setup(x => x.TryGetValue("MyMessage", out messageType))
       .Returns(true);
+
     _messageMapMock
-      .Setup(x => x[typeof(object)])
-      .Returns(baseMessageName);
+      .Setup(x => x.TryGetValue(typeof(object), out baseMessageName!))
+      .Returns(true);
 
     _contextMock
       .Setup(x => x.Request.Body)
@@ -292,7 +293,7 @@ public class TopicRouterTests
     context.Response.StatusCode.Should().Be(statusCode);
     _delegatesMock.Verify(x => x.TryGetValue("MyMessage", out @delegate));
     _messageMapMock.Verify(x => x.TryGetValue("MyMessage", out messageType));
-    _messageMapMock.Verify(x => x[typeof(object)]);
+    _messageMapMock.Verify(x => x.TryGetValue(typeof(object), out baseMessageName!));
     _delegatesMock.Verify(x => x.TryGetValue(baseMessageName, out @delegate));
     _delegatesMock.VerifyNoOtherCalls();
     _messageMapMock.VerifyNoOtherCalls();

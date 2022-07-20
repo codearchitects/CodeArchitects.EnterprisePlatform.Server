@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Dapr.AspNetCore.Components;
-using CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;

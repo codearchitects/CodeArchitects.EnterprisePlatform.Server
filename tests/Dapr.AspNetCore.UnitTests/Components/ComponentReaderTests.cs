@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
-using FluentAssertions;
 using Microsoft.Extensions.FileProviders;
 using static CodeArchitects.Platform.Dapr.AspNetCore.Components.ComponentReaderFixture;
 
