@@ -7,8 +7,10 @@ using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
+using CodeArchitects.Platform.Messaging.Bindings;
 using CodeArchitects.Platform.Messaging.Dapr;
 using CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
+using CodeArchitects.Platform.Messaging.Dapr.Bindings;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 using Dapr.Client;
@@ -68,32 +70,71 @@ public static class MessagingDaprInfrastructureBuilderExtensions
 
   private static IDaprInfrastructureBuilder AddMessagingCore(IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
-    ILogger logger = builder.Logger;
-
-    MessagingConfig config = new();
-    builder.Configuration.Bind(s_messagingKey, config);
-    builder.DaprServices.AddService(config);
+    MessagingConfig config = CreateConfig(builder, out bool isConfigValid);
 
     DaprMessagingOptionsBuilder optionsBuilder = new(config);
     configure(optionsBuilder);
-
-    ValidationContext validationContext = new(config);
-    List<ValidationResult> validationResults = new();
-    bool isConfigValid = Validator.TryValidateObject(config, validationContext, validationResults);
-    if (!isConfigValid)
-    {
-      foreach (ValidationResult validationResult in validationResults)
-      {
-        logger.LogWarning(validationResult.ErrorMessage);
-      }
-    }
 
     MessageBiMap messageMap = new();
     MessagingInfo info = MessagingInfo.Create(messageMap, builder.ComponentAccessor, config.DefaultBus);
     string? defaultBus = info.GetDefaultBus();
 
+    IMessagingDescriptor descriptor = CreateDescriptor(builder, optionsBuilder, config, isConfigValid, defaultBus);
+    builder.DaprServices.AddService(descriptor);
+
+    foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
+    {
+      messageMap.Add(messageDescriptor.Type, messageDescriptor.Name);
+    }
+
+    AddHandlers(builder, descriptor);
+
+    AddMessageBus(builder, info, defaultBus);
+
+    AddTopicRouterFactory(builder, messageMap);
+
+    AddDefaultOutputBindings(builder.Services, info);
+
+    builder.Services.AddSingleton<MessagingMarkerService>();
+
+    return builder;
+  }
+
+  private static void AddDefaultOutputBindings(IServiceCollection services, IMessagingInfo info)
+  {
+    services.AddSingleton<IOutputBinding<IMessageBusOutputMetadata>>(delegate (IServiceProvider services)
+    {
+      DaprClient dapr = services.GetRequiredService<DaprClient>();
+      return new MessageBusOutputBinding(dapr, info);
+    });
+
+    services.AddSingleton<IOutputBinding<IStateStoreOutputMetadata>, StateStoreOutputBinding>();
+  }
+
+  private static MessagingConfig CreateConfig(IDaprInfrastructureBuilder builder, out bool isConfigValid)
+  {
+    MessagingConfig config = new();
+    builder.Configuration.Bind(s_messagingKey, config);
+    builder.DaprServices.AddService(config);
+
+    ValidationContext validationContext = new(config);
+    List<ValidationResult> validationResults = new();
+    isConfigValid = Validator.TryValidateObject(config, validationContext, validationResults);
+    if (!isConfigValid)
+    {
+      foreach (ValidationResult validationResult in validationResults)
+      {
+        builder.Logger.LogWarning(validationResult.ErrorMessage);
+      }
+    }
+
+    return config;
+  }
+
+  private static IMessagingDescriptor CreateDescriptor(IDaprInfrastructureBuilder builder, DaprMessagingOptionsBuilder optionsBuilder, MessagingConfig config, bool isConfigValid, string? defaultBus)
+  {
     List<HandlerDiagnostics> diagnosticCollection = new();
-    ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), logger);
+    ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), builder.Logger);
     IMessagingDescriptor descriptorFromReflection = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection);
     IMessagingDescriptor descriptor = isConfigValid
       ? MessagingDescriptor.Merge(
@@ -104,15 +145,14 @@ public static class MessagingDaprInfrastructureBuilderExtensions
 
     foreach (HandlerDiagnostics diagnostics in diagnosticCollection)
     {
-      logger.LogWarning(diagnostics.MessageTemplate, diagnostics.MessageArguments);
-    }
-    builder.DaprServices.AddService(descriptor);
-
-    foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
-    {
-      messageMap.Add(messageDescriptor.Type, messageDescriptor.Name);
+      builder.Logger.LogWarning(diagnostics.MessageTemplate, diagnostics.MessageArguments);
     }
 
+    return descriptor;
+  }
+
+  private static void AddHandlers(IDaprInfrastructureBuilder builder, IMessagingDescriptor descriptor)
+  {
     IEnumerable<Type> handlerConcreteTypes = descriptor.HandlerDescriptors
       .Select(descr => descr.ConcreteType)
       .Distinct();
@@ -120,7 +160,10 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     {
       builder.Services.AddScoped(handlerConcreteType);
     }
+  }
 
+  private static void AddMessageBus(IDaprInfrastructureBuilder builder, IMessagingInfo info, string? defaultBus)
+  {
     builder.Services.AddSingleton<IServiceResolver<IMessageBus>>(delegate (IServiceProvider services)
     {
       DaprClient dapr = services.GetRequiredService<DaprClient>();
@@ -132,16 +175,16 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     {
       builder.Services.AddSingleton(sp => sp.GetRequiredService<IServiceResolver<IMessageBus>>().Resolve(defaultBus));
     }
+  }
 
-    builder.Services.AddSingleton<MessagingMarkerService>();
+  private static void AddTopicRouterFactory(IDaprInfrastructureBuilder builder, IMessageBiMap messageMap)
+  {
     builder.Services.AddSingleton<ITopicRouterFactory>(delegate (IServiceProvider services)
     {
       OutputActionFactory outputActionFactory = new OutputActionFactory();
       HandlerDelegateFactory delegateFactory = new HandlerDelegateFactory(services, outputActionFactory);
       return new TopicRouterFactory(delegateFactory, messageMap);
     });
-
-    return builder;
   }
 
   #region Deprecated methods

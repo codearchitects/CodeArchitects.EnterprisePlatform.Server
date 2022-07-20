@@ -2,8 +2,18 @@
 
 namespace CodeArchitects.Platform.Dapr.AspNetCore;
 
+/// <summary>
+/// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
+/// </summary>
 public static class DaprInfrastructureBuilderExtensions
 {
+  /// <summary>
+  /// Fluently sets the logger of the builder.
+  /// </summary>
+  /// <param name="builder">The builder.</param>
+  /// <param name="logger">The logger.</param>
+  /// <returns>The builder.</returns>
+  /// <exception cref="ArgumentNullException">Thrown if builder or logger is null.</exception>
   public static IDaprInfrastructureBuilder UseLogger(this IDaprInfrastructureBuilder builder, ILogger logger)
   {
     if (builder is null)
