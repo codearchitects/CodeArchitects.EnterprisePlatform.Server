@@ -2,6 +2,9 @@
 
 namespace CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 
+/// <summary>
+/// The schema of the spec section of the component.
+/// </summary>
 public class SpecSchema
 {
   [Required]

@@ -50,7 +50,7 @@ internal class DaprInfrastructureOptions :
     return this;
   }
 
-  public IConfiguredDaprInfrastructureOptionsBuilder ConfigureDapr(Action<DaprClientBuilder> configure)
+  public IConfiguredDaprInfrastructureOptionsBuilder ConfigureDaprClient(Action<DaprClientBuilder> configure)
   {
     if (configure is null)
       throw new ArgumentNullException(nameof(configure));
