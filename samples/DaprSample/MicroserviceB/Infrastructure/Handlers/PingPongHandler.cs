@@ -4,10 +4,10 @@ using MicroserviceB.Domain.Messaging;
 
 namespace MicroserviceB.Infrastructure.Handlers;
 
-[MessageHandler("messagebus", "pingpong")]
+[MessageHandler("messagebus", "ping")]
 public class PingPongHandler : IMessageHandler<PingMessage, PongMessage>
 {
-  [return: MessageBus("messagebus", "pingpong")]
+  [return: MessageBus("messagebus", "pong")]
   public async Task<PongMessage> HandleAsync(PingMessage message, CancellationToken cancellationToken)
   {
     Console.WriteLine($"[{DateTime.Now}] Ping! {message}");

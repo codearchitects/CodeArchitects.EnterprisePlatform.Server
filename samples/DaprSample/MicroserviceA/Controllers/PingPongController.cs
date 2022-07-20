@@ -18,10 +18,10 @@ public class PingPongController : ControllerBase
     _store = store;
   }
 
-  [HttpPost("pingpong")]
+  [HttpPost]
   public async Task<IActionResult> PingPong()
   {
-    await _bus.SendAsync("pingpong", new PingMessage(Guid.NewGuid(), 0));
+    await _bus.SendAsync("ping", new PingMessage(Guid.NewGuid(), 0));
 
     return Ok();
   }
@@ -30,9 +30,13 @@ public class PingPongController : ControllerBase
   public async Task<IActionResult> Ping()
   {
     PingMessage? message = await _store.GetAsync<PingMessage>("ping");
-    if (message is null)
-      return NotFound();
+    return message is null ? NotFound() : Ok(message);
+  }
 
-    return Ok(message);
+  [HttpGet("pong")]
+  public async Task<IActionResult> Pong()
+  {
+    PongMessage? message = await _store.GetAsync<PongMessage>("pong");
+    return message is null ? NotFound() : Ok(message);
   }
 }
