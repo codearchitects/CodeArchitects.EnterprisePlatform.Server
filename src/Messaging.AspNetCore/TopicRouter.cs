@@ -132,7 +132,7 @@ internal class TopicRouter
     {
       if (!TryGetFallbackDelegate(type, out @delegate))
       {
-        logger.LogWarning($"No handler was registered for message of type '{type}'.");
+        logger.LogInformation($"No handler was registered for message of type '{type}'.");
         context.Response.StatusCode = StatusCodes.Status200OK;
         return;
       }
