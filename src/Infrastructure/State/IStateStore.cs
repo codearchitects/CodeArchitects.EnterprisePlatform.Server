@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace CodeArchitects.Platform.Infrastructure.State;
+﻿namespace CodeArchitects.Platform.Infrastructure.State;
 
 /// <summary>
 /// A key-value state store to persist data in a non-transactional way.

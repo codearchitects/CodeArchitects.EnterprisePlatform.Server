@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using System;
-using Xunit;
 using static CodeArchitects.Platform.Application.Remoting.QueryHelpersFixtures;
 
 namespace CodeArchitects.Platform.Application.Remoting;

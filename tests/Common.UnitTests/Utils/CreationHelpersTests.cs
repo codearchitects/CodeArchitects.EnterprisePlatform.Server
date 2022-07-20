@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
 using System;
-using Xunit;
 
 namespace CodeArchitects.Platform.Common.Utils;
 

@@ -1,8 +1,5 @@
 ﻿using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
 
@@ -21,11 +18,6 @@ internal class StateStore : IStateStore
   /// <param name="storeName">The name of the state store.</param>
   public StateStore(DaprClient dapr, string storeName)
   {
-    if (dapr is null)
-      throw new ArgumentNullException(nameof(dapr));
-    if (string.IsNullOrWhiteSpace(storeName))
-      throw new ArgumentException($"'{nameof(storeName)}' cannot be null or whitespace.", nameof(storeName));
-
     _dapr = dapr;
     _storeName = storeName;
   }

@@ -1,7 +1,6 @@
 ﻿using CodeArchitects.Platform.Application.SignalR.Fakes;
 using FluentAssertions;
 using System.Reflection;
-using Xunit;
 
 namespace CodeArchitects.Platform.Application.SignalR;
 

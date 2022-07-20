@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
-using Xunit;
 
 namespace CodeArchitects.Platform.Application.SignalR;
 

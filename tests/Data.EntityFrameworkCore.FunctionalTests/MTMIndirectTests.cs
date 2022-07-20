@@ -4,7 +4,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;

@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using System;
 using System.Collections.Generic;
-using Xunit;
 
 namespace CodeArchitects.Platform.Common.Utils;
 
