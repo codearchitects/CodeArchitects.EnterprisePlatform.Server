@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    
+  redis:
+    image: redis:alpine
+
+  microservicea:
+    image: ${DOCKER_REGISTRY-}microservicea
+    build:
+      context: .
+      dockerfile: MicroserviceA/Dockerfile
+
+  microservicea-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:microservicea
+    depends_on:
+      - microservicea
+
+  microserviceb:
+    image: ${DOCKER_REGISTRY-}microserviceb
+    build:
+      context: .
+      dockerfile: MicroserviceB/Dockerfile
+
+  microserviceb-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:microserviceb
+    depends_on:
+      - microserviceb
+      
