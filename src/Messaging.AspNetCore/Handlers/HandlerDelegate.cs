@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 
-namespace CodeArchitects.Platform.Messaging.AspNetCore;
+namespace CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 
 /// <summary>
 /// Delegates the execution of a message to its handler and executes output bindings.

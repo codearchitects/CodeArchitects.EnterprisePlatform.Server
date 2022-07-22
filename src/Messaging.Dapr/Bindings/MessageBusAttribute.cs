@@ -1,20 +1,35 @@
 ﻿namespace CodeArchitects.Platform.Messaging.Dapr.Bindings;
 
-[AttributeUsage(AttributeTargets.ReturnValue)]
+[AttributeUsage(AttributeTargets.ReturnValue, AllowMultiple = true)]
 public class MessageBusAttribute : Attribute, IMessageBusOutputMetadata
 {
-  public MessageBusAttribute(string busName)
+  public MessageBusAttribute(string bus)
   {
-    BusName = busName;
+    Bus = bus;
   }
 
-  public MessageBusAttribute(string busName, string? topic)
+  public MessageBusAttribute(string bus, string? topic)
   {
-    BusName = busName;
+    Bus = bus;
     Topic = topic;
   }
 
-  public string BusName { get; }
+  public MessageBusAttribute(string bus, params Type[] resultTypes)
+  {
+    Bus = bus;
+    AllowedTypes = resultTypes;
+  }
+
+  public MessageBusAttribute(string bus, string? topic, params Type[] resultTypes)
+  {
+    Bus = bus;
+    Topic = topic;
+    AllowedTypes = resultTypes;
+  }
+
+  public string Bus { get; }
 
   public string? Topic { get; init; }
+
+  public IEnumerable<Type>? AllowedTypes { get; }
 }

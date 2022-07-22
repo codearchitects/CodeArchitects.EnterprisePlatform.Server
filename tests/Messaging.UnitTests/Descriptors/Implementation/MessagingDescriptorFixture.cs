@@ -37,7 +37,10 @@ public static class MessagingDescriptorFixture
           .SetInterfaceType(typeof(IMessageHandler<Message1>))
           .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message1))
-          .SetResultType(typeof(void)));
+          .SetResultType(typeof(void))
+          .SetHasResult(false)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>()));
     }
 
     private static void AddStandardMessageHandler2(IMessagingDescriptorBuilder builder)
@@ -50,8 +53,12 @@ public static class MessagingDescriptorFixture
           .SetConcreteType(typeof(StandardMessageHandler))
           .SetMessageType(typeof(Message2))
           .SetResultType(typeof(Message1))
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(typeof(IFakeOutputMetadata1))
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(StandardMessageHandlerInfo.Identity2MetadataObject)))
         .AddMessageDescriptor(_ => _
           .SetName(typeof(Message2).Name)
@@ -190,8 +197,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1)));
       first = builder.Descriptor;
 
@@ -204,8 +215,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic2)
           .SetMessageType(messageType2)
           .SetResultType(resultType2)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2)));
       second = builder.Descriptor;
 
@@ -218,8 +233,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1)))
         .AddHandlerDescriptor(_ => _
           .SetConcreteType(handlerType2)
@@ -228,8 +247,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic2)
           .SetMessageType(messageType2)
           .SetResultType(resultType2)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2)));
       expected = builder.Descriptor;
 
@@ -245,8 +268,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1)));
       first = builder.Descriptor;
 
@@ -259,8 +286,12 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2)));
       second = builder.Descriptor;
 
@@ -273,11 +304,16 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2)));
       expected = builder.Descriptor;
 
@@ -293,11 +329,16 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType3)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject3)))
         .AddHandlerDescriptor(_ => _
           .SetConcreteType(handlerType2)
@@ -305,7 +346,10 @@ public static class MessagingDescriptorFixture
           .SetBus(bus2)
           .SetTopic(topic2)
           .SetMessageType(messageType2)
-          .SetResultType(resultType2));
+          .SetResultType(resultType2)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>()));
       first = builder.Descriptor;
 
       builder = new(MockBehavior.Strict);
@@ -317,11 +361,16 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType3)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject3)))
         .AddHandlerDescriptor(_ => _
           .SetConcreteType(handlerType3)
@@ -329,7 +378,10 @@ public static class MessagingDescriptorFixture
           .SetBus(bus3)
           .SetTopic(topic3)
           .SetMessageType(messageType3)
-          .SetResultType(resultType3));
+          .SetResultType(resultType3)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>()));
       second = builder.Descriptor;
 
       builder = new(MockBehavior.Strict);
@@ -341,14 +393,20 @@ public static class MessagingDescriptorFixture
           .SetTopic(topic1)
           .SetMessageType(messageType1)
           .SetResultType(resultType1)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>())
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType1)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject1))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType3)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject3))
           .AddOutputBindingDescriptor(_ => _
             .SetMetadataType(metadataType2)
+            .SetIsTypeFiltered(false)
             .SetMetadataObject(metadataObject2)))
         .AddHandlerDescriptor(_ => _
           .SetConcreteType(handlerType2)
@@ -356,14 +414,20 @@ public static class MessagingDescriptorFixture
           .SetBus(bus2)
           .SetTopic(topic2)
           .SetMessageType(messageType2)
-          .SetResultType(resultType2))
+          .SetResultType(resultType2)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>()))
         .AddHandlerDescriptor(_ => _
           .SetConcreteType(handlerType3)
           .SetInterfaceType(interfaceType3)
           .SetBus(bus3)
           .SetTopic(topic3)
           .SetMessageType(messageType3)
-          .SetResultType(resultType3));
+          .SetResultType(resultType3)
+          .SetHasResult(true)
+          .SetHasUnionResult(false)
+          .SetResultTypes(Array.Empty<Type>()));
       expected = builder.Descriptor;
 
       yield return new object?[] { first, second, expected };

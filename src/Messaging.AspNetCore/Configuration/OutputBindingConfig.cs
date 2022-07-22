@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.Extensions.Configuration;
+using System.ComponentModel.DataAnnotations;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 
@@ -16,5 +17,5 @@ public class OutputBindingConfig
   /// <summary>
   /// The metadata object.
   /// </summary>
-  public Dictionary<string, object> Metadata { get; set; } = new();
+  public Dictionary<string, IConfigurationSection> Metadata { get; set; } = new();
 }

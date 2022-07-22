@@ -10,34 +10,27 @@ internal record OutputBindingDescriptor(
   Type MetadataType,
   object MetadataObject) : IOutputBindingDescriptor
 {
-  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method, ICollection<HandlerDiagnostics> diagnosticCollection)
+  public bool IsTypeFiltered => typeof(ITypedOutputMetadata).IsAssignableFrom(MetadataType);
+
+  public static IReadOnlyCollection<OutputBindingDescriptor> Create(MethodInfo method)
   {
     object[] returnAttributes = method.ReturnTypeCustomAttributes.GetCustomAttributes(false);
-    Dictionary<Type, OutputBindingDescriptor> descriptors = new(returnAttributes.Length);
+    List<OutputBindingDescriptor> descriptors = new(returnAttributes.Length);
 
     foreach (object returnAttribute in returnAttributes)
     {
       IEnumerable<Type> outputMetadataInterfaceTypes = returnAttribute
         .GetType()
         .GetInterfaces()
-        .Where(type => typeof(IOutputMetadata).IsAssignableFrom(type) && type != typeof(IOutputMetadata));
+        .Where(type => typeof(IOutputMetadata).IsAssignableFrom(type) && type != typeof(IOutputMetadata) && type != typeof(ITypedOutputMetadata));
 
       foreach (Type interfaceType in outputMetadataInterfaceTypes)
       {
         OutputBindingDescriptor descriptor = new OutputBindingDescriptor(interfaceType, returnAttribute);
-        if (descriptors.ContainsKey(descriptor.MetadataType))
-        {
-          diagnosticCollection.Add(DuplicateOutputBinding(method.DeclaringType));
-          continue;
-        }
-
-        descriptors.Add(descriptor.MetadataType, descriptor);
+        descriptors.Add(descriptor);
       }
     }
 
-    return descriptors.Values;
+    return descriptors;
   }
-
-  private static HandlerDiagnostics DuplicateOutputBinding(Type concreteType)
-    => new(concreteType, "Duplicate output binding of the same metadata found on handler {0}.", concreteType);
 }

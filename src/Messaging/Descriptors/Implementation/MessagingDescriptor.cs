@@ -91,7 +91,13 @@ internal record MessagingDescriptor(
           }
         }
 
-        handlerDescriptors.Add(new HandlerDescriptor(handlerDescriptor.Bus, handlerDescriptor.Topic, handlerDescriptor.InterfaceType, handlerDescriptor.ConcreteType, outputBindingDescriptors.Values));
+        handlerDescriptors.Add(new HandlerDescriptor(
+          Bus: handlerDescriptor.Bus,
+          Topic: handlerDescriptor.Topic,
+          MessageType: handlerDescriptor.MessageType,
+          ResultType: handlerDescriptor.ResultType,
+          ConcreteType: handlerDescriptor.ConcreteType,
+          OutputBindingDescriptors: outputBindingDescriptors.Values));
       }
       else
       {

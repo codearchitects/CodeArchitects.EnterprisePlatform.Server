@@ -70,6 +70,30 @@ internal class HandlerDescriptorBuilder : IHandlerDescriptorBuilder
     return this;
   }
 
+  public IHandlerDescriptorBuilder SetHasResult(bool hasResult)
+  {
+    _descriptorMock
+      .Setup(x => x.HasResult)
+      .Returns(hasResult);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder SetHasUnionResult(bool hasUnionResult)
+  {
+    _descriptorMock
+      .Setup(x => x.HasUnionResult)
+      .Returns(hasUnionResult);
+    return this;
+  }
+
+  public IHandlerDescriptorBuilder SetResultTypes(IReadOnlyList<Type> resultTypes)
+  {
+    _descriptorMock
+      .Setup(x => x.ResultTypes)
+      .Returns(resultTypes);
+    return this;
+  }
+
   public IHandlerDescriptorBuilder AddOutputBindingDescriptor(Func<IOutputBindingDescriptorBuilder, IOutputBindingDescriptorBuilder> build)
   {
     OutputBindingDescriptorBuilder builder = new(_behavior);

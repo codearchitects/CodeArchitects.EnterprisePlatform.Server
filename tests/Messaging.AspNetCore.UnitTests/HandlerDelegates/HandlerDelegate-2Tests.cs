@@ -1,21 +1,20 @@
 ﻿using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Fixtures;
-using FluentAssertions;
+using CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 using Microsoft.AspNetCore.Http;
-using Moq;
 using Newtonsoft.Json.Linq;
 
-namespace CodeArchitects.Platform.Messaging.AspNetCore;
+namespace CodeArchitects.Platform.Messaging.AspNetCore.HandlerDelegates;
 
 public class HandlerDelegate2Tests
 {
-  private readonly HandlerDelegate<Message1, Message1Handler> _sut;
+  private readonly HandlerDelegate<Message1Handler, Message1> _sut;
   private readonly Mock<OutputAction> _outputActionMock;
 
   public HandlerDelegate2Tests()
   {
     _outputActionMock = new(MockBehavior.Loose);
-    _sut = new HandlerDelegate<Message1, Message1Handler>(new[] { _outputActionMock.Object });
+    _sut = new HandlerDelegate<Message1Handler, Message1>(new[] { _outputActionMock.Object });
   }
 
   [Fact]

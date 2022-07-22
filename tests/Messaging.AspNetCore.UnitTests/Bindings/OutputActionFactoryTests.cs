@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using Moq;
+﻿using CodeArchitects.Platform.Messaging.AspNetCore.Fixtures;
+using CodeArchitects.Platform.Messaging.Bindings;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 
@@ -16,13 +16,13 @@ public class OutputActionFactoryTests
   public void Create_ShouldCreateOutputActionOfMetadataType_WhenMetadataObjectIsInstanceOfMetadataType()
   {
     // Arrange
-    object @object = new();
+    OutputMetadata @object = new();
 
     // Act
-    OutputAction action = _sut.CreateOutputAction(typeof(object), @object, Mock.Of<IServiceProvider>());
+    OutputAction action = _sut.CreateOutputAction(typeof(OutputMetadata), @object, Mock.Of<IServiceProvider>());
 
     // Assert
-    action.Should().BeOfType<OutputAction<object>>();
+    action.Should().BeOfType<OutputAction<OutputMetadata>>();
   }
 
   [Fact]

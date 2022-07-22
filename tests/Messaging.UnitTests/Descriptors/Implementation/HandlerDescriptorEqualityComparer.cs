@@ -7,7 +7,8 @@ internal class HandlerDescriptorEqualityComparer :
   IEqualityComparer<IHandlerDescriptor>,
   IEqualityComparer<IOutputBindingDescriptor>,
   IEqualityComparer<IMessageDescriptor>,
-  IEqualityComparer<HandlerDiagnostics>
+  IEqualityComparer<HandlerDiagnostics>,
+  IEqualityComparer<Type>
 {
   public static readonly HandlerDescriptorEqualityComparer Instance = new();
 
@@ -44,16 +45,25 @@ internal class HandlerDescriptorEqualityComparer :
     if (x.Topic != y.Topic)
       return false;
 
-    if (x.InterfaceType != y.InterfaceType)
+    if (!Equals(x.InterfaceType, y.InterfaceType))
       return false;
 
-    if (x.ConcreteType != y.ConcreteType)
+    if (!Equals(x.ConcreteType, y.ConcreteType))
       return false;
 
-    if (x.MessageType != y.MessageType)
+    if (!Equals(x.MessageType, y.MessageType))
       return false;
 
-    if (x.ResultType != y.ResultType)
+    if (!Equals(x.ResultType, y.ResultType))
+      return false;
+
+    if (x.HasResult != y.HasResult)
+      return false;
+
+    if (x.HasUnionResult != y.HasUnionResult)
+      return false;
+
+    if (!x.ResultTypes.SequenceEqual(y.ResultTypes))
       return false;
 
     if (!x.OutputBindingDescriptors.SequenceEqual(y.OutputBindingDescriptors, this))
@@ -71,6 +81,9 @@ internal class HandlerDescriptorEqualityComparer :
       return false;
 
     if (x.MetadataType != y.MetadataType)
+      return false;
+
+    if (x.IsTypeFiltered != y.IsTypeFiltered)
       return false;
 
     if (!x.MetadataObject.Equals(y.MetadataObject))
@@ -99,6 +112,28 @@ internal class HandlerDescriptorEqualityComparer :
       return false;
 
     return (x.Name, x.Type) == (y.Name, y.Type);
+  }
+
+  public bool Equals(Type? x, Type? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!x.IsGenericType)
+    {
+      if (y.IsGenericType)
+        return false;
+
+      return x.Equals(y);
+    }
+
+    if (x.GetGenericTypeDefinition() != y.GetGenericTypeDefinition())
+      return false;
+
+    return x.GetGenericArguments().SequenceEqual(y.GetGenericArguments(), this);
   }
 
   public int GetHashCode([DisallowNull] IMessagingDescriptor obj)
@@ -147,5 +182,10 @@ internal class HandlerDescriptorEqualityComparer :
   public int GetHashCode([DisallowNull] IMessageDescriptor obj)
   {
     return HashCode.Combine(obj.Name, obj.Type);
+  }
+
+  public int GetHashCode([DisallowNull] Type obj)
+  {
+    return 0;
   }
 }

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using OneOf;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
@@ -8,22 +9,18 @@ namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 internal record HandlerDescriptor(
   string? Bus,
   string? Topic,
-  Type InterfaceType,
+  Type MessageType,
+  Type ResultType,
   Type ConcreteType,
   IReadOnlyCollection<IOutputBindingDescriptor> OutputBindingDescriptors) : IHandlerDescriptor
 {
-  public Type MessageType => InterfaceType.GetGenericArguments()[0];
+  public Type InterfaceType => HasResult ? typeof(IMessageHandler<,>).MakeGenericType(MessageType, ResultType) : typeof(IMessageHandler<>).MakeGenericType(MessageType);
 
-  public Type ResultType
-  {
-    get
-    {
-      Type[] genericArguments = InterfaceType.GetGenericArguments();
-      return genericArguments.Length == 2
-        ? genericArguments[1]
-        : typeof(void);
-    }
-  }
+  public bool HasResult => ResultType != typeof(void);
+
+  public bool HasUnionResult => typeof(IOneOf).IsAssignableFrom(ResultType);
+
+  public IReadOnlyList<Type> ResultTypes => HasUnionResult ? ResultType.GetGenericArguments() : Array.Empty<Type>();
 
   public static IEnumerable<HandlerDescriptor> Create(Type concreteType, string? defaultBus, string? defaultTopic, ICollection<HandlerDiagnostics> diagnosticCollection)
   {
@@ -54,7 +51,7 @@ internal record HandlerDescriptor(
       if (handlerMethod.IsDefined(typeof(DoesNotHandleAttribute)))
         continue;
 
-      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod, diagnosticCollection);
+      IReadOnlyCollection<IOutputBindingDescriptor> outputBindings = OutputBindingDescriptor.Create(handlerMethod);
 
       IEnumerable<MessageHandlerAttribute> methodAttributes = handlerMethod.GetCustomAttributes<MessageHandlerAttribute>();
       if (!methodAttributes.Any())
@@ -64,10 +61,15 @@ internal record HandlerDescriptor(
 
       foreach (MessageHandlerAttribute methodAttribute in methodAttributes)
       {
+        Type[] interfaceGenericArguments = handlerInterfaceType.GetGenericArguments();
+        Type messageType = interfaceGenericArguments[0];
+        Type resultType = interfaceGenericArguments.Length == 1 ? typeof(void) : interfaceGenericArguments[1];
+
         yield return new HandlerDescriptor(
           Bus: methodAttribute.Bus ?? defaultBus,
           Topic: methodAttribute.Topic ?? defaultTopic,
-          InterfaceType: handlerInterfaceType,
+          MessageType: messageType,
+          ResultType: resultType,
           ConcreteType: concreteType,
           OutputBindingDescriptors: outputBindings);
       }

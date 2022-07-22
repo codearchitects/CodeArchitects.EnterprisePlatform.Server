@@ -11,8 +11,14 @@ internal interface IHandlerDescriptorBuilder
   IHandlerDescriptorBuilder SetConcreteType(Type concreteType);
 
   IHandlerDescriptorBuilder SetMessageType(Type messageType);
-  
+
   IHandlerDescriptorBuilder SetResultType(Type resultType);
+
+  IHandlerDescriptorBuilder SetHasResult(bool hasResult);
+
+  IHandlerDescriptorBuilder SetHasUnionResult(bool hasUnionResult);
+
+  IHandlerDescriptorBuilder SetResultTypes(IReadOnlyList<Type> resultTypes);
 
   IHandlerDescriptorBuilder AddOutputBindingDescriptor(Func<IOutputBindingDescriptorBuilder, IOutputBindingDescriptorBuilder> build);
 }

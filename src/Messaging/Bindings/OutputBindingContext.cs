@@ -9,6 +9,4 @@
 /// <param name="Metadata">The metadata configured for the binding.</param>
 /// <param name="Message">The message handled.</param>
 /// <param name="Result">The result produced by the handling action.</param>
-public record OutputBindingContext<TMetadata, TMessage, TResult>(TMetadata Metadata, TMessage Message, TResult? Result)
-  where TMessage : class
-  where TResult : class;
+public record OutputBindingContext<TMetadata, TMessage, TResult>(TMetadata Metadata, TMessage Message, TResult? Result);

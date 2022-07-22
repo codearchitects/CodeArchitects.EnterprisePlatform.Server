@@ -22,6 +22,14 @@ internal class OutputBindingDescriptorBuilder : IOutputBindingDescriptorBuilder
     return this;
   }
 
+  public IOutputBindingDescriptorBuilder SetIsTypeFiltered(bool isTypeFiltered)
+  {
+    _descriptorMock
+      .Setup(x => x.IsTypeFiltered)
+      .Returns(isTypeFiltered);
+    return this;
+  }
+
   public IOutputBindingDescriptorBuilder SetMetadataObject(object metadataObject)
   {
     _descriptorMock

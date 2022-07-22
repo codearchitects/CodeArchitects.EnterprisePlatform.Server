@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
+using CodeArchitects.Platform.Messaging.Bindings;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
@@ -9,17 +11,25 @@ internal class DaprMessagingOptionsBuilder : IDaprMessagingOptionsBuilder
   private readonly MessagingConfig _config;
   private readonly HashSet<Type> _handlerTypes;
   private readonly HashSet<Type> _messageTypes;
+  private readonly Dictionary<string, Type> _typeAliases;
+  private readonly List<ServiceDescriptor> _bindingServiceDescriptors;
 
   public DaprMessagingOptionsBuilder(MessagingConfig config)
   {
+    _config = config;
     _handlerTypes = new();
     _messageTypes = new();
-    _config = config;
+    _typeAliases = new();
+    _bindingServiceDescriptors = new();
   }
 
   public IEnumerable<Type> HandlerTypes => _handlerTypes;
 
   public IEnumerable<Type> MessageTypes => _messageTypes;
+
+  public IReadOnlyDictionary<string, Type> TypeAliases => _typeAliases;
+
+  public IEnumerable<ServiceDescriptor> BindingServiceDescriptors => _bindingServiceDescriptors;
 
   public IDaprMessagingOptionsBuilder Configure(Action<MessagingConfig> configure)
   {
@@ -74,8 +84,29 @@ internal class DaprMessagingOptionsBuilder : IDaprMessagingOptionsBuilder
     return this;
   }
 
-  public IDaprMessagingOptionsBuilder ScanAssemblyOfType<T>()
+  public IDaprMessagingOptionsBuilder RegisterOutputBinding(Type outputBindingType, ServiceLifetime lifetime = ServiceLifetime.Scoped)
   {
-    return ScanAssembly(typeof(T).Assembly);
+    IEnumerable<Type> interfaceTypes = outputBindingType
+      .GetInterfaces()
+      .Where(type => typeof(IOutputMetadata).IsAssignableFrom(type) && type != typeof(IOutputMetadata) && type != typeof(ITypedOutputMetadata));
+
+    if (!interfaceTypes.Any())
+      throw new ArgumentException($"'{nameof(outputBindingType)}' must implement the '{typeof(IOutputBinding<>)}' interface.");
+
+    foreach (Type interfaceType in interfaceTypes)
+    {
+      _bindingServiceDescriptors.Add(new ServiceDescriptor(interfaceType, outputBindingType, lifetime));
+    }
+
+    return this;
+  }
+
+  public IDaprMessagingOptionsBuilder RegisterOutputMetadataAlias(string alias, Type metadataType)
+  {
+    if (!typeof(IOutputMetadata).IsAssignableFrom(metadataType))
+      throw new ArgumentException($"'{nameof(metadataType)}' should implement the IOutputMetadata interface.", nameof(metadataType));
+
+    _typeAliases.Add("$" + alias, metadataType);
+    return this;
   }
 }

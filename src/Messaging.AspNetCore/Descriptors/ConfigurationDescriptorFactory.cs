@@ -3,7 +3,9 @@ using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.Bindings;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OneOf;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
@@ -12,11 +14,13 @@ internal class ConfigurationDescriptorFactory
 {
   private readonly IDictionaryAdapterFactory _adapterFactory;
   private readonly ILogger _logger;
+  private readonly IReadOnlyDictionary<string, Type> _typeAliases;
 
-  public ConfigurationDescriptorFactory(IDictionaryAdapterFactory adapterFactory, ILogger logger)
+  public ConfigurationDescriptorFactory(IDictionaryAdapterFactory adapterFactory, ILogger logger, IReadOnlyDictionary<string, Type> typeAliases)
   {
     _adapterFactory = adapterFactory;
     _logger = logger;
+    _typeAliases = typeAliases;
   }
 
   public IMessagingDescriptor Create(IReadOnlyDictionary<string, HandlerClassBindingsConfig> bindings, string? defaultBus, string? defaultTopic)
@@ -40,7 +44,7 @@ internal class ConfigurationDescriptorFactory
 
   private IEnumerable<IHandlerDescriptor> ProcessClassBindings(string handlerName, HandlerClassBindingsConfig classBinding, string? defaultBus, string? defaultTopic)
   {
-    Type? handlerType = GetType(handlerName);
+    Type? handlerType = Type.GetType(handlerName);
     if (handlerType is null)
     {
       _logger.LogWarning("Could not find handler type '{className}'.", handlerName);
@@ -64,19 +68,21 @@ internal class ConfigurationDescriptorFactory
 
   private IHandlerDescriptor? ProcessMethodBinding(Type handlerType, HandlerClassBindingsConfig classBinding, HandlerBindingsConfig binding, string? defaultBus, string? defaultTopic)
   {
-    Type? messageType = GetType(binding.MessageName);
+    if (binding.MessageType is null)
+    {
+      _logger.LogWarning("'MessageType' was null.");
+      return null;
+    }
+    Type? messageType = Type.GetType(binding.MessageType);
     if (messageType is null)
     {
-      _logger.LogWarning("Could not find message type '{messageName}'.", binding.MessageName);
+      _logger.LogWarning("Could not find message type '{messageName}'.", binding.MessageType);
       return null;
     }
 
-    Type? resultType = binding.ResultName is null ? typeof(void) : GetType(binding.ResultName);
+    Type? resultType = GetResultType(binding.ResultType, binding.ResultTypes);
     if (resultType is null)
-    {
-      _logger.LogWarning("Could not find result type '{resultName}'.", binding.ResultName);
       return null;
-    }
 
     Type interfaceType = resultType == typeof(void)
       ? typeof(IMessageHandler<>).MakeGenericType(messageType)
@@ -90,38 +96,123 @@ internal class ConfigurationDescriptorFactory
     string? bus = binding.Bus ?? classBinding.Bus ?? defaultBus;
     if (bus is null)
     {
-      _logger.LogWarning("No bus configured for handler {className}, message {messageName} and result {resultName}.", handlerType.FullName, binding.MessageName, binding.ResultName);
+      _logger.LogWarning("No bus configured for handler {className}, message {messageName} and result {resultName}.", handlerType.FullName, binding.MessageType, binding.ResultType);
       return null;
     }
 
     string? topic = binding.Topic ?? classBinding.Topic ?? defaultTopic;
     if (topic is null)
     {
-      _logger.LogWarning("No topic configured for handler {className}, message {messageName} and result {resultName}.", handlerType.FullName, binding.MessageName, binding.ResultName);
+      _logger.LogWarning("No topic configured for handler {className}, message {messageName} and result {resultName}.", handlerType.FullName, binding.MessageType, binding.ResultType);
       return null;
     }
 
     IReadOnlyCollection<IOutputBindingDescriptor> bindingDescriptors = ProcessOutputBindings(binding.Output).ToList();
-    return new HandlerDescriptor(bus, topic, interfaceType, handlerType, bindingDescriptors);
+    return new HandlerDescriptor(bus, topic, messageType, resultType, handlerType, bindingDescriptors);
+
+    Type? GetResultType(string? resultType, IReadOnlyList<string> resultTypes)
+    {
+      if (resultType is not null)
+      {
+        Type? result = Type.GetType(resultType);
+        if (result is null)
+        {
+          _logger.LogWarning("Could not find result type '{resultName}'.", resultType);
+        }
+
+        return result;
+      }
+
+      if (resultTypes.Count == 0)
+        return typeof(void);
+
+      int arity = resultTypes.Count;
+
+      if (arity == 1)
+      {
+        resultType = resultTypes[0];
+        if (resultType is null)
+        {
+          _logger.LogWarning("'ResultTypes' section contained a null element.");
+          return null;
+        }
+
+        Type? result = Type.GetType(resultType);
+        if (result is null)
+        {
+          _logger.LogWarning("Could not find result type '{resultName}'.", resultType);
+        }
+
+        return result;
+      }
+
+      Type oneOfType = arity switch
+      {
+        2 => typeof(OneOf<,>),
+        3 => typeof(OneOf<,,>),
+        4 => typeof(OneOf<,,,>),
+        5 => typeof(OneOf<,,,,>),
+        6 => typeof(OneOf<,,,,,>),
+        7 => typeof(OneOf<,,,,,,>),
+        8 => typeof(OneOf<,,,,,,,>),
+        9 => typeof(OneOf<,,,,,,,,>),
+        _ => throw new NotSupportedException("Can support a maximum of 9 result types in a union type.")
+      };
+
+      Type[] genericArguments = new Type[arity];
+      for (int i = 0; i < arity; i++)
+      {
+        resultType = resultTypes[i];
+        if (resultType is null)
+        {
+          _logger.LogWarning("'ResultTypes' section contained a null element.");
+          return null;
+        }
+
+        Type? typeArgument = Type.GetType(resultType);
+        if (typeArgument is null)
+        {
+          _logger.LogWarning("Could not find result type '{resultName}'.", resultType);
+          return null;
+        }
+
+        genericArguments[i] = typeArgument;
+      }
+
+      return oneOfType.MakeGenericType(genericArguments);
+    }
   }
 
   private IEnumerable<IOutputBindingDescriptor> ProcessOutputBindings(IEnumerable<OutputBindingConfig> outputBindings)
   {
     foreach (OutputBindingConfig outputBinding in outputBindings)
     {
-      Type? metadataType = GetType(outputBinding.Name);
+      string name = outputBinding.Name;
+      if (name is null)
+      {
+        _logger.LogWarning("'Metadata:Name' was null.");
+        continue;
+      }
+
+      Type? metadataType = _typeAliases.GetValueOrDefault(name) ?? Type.GetType(name);
       if (metadataType is null)
       {
-        _logger.LogWarning("Could not find metadata type '{metadataName}'.", outputBinding.Name);
+        _logger.LogWarning("Could not find metadata type '{metadataName}'.", name);
+        continue;
+      }
+      if (!metadataType.IsInterface)
+      {
+        _logger.LogWarning("Type '{metadataName}' is not an interface.", name);
         continue;
       }
       if (!typeof(IOutputMetadata).IsAssignableFrom(metadataType))
       {
-        _logger.LogWarning("Type '{metadataName}' is not a metadata type.", outputBinding.Name);
+        _logger.LogWarning("Type '{metadataName}' is not a metadata type.", name);
         continue;
       }
 
-      object metadataObject = _adapterFactory.GetAdapter(metadataType, outputBinding.Metadata); // TODO: Test what happens when dictionary is invalid
+      BinderDictionary dictionary = CreateBinderDictionary(metadataType, outputBinding.Metadata);
+      object metadataObject = _adapterFactory.GetAdapter(metadataType, dictionary);
 
       yield return new OutputBindingDescriptor(metadataType, metadataObject);
     }
@@ -142,14 +233,23 @@ internal class ConfigurationDescriptorFactory
     return messageDescriptors.Values;
   }
 
-  private static Type? GetType(string fullyQualifiedName)
+  private static BinderDictionary CreateBinderDictionary(Type metadataType, Dictionary<string, IConfigurationSection> metadataDictionary)
   {
-    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-    {
-      if (assembly.GetType(fullyQualifiedName) is Type type)
-        return type;
-    }
+    Dictionary<string, PropertyInfo> properties = new();
+    AddProperties(metadataType);
 
-    return null;
+    return new BinderDictionary(metadataDictionary, properties);
+
+    void AddProperties(Type type)
+    {
+      foreach (PropertyInfo property in type.GetProperties())
+      {
+        properties.Add(property.Name, property);
+      }
+      foreach (Type interfaceType in type.GetInterfaces())
+      {
+        AddProperties(interfaceType);
+      }
+    }
   }
 }

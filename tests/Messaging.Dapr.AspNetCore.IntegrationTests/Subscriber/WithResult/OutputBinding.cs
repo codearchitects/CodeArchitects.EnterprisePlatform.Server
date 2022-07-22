@@ -5,17 +5,21 @@ namespace Subscriber.WithResult;
 public interface ITestOutputMetadata : IOutputMetadata
 {
   string Data { get; }
+  Type? Type { get; }
 }
 
 [AttributeUsage(AttributeTargets.ReturnValue)]
 public class TestOutputBindingAttribute : Attribute, ITestOutputMetadata
 {
-  public TestOutputBindingAttribute(string data)
+  public TestOutputBindingAttribute(string data, Type? type)
   {
     Data = data;
+    Type = type;
   }
 
   public string Data { get; }
+
+  public Type? Type { get; }
 }
 
 public class TestOutputBinding : IOutputBinding<ITestOutputMetadata>
@@ -28,8 +32,6 @@ public class TestOutputBinding : IOutputBinding<ITestOutputMetadata>
   }
 
   public Task ExecuteAsync<TMessage, TResult>(OutputBindingContext<ITestOutputMetadata, TMessage, TResult> context, CancellationToken cancellationToken)
-    where TMessage : class
-    where TResult : class
   {
     Result result = (Result)(object)context.Result!;
     _awaiter.Complete(result.Id);

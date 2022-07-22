@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace CodeArchitects.Platform.Messaging.Descriptors;
+﻿namespace CodeArchitects.Platform.Messaging.Descriptors;
 
 /// <summary>
 /// Represents an anomaly in the message handler configuration.

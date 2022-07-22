@@ -25,7 +25,6 @@ internal class MessageBus : IMessageBus
   }
 
   public Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default)
-    where TMessage : class
   {
     if (message is null)
       throw new ArgumentNullException(nameof(message));
@@ -34,7 +33,6 @@ internal class MessageBus : IMessageBus
   }
 
   public Task SendAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default)
-    where TMessage : class
   {
     if (topic is null)
       throw new ArgumentNullException(nameof(topic));
@@ -45,7 +43,6 @@ internal class MessageBus : IMessageBus
   }
 
   private Task SendCoreAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default)
-    where TMessage : class
   {
     CloudEvent<TMessage> @event = new CloudEvent<TMessage>(message)
     {

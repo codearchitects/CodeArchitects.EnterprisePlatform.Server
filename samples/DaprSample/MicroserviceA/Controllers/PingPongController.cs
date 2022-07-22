@@ -32,11 +32,4 @@ public class PingPongController : ControllerBase
     PingMessage? message = await _store.GetAsync<PingMessage>("ping");
     return message is null ? NotFound() : Ok(message);
   }
-
-  [HttpGet("pong")]
-  public async Task<IActionResult> Pong()
-  {
-    PongMessage? message = await _store.GetAsync<PongMessage>("pong");
-    return message is null ? NotFound() : Ok(message);
-  }
 }

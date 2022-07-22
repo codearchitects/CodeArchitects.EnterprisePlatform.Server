@@ -10,24 +10,31 @@ namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 /// </summary>
 /// <typeparam name="TMetadata">The type of the metadata.</typeparam>
 internal class OutputAction<TMetadata> : OutputAction
+  where TMetadata : IOutputMetadata
 {
+  protected readonly TMetadata _metadata;
   private readonly IServiceProvider _services;
-  private readonly TMetadata _metadata;
 
   /// <summary>
   /// Creates a new <see cref="OutputAction{TMetadata}"/>.
   /// </summary>
-  /// <param name="services">The service provider.</param>
   /// <param name="metadata">The metadata instance.</param>
-  public OutputAction(IServiceProvider services, TMetadata metadata)
+  /// <param name="services">The service provider.</param>
+  public OutputAction(TMetadata metadata, IServiceProvider services)
   {
-    _services = services;
     _metadata = metadata;
+    _services = services;
   }
 
-  public override Task ExecuteAsync<TMessage, TResult>(TMessage message, TResult? result, CancellationToken cancellationToken)
-    where TMessage : class
-    where TResult : class
+  public override bool IsTypeFiltered => false;
+
+  public override bool CanExecute(Type resultType)
+  {
+    return true;
+  }
+
+  public sealed override Task ExecuteAsync<TMessage, TResult>(TMessage message, TResult? result, CancellationToken cancellationToken)
+    where TResult : default
   {
     IOutputBinding<TMetadata>? binding = _services.GetService<IOutputBinding<TMetadata>>();
     if (binding is null)

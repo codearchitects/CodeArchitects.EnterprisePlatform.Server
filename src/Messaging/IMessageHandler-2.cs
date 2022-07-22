@@ -6,8 +6,6 @@
 /// <typeparam name="TMessage">The type of the handled message.</typeparam>
 /// <typeparam name="TResult">The type of the result.</typeparam>
 public interface IMessageHandler<TMessage, TResult>
-  where TMessage : class
-  where TResult : class
 {
   /// <summary>
   /// Action that is execuded in response to a message of type <typeparamref name="TMessage"/>.

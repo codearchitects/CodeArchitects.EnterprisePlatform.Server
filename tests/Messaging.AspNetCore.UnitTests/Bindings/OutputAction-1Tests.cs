@@ -1,21 +1,20 @@
-﻿using CodeArchitects.Platform.Messaging.Bindings;
-using FluentAssertions;
+﻿using CodeArchitects.Platform.Messaging.AspNetCore.Fixtures;
+using CodeArchitects.Platform.Messaging.Bindings;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 
 public class OutputAction1Tests
 {
   private readonly Mock<IServiceProvider> _servicesMock;
-  private readonly object _metadata;
-  private readonly OutputAction<object> _sut;
+  private readonly OutputMetadata _metadata;
+  private readonly OutputAction<OutputMetadata> _sut;
 
   public OutputAction1Tests()
   {
     _servicesMock = new(MockBehavior.Strict);
-    _metadata = new object();
-    _sut = new OutputAction<object>(_servicesMock.Object, _metadata);
+    _metadata = new OutputMetadata();
+    _sut = new OutputAction<OutputMetadata>(_metadata, _servicesMock.Object);
   }
 
   [Fact]
@@ -23,7 +22,7 @@ public class OutputAction1Tests
   {
     // Arrange
     _servicesMock
-      .Setup(x => x.GetService(typeof(IOutputBinding<object>)))
+      .Setup(x => x.GetService(typeof(IOutputBinding<OutputMetadata>)))
       .Returns(null);
     _servicesMock
       .Setup(x => x.GetService(typeof(ILoggerFactory)))
@@ -43,7 +42,7 @@ public class OutputAction1Tests
     Mock<ILogger> loggerMock = new(MockBehavior.Loose);
 
     _servicesMock
-      .Setup(x => x.GetService(typeof(IOutputBinding<object>)))
+      .Setup(x => x.GetService(typeof(IOutputBinding<OutputMetadata>)))
       .Returns(null);
     _servicesMock
       .Setup(x => x.GetService(typeof(ILoggerFactory)))
@@ -66,13 +65,13 @@ public class OutputAction1Tests
     object? result = new object();
     CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
-    Mock<IOutputBinding<object>> bindingMock = new(MockBehavior.Strict);
+    Mock<IOutputBinding<OutputMetadata>> bindingMock = new(MockBehavior.Strict);
     bindingMock
-      .Setup(x => x.ExecuteAsync(It.IsAny<OutputBindingContext<object, object, object>>(), It.IsAny<CancellationToken>()))
+      .Setup(x => x.ExecuteAsync(It.IsAny<OutputBindingContext<OutputMetadata, object, object>>(), It.IsAny<CancellationToken>()))
       .Returns(expected);
 
     _servicesMock
-      .Setup(x => x.GetService(typeof(IOutputBinding<object>)))
+      .Setup(x => x.GetService(typeof(IOutputBinding<OutputMetadata>)))
       .Returns(bindingMock.Object);
 
     // Act
@@ -80,6 +79,6 @@ public class OutputAction1Tests
 
     // Assert
     task.Should().BeSameAs(expected);
-    bindingMock.Verify(x => x.ExecuteAsync(It.Is<OutputBindingContext<object, object, object>>(ctx => ctx.Message == message && ctx.Result == result && ctx.Metadata == _metadata), cancellationToken));
+    bindingMock.Verify(x => x.ExecuteAsync(It.Is<OutputBindingContext<OutputMetadata, object, object>>(ctx => ctx.Message == message && ctx.Result == result && ctx.Metadata == _metadata), cancellationToken));
   }
 }

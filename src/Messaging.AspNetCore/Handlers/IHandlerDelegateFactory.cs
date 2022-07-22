@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Messaging.Descriptors;
 
-namespace CodeArchitects.Platform.Messaging.AspNetCore;
+namespace CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 
 /// <summary>
 /// Creates handler delegates for handler identities.

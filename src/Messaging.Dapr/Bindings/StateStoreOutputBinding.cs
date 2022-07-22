@@ -13,8 +13,6 @@ internal class StateStoreOutputBinding : IOutputBinding<IStateStoreOutputMetadat
   }
 
   public Task ExecuteAsync<TMessage, TResult>(OutputBindingContext<IStateStoreOutputMetadata, TMessage, TResult> context, CancellationToken cancellationToken)
-    where TMessage : class
-    where TResult : class
   {
     if (context.Result is not { } result)
       return Task.CompletedTask;

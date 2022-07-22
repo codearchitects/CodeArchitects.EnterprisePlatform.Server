@@ -5,6 +5,7 @@
 /// </summary>
 /// <typeparam name="TMetadata">The type of the metadata that are relative to the binding.</typeparam>
 public interface IOutputBinding<TMetadata>
+  where TMetadata : IOutputMetadata
 {
   /// <summary>
   /// Action that executes after a message handling action.
@@ -14,7 +15,5 @@ public interface IOutputBinding<TMetadata>
   /// <param name="context">An object containing data relative to this action.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
   /// <returns></returns>
-  Task ExecuteAsync<TMessage, TResult>(OutputBindingContext<TMetadata, TMessage, TResult> context, CancellationToken cancellationToken)
-    where TMessage : class
-    where TResult : class;
+  Task ExecuteAsync<TMessage, TResult>(OutputBindingContext<TMetadata, TMessage, TResult> context, CancellationToken cancellationToken);
 }

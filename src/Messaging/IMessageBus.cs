@@ -12,7 +12,7 @@ public interface IMessageBus
   /// <param name="message">The message instance.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
   /// <returns>A task that completes when the message is published.</returns>
-  Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) where TMessage : class;
+  Task SendAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default);
 
   /// <summary>
   /// Publishes the message to the a topic of the bus.
@@ -22,5 +22,5 @@ public interface IMessageBus
   /// <param name="message">The message instance.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
   /// <returns>A task that completes when the message is published.</returns>
-  Task SendAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default) where TMessage : class;
+  Task SendAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default);
 }

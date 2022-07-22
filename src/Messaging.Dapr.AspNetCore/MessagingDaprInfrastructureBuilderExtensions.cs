@@ -6,6 +6,7 @@ using CodeArchitects.Platform.Messaging.AspNetCore;
 using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.AspNetCore.Descriptors;
+using CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 using CodeArchitects.Platform.Messaging.Bindings;
 using CodeArchitects.Platform.Messaging.Dapr;
@@ -37,7 +38,6 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   /// </remarks>
   /// <param name="builder">The Dapr infrastructure builder.</param>
   /// <returns></returns>
-  /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is null.</exception>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder)
   {
     if (builder is null)
@@ -57,7 +57,6 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   /// <param name="builder">The Dapr infrastructure builder.</param>
   /// <param name="configure">An action that can be used to configure the messaging options.</param>
   /// <returns>The builder.</returns>
-  /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> or <paramref name="configure"/> is null.</exception>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
     if (builder is null)
@@ -70,16 +69,19 @@ public static class MessagingDaprInfrastructureBuilderExtensions
 
   private static IDaprInfrastructureBuilder AddMessagingCore(IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
-    MessagingConfig config = CreateConfig(builder, out bool isConfigValid);
+    MessagingConfig config = new();
+    builder.Configuration.Bind(s_messagingKey, config);
+    builder.DaprServices.AddService(config);
 
     DaprMessagingOptionsBuilder optionsBuilder = new(config);
+    RegisterDefaultAliases(optionsBuilder);
     configure(optionsBuilder);
 
     MessageBiMap messageMap = new();
     MessagingInfo info = MessagingInfo.Create(messageMap, builder.ComponentAccessor, config.DefaultBus);
     string? defaultBus = info.GetDefaultBus();
 
-    IMessagingDescriptor descriptor = CreateDescriptor(builder, optionsBuilder, config, isConfigValid, defaultBus);
+    IMessagingDescriptor descriptor = CreateDescriptor(builder, optionsBuilder, config, defaultBus);
     builder.DaprServices.AddService(descriptor);
 
     foreach (IMessageDescriptor messageDescriptor in descriptor.MessageDescriptors)
@@ -94,6 +96,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     AddTopicRouterFactory(builder, messageMap);
 
     AddDefaultOutputBindings(builder.Services, info);
+
+    AddCustomOutputBindings(builder.Services, optionsBuilder);
 
     builder.Services.AddSingleton<MessagingMarkerService>();
 
@@ -111,37 +115,23 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     services.AddSingleton<IOutputBinding<IStateStoreOutputMetadata>, StateStoreOutputBinding>();
   }
 
-  private static MessagingConfig CreateConfig(IDaprInfrastructureBuilder builder, out bool isConfigValid)
+  private static void AddCustomOutputBindings(IServiceCollection services, DaprMessagingOptionsBuilder optionsBuilder)
   {
-    MessagingConfig config = new();
-    builder.Configuration.Bind(s_messagingKey, config);
-    builder.DaprServices.AddService(config);
-
-    ValidationContext validationContext = new(config);
-    List<ValidationResult> validationResults = new();
-    isConfigValid = Validator.TryValidateObject(config, validationContext, validationResults);
-    if (!isConfigValid)
+    foreach (ServiceDescriptor serviceDescriptor in optionsBuilder.BindingServiceDescriptors)
     {
-      foreach (ValidationResult validationResult in validationResults)
-      {
-        builder.Logger.LogWarning(validationResult.ErrorMessage);
-      }
+      services.Add(serviceDescriptor);
     }
-
-    return config;
   }
 
-  private static IMessagingDescriptor CreateDescriptor(IDaprInfrastructureBuilder builder, DaprMessagingOptionsBuilder optionsBuilder, MessagingConfig config, bool isConfigValid, string? defaultBus)
+  private static IMessagingDescriptor CreateDescriptor(IDaprInfrastructureBuilder builder, DaprMessagingOptionsBuilder optionsBuilder, MessagingConfig config, string? defaultBus)
   {
     List<HandlerDiagnostics> diagnosticCollection = new();
-    ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), builder.Logger);
+    ConfigurationDescriptorFactory configurationDescriptorFactory = new(new DictionaryAdapterFactory(), builder.Logger, optionsBuilder.TypeAliases);
     IMessagingDescriptor descriptorFromReflection = MessagingDescriptor.Create(optionsBuilder.HandlerTypes, optionsBuilder.MessageTypes, defaultBus, MessageBus.DefaultTopic, diagnosticCollection);
-    IMessagingDescriptor descriptor = isConfigValid
-      ? MessagingDescriptor.Merge(
-          first: descriptorFromReflection,
-          second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
-          diagnosticCollection: diagnosticCollection)
-      : descriptorFromReflection;
+    IMessagingDescriptor descriptor = MessagingDescriptor.Merge(
+      first: descriptorFromReflection,
+      second: configurationDescriptorFactory.Create(config.Handlers, defaultBus, MessageBus.DefaultTopic),
+      diagnosticCollection: diagnosticCollection);
 
     foreach (HandlerDiagnostics diagnostics in diagnosticCollection)
     {
@@ -185,6 +175,12 @@ public static class MessagingDaprInfrastructureBuilderExtensions
       HandlerDelegateFactory delegateFactory = new HandlerDelegateFactory(services, outputActionFactory);
       return new TopicRouterFactory(delegateFactory, messageMap);
     });
+  }
+
+  private static void RegisterDefaultAliases(IDaprMessagingOptionsBuilder optionsBuilder)
+  {
+    optionsBuilder.RegisterOutputMetadataAlias("MessageBus", typeof(IMessageBusOutputMetadata));
+    optionsBuilder.RegisterOutputMetadataAlias("StateStore", typeof(IStateStoreOutputMetadata));
   }
 
   #region Deprecated methods

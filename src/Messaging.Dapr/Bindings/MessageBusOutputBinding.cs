@@ -16,8 +16,6 @@ internal class MessageBusOutputBinding : IOutputBinding<IMessageBusOutputMetadat
   }
 
   public Task ExecuteAsync<TMessage, TResult>(OutputBindingContext<IMessageBusOutputMetadata, TMessage, TResult> context, CancellationToken cancellationToken)
-    where TMessage : class
-    where TResult : class
   {
     if (context.Result is not { } result)
       return Task.CompletedTask;
@@ -26,6 +24,6 @@ internal class MessageBusOutputBinding : IOutputBinding<IMessageBusOutputMetadat
     {
       Type = _info.GetMessageName(typeof(TResult))
     };
-    return _dapr.PublishEventAsync(context.Metadata.BusName, context.Metadata.Topic ?? MessageBus.DefaultTopic, @event, cancellationToken);
+    return _dapr.PublishEventAsync(context.Metadata.Bus, context.Metadata.Topic ?? MessageBus.DefaultTopic, @event, cancellationToken);
   }
 }

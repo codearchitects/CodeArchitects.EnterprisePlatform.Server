@@ -21,12 +21,17 @@ public class HandlerBindingsConfig
   /// The fully qualified name of the message type.
   /// </summary>
   [Required]
-  public string MessageName { get; set; } = default!;
+  public string MessageType { get; set; } = default!;
 
   /// <summary>
   /// The fully qualified name of the result type.
   /// </summary>
-  public string? ResultName { get; set; }
+  public string? ResultType { get; set; }
+
+  /// <summary>
+  /// The fully qualified names of the result types, if a union type is used.
+  /// </summary>
+  public List<string> ResultTypes { get; set; } = new();
 
   /// <summary>
   /// The list of the output actions the handler will be bound to.

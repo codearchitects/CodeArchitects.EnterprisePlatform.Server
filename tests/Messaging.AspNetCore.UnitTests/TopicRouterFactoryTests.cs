@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Messaging.AspNetCore.Fixtures;
+using CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using FluentAssertions;

@@ -1,7 +1,8 @@
 ﻿using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
+using CodeArchitects.Platform.Messaging.Bindings;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// A fluent builder that can be used to configure messaging options.
@@ -37,9 +38,18 @@ public interface IDaprMessagingOptionsBuilder
   IDaprMessagingOptionsBuilder ScanAssembly(Assembly assembly);
 
   /// <summary>
-  /// Scans the assembly of the given type for registering messages and message handlers.
+  /// Registers an output binding to the application services with the given lifetime.
   /// </summary>
-  /// <typeparam name="T">A marker type of the assembly.</typeparam>
+  /// <param name="outputBindingType">The output binding type. It must implement <see cref="IOutputBinding{TMetadata}"/>.</param>
+  /// <param name="lifetime">The service lifetime.</param>
   /// <returns>The builder.</returns>
-  IDaprMessagingOptionsBuilder ScanAssemblyOfType<T>();
+  IDaprMessagingOptionsBuilder RegisterOutputBinding(Type outputBindingType, ServiceLifetime lifetime = ServiceLifetime.Scoped);
+
+  /// <summary>
+  /// Registers an alias for an output metadata type that can be used instead of its fully-qualified name in configuration, prefixing it with '$'.
+  /// </summary>
+  /// <param name="alias">The alias.</param>
+  /// <param name="metadataType">The metadata type.</param>
+  /// <returns>The builder.</returns>
+  IDaprMessagingOptionsBuilder RegisterOutputMetadataAlias(string alias, Type metadataType);
 }
