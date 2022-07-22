@@ -6,8 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</RootNamespace>
-    <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
+    
   </PropertyGroup>
 
   <ItemGroup>
