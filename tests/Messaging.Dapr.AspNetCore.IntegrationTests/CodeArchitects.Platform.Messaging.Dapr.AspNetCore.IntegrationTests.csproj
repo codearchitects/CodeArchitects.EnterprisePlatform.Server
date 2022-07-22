@@ -1,20 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
 
     <IsPackable>false</IsPackable>
-
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName.Replace(".UnitTests", ""))))</RootNamespace>
+    
+    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName.Replace(".IntegrationTests", ""))))</RootNamespace>
     <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Publisher\**" />
+    <Compile Remove="Subscriber\**" />
+    <EmbeddedResource Remove="Publisher\**" />
+    <EmbeddedResource Remove="Subscriber\**" />
+    <None Remove="Publisher\**" />
+    <None Remove="Subscriber\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Moq" Version="4.18.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Messaging.Dapr.AspNetCore\Messaging.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

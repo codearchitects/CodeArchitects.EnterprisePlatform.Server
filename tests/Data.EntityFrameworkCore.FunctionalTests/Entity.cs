@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
 public class Entity : IEntity<Guid>
 {

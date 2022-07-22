@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMOwned;
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.OTMOwned;
 
 public class Primary : Entity
 {

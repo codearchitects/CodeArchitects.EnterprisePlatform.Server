@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using System.Net;
+﻿using System.Net;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests;
 

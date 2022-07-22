@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace CodeArchitects.Platform.Application.SignalR;
+﻿namespace CodeArchitects.Platform.Application.SignalR;
 
 public class HubEndpointAttributeTests
 {

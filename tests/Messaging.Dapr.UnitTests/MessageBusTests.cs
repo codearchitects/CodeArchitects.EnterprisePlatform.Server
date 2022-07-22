@@ -1,8 +1,6 @@
 ﻿using CodeArchitects.Platform.Messaging.Dapr.Fixtures;
 using Dapr;
 using Dapr.Client;
-using FluentAssertions;
-using Moq;
 
 namespace CodeArchitects.Platform.Messaging.Dapr;
 

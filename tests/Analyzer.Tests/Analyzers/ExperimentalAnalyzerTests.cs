@@ -1,12 +1,8 @@
 ﻿using CodeArchitects.Platform.Analyzer.Analyzers;
 using CodeArchitects.Platform.CodeAnalysis;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Analyzer.Tests.Analyzers;
 

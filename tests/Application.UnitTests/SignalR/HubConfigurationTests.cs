@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Application.SignalR.Fakes;
-using FluentAssertions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Application.SignalR;

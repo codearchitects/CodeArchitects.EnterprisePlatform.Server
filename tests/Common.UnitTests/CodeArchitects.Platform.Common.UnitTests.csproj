@@ -1,14 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
 
     <IsPackable>false</IsPackable>
 
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName.Replace(".UnitTests", ""))))</RootNamespace>
-    <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
+    <RootNamespace>$(MSBuildProjectName.Replace(".UnitTests", ""))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Infrastructure.Dapr\Infrastructure.Dapr.csproj" />
+    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj" />
   </ItemGroup>
 
 </Project>

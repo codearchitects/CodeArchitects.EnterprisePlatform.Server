@@ -1,9 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Utils;
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;

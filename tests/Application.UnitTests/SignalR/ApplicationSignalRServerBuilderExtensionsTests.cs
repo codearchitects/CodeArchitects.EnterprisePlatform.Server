@@ -1,9 +1,6 @@
 ﻿using CodeArchitects.Platform.Application.SignalR.Fakes;
-using FluentAssertions;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using System.Collections.Generic;
 
 namespace CodeArchitects.Platform.Application.SignalR;
 

@@ -5,12 +5,14 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</RootNamespace>
-    <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.14" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\CodeArchitects.Platform.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,10 +1,8 @@
 ﻿using CodeArchitects.Platform.Application.Identity;
 using CodeArchitects.Platform.Common.Identity;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
-using Xunit;
 
 namespace CodeArchitects.Platform.Application.DependencyInjection;
 

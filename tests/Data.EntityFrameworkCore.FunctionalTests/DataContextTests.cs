@@ -1,11 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Identity;
-using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 

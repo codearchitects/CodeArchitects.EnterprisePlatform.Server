@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 using Microsoft.Extensions.FileProviders;
-using Moq;
 using System.Reflection;
 using System.Text;
 using Xunit.Sdk;

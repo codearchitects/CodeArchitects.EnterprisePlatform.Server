@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Messaging.AspNetCore.Fixtures;
-using CodeArchitects.Platform.Messaging.Bindings;
 
 namespace CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 

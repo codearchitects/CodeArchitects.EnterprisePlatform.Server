@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-using System;
-using static CodeArchitects.Platform.Application.Remoting.QueryHelpersFixtures;
+﻿using static CodeArchitects.Platform.Application.Remoting.QueryHelpersFixtures;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 

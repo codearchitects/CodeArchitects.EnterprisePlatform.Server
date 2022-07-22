@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
 
 public class Primary : Entity
 {

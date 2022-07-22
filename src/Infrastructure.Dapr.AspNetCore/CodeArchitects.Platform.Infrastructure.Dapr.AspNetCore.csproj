@@ -5,8 +5,6 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</RootNamespace>
-    <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dapr.AspNetCore\Dapr.AspNetCore.csproj" />
-    <ProjectReference Include="..\Infrastructure.Dapr\Infrastructure.Dapr.csproj" />
+    <ProjectReference Include="..\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
+﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Model.MTMIndirect;
 
 public class PrimarySecondary
 {

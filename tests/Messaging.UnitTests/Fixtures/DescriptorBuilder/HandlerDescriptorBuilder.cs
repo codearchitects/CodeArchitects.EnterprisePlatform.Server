@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Messaging.Descriptors;
-using Moq;
 
 namespace CodeArchitects.Platform.Messaging.Fixtures.DescriptorBuilder;
 

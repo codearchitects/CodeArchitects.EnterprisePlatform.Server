@@ -5,8 +5,6 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</RootNamespace>
-    <AssemblyName>$([System.String]::Concat("CodeArchitects.Platform.", $(MSBuildProjectName)))</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
+    <ProjectReference Include="..\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

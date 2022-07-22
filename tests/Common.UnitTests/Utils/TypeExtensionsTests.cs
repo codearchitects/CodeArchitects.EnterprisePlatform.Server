@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-
-namespace CodeArchitects.Platform.Common.Utils;
+﻿namespace CodeArchitects.Platform.Common.Utils;
 
 public class TypeExtensionsTests
 {

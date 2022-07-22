@@ -2,79 +2,79 @@ version: 1
 
 components:
   # packages
-  - name: Analyzer
+  - name: CodeArchitects.Platform.CodeArchitects.Platform.Analyzer
     path: src\Analyzer
     type: dotnet-package
-  - name: Application
+  - name: CodeArchitects.Platform.CodeArchitects.Platform.Application
     path: src\Application
     type: dotnet-package
-  - name: CodeAnalysis
+  - name: CodeArchitects.Platform.CodeAnalysis
     path: src\CodeAnalysis
     type: dotnet-package
-  - name: Common
+  - name: CodeArchitects.Platform.Common
     path: src\Common
     type: dotnet-package
-  - name: Dapr.AspNetCore
+  - name: CodeArchitects.Platform.Dapr.AspNetCore
     path: src\Dapr.AspNetCore
     type: dotnet-package
-  - name: Data
+  - name: CodeArchitects.Platform.Data
     path: src\Data
     type: dotnet-package
-  - name: Data.EntityFrameworkCore
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore
     path: src\Data.EntityFrameworkCore
     type: dotnet-package
-  - name: Infrastructure
+  - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
     type: dotnet-package
-  - name: Infrastructure.Dapr
+  - name: CodeArchitects.Platform.Infrastructure.Dapr
     path: src\Infrastructure.Dapr
     type: dotnet-package
-  - name: Infrastructure.Dapr.AspNetCore
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore
     path: src\Infrastructure.Dapr.AspNetCore
     type: dotnet-package
-  - name: Messaging
+  - name: CodeArchitects.Platform.Messaging
     path: src\Messaging
     type: dotnet-package
-  - name: Messaging.AspNetCore
+  - name: CodeArchitects.Platform.Messaging.AspNetCore
     path: src\Messaging.AspNetCore
     type: dotnet-package
-  - name: Messaging.Dapr
+  - name: CodeArchitects.Platform.Messaging.Dapr
     path: src\Messaging.Dapr
     type: dotnet-package
-  - name: Messaging.Dapr.AspNetCore
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore
     path: src\Messaging.Dapr.AspNetCore
     type: dotnet-package
 
   # tests
-  - name: Analyzer.Tests
+  - name: CodeArchitects.Platform.Analyzer.Tests
     path: tests\Analyzer.Tests
     type: dotnet-test
-  - name: Application.UnitTests
+  - name: CodeArchitects.Platform.Application.UnitTests
     path: tests\Application.UnitTests
     type: dotnet-test
-  - name: Common.UnitTests
+  - name: CodeArchitects.Platform.Common.UnitTests
     path: tests\Common.UnitTests
     type: dotnet-test
-  - name: Dapr.AspNetCore.UnitTests
+  - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
     path: tests\Dapr.AspNetCore.UnitTests
     type: dotnet-test
-  - name: Infrastructure.Dapr.AspNetCore.UnitTests
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
     path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
     type: dotnet-test
-  - name: Infrastructure.Dapr.UnitTests
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.UnitTests
     path: tests\Infrastructure.Dapr.UnitTests
     type: dotnet-test
-  - name: Messaging.AspNetCore.UnitTests
+  - name: CodeArchitects.Platform.Messaging.AspNetCore.UnitTests
     path: tests\Messaging.AspNetCore.UnitTests
     type: dotnet-test
-  - name: Messaging.Dapr.AspNetCore.UnitTests
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.UnitTests
     path: tests\Messaging.Dapr.AspNetCore.UnitTests
     type: dotnet-test
-  - name: Messaging.Dapr.UnitTests
+  - name: CodeArchitects.Platform.Messaging.Dapr.UnitTests
     path: tests\Messaging.Dapr.UnitTests
     type: dotnet-test
-  - name: Messaging.UnitTests
+  - name: CodeArchitects.Platform.Messaging.UnitTests
     path: tests\Messaging.UnitTests
     type: dotnet-test
-  # TODO: Add tests for Data.EntityFrameworkCore when they all pass (hopefully)
-  # TODO: Add Messaging.Dapr.AspNetCore.IntegrationTests
+  # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)
+  # TODO: Add CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests

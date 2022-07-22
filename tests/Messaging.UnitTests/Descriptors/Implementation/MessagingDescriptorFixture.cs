@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Messaging.Fixtures;
 using CodeArchitects.Platform.Messaging.Fixtures.DescriptorBuilder;
-using Moq;
 using System.Reflection;
 using Xunit.Sdk;
 

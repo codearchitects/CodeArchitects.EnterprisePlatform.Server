@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
-using System.Threading.Tasks;
 
 namespace CodeArchitects.Platform.Analyzer.Tests;
 

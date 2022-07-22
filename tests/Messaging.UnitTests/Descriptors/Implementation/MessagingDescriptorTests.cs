@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using static CodeArchitects.Platform.Messaging.Descriptors.Implementation.MessagingDescriptorFixture;
+﻿using static CodeArchitects.Platform.Messaging.Descriptors.Implementation.MessagingDescriptorFixture;
 
 namespace CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 
