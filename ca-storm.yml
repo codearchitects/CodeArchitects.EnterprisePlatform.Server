@@ -2,10 +2,10 @@ version: 1
 
 components:
   # packages
-  - name: CodeArchitects.Platform.CodeArchitects.Platform.Analyzer
+  - name: CodeArchitects.Platform.Analyzer
     path: src\Analyzer
     type: dotnet-package
-  - name: CodeArchitects.Platform.CodeArchitects.Platform.Application
+  - name: CodeArchitects.Platform.Application
     path: src\Application
     type: dotnet-package
   - name: CodeArchitects.Platform.CodeAnalysis
