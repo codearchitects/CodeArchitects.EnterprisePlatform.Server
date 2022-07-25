@@ -17,7 +17,6 @@ using CodeArchitects.Platform.Messaging.Descriptors.Implementation;
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -109,7 +108,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
     services.AddSingleton<IOutputBinding<IMessageBusOutputMetadata>>(delegate (IServiceProvider services)
     {
       DaprClient dapr = services.GetRequiredService<DaprClient>();
-      return new MessageBusOutputBinding(dapr, info);
+      ILogger logger = services.CreateMessagingLogger();
+      return new MessageBusOutputBinding(dapr, info, logger);
     });
 
     services.AddSingleton<IOutputBinding<IStateStoreOutputMetadata>, StateStoreOutputBinding>();

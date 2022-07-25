@@ -3,31 +3,19 @@
 [AttributeUsage(AttributeTargets.ReturnValue, AllowMultiple = true)]
 public class MessageBusAttribute : Attribute, IMessageBusOutputMetadata
 {
-  public MessageBusAttribute(string bus)
+  public MessageBusAttribute(params Type[] resultTypes)
   {
-    Bus = bus;
-  }
-
-  public MessageBusAttribute(string bus, string? topic)
-  {
-    Bus = bus;
-    Topic = topic;
-  }
-
-  public MessageBusAttribute(string bus, params Type[] resultTypes)
-  {
-    Bus = bus;
     AllowedTypes = resultTypes;
   }
 
-  public MessageBusAttribute(string bus, string? topic, params Type[] resultTypes)
+  public MessageBusAttribute(string bus, string topic, params Type[] resultTypes)
   {
     Bus = bus;
     Topic = topic;
     AllowedTypes = resultTypes;
   }
 
-  public string Bus { get; }
+  public string? Bus { get; init; }
 
   public string? Topic { get; init; }
 
