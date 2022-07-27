@@ -13,7 +13,7 @@ public class PingPongHandler : IMessageHandler<PingMessage, OneOf<PongMessage, P
     await Task.Delay(1000, cancellationToken);
 
     if (Random.Shared.Next(10) == 2)
-      return new PointMessage(message.Id, message.Counter + 1, "MicroserviceA");
+      return new PointMessage(message.Id, message.Counter + 1, "MicroserviceB");
 
     return new PongMessage(message.Id, message.Counter + 1);
   }

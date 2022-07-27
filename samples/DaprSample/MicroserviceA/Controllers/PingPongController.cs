@@ -26,10 +26,10 @@ public class PingPongController : ControllerBase
     return Ok();
   }
 
-  [HttpGet("ping")]
-  public async Task<IActionResult> Ping()
+  [HttpGet("point")]
+  public async Task<IActionResult> Point()
   {
-    PingMessage? message = await _store.GetAsync<PingMessage>("ping");
+    PointMessage? message = await _store.GetAsync<PointMessage>("point");
     return message is null ? NotFound() : Ok(message);
   }
 }

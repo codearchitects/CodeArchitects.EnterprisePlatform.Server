@@ -5,12 +5,11 @@ using OneOf;
 
 namespace MicroserviceA.Infrastructure.Handlers;
 
-[MessageHandler]
+[MessageHandler("messagebus")]
 public class PingPongHandler : IMessageHandler<PongMessage, OneOf<PingMessage, PointMessage>>, IMessageHandler<PointMessage>
 {
-  [MessageHandler("messagebus", "pong")]
-  [return: MessageBus("messagebus", "ping", typeof(PingMessage))]
-  [return: MessageBus("messagebus", "point", typeof(PointMessage))]
+  [return: MessageBus(typeof(PingMessage), Topic = "ping")]
+  [return: MessageBus(typeof(PointMessage), Topic = "point")]
   public async Task<OneOf<PingMessage, PointMessage>> HandleAsync(PongMessage message, CancellationToken cancellationToken)
   {
     Console.WriteLine($"[{DateTime.Now}] Pong! {message.Counter} hits.");
@@ -23,7 +22,7 @@ public class PingPongHandler : IMessageHandler<PongMessage, OneOf<PingMessage, P
     return new PingMessage(message.Id, message.Counter + 1);
   }
 
-  [MessageHandler("messagebus", "point")]
+  [MessageHandler(Topic = "point")]
   public Task HandleAsync(PointMessage message, CancellationToken cancellationToken)
   {
     Console.WriteLine($"[{DateTime.Now}] Point! {message.Winner} wins after {message.Counter} hits!");
