@@ -6,6 +6,34 @@
 public static class DaprMessagingOptionsBuilderExtensions
 {
   /// <summary>
+  /// Registers an handler using its attributes.
+  /// </summary>
+  /// <param name="builder">The builder.</param>
+  /// <typeparam name="THandler">The handler type.</typeparam>
+  /// <returns>The builder.</returns>
+  public static IDaprMessagingOptionsBuilder AddHandler<THandler>(this IDaprMessagingOptionsBuilder builder)
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
+    return builder.AddHandler(typeof(THandler));
+  }
+
+  /// <summary>
+  /// Registers a message type.
+  /// </summary>
+  /// <param name="builder">The builder.</param>
+  /// <typeparam name="TMessage">The message type.</typeparam>
+  /// <returns>The builder.</returns>
+  public static IDaprMessagingOptionsBuilder AddMessage<TMessage>(this IDaprMessagingOptionsBuilder builder)
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
+    return builder.AddMessage(typeof(TMessage));
+  }
+
+  /// <summary>
   /// Scans the assembly of the given type for registering messages and message handlers.
   /// </summary>
   /// <param name="builder">The builder.</param>
