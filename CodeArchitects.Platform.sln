@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Subscriber", "tests\Messagi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dapr.AspNetCore.UnitTests", "tests\Dapr.AspNetCore.UnitTests\CodeArchitects.Platform.Dapr.AspNetCore.UnitTests.csproj", "{C46C47AB-4636-4D7B-AC92-F4C12EDC4D1A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Extensions", "src\Extensions\CodeArchitects.Platform.Extensions.csproj", "{F702B26E-4364-4706-8418-5CC69935DC6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +189,10 @@ Global
 		{C46C47AB-4636-4D7B-AC92-F4C12EDC4D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C46C47AB-4636-4D7B-AC92-F4C12EDC4D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C46C47AB-4636-4D7B-AC92-F4C12EDC4D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F702B26E-4364-4706-8418-5CC69935DC6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F702B26E-4364-4706-8418-5CC69935DC6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F702B26E-4364-4706-8418-5CC69935DC6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F702B26E-4364-4706-8418-5CC69935DC6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
