@@ -35,13 +35,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Mes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroserviceA", "MicroserviceA\MicroserviceA.csproj", "{ED86CC39-AA5A-4A20-8701-9C6738B94913}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroserviceB", "MicroserviceB\MicroserviceB.csproj", "{B5088FC3-5B09-4929-B0AE-7BF05222FDCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroserviceB", "MicroserviceB\MicroserviceB.csproj", "{B5088FC3-5B09-4929-B0AE-7BF05222FDCF}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4B07E4CB-04F1-4FC3-9885-CAF0E5F2243F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dapr", "Dapr", "{5720B776-6724-4078-8BF6-A599BD0799AD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", "{378FFE2A-7F10-4F5A-9205-E04B417AC4F5}"
+	ProjectSection(SolutionItems) = preProject
+		Dapr\components\messagebus.yml = Dapr\components\messagebus.yml
+		Dapr\components\statestore.yml = Dapr\components\statestore.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

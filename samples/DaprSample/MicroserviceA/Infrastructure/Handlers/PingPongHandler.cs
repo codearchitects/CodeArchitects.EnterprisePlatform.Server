@@ -8,6 +8,7 @@ namespace MicroserviceA.Infrastructure.Handlers;
 [MessageHandler("messagebus")]
 public class PingPongHandler : IMessageHandler<PongMessage, OneOf<PingMessage, PointMessage>>, IMessageHandler<PointMessage>
 {
+  [MessageHandler(Topic = "pong")]
   [return: MessageBus(typeof(PingMessage), Topic = "ping")]
   [return: MessageBus(typeof(PointMessage), Topic = "point")]
   public async Task<OneOf<PingMessage, PointMessage>> HandleAsync(PongMessage message, CancellationToken cancellationToken)
