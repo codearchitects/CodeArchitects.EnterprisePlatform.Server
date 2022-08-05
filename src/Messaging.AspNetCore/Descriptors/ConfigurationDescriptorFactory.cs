@@ -87,6 +87,7 @@ internal class ConfigurationDescriptorFactory
     Type interfaceType = resultType == typeof(void)
       ? typeof(IMessageHandler<>).MakeGenericType(messageType)
       : typeof(IMessageHandler<,>).MakeGenericType(messageType, resultType);
+
     if (!interfaceType.IsAssignableFrom(handlerType))
     {
       _logger.LogWarning("Type '{className}' is not assignable to {interfaceName}.", handlerType.FullName, interfaceType.FullName);

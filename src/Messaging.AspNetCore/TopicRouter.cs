@@ -36,9 +36,9 @@ internal class TopicRouter
     switch (context.Request.ContentType)
     {
       case "application/cloudevents+json":
-        return ProcessCloudEvent(context, jsonReader, logger);
+        return ProcessCloudEventAsync(context, jsonReader, logger);
       case "application/json":
-        return ProcessRawPayload(context, jsonReader, logger);
+        return ProcessRawPayloadAsync(context, jsonReader, logger);
       default:
         logger.LogError($"Unsupported media type: '{context.Request.ContentType}'.");
         context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
@@ -46,7 +46,7 @@ internal class TopicRouter
     };
   }
 
-  private async Task ProcessCloudEvent(HttpContext context, JsonReader jsonReader, ILogger logger)
+  private async Task ProcessCloudEventAsync(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
     JObject cloudEventObject;
     try
@@ -103,7 +103,7 @@ internal class TopicRouter
     context.Response.StatusCode = StatusCodes.Status400BadRequest;
   }
 
-  private async Task ProcessRawPayload(HttpContext context, JsonReader jsonReader, ILogger logger)
+  private async Task ProcessRawPayloadAsync(HttpContext context, JsonReader jsonReader, ILogger logger)
   {
     JObject messageObject;
     try

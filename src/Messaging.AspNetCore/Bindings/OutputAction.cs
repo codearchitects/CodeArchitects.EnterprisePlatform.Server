@@ -5,6 +5,9 @@
 /// </summary>
 internal abstract class OutputAction
 {
+  /// <summary>
+  /// <c>true</c> if the output action is executed only for certain types, <c>false</c> otherwise.
+  /// </summary>
   public abstract bool IsTypeFiltered { get; }
 
   /// <summary>
