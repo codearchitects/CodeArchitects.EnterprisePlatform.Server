@@ -1,21 +1,17 @@
-﻿using FluentAssertions;
-using Xunit;
+﻿namespace CodeArchitects.Platform.Application.SignalR;
 
-namespace CodeArchitects.Platform.Application.SignalR
+public class HubEndpointAttributeTests
 {
-  public class HubEndpointAttributeTests
+  [Fact]
+  public void Constructor_ShouldSetPattern()
   {
-    [Fact]
-    public void Constructor_ShouldSetPattern()
-    {
-      // Arrange
-      const string endpoint = nameof(endpoint);
+    // Arrange
+    const string endpoint = nameof(endpoint);
 
-      // Act
-      HubEndpointAttribute attribute = new HubEndpointAttribute(endpoint);
+    // Act
+    HubEndpointAttribute attribute = new HubEndpointAttribute(endpoint);
 
-      // Assert
-      attribute.Endpoint.Should().Be(endpoint);
-    }
+    // Assert
+    attribute.Endpoint.Should().Be(endpoint);
   }
 }

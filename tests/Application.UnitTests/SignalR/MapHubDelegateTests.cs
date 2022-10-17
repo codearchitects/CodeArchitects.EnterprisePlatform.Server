@@ -1,25 +1,23 @@
-﻿using FluentAssertions;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
-using Xunit;
 
-namespace CodeArchitects.Platform.Application.SignalR
+namespace CodeArchitects.Platform.Application.SignalR;
+
+using MapHubDelegate = ApplicationHubEndpointRouteBuilderExtensions.MapHubDelegate;
+
+public class MapHubDelegateTests
 {
-  using MapHubDelegate = ApplicationHubEndpointRouteBuilderExtensions.MapHubDelegate;
-
-  public class MapHubDelegateTests
+  [Fact]
+  public void Create_ShouldCreateMapHubDelegate_WhenHubTypeIsSubTypeOfHub()
   {
-    [Fact]
-    public void Create_ShouldCreateMapHubDelegate_WhenHubTypeIsSubTypeOfHub()
-    {
-      // Arrange
+    // Arrange
 
-      // Act
-      MapHubDelegate mapHub = MapHubDelegate.Create(typeof(MyHub));
+    // Act
+    MapHubDelegate mapHub = MapHubDelegate.Create(typeof(MyHub));
 
-      // Assert
-      mapHub.Should().NotBeNull();
-    }
-
-    private class MyHub : Hub { }
+    // Assert
+    mapHub.Should().NotBeNull();
   }
+
+  private class MyHub : Hub { }
 }

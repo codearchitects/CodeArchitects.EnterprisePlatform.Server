@@ -6,83 +6,83 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace CodeArchitects.Platform.Analyzer.Analyzers
+namespace CodeArchitects.Platform.Analyzer.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class ExperimentalAnalyzer : DiagnosticAnalyzer
 {
-  [DiagnosticAnalyzer(LanguageNames.CSharp)]
-  public class ExperimentalAnalyzer : DiagnosticAnalyzer
+  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+    DiagnosticDescriptors.CAESP001);
+
+  private static readonly string s_experimentalAttributeName = "CodeArchitects.Platform.CodeAnalysis.ExperimentalAttribute";
+
+  public override void Initialize(AnalysisContext context)
   {
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-      DiagnosticDescriptors.CAESP001);
+    context.EnableConcurrentExecution();
+    context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
-    private static readonly string _experimentalAttributeName = "CodeArchitects.Platform.CodeAnalysis.ExperimentalAttribute";
+    context.RegisterSyntaxNodeAction(AnalyzeIdentifierNameNode, SyntaxKind.IdentifierName);
+    context.RegisterSyntaxNodeAction(AnalyzeGenericNameNode, SyntaxKind.GenericName);
+    context.RegisterSyntaxNodeAction(AnalyzeObjectCreationNode, SyntaxKind.ObjectCreationExpression);
+  }
 
-    public override void Initialize(AnalysisContext context)
+  private void AnalyzeIdentifierNameNode(SyntaxNodeAnalysisContext context)
+  {
+    if (context.Node is not IdentifierNameSyntax node)
     {
-      context.EnableConcurrentExecution();
-      context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-
-      context.RegisterSyntaxNodeAction(AnalyzeIdentifierNameNode, SyntaxKind.IdentifierName);
-      context.RegisterSyntaxNodeAction(AnalyzeGenericNameNode, SyntaxKind.GenericName);
-      context.RegisterSyntaxNodeAction(AnalyzeObjectCreationNode, SyntaxKind.ObjectCreationExpression);
+      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
     }
 
-    private void AnalyzeIdentifierNameNode(SyntaxNodeAnalysisContext context)
+    bool isExperimental = context.SemanticModel
+      .GetSymbolInfo(node)
+      .Symbol?
+      .GetAttributes()
+      .Any(x => x.AttributeClass?.ToString() == s_experimentalAttributeName)
+      ?? false;
+
+    if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
     {
-      if (context.Node is not IdentifierNameSyntax node)
-      {
-        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
-      }
-
-      bool isExperimental = context.SemanticModel
-        .GetSymbolInfo(node)
-        .Symbol?
-        .GetAttributes()
-        .Any(x => x.AttributeClass?.ToString() == _experimentalAttributeName)
-        ?? false;
-
-      if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
-      {
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
-      }
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
     }
-    private void AnalyzeGenericNameNode(SyntaxNodeAnalysisContext context)
+  }
+
+  private void AnalyzeGenericNameNode(SyntaxNodeAnalysisContext context)
+  {
+    if (context.Node is not GenericNameSyntax node)
     {
-      if (context.Node is not GenericNameSyntax node)
-      {
-        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
-      }
-
-      bool isExperimental = context.SemanticModel
-        .GetSymbolInfo(node)
-        .Symbol?
-        .GetAttributes()
-        .Any(x => x.AttributeClass?.ToString() == _experimentalAttributeName)
-        ?? false;
-
-      if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
-      {
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
-      }
+      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
     }
 
-    private void AnalyzeObjectCreationNode(SyntaxNodeAnalysisContext context)
+    bool isExperimental = context.SemanticModel
+      .GetSymbolInfo(node)
+      .Symbol?
+      .GetAttributes()
+      .Any(x => x.AttributeClass?.ToString() == s_experimentalAttributeName)
+      ?? false;
+
+    if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
     {
-      if (context.Node is not ObjectCreationExpressionSyntax node)
-      {
-        throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(ObjectCreationExpressionSyntax)} but got {context.Node.GetType().Name} instead.");
-      }
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
+    }
+  }
 
-      bool isExperimental = context.SemanticModel
-        .GetSymbolInfo(node)
-        .Symbol?
-        .GetAttributes()
-        .Any(x => x.AttributeClass?.ToString() == _experimentalAttributeName)
-        ?? false;
+  private void AnalyzeObjectCreationNode(SyntaxNodeAnalysisContext context)
+  {
+    if (context.Node is not ObjectCreationExpressionSyntax node)
+    {
+      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(ObjectCreationExpressionSyntax)} but got {context.Node.GetType().Name} instead.");
+    }
 
-      if (isExperimental)
-      {
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
-      }
+    bool isExperimental = context.SemanticModel
+      .GetSymbolInfo(node)
+      .Symbol?
+      .GetAttributes()
+      .Any(x => x.AttributeClass?.ToString() == s_experimentalAttributeName)
+      ?? false;
+
+    if (isExperimental)
+    {
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAESP001, node.GetLocation()));
     }
   }
 }

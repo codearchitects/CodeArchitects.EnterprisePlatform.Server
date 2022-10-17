@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Identity;
 using Microsoft.Identity.Web;
-using System;
 using System.Security.Claims;
 
 namespace CodeArchitects.Platform.Application.Identity;

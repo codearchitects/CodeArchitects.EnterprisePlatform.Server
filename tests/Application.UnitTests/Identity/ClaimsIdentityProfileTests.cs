@@ -1,10 +1,5 @@
-﻿using FluentAssertions;
-using Microsoft.Identity.Web;
-using Moq;
-using System;
-using System.Linq;
+﻿using Microsoft.Identity.Web;
 using System.Security.Claims;
-using Xunit;
 
 namespace CodeArchitects.Platform.Application.Identity;
 

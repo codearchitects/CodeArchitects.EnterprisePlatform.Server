@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj" />
+    <ProjectReference Include="..\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj" />
+  </ItemGroup>
+
+</Project>

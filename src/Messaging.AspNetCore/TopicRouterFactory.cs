@@ -1,0 +1,43 @@
+﻿using CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
+using CodeArchitects.Platform.Messaging.AspNetCore.Utils;
+using CodeArchitects.Platform.Messaging.Descriptors;
+using System.Collections.Concurrent;
+
+namespace CodeArchitects.Platform.Messaging.AspNetCore;
+
+/// <summary>
+/// Implementation of <see cref="ITopicRouterFactory"/>.
+/// </summary>
+internal class TopicRouterFactory : ITopicRouterFactory
+{
+  private readonly IHandlerDelegateFactory _delegateFactory;
+  private readonly IMessageBiMap _messageMap;
+
+  /// <summary>
+  /// Creates a new <see cref="TopicRouterFactory"/> instance.
+  /// </summary>
+  /// <param name="delegateFactory">The handler delegate factory.</param>
+  /// <param name="messageMap">The message bidirectional map.</param>
+  public TopicRouterFactory(
+    IHandlerDelegateFactory delegateFactory,
+    IMessageBiMap messageMap)
+  {
+    _delegateFactory = delegateFactory;
+    _messageMap = messageMap;
+  }
+
+  public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> descriptors)
+  {
+    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
+    foreach (IHandlerDescriptor descriptor in descriptors)
+    {
+      string messageName = _messageMap[descriptor.MessageType];
+      HandlerDelegate @delegate = _delegateFactory.CreateHandlerDelegate(descriptor);
+
+      if (!delegates.TryAdd(messageName, @delegate))
+        throw new InvalidOperationException($"Duplicate message '{messageName}' handler on bus '{descriptor.Bus}' and topic '{descriptor.Topic}'.");
+    }
+
+    return new TopicRouter(new ConcurrentDictionary<string, HandlerDelegate>(delegates), _messageMap);
+  }
+}

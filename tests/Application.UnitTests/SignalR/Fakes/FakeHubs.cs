@@ -1,32 +1,29 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Threading.Tasks;
 
-namespace CodeArchitects.Platform.Application.SignalR.Fakes
+namespace CodeArchitects.Platform.Application.SignalR.Fakes;
+
+public interface IFakeHub1
 {
-  public interface IFakeHub1
-  {
-    Task Method();
-  }
+  Task Method();
+}
 
-  public class FakeHub1 : Hub<IFakeHub1>, IFakeHub1
+public class FakeHub1 : Hub<IFakeHub1>, IFakeHub1
+{
+  public Task Method()
   {
-    public Task Method()
-    {
-      throw new NotImplementedException();
-    }
+    throw new NotImplementedException();
   }
+}
 
-  public interface IFakeHub2
-  {
-    Task Method();
-  }
+public interface IFakeHub2
+{
+  Task Method();
+}
 
-  public class FakeHub2 : Hub<IFakeHub2>, IFakeHub2
+public class FakeHub2 : Hub<IFakeHub2>, IFakeHub2
+{
+  public Task Method()
   {
-    public Task Method()
-    {
-      throw new NotImplementedException();
-    }
+    throw new NotImplementedException();
   }
 }

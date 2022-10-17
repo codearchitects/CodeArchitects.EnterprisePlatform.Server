@@ -1,10 +1,9 @@
-﻿namespace CodeArchitects.Platform.Data
+﻿namespace CodeArchitects.Platform.Data;
+
+public enum ObjectState
 {
-  public enum ObjectState
-  {
-    Unchanged,
-    Added,
-    Updated,
-    Deleted  
-  }
+  Unchanged,
+  Added,
+  Updated,
+  Deleted
 }

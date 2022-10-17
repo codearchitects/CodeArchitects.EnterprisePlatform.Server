@@ -1,7 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data
+﻿namespace CodeArchitects.Platform.Data;
+
+public interface ITrackable
 {
-  public interface ITrackable
-  {
-    ObjectState ObjectState { get; set; }
-  }
+  ObjectState ObjectState { get; set; }
 }
