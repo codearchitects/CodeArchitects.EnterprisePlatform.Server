@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests;
 
-public class Tests
+public class Tests : IClassFixture<TestFixture>
 {
   [Theory]
   [InlineData("by-reflection")]
@@ -11,7 +11,7 @@ public class Tests
   {
     // Arrange
     Guid messageId = Guid.NewGuid();
-    int millisecondsTimeout = 10000;
+    int millisecondsTimeout = 20000;
     using HttpClient http = new HttpClient();
 
     // Act
@@ -32,7 +32,7 @@ public class Tests
   {
     // Arrange
     Guid messageId = Guid.NewGuid();
-    int millisecondsTimeout = 10000;
+    int millisecondsTimeout = 20000;
     using HttpClient http = new HttpClient();
 
     // Act
