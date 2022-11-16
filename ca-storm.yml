@@ -76,5 +76,8 @@ components:
   - name: CodeArchitects.Platform.Messaging.UnitTests
     path: tests\Messaging.UnitTests
     type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+    path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
+    type: dotnet-test
   # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)
   # TODO: Add CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
