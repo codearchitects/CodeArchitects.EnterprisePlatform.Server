@@ -67,9 +67,6 @@ components:
   - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
     path: tests\Dapr.AspNetCore.UnitTests
     type: dotnet-test
-  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests
-    path: tests\Data.EntityFrameworkCore.FunctionalTests
-    type: dotnet-test
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests
     path: tests\Data.EntityFrameworkCore.UnitTests
     type: dotnet-test
@@ -94,5 +91,6 @@ components:
   - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
     path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
     type: dotnet-test
-  # TODO: Add tests for CodeArchitects.Platform.Data.EntityFrameworkCore when they all pass (hopefully)
-  # TODO: Add CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+  - name: CodeArchitects.Platform.Data.IntegrationTests
+    path: tests\Data.IntegrationTests
+    type: dotnet-test
