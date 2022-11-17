@@ -6,6 +6,8 @@ using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.SoftDelete;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Fixtures.Model;
+using Docker.DotNet;
+using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
@@ -170,6 +172,17 @@ public class TestFixture : IAsyncLifetime
 
   async Task IAsyncLifetime.InitializeAsync()
   {
+    if (OperatingSystem.IsLinux())
+    {
+      DockerClient dockerClient = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
+
+      await dockerClient.Images.CreateImageAsync(new ImagesCreateParameters
+      {
+        FromImage = "testcontainers/ryuk",
+        Tag = "0.3.4"
+      }, null, new Progress<JSONMessage>());
+    }
+
     await _msSqlContainer.StartAsync();
     await _postgresContainer.StartAsync();
 
