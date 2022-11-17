@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Application.SignalR;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;

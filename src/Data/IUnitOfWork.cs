@@ -1,10 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿namespace CodeArchitects.Platform.Data;
 
-namespace CodeArchitects.Platform.Data;
-
-public interface IUnitOfWork
+public interface IUnitOfWork : IDisposable
 {
-  void Save();
-  Task SaveAsync(CancellationToken cancellationToken = default);
+  Task CommitAsync(CancellationToken cancellationToken = default);
 }

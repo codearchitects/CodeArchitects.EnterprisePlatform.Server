@@ -5,9 +5,9 @@ using System.Security.Claims;
 namespace CodeArchitects.Platform.Application.Identity;
 
 /// <summary>
-/// Implementation of <see cref="IIdentityProfile"/> based on the current user's claims.
+/// Implementation of <see cref="IIdentityProfile{TUserId, TTenantId}"/> based on the current user's claims.
 /// </summary>
-public class ClaimsIdentityProfile : IIdentityProfile
+public class ClaimsIdentityProfile : IIdentityProfile<Guid, Guid>
 {
   private Guid? _userId;
   private Guid? _tenantId;

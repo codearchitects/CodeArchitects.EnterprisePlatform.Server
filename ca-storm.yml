@@ -23,6 +23,15 @@ components:
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore
     path: src\Data.EntityFrameworkCore
     type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5
+    path: src\Data.EntityFrameworkCore5
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore
+    path: src\Data.EntityFrameworkCore.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.AspNetCore
+    path: src\Data.EntityFrameworkCore5.AspNetCore
+    type: dotnet-package
   - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
     type: dotnet-package
@@ -57,6 +66,12 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
     path: tests\Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests
+    path: tests\Data.EntityFrameworkCore.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests
+    path: tests\Data.EntityFrameworkCore.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
     path: tests\Infrastructure.Dapr.AspNetCore.UnitTests

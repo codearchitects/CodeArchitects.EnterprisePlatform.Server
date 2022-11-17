@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.CodeAnalysis;
+﻿namespace CodeArchitects.Platform.CodeAnalysis;
 
 [AttributeUsage(
   AttributeTargets.Class       |
