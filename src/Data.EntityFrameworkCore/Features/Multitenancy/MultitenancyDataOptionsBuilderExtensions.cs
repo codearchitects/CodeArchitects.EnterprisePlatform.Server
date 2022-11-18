@@ -12,11 +12,19 @@ public static class MultitenancyDataOptionsBuilderExtensions
     return builder.UseMultitenancyCore(descriptor);
   }
 
-  public static DataOptionsBuilder UseMultitenancy(this DataOptionsBuilder builder, bool disableModificationFilters = false)
+  public static DataOptionsBuilder UseMultitenancy<TDescriptor>(this DataOptionsBuilder builder)
+    where TDescriptor : IMultitenancyDescriptor, new()
+  {
+    ArgumentNullException.ThrowIfNull(builder);
+    
+    return builder.UseMultitenancyCore(new TDescriptor());
+  }
+
+  public static DataOptionsBuilder UseMultitenancy(this DataOptionsBuilder builder, bool disableModificationFilters = true)
   {
     ArgumentNullException.ThrowIfNull(builder);
 
-    return builder.UseMultitenancyCore(new DefaultMultitenancyDescriptor(typeof(Guid), disableModificationFilters));
+    return builder.UseMultitenancyCore(new DefaultMultitenancyDescriptor<Guid>(!disableModificationFilters));
   }
 
   private static DataOptionsBuilder UseMultitenancyCore(this DataOptionsBuilder builder, IMultitenancyDescriptor descriptor)

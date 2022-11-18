@@ -20,11 +20,13 @@ internal class DataExtension : DataExtensionBase
   public override void ApplyServices(IServiceCollection services)
   {
     base.ApplyServices(services);
+    services.AddScoped<AggregateServiceProvider>();
+
     PluginServiceCollection pluginServices = new(services);
 
     foreach (IDataExtensionPlugin plugin in _plugins)
     {
-      plugin.ApplyServices(services, pluginServices);
+      plugin.ApplyServices(pluginServices);
     }
   }
 

@@ -15,7 +15,7 @@ internal class MultitenancyDataPlugin : IDataExtensionPlugin
     _descriptor = descriptor;
   }
 
-  public void ApplyServices(IServiceCollection services, IPluginServiceCollection pluginServices)
+  public void ApplyServices(IPluginServiceCollection services)
   {
     if (_descriptor.MultitenancyContextType is not null)
     {
@@ -31,7 +31,7 @@ internal class MultitenancyDataPlugin : IDataExtensionPlugin
     ConventionSetPlugin plugin = new(_descriptor.TenantIdType);
     services.AddScoped(typeof(IConventionSetPlugin), sp => plugin);
 
-    pluginServices
+    services
       .AddModificationInterceptor<ModificationInterceptor>()
       .AddQueryRootExpressionInterceptor<QueryRootExpressionInterceptor>();
   }

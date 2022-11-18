@@ -15,7 +15,7 @@ internal class SoftDeleteDataPlugin : IDataExtensionPlugin
     _descriptor = descriptor;
   }
 
-  public void ApplyServices(IServiceCollection services, IPluginServiceCollection pluginServices)
+  public void ApplyServices(IPluginServiceCollection services)
   {
     if (_descriptor.SoftDeleteContextType is not null)
     {
@@ -30,7 +30,7 @@ internal class SoftDeleteDataPlugin : IDataExtensionPlugin
 
     services.AddScoped<IConventionSetPlugin, ConventionSetPlugin>();
 
-    pluginServices
+    services
       .AddModificationInterceptor<ModificationInterceptor>()
       .AddQueryRootExpressionInterceptor<QueryRootExpressionInterceptor>();
   }

@@ -5,14 +5,14 @@ namespace CodeArchitects.Platform.Data.Features.Multitenancy;
 public class ProfileMultitenancyContext<TTenantId> : IMultitenancyContext
   where TTenantId : IEquatable<TTenantId>
 {
-  private readonly ITenantProfile<TTenantId> _profile;
-
   public ProfileMultitenancyContext(ITenantProfile<TTenantId> profile)
   {
-    _profile = profile;
+    Profile = profile;
   }
+
+  protected ITenantProfile<TTenantId> Profile { get; }
 
   public virtual bool ShouldFilter => true;
 
-  public object TenantId => _profile.TenantId;
+  public object TenantId => Profile.TenantId;
 }

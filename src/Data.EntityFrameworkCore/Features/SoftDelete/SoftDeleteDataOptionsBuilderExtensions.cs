@@ -12,6 +12,14 @@ public static class SoftDeleteDataOptionsBuilderExtensions
     return builder.UseSoftDeleteCore(descriptor);
   }
 
+  public static DataOptionsBuilder UseSoftDelete<TSoftDeleteDescriptor>(this DataOptionsBuilder builder)
+    where TSoftDeleteDescriptor : ISoftDeleteDescriptor, new()
+  {
+    ArgumentNullException.ThrowIfNull(builder);
+
+    return builder.UseSoftDeleteCore(new TSoftDeleteDescriptor());
+  }
+
   public static DataOptionsBuilder UseSoftDelete(this DataOptionsBuilder builder)
   {
     ArgumentNullException.ThrowIfNull(builder);

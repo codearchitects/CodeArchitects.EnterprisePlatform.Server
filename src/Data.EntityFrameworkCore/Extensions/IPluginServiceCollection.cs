@@ -1,6 +1,8 @@
-﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public interface IPluginServiceCollection
+namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
+
+public interface IPluginServiceCollection : IServiceCollection
 {
   IPluginServiceCollection AddModificationInterceptor(Type implementationType);
   IPluginServiceCollection AddModificationInterceptor(Func<IServiceProvider, object> implementationFactory);

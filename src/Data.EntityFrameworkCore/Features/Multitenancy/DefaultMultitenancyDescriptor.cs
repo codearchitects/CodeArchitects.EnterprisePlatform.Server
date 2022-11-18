@@ -2,19 +2,23 @@
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 
-internal class DefaultMultitenancyDescriptor : IMultitenancyDescriptor
+public class DefaultMultitenancyDescriptor<TTenantId> : IMultitenancyDescriptor
+  where TTenantId : IEquatable<TTenantId>
 {
-  public DefaultMultitenancyDescriptor(Type tenantIdType, bool disableModificationFilters)
+  public DefaultMultitenancyDescriptor()
   {
-    TenantIdType = tenantIdType;
-    UsesModificationInterceptors = !disableModificationFilters;
   }
 
-  public Type TenantIdType { get; }
+  public DefaultMultitenancyDescriptor(bool usesModificationInterceptors)
+  {
+    UsesModificationInterceptors = usesModificationInterceptors;
+  }
 
-  public Type? MultitenancyContextType => typeof(ProfileMultitenancyContext<>).MakeGenericType(TenantIdType);
+  public virtual Type TenantIdType => typeof(TTenantId);
 
-  public Func<IServiceProvider, IMultitenancyContext>? MultitenancyContextImplementationFactory => null;
+  public virtual Type? MultitenancyContextType => typeof(ProfileMultitenancyContext<TTenantId>);
 
-  public bool UsesModificationInterceptors { get; }
+  public virtual Func<IServiceProvider, IMultitenancyContext>? MultitenancyContextImplementationFactory => null;
+
+  public virtual bool UsesModificationInterceptors { get; }
 }
