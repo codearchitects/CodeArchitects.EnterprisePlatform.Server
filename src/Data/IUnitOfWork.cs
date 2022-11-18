@@ -1,6 +1,8 @@
 ﻿namespace CodeArchitects.Platform.Data;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IAsyncDisposable
 {
-  Task CommitAsync(CancellationToken cancellationToken = default);
+  Task SaveAsync(CancellationToken cancellationToken = default);
+
+  // TODO: Add transactions
 }

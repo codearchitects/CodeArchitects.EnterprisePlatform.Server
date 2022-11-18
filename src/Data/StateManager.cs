@@ -1,20 +1,18 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CodeArchitects.Platform.Data;
+﻿namespace CodeArchitects.Platform.Data;
 
 internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 {
   private UnitOfWork? _current;
 
-  [MemberNotNullWhen(true, nameof(_current))]
-  protected bool IsActive => _current is not null;
-
-  public IUnitOfWork Begin()
+  public IUnitOfWork Begin(bool autoSave = false, CancellationToken cancellationToken = default)
   {
     if (_current is not null)
       throw new InvalidOperationException("Another unit of work began and was not disposed.");
 
-    _current = new UnitOfWork(this);
+    _current = autoSave
+      ? new AutoSaveUnitOfWork(this, cancellationToken)
+      : new UnitOfWork(this);
+
     return _current;
   }
 
@@ -27,14 +25,41 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 
   protected abstract Task SaveCoreAsync(CancellationToken cancellationToken);
 
-  private sealed class UnitOfWork : IUnitOfWork
+  private class UnitOfWork : IUnitOfWork
   {
-    private readonly StateManager _manager;
+    protected readonly StateManager _manager;
 
-    public UnitOfWork(StateManager manager) => _manager = manager;
+    public UnitOfWork(StateManager manager)
+    {
+      _manager = manager;
+    }
 
-    Task IUnitOfWork.CommitAsync(CancellationToken cancellationToken) => _manager.SaveCoreAsync(cancellationToken);
+    public Task SaveAsync(CancellationToken cancellationToken = default)
+    {
+      return _manager.SaveCoreAsync(cancellationToken);
+    }
 
-    void IDisposable.Dispose() => _manager._current = null;
+    public virtual ValueTask DisposeAsync()
+    {
+      _manager._current = null;
+      return new(Task.CompletedTask);
+    }
+  }
+
+  private sealed class AutoSaveUnitOfWork : UnitOfWork
+  {
+    private readonly CancellationToken _cancellationToken;
+
+    public AutoSaveUnitOfWork(StateManager manager, CancellationToken cancellationToken)
+      : base(manager)
+    {
+      _cancellationToken = cancellationToken;
+    }
+
+    public override ValueTask DisposeAsync()
+    {
+      _manager._current = null;
+      return new(_manager.SaveCoreAsync(_cancellationToken));
+    }
   }
 }

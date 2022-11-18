@@ -2,5 +2,5 @@
 
 public interface IUnitOfWorkManager
 {
-  IUnitOfWork Begin();
+  IUnitOfWork Begin(bool autoSave = false, CancellationToken cancellationToken = default);
 }
