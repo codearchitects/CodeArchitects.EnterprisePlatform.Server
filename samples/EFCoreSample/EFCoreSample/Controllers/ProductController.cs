@@ -7,27 +7,27 @@ namespace EFCoreSample.Controllers;
 
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-[Route("[controller]")]
+[Route("products")]
 public class ProductController : ControllerBase
 {
-  private readonly IProductRepository _productRepository;
+  private readonly IProductRepository _repository;
 
-  public ProductController(IProductRepository productRepository)
+  public ProductController(IProductRepository repository)
   {
-    _productRepository = productRepository;
+    _repository = repository;
   }
 
   [HttpGet("withpricelessthan")]
   public async Task<ActionResult> GetProductsWithPriceLessThan(decimal price, CancellationToken cancellationToken)
   {
-    var products = await _productRepository.GetProductsWithPriceLessThan(price, cancellationToken);
+    var products = await _repository.GetProductsWithPriceLessThan(price, cancellationToken);
     return Ok(products);
   }
 
   [HttpGet("public")]
   public async Task<ActionResult> GetPublicProducts(CancellationToken cancellationToken)
   {
-    var products = await _productRepository.GetPublicProducts(cancellationToken);
+    var products = await _repository.GetPublicProducts(cancellationToken);
     return Ok(products);
   }
 }

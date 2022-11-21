@@ -1,28 +1,41 @@
+using CodeArchitects.Platform.Data.AutoMapper;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using EFCoreSample;
+using EFCoreSample.Domain.Model;
 using EFCoreSample.Domain.Repositories;
 using EFCoreSample.Infrastructure.Data;
 using EFCoreSample.Infrastructure.Repositories;
+using EFCoreSample.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+  .AddControllers()
+  .AddNewtonsoftJson(opt =>
+  {
+    opt.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+  });
 
 builder.Services.AddIdentityProfile();
 
 builder.Services.AddDbContext<DataContext>(options => options
   .UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"))
+  .LogTo(Console.WriteLine, LogLevel.Debug)
   .UseData(data => data
     .UseMultitenancy<MultitenancyDescriptor>()));
 
 builder.Services.AddData<DataContext>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+
+builder.Services.AddAutoMapper(typeof(Program), typeof(AutoMapperTracking));
 
 builder.Services
   .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -19,9 +19,9 @@ public class FindAsyncTests : TestBase
     _user.Carts = Cart.Many(2);
     _user.Carts[0].Items = CartItem.Many(2, _user.Carts[0].Id);
     _user.Carts[1].Items = CartItem.Many(1, _user.Carts[1].Id);
-    _user.Carts[0].Items![0].Product = Product.One();
-    _user.Carts[0].Items![1].Product = Product.One();
-    _user.Carts[1].Items![0].Product = Product.One();
+    _user.Carts[0].Items![0].ShippingAddress = ShippingAddress.One();
+    _user.Carts[0].Items![1].ShippingAddress = ShippingAddress.One();
+    _user.Carts[1].Items![0].ShippingAddress = ShippingAddress.One();
     _user.Claims = UserClaim.Many(2);
 
     _seed = new[] { _user };
@@ -74,7 +74,7 @@ public class FindAsyncTests : TestBase
     fromDb!.Index.Should().Be(item.Index);
     fromDb!.CartId.Should().Be(item.CartId);
     fromDb.Cart.Should().BeNull();
-    fromDb.Product.Should().BeNull();
+    fromDb.ShippingAddress.Should().BeNull();
   }
 
   [Theory, RepositoryDependenciesData]
@@ -116,8 +116,8 @@ public class FindAsyncTests : TestBase
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().NotBeNull()
       .And.HaveCount(2)
-      .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.Product == null)
-      .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.Product == null);
+      .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.ShippingAddress == null)
+      .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.ShippingAddress == null);
     fromDb.User.Should().BeNull();
   }
 
@@ -178,15 +178,15 @@ public class FindAsyncTests : TestBase
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
       .Include(e => e.Items, _ => _
-        .Include(e => e.Product)));
+        .Include(e => e.ShippingAddress)));
 
     // Assert
     fromDb.Should().NotBeNull();
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().NotBeNull()
       .And.HaveCount(2)
-      .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.Product!.Id == cart.Items[0].Product!.Id)
-      .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.Product!.Id == cart.Items[1].Product!.Id);
+      .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.ShippingAddress!.Id == cart.Items[0].ShippingAddress!.Id)
+      .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.ShippingAddress!.Id == cart.Items[1].ShippingAddress!.Id);
     fromDb.User.Should().BeNull();
   }
 
@@ -207,11 +207,11 @@ public class FindAsyncTests : TestBase
     fromDb.Carts.Should().NotBeNull().And.HaveCount(2);
     fromDb.Carts.Should().Contain(cart => cart.Id == _user.Carts![0].Id)
       .Which.Items.Should().HaveCount(2)
-        .And.Contain(item => item.Index == _user.Carts![0].Items![0].Index && item.CartId == _user.Carts![0].Id && item.Product == null)
-        .And.Contain(item => item.Index == _user.Carts![0].Items![1].Index && item.CartId == _user.Carts![0].Id && item.Product == null);
+        .And.Contain(item => item.Index == _user.Carts![0].Items![0].Index && item.CartId == _user.Carts![0].Id && item.ShippingAddress == null)
+        .And.Contain(item => item.Index == _user.Carts![0].Items![1].Index && item.CartId == _user.Carts![0].Id && item.ShippingAddress == null);
     fromDb.Carts.Should().Contain(cart => cart.Id == _user.Carts![1].Id)
       .Which.Items.Should().HaveCount(1)
-        .And.Contain(item => item.Index == _user.Carts![1].Items![0].Index && item.CartId == _user.Carts![1].Id && item.Product == null);
+        .And.Contain(item => item.Index == _user.Carts![1].Items![0].Index && item.CartId == _user.Carts![1].Id && item.ShippingAddress == null);
     fromDb.Address.Should().BeNull();
     fromDb.Claims.Should().BeNull();
   }

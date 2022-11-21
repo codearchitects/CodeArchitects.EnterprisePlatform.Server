@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Associations;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using EFCoreSample.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,21 @@ public class DataContext : DbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    modelBuilder.Entity<Cart>(entity =>
+    {
+      entity
+        .HasMany(e => e.Orders)
+        .WithOne()
+        .AsAggregation();
+    });
+
+    modelBuilder.Entity<Order>(entity =>
+    {
+      entity
+        .HasMany(x => x.Products)
+        .WithMany();
+    });
+
     modelBuilder.Entity<Product>(entity =>
     {
       entity.IsMultiTenant("TenantId");

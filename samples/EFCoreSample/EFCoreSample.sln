@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreSample", "EFCoreSample\EFCoreSample.csproj", "{F2AC3DEE-5F30-4223-B196-400E6458597C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreSample", "EFCoreSample\EFCoreSample.csproj", "{F2AC3DEE-5F30-4223-B196-400E6458597C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platform", "Platform", "{E952FB0E-4E02-45E1-BE90-D754AE432154}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Application", "..\..\src\Application\CodeArchitects.Platform.Application.csproj", "{C8D537E7-A291-445A-A031-484A5F3F911E}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{D45F8026-383A-4BA4-87D1-6BA2A5ADA8A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AutoMapper", "..\..\src\Data.AutoMapper\CodeArchitects.Platform.Data.AutoMapper.csproj", "{17F6C8A1-A123-4483-BED9-47917C925CD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{D45F8026-383A-4BA4-87D1-6BA2A5ADA8A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D45F8026-383A-4BA4-87D1-6BA2A5ADA8A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D45F8026-383A-4BA4-87D1-6BA2A5ADA8A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{6655B03D-12FE-44D1-AE45-F19ABDC29231} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{686DB84D-FC3D-4075-B2C1-6DA54E25D0BE} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{C8D537E7-A291-445A-A031-484A5F3F911E} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
+		{17F6C8A1-A123-4483-BED9-47917C925CD6} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C18616EF-F29C-4DC6-85E9-96946263D242}

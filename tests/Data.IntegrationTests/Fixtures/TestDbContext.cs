@@ -62,9 +62,14 @@ public class TestDbContext : DbContext
         .HasKey(item => new { item.Index, item.CartId });
 
       entity
-        .HasOne(item => item.Product)
+        .HasOne(item => item.ShippingAddress)
         .WithMany()
+        .IsRequired(false)
         .AsComposition();
+
+      entity
+        .HasMany(item => item.Products)
+        .WithMany();
     });
 
     modelBuilder.Entity<Product>(entity =>

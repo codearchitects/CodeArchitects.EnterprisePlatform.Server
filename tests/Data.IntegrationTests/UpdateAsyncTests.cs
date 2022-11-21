@@ -239,6 +239,46 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
+  public async Task UpdateAsync_ShouldUpdateEntityAndRemoveOrAddLinksOfAggregateEntity_WhenNavigationIsManyToManyAndNavigationIsRemoved(RepositoryDependencies dependencies)
+  {
+    // Arrange
+    ITrackingContext trackingContext = dependencies.TrackingContext;
+
+    Product product1 = Product.One();
+    Product product2 = Product.One();
+    Product product3 = Product.One();
+    Cart cart = Cart.One();
+    CartItem item = CartItem.One(cart.Id);
+    item.Products = new() { product1, product2 };
+
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, new object[] { cart, item, product1, product2, product3 });
+
+    cart.Name = "New cart name";
+    item.Name = "New item name";
+    item.Products = new() { product1, product3 };
+    trackingContext.SetTrackingState(cart, TrackingState.Modified);
+    trackingContext.SetTrackingState(item, TrackingState.Modified);
+    trackingContext.SetTrackingState(product1, TrackingState.Removed);
+    trackingContext.SetTrackingState(product3, TrackingState.Added);
+
+    // Act
+    await sut.UpdateAsync(cart);
+
+    // Assert
+    Cart? fromDb = _fixture.DbContext.Set<Cart>()
+      .Include(x => x.Items!)
+      .ThenInclude(x => x.Products)
+      .FirstOrDefault(x => x.Id == cart.Id);
+
+    fromDb.Should().NotBeNull();
+    fromDb!.Name.Should().Be(cart.Name);
+    fromDb.Items.Should().HaveCount(1);
+    fromDb.Items![0].Products.Should().HaveCount(2)
+      .And.ContainSingle(product => product.Id == product2.Id)
+      .And.ContainSingle(product => product.Id == product3.Id);
+  }
+
+  [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToManyCompositionAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange

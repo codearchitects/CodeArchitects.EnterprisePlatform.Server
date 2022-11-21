@@ -105,10 +105,51 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     if (_trackingContext.GetTrackingState(entity) is not TrackingState.Modified)
     {
       DbContext.Entry(entity).State = EntityState.Modified;
-      await DbContext.SaveChangesAsync(cancellationToken); // TODO: Do not call SaveChangesAsync if using a UOW
+      await _stateManager.SaveAsync(cancellationToken);
     }
 
-    DbContext.Attach(entity);
+    List<Action> manyToManyUpdates = new();
+    DbContext.ChangeTracker.TrackGraph(entity, null, delegate (EntityEntryGraphNode<object?> node)
+    {
+      TrackingState state = _trackingContext.GetTrackingState(node.Entry.Entity);
+      switch (node.InboundNavigation)
+      {
+        case null:
+          return true;
+        case ISkipNavigation skipNavigation:
+          switch (state)
+          {
+            case TrackingState.Added:
+              var collectionAccessor = skipNavigation.GetCollectionAccessor()!;
+              collectionAccessor.Remove(node.SourceEntry!.Entity, node.Entry.Entity);
+              manyToManyUpdates.Add(() =>
+              {
+                collectionAccessor.Add(node.SourceEntry.Entity, node.Entry.Entity, false);
+                node.Entry.State = EntityState.Unchanged;
+              });
+              break;
+            case TrackingState.Removed:
+              manyToManyUpdates.Add(() =>
+              {
+                skipNavigation.GetCollectionAccessor()!.Remove(node.SourceEntry!.Entity, node.Entry.Entity);
+                node.Entry.State = EntityState.Unchanged;
+              });
+              break;
+            case TrackingState.Detached or TrackingState.Unchanged:
+              break;
+            default:
+              throw new InvalidTrackingStateException(node.Entry.Metadata.ClrType.Name, state);
+          }
+          return false;
+        case INavigation navigation:
+          return !navigation.IsOnDependent && navigation.IsAggregation();
+        default:
+          Debug.Fail("This point should be unreacheable.");
+          return false;
+      }
+    });
+
+    DbContext.Attach(entity); // TODO: Attach in the previous graph tracking
 
     DbContext.ChangeTracker.TrackGraph(entity, _trackingContext, static delegate (EntityEntryGraphNode<ITrackingContext> node)
     {
@@ -122,26 +163,9 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           return true;
 
         case ISkipNavigation skipNavigation: // Many-to-many navigation
-          switch (state)
-          {
-            case TrackingState.Added:
-              EntityState sourceState = node.SourceEntry!.State;
-              node.SourceEntry.State = EntityState.Detached;
-              skipNavigation.GetCollectionAccessor()!.Add(node.SourceEntry.Entity, node.Entry.Entity, false);
-              node.SourceEntry.State = sourceState;
-              break;
-            case TrackingState.Removed:
-              skipNavigation.GetCollectionAccessor()!.Remove(node.SourceEntry!.Entity, node.Entry.Entity);
-              break;
-            case TrackingState.Detached or TrackingState.Unchanged:
-              node.Entry.State = EntityState.Detached;
-              break;
-            default:
-              throw new InvalidTrackingStateException(node.Entry.Metadata.ClrType.Name, state);
-          }
           return false;
 
-        case INavigation navigation: // One-to-one or many-to-many navigation
+        case INavigation navigation: // One-to-one or one-to-many navigation
           if (navigation.IsOnDependent)
           {
             if (navigation.IsAggregation())
@@ -229,6 +253,11 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           return false;
       }
     });
+
+    foreach (Action manyToManyUpdate in manyToManyUpdates)
+    {
+      manyToManyUpdate();
+    }
 
     await _stateManager.SaveAsync(cancellationToken);
   }

@@ -9,7 +9,7 @@ using System.Text;
 namespace EFCoreSample.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("auth")]
 public class AuthController : ControllerBase
 {
   private readonly IConfiguration _configuration;

@@ -8,7 +8,8 @@ public class CartItem
   public Guid CartId { get; set; }
   public string? Name { get; set; }
   public Cart? Cart { get; set; } // OTM aggregation, on dependent
-  public Product? Product { get; set; } // OTM composition, on dependent
+  public List<Product>? Products { get; set; } // MTM
+  public ShippingAddress? ShippingAddress { get; set; } // OTM, on dependent
 
   private static readonly Faker<CartItem> s_faker = new Faker<CartItem>()
     .RuleFor(cart => cart.Index, faker => faker.IndexGlobal)
