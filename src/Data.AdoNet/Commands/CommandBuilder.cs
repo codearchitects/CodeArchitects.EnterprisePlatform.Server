@@ -18,6 +18,5 @@ internal class CommandBuilder<TEntity, TKey> : ICommandBuilder<TEntity, TKey>
 
   public void BuildSelectCommand(DbCommand command, TKey key, IReadOnlyCollection<string> paths)
   {
-    command.CommandText = _textBuilder.BuildSelectText(_entity, paths);
   }
 }

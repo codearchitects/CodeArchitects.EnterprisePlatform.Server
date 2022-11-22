@@ -77,14 +77,12 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
   public Task BatchExecuteAsync(Execution<TDbConnection> execution, CancellationToken cancellationToken = default)
   {
-    _stateManager.AddExecution(execution);
-    return _stateManager.SaveAsync(cancellationToken);
+    return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
   public Task BatchExecuteAsync(Execution<IDbConnection> execution, CancellationToken cancellationToken = default)
   {
-    _stateManager.AddExecution(execution);
-    return _stateManager.SaveAsync(cancellationToken);
+    return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
   private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, IReadOnlyCollection<string> paths, CancellationToken cancellationToken = default)

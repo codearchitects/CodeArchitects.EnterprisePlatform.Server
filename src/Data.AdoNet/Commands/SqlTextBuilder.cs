@@ -1,40 +1,85 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Text;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Commands;
 
 internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple database providers
 {
-  public string BuildSelectText(IEntityModel entity, IReadOnlyCollection<string> paths)
+  public string BuildSelectText(INavigationPlan plan)
   {
-    return paths.Count == 0
-      ? BuildSelectTextNoJoins(entity)
-      : BuildSelectTextWithJoins(entity, paths);
+    StringBuilder stringBuilder = new();
+
+    if (plan.Navigations.Count == 0)
+    {
+      BuildSelectTextNoJoins(stringBuilder, plan.Entity);
+    }
+    else
+    {
+      BuildSelectTextWithJoins(stringBuilder, plan);
+    }
+
+    return stringBuilder.ToString();
   }
 
-  private string BuildSelectTextNoJoins(IEntityModel entity)
+  private static void BuildSelectTextNoJoins(StringBuilder stringBuilder, IEntityModel entity)
   {
-    return new StringBuilder("SELECT TOP(1) ")
-      .AppendJoin(", ", GetPropertyList(entity.Properties))
-      .Append(" FROM [")
+    stringBuilder
+      .Append("SELECT TOP(1) ")
+      .AppendJoin(", ", entity.Properties, AppendPropertyList)
+      .AppendLine()
+      .Append("FROM [")
       .Append(entity.Name)
-      .Append("] AS t WHERE ")
-      .AppendJoin(" AND ", GetWherePredicates(entity.PrimaryKey.Properties))
-      .ToString();
+      .AppendLine("]")
+      .Append("WHERE ")
+      .AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWherePredicates);
+  }
 
-    static IEnumerable<string> GetPropertyList(IEnumerable<IPropertyModel> properties)
-    {
-      return properties.Select(property => $"t.[{property.Name}]");
-    }
+  private static void BuildSelectTextWithJoins(StringBuilder stringBuilder, INavigationPlan plan)
+  {
+    stringBuilder
+      .Append("SELECT ")
+      .AppendJoin(", ", plan.Properties, AppendPropertyList)
+      .AppendLine()
+      .AppendLine("FROM (");
 
-    static IEnumerable<string> GetWherePredicates(IEnumerable<IPrimaryKeyPropertyModel> properties)
+    BuildSelectTextNoJoins(stringBuilder, plan.Entity);
+
+    stringBuilder.AppendLine();
+
+    stringBuilder.AppendLine(") AS t");
+
+    foreach (INavigationPlan navigation in plan.Navigations)
     {
-      return properties.Select(property => $"t.[{property.Name}] = @p{property.Index}");
+      stringBuilder.AppendLine("LEFT JOIN (");
+      stringBuilder.AppendLine(")");
     }
   }
 
-  private string BuildSelectTextWithJoins(IEntityModel entity, IEnumerable<string> paths)
+  private static void AppendPropertyList(StringBuilder stringBuilder, IPropertyModel property)
   {
-    throw new NotImplementedException();
+    stringBuilder
+      .Append('[')
+      .Append(property.Name)
+      .Append(']');
+  }
+
+  private static void AppendWherePredicates(StringBuilder stringBuilder, IPropertyModel property)
+  {
+    stringBuilder
+      .Append('[')
+      .Append(property.Name)
+      .Append("] = @p")
+      .Append(property.Index);
+  }
+
+  private static void AppendWherePredicatesWithAlias(StringBuilder stringBuilder, string alias, IPropertyModel property)
+  {
+    stringBuilder
+      .Append(alias)
+      .Append(".[")
+      .Append(property.Name)
+      .Append("] = @p")
+      .Append(property.Index);
   }
 }
