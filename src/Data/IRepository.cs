@@ -15,3 +15,8 @@ public interface IRepository<TEntity, TKey>
   Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
   Task RemoveAsync(TKey key, CancellationToken cancellationToken = default);
 }
+
+public static class C
+{
+  public static Index I() => default;
+}

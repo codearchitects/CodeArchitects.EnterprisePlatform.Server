@@ -1,6 +1,8 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP3_1_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that the output will be non-<see langword="null"/> if the named parameter is non-<see langword="null"/>.

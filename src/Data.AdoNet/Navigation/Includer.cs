@@ -1,38 +1,85 @@
-﻿using CodeArchitects.Platform.Data.Navigation;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.Navigation;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class Includer<TEntity> : IIncluder<TEntity>
+internal class Includer<TEntity> : IIncluder<TEntity>, INavigationSpec
   where TEntity : class
 {
-  private readonly List<string> _paths;
+  private readonly IEntityModel _entity;
+  private readonly List<ISubNavigationSpec> _navigationSpecs;
 
-  public Includer()
+  public Includer(IEntityModel entity)
   {
-    _paths = new List<string>();
+    _entity = entity;
+    _navigationSpecs = new();
   }
 
-  public IReadOnlyCollection<string> Paths => _paths;
-
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression) where T : class
+  public string BuildSelectQuery()
   {
     throw new NotImplementedException();
   }
 
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude) where T : class
+  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression)
+  where T : class
   {
-    throw new NotImplementedException();
+    if (includeExpression.Body is not MemberExpression member)
+      throw new ArgumentException("", nameof(includeExpression)); // TODO: Support other expressions
+
+    string navigation = member.Member switch
+    {
+      PropertyInfo property => property.Name,
+      FieldInfo field => field.Name,
+      _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
+    };
+
+    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+
+    // _navigationSpecs.Add(navigationModel);
+
+    return this;
   }
 
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, IEnumerable<T>?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude) where T : class
+  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
+    where T : class
   {
-    throw new NotImplementedException();
+    if (includeExpression.Body is not MemberExpression member)
+      throw new ArgumentException("", nameof(includeExpression)); // TODO: Support other expressions
+
+    string navigation = member.Member switch
+    {
+      PropertyInfo property => property.Name,
+      FieldInfo field => field.Name,
+      _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
+    };
+
+    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+
+    // _navigationSpecs.Add(navigationModel);
+
+
+    return this;
+  }
+
+  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, IEnumerable<T>?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
+    where T : class
+  {
+    return this;
   }
 
   public IStringIncluder<TEntity> Include(string navigation)
   {
-    _paths.Add(navigation);
+    // TODO: string[] paths = navigation.Split('.');
+
+    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+
+    // _navigationSpecs.Add(navigationModel);
+
     return this;
   }
 }

@@ -1,32 +1,10 @@
 ﻿namespace System.Text;
 
-#if !NETCOREAPP2_0_OR_GREATER
-
 internal delegate void AppendAction<in T>(StringBuilder stringBuilder, T current);
 internal delegate void AppendAction<TState, in T>(StringBuilder stringBuilder, in TState state, T current);
 
 internal static partial class StringBuilderExtensions
 {
-  public static StringBuilder AppendJoin(this StringBuilder stringBuilder, string separator, params object?[] values)
-  {
-    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
-  }
-
-  public static StringBuilder AppendJoin<T>(this StringBuilder stringBuilder, string separator, IEnumerable<T> values)
-  {
-    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
-  }
-
-  public static StringBuilder AppendJoin(this StringBuilder stringBuilder, char separator, params object?[] values)
-  {
-    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
-  }
-
-  public static StringBuilder AppendJoin<T>(this StringBuilder stringBuilder, char separator, IEnumerable<T> values)
-  {
-    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
-  }
-
   public static StringBuilder AppendJoin<T>(this StringBuilder stringBuilder, string separator, IEnumerable<T> values, AppendAction<T> append)
   {
     return AppendJoinCore(stringBuilder, separator, values, append);
@@ -117,6 +95,31 @@ internal static partial class StringBuilderExtensions
     }
 
     return stringBuilder;
+  }
+}
+
+#if !NETCOREAPP2_0_OR_GREATER
+
+internal static partial class StringBuilderExtensions
+{
+  public static StringBuilder AppendJoin(this StringBuilder stringBuilder, string separator, params object?[] values)
+  {
+    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
+  }
+
+  public static StringBuilder AppendJoin<T>(this StringBuilder stringBuilder, string separator, IEnumerable<T> values)
+  {
+    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
+  }
+
+  public static StringBuilder AppendJoin(this StringBuilder stringBuilder, char separator, params object?[] values)
+  {
+    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
+  }
+
+  public static StringBuilder AppendJoin<T>(this StringBuilder stringBuilder, char separator, IEnumerable<T> values)
+  {
+    return AppendJoinCore(stringBuilder, separator, values, static (sb, current) => sb.Append(current));
   }
 }
 

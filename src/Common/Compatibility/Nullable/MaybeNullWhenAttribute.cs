@@ -1,6 +1,8 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP3_1_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that when a method returns <see cref="ReturnValue"/>, the parameter may be <see langword="null"/> even if the corresponding type disallows it.

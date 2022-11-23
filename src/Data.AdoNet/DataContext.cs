@@ -11,9 +11,9 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 {
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor _executor;
-  private readonly IModel _model;
+  private readonly IPersistenceModel _model;
 
-  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IModel model)
+  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IPersistenceModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
@@ -41,10 +41,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     IEntityModel entityModel = EnsureEntity<TEntity>();
     EnsureKey<TKey>(entityModel);
 
-    Includer<TEntity> includer = new();
+    Includer<TEntity> includer = new(entityModel);
     includeAction(includer);
 
-    return FindAsyncCore<TEntity, TKey>(key, includer.Paths, cancellationToken);
+    return FindAsyncCore<TEntity, TKey>(key, null!, cancellationToken);
   }
 
   public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)

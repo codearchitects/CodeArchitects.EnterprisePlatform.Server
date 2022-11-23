@@ -13,7 +13,7 @@ internal static class AnnotatableExtensions
       value = default;
       return false;
     }
-
+    
     if (annotation.Value is not TValue annotationValue)
       throw new InvalidOperationException($"Annotation '{annotationName}' has the wrong type.");
 

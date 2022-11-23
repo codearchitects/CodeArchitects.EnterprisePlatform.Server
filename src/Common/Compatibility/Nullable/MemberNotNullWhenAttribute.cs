@@ -1,6 +1,8 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NET5_0_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that the method or property will ensure that the listed field and property members have non-<see langword="null"/> values when returning with the specified return value condition.

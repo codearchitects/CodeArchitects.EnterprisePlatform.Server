@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IModel
+internal interface IPersistenceModel
 {
   bool TryGetEntity(Type entityType, [NotNullWhen(true)] out IEntityModel entity);
 }

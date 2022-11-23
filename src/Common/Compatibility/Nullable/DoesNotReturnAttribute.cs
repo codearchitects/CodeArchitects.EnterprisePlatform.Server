@@ -1,6 +1,8 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP3_1_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that a method that will never return under any circumstance.

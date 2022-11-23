@@ -1,6 +1,8 @@
-﻿namespace CodeArchitects.Platform.Common.Utils;
+﻿using System.Diagnostics;
+
+namespace CodeArchitects.Platform.Common.Utils;
 
 internal static class Errors
 {
-  public static Exception Unreacheable => throw new InvalidOperationException("This was supposed to be unreacheable.");
+  public static Exception Unreacheable => throw new UnreachableException();
 }

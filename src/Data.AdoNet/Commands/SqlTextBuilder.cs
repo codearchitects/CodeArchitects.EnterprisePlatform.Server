@@ -6,18 +6,18 @@ namespace CodeArchitects.Platform.Data.AdoNet.Commands;
 
 internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple database providers
 {
-  public string BuildSelectText(INavigationPlan plan)
+  public string BuildSelectText(INavigationSpec plan)
   {
     StringBuilder stringBuilder = new();
 
-    if (plan.Navigations.Count == 0)
-    {
-      BuildSelectTextNoJoins(stringBuilder, plan.Entity);
-    }
-    else
-    {
-      BuildSelectTextWithJoins(stringBuilder, plan);
-    }
+    // if (plan.Navigations.Count == 0)
+    // {
+    //   BuildSelectTextNoJoins(stringBuilder, plan.Entity);
+    // }
+    // else
+    // {
+    //   BuildSelectTextWithJoins(stringBuilder, plan);
+    // }
 
     return stringBuilder.ToString();
   }
@@ -29,31 +29,31 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
       .AppendJoin(", ", entity.Properties, AppendPropertyList)
       .AppendLine()
       .Append("FROM [")
-      .Append(entity.Name)
+      .Append(entity.TableName)
       .AppendLine("]")
       .Append("WHERE ")
       .AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWherePredicates);
   }
 
-  private static void BuildSelectTextWithJoins(StringBuilder stringBuilder, INavigationPlan plan)
+  private static void BuildSelectTextWithJoins(StringBuilder stringBuilder, INavigationSpec plan)
   {
-    stringBuilder
-      .Append("SELECT ")
-      .AppendJoin(", ", plan.Properties, AppendPropertyList)
-      .AppendLine()
-      .AppendLine("FROM (");
-
-    BuildSelectTextNoJoins(stringBuilder, plan.Entity);
-
-    stringBuilder.AppendLine();
-
-    stringBuilder.AppendLine(") AS t");
-
-    foreach (INavigationPlan navigation in plan.Navigations)
-    {
-      stringBuilder.AppendLine("LEFT JOIN (");
-      stringBuilder.AppendLine(")");
-    }
+    // stringBuilder
+    //   .Append("SELECT ")
+    //   .AppendJoin(", ", plan.Properties, AppendPropertyList)
+    //   .AppendLine()
+    //   .AppendLine("FROM (");
+    // 
+    // BuildSelectTextNoJoins(stringBuilder, plan.Entity);
+    // 
+    // stringBuilder.AppendLine();
+    // 
+    // stringBuilder.AppendLine(") AS t");
+    // 
+    // foreach (INavigationPlan navigation in plan.Navigations)
+    // {
+    //   stringBuilder.AppendLine("LEFT JOIN (");
+    //   stringBuilder.AppendLine(")");
+    // }
   }
 
   private static void AppendPropertyList(StringBuilder stringBuilder, IPropertyModel property)
