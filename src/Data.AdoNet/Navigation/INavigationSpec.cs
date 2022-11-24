@@ -55,6 +55,7 @@ class NavigationNode : ISubNavigation
         .Append(state.Index)
         .Append(".[")
         .Append(property.ColumnName)
+        .Append('_')
         .Append(state.NavigationId)
         .Append(']');
     }
@@ -119,17 +120,21 @@ class NavigationNode : ISubNavigation
 
   public void AppendJoinConditions(int index, StringBuilder stringBuilder)
   {
-    stringBuilder.AppendJoin(", ", ref index, _model.Keys, AppendCondition);
+    (int, int) state = (index, _model.Id);
 
-    static void AppendCondition(StringBuilder stringBuilder, ref int index, IKeyPair pair)
+    stringBuilder.AppendJoin(", ", ref state, _model.Keys, AppendCondition);
+
+    static void AppendCondition(StringBuilder stringBuilder, ref (int Index, int NavigationId) state, IKeyPair pair)
     {
       stringBuilder
         .Append("t.[")
         .Append(pair.FromProperty.ColumnName)
         .Append("] = t")
-        .Append(index)
+        .Append(state.Index)
         .Append(".[")
         .Append(pair.ToProperty.ColumnName)
+        .Append('_')
+        .Append(state.NavigationId)
         .Append(']');
     }
   }
@@ -249,7 +254,7 @@ class SqlBuilder
         .Append("] = @p")
         .Append(property.Index))
       .AppendLine()
-      .Append(")");
+      .Append(") AS t");
 
     for (index = 0; index < navigations.Count; index++)
     {

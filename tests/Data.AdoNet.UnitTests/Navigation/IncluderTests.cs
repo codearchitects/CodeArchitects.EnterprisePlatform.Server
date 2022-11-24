@@ -6,9 +6,38 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 public class IncluderTests
 {
+  class Parent
+  {
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public ChildA? ChildA { get; set; }
+    public ChildB? ChildB { get; set; }
+  }
+
+  class ChildA
+  {
+    public int Id { get; set; }
+    public int ParentId { get; set; }
+  }
+
+  class ChildB
+  {
+    public int Id { get; set; }
+    public int ParentId { get; set; }
+    public ChildC? ChildC { get; set; }
+  }
+
+  class ChildC
+  {
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public int ChildBId { get; set; }
+  }
+
   [Fact]
   public void Test()
   {
+    #region Mock
     INavigationSpec spec = NavigationSpecBuilder.Build(_ => _
       .SetNavigations(_ => _
         .Add(new NavigationLeaf(
@@ -40,38 +69,11 @@ public class IncluderTests
             .Add(_ => _
               .SetColumnName("Id")
               .SetIndex(0))))));
+    #endregion
 
     SqlBuilder sut = new();
 
     var sql = sut.WriteSelectSql(spec);
-  }
-
-  class Parent
-  {
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public ChildA? ChildA { get; set; }
-    public ChildB? ChildB { get; set; }
-  }
-
-  class ChildA
-  {
-    public int Id { get; set; }
-    public int ParentId { get; set; }
-  }
-
-  class ChildB
-  {
-    public int Id { get; set; }
-    public int ParentId { get; set; }
-    public ChildC? ChildC { get; set; }
-  }
-
-  class ChildC
-  {
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public int ChildBId { get; set; }
   }
 
   [Fact]
