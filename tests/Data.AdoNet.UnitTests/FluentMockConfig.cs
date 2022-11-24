@@ -8,4 +8,4 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IPrimaryKeyModel))]
 [assembly: GenerateFluentMockFor(typeof(INavigationModel))]
 [assembly: GenerateFluentMockFor(typeof(IKeyPair))]
-[assembly: GenerateFluentMockFor(typeof(INavigationSpec))]
+[assembly: GenerateFluentMockFor(typeof(INavigationRoot))]

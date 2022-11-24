@@ -19,7 +19,7 @@ internal class Executor<TEntity, TKey> : IExecutor<TEntity, TKey>
 
   public async Task<TEntity?> ExecuteSelectCommandAsync(DbCommand command, TKey key, IReadOnlyCollection<string> paths, CancellationToken cancellationToken)
   {
-    _builder.BuildSelectCommand(command, key, paths);
+    // _builder.BuildSelectCommand(command, key, paths);
 
     DbDataReader dataReader = await command.ExecuteReaderAsync(cancellationToken);
 

@@ -27,7 +27,7 @@ public class SqlTextBuilderTests
     //     .SetPrimaryKey(_ => _
     //       .SetProperties(idProperty))));
 
-    SqlTextBuilder sut = new();
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
     // string text = sut.BuildSelectText(plan);

@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Commands;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
 using CodeArchitects.Platform.Data.AdoNet.Navigation.FluentMock;
 
@@ -34,14 +35,48 @@ public class IncluderTests
     public int ChildBId { get; set; }
   }
 
+  record NavigationLeaf(INavigationModel Model) : INavigationLeaf
+  {
+    public int Index => Model.Id;
+
+    public IEntityModel Target => Model.To;
+
+    public void Accept<TVisitor>(in TVisitor visitor) where TVisitor : INavigationVisitor
+    {
+      visitor.VisitLeaf(this);
+    }
+
+    public void Accept<TVisitor, TState>(in TVisitor visitor, in TState state) where TVisitor : INavigationVisitor<TState>
+    {
+      visitor.VisitLeaf(this, in state);
+    }
+  }
+
+  record NavigationNode(INavigationModel Model, IReadOnlyList<INavigation> Children) : INavigationNode
+  {
+    public int Index => Model.Id;
+
+    public IEntityModel Target => Model.To;
+
+    public void Accept<TVisitor>(in TVisitor visitor) where TVisitor : INavigationVisitor
+    {
+      visitor.VisitNode(this);
+    }
+
+    public void Accept<TVisitor, TState>(in TVisitor visitor, in TState state) where TVisitor : INavigationVisitor<TState>
+    {
+      visitor.VisitNode(this, in state);
+    }
+  }
+
   [Fact]
   public void Test()
   {
     #region Mock
-    INavigationSpec spec = NavigationSpecBuilder.Build(_ => _
-      .SetNavigations(_ => _
+    INavigationRoot spec = NavigationRootBuilder.Build(_ => _
+      .SetChildren(_ => _
         .Add(new NavigationLeaf(
-          model: NavigationModelBuilder.Build(_ => _
+          Model: NavigationModelBuilder.Build(_ => _
             .SetId(1)
             .SetIsOnDependent(false)
             .SetTo(_ => _
@@ -57,7 +92,7 @@ public class IncluderTests
                   .SetColumnName("Id"))
                 .SetToProperty(_ => _
                   .SetColumnName("ParentId"))))))))
-      .SetEntity(_ => _
+      .SetTarget(_ => _
         .SetTableName("Parent")
         .SetProperties(_ => _
           .Add(_ => _
@@ -71,9 +106,9 @@ public class IncluderTests
               .SetIndex(0))))));
     #endregion
 
-    SqlBuilder sut = new();
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
-    var sql = sut.WriteSelectSql(spec);
+    var sql = sut.BuildSelectText(spec);
   }
 
   [Fact]
@@ -87,11 +122,11 @@ public class IncluderTests
     //     .Include(childB => childB.ChildC)));
 
     #region Mock
-    INavigationSpec spec = NavigationSpecBuilder.Build(_ => _
-      .SetNavigations(_ => _
+    INavigationRoot spec = NavigationRootBuilder.Build(_ => _
+      .SetChildren(_ => _
         .Add(new NavigationLeaf(
-          model: NavigationModelBuilder.Build(_ => _
-            .SetId(1)
+          Model: NavigationModelBuilder.Build(_ => _
+            .SetId(12)
             .SetIsOnDependent(false)
             .SetTo(_ => _
               .SetTableName("ChildA")
@@ -107,8 +142,8 @@ public class IncluderTests
                 .SetToProperty(_ => _
                   .SetColumnName("ParentId")))))))
         .Add(new NavigationNode(
-          model: NavigationModelBuilder.Build(_ => _
-            .SetId(2)
+          Model: NavigationModelBuilder.Build(_ => _
+            .SetId(93)
             .SetIsOnDependent(false)
             .SetTo(_ => _
               .SetTableName("ChildB")
@@ -123,11 +158,11 @@ public class IncluderTests
                   .SetColumnName("Id"))
                 .SetToProperty(_ => _
                   .SetColumnName("ParentId"))))),
-          navigations: new[]
+          Children: new[]
           {
             new NavigationLeaf(
-              model: NavigationModelBuilder.Build(_ => _
-                .SetId(3)
+              Model: NavigationModelBuilder.Build(_ => _
+                .SetId(42)
                 .SetIsOnDependent(false)
                 .SetTo(_ => _
                   .SetTableName("ChildC")
@@ -145,7 +180,7 @@ public class IncluderTests
                     .SetToProperty(_ => _
                       .SetColumnName("ChildBId"))))))
           })))
-      .SetEntity(_ => _
+      .SetTarget(_ => _
         .SetTableName("Parent")
         .SetProperties(_ => _
           .Add(_ => _
@@ -159,9 +194,9 @@ public class IncluderTests
               .SetIndex(0))))));
     #endregion
 
-    SqlBuilder sut = new();
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
-    var sql = sut.WriteSelectSql(spec);
+    var sql = sut.BuildSelectText(spec);
   }
 
 

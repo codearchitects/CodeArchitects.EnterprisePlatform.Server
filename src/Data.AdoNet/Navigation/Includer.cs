@@ -9,12 +9,10 @@ internal class Includer<TEntity> : IIncluder<TEntity>
   where TEntity : class
 {
   private readonly IEntityModel _entity;
-  private readonly List<ISubNavigationSpec> _navigationSpecs;
 
   public Includer(IEntityModel entity)
   {
     _entity = entity;
-    _navigationSpecs = new();
   }
 
   public string BuildSelectQuery()

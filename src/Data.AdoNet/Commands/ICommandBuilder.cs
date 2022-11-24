@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Commands;
 
@@ -6,5 +7,5 @@ internal interface ICommandBuilder<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  void BuildSelectCommand(DbCommand command, TKey key, IReadOnlyCollection<string> paths);
+  void BuildSelectCommand(DbCommand command, TKey key, INavigationRoot navigation);
 }

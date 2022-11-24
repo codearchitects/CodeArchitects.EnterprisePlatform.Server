@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Commands;
@@ -16,7 +17,8 @@ internal class CommandBuilder<TEntity, TKey> : ICommandBuilder<TEntity, TKey>
     _entity = entity;
   }
 
-  public void BuildSelectCommand(DbCommand command, TKey key, IReadOnlyCollection<string> paths)
+  public void BuildSelectCommand(DbCommand command, TKey key, INavigationRoot navigation)
   {
+    throw new NotImplementedException();
   }
 }
