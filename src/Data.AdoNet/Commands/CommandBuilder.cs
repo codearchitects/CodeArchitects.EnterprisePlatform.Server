@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Sql;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Commands;

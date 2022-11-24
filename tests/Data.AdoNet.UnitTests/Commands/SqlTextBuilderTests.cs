@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Sql;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Commands;
 
