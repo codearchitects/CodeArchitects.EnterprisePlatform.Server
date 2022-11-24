@@ -18,11 +18,11 @@ internal readonly struct AppendUnaliasedColumns : INavigationVisitor<int>
 
   public readonly void VisitNode(INavigationNode navigation, in int index)
   {
-    _stringBuilder.AppendNodeColumns(in index, navigation);
+    _stringBuilder.AppendNodeColumns(index, navigation);
   }
 
   public readonly void VisitLeaf(INavigationLeaf navigation, in int index)
   {
-    _stringBuilder.AppendLeafUnaliasedColumns(in index, navigation);
+    _stringBuilder.AppendLeafUnaliasedColumns(index, navigation);
   }
 }

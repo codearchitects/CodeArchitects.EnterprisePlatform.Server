@@ -78,19 +78,20 @@ internal readonly struct SelectStringBuilder
     }
   }
 
+
   public void AppendColumns(INavigation navigation)
   {
-    new AppendColumns(this).Visit(navigation, navigation.Index);
+    new AppendColumns(this).Visit(navigation);
   }
 
   public void AppendTarget(INavigation navigation)
   {
-    new AppendTarget(this).Visit(navigation, navigation.Index);
+    new AppendTarget(this).Visit(navigation);
   }
 
   public void AppendJoinConditions(INavigation navigation)
   {
-    new AppendJoinCondition(this).Visit(navigation, navigation.Index);
+    new AppendJoinCondition(this).Visit(navigation);
   }
 
   public void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
@@ -123,7 +124,7 @@ internal readonly struct SelectStringBuilder
     AppendJoin(", ", children, static (stringBuilder, child) => stringBuilder.AppendColumns(child));
   }
 
-  public void AppendNodeColumns(in int index, INavigationNode navigation)
+  public void AppendNodeColumns(int index, INavigationNode navigation)
   {
     IndexPair state = new(index, navigation.Index);
 
@@ -142,7 +143,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public void AppendLeafAliasedColumns(in int index, INavigationLeaf navigation)
+  public void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Index);
 
@@ -154,7 +155,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public void AppendLeafUnaliasedColumns(in int index, INavigationLeaf navigation)
+  public void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Index);
 

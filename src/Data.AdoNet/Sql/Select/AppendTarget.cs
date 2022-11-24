@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
-internal readonly struct AppendTarget : INavigationVisitor<int>
+internal readonly struct AppendTarget : INavigationVisitor
 {
   private readonly SelectStringBuilder _stringBuilder;
 
@@ -12,16 +12,16 @@ internal readonly struct AppendTarget : INavigationVisitor<int>
     _stringBuilder = stringBuilder;
   }
 
-  public readonly void Visit(INavigation navigation, int index)
+  public readonly void Visit(INavigation navigation)
   {
-    navigation.Accept(in this, in index);
+    navigation.Accept(in this);
   }
 
-  public readonly void VisitNode(INavigationNode navigation, in int index)
+  public readonly void VisitNode(INavigationNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", in index, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Target.Properties, AppendTargetColumn);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
@@ -42,19 +42,19 @@ internal readonly struct AppendTarget : INavigationVisitor<int>
     _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, in int index, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, in INavigationNode navigation, IPropertyModel property)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append("] AS [");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(index);
+      stringBuilder.Append(navigation.Index);
       stringBuilder.Append(']');
     }
   }
 
-  public readonly void VisitLeaf(INavigationLeaf navigation, in int index)
+  public readonly void VisitLeaf(INavigationLeaf navigation)
   {
     _stringBuilder.Append("[");
     _stringBuilder.Append(navigation.Target.TableName);
