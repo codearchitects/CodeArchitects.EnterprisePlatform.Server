@@ -1,21 +1,20 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class IncluderLeaf : INavigationLeaf
 {
-  private readonly INavigationModel _navigation;
-
-  public IncluderLeaf(INavigationModel navigation)
+  public IncluderLeaf(INavigationModel model)
   {
-    _navigation = navigation;
+    Model = model;
   }
 
-  public int Index => _navigation.Id;
+  public int Index => Model.Id;
 
-  public IEntityModel Target => _navigation.To;
+  public IEntityModel Target => Model.To;
 
-  public INavigationModel Model => _navigation;
+  public INavigationModel Model { get; }
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
@@ -43,6 +42,7 @@ internal class IncluderLeaf : INavigationLeaf
       _index = index;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Visit(INavigation navigation)
     {
       return navigation.Accept<EqualityVisitor, bool>(in this);

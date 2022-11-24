@@ -34,7 +34,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     };
 
     if (!Entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
-      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(navigation));
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(includeExpression));
 
     // _navigationSpecs.Add(navigationModel);
 
@@ -55,7 +55,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     };
 
     if (!Entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
-      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(navigation));
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(includeExpression));
 
     // _navigationSpecs.Add(navigationModel);
 

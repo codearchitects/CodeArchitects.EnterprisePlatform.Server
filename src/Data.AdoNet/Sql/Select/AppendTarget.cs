@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
@@ -12,6 +13,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder = stringBuilder;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public readonly void Visit(INavigation navigation)
   {
     navigation.Accept<AppendTarget, VoidResult>(in this);

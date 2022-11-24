@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
-internal struct NavigationCacheKey : IEquatable<NavigationCacheKey>
+internal readonly struct NavigationCacheKey : IEquatable<NavigationCacheKey>
 {
   private readonly IEntityModel _root;
   private readonly IReadOnlyList<INavigation> _navigations;
@@ -20,7 +20,7 @@ internal struct NavigationCacheKey : IEquatable<NavigationCacheKey>
     _navigations = Array.Empty<INavigation>();
   }
 
-  public bool Equals(NavigationCacheKey other)
+  public readonly bool Equals(NavigationCacheKey other)
   {
     if (!ReferenceEquals(_root, other._root))
       return false;
@@ -40,12 +40,12 @@ internal struct NavigationCacheKey : IEquatable<NavigationCacheKey>
     return true;
   }
 
-  public override bool Equals(object obj)
+  public readonly override bool Equals(object obj)
   {
     return obj is NavigationCacheKey other && Equals(other);
   }
 
-  public override int GetHashCode()
+  public readonly override int GetHashCode()
   {
     return _root.GetHashCode() + _navigations.Count;
   }

@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
@@ -11,6 +12,7 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
     _stringBuilder = stringBuilder;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public readonly void Visit(INavigation navigation)
   {
     navigation.Accept<AppendColumns, VoidResult>(in this);
