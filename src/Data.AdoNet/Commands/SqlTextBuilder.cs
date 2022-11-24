@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Commands;
 
 internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple database providers
 {
-  public string BuildSelectText(INavigationSpec plan)
+  public string BuildSelectText(INavigation plan)
   {
     StringBuilder stringBuilder = new();
 
@@ -35,7 +35,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
       .AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWherePredicates);
   }
 
-  private static void BuildSelectTextWithJoins(StringBuilder stringBuilder, INavigationSpec plan)
+  private static void BuildSelectTextWithJoins(StringBuilder stringBuilder, INavigation plan)
   {
     // stringBuilder
     //   .Append("SELECT ")

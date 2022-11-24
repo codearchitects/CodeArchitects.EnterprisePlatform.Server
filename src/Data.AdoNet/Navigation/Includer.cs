@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class Includer<TEntity> : IIncluder<TEntity>, INavigationSpec
+internal class Includer<TEntity> : IIncluder<TEntity>
   where TEntity : class
 {
   private readonly IEntityModel _entity;

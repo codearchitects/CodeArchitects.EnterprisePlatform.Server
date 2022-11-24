@@ -9,7 +9,6 @@ internal class IncluderNode<TEntity> : IExpressionIncluder<TEntity>, ISubNavigat
   where TEntity : class
 {
   private readonly INavigationModel _navigation;
-  private readonly List<ISubNavigationSpec> _navigations;
 
   public IncluderNode(INavigationModel navigation)
   {

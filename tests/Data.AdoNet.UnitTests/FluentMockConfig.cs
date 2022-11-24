@@ -6,4 +6,6 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IPropertyModel))]
 [assembly: GenerateFluentMockFor(typeof(IPrimaryKeyPropertyModel))]
 [assembly: GenerateFluentMockFor(typeof(IPrimaryKeyModel))]
-// [assembly: GenerateFluentMockFor(typeof(INavigationSpec))]
+[assembly: GenerateFluentMockFor(typeof(INavigationModel))]
+[assembly: GenerateFluentMockFor(typeof(IKeyPair))]
+[assembly: GenerateFluentMockFor(typeof(INavigationSpec))]
