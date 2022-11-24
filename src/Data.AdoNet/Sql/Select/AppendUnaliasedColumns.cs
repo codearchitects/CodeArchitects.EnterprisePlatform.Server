@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
-internal readonly struct AppendUnaliasedColumns : INavigationVisitor<int>
+internal readonly struct AppendUnaliasedColumns : INavigationVisitor<VoidResult, int>
 {
   private readonly SelectStringBuilder _stringBuilder;
 
@@ -13,16 +13,20 @@ internal readonly struct AppendUnaliasedColumns : INavigationVisitor<int>
 
   public readonly void Visit(INavigation navigation, int index)
   {
-    navigation.Accept(in this, in index);
+    navigation.Accept<AppendUnaliasedColumns, VoidResult, int>(in this, in index);
   }
 
-  public readonly void VisitNode(INavigationNode navigation, in int index)
-  {
-    _stringBuilder.AppendNodeColumns(index, navigation);
-  }
-
-  public readonly void VisitLeaf(INavigationLeaf navigation, in int index)
+  public readonly VoidResult VisitLeaf(INavigationLeaf navigation, in int index)
   {
     _stringBuilder.AppendLeafUnaliasedColumns(index, navigation);
+
+    return VoidResult.Instance;
+  }
+
+  public readonly VoidResult VisitNode(INavigationNode navigation, in int index)
+  {
+    _stringBuilder.AppendNodeColumns(index, navigation);
+
+    return VoidResult.Instance;
   }
 }

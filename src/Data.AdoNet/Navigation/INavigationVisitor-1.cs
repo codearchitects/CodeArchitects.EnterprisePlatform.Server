@@ -1,7 +1,7 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal interface INavigationVisitor<TState>
+internal interface INavigationVisitor<TResult>
 {
-  void VisitNode(INavigationNode navigation, in TState state);
-  void VisitLeaf(INavigationLeaf navigation, in TState state);
+  TResult VisitNode(INavigationNode navigation);
+  TResult VisitLeaf(INavigationLeaf navigation);
 }

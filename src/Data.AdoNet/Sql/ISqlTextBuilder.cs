@@ -4,5 +4,5 @@ namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
 internal interface ISqlTextBuilder
 {
-  string BuildSelectText(INavigationRoot spec);
+  string BuildSelectText(INavigationRoot root);
 }

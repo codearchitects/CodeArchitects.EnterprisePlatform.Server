@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
-internal readonly struct AppendTarget : INavigationVisitor
+internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 {
   private readonly SelectStringBuilder _stringBuilder;
 
@@ -14,10 +14,19 @@ internal readonly struct AppendTarget : INavigationVisitor
 
   public readonly void Visit(INavigation navigation)
   {
-    navigation.Accept(in this);
+    navigation.Accept<AppendTarget, VoidResult>(in this);
   }
 
-  public readonly void VisitNode(INavigationNode navigation)
+  public readonly VoidResult VisitLeaf(INavigationLeaf navigation)
+  {
+    _stringBuilder.Append("[");
+    _stringBuilder.Append(navigation.Target.TableName);
+    _stringBuilder.Append(']');
+
+    return VoidResult.Instance;
+  }
+
+  public readonly VoidResult VisitNode(INavigationNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
@@ -37,10 +46,12 @@ internal readonly struct AppendTarget : INavigationVisitor
       _stringBuilder.Append(child.Index);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
+      _stringBuilder.AppendLine();
     }
 
-    _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
+
+    return VoidResult.Instance;
 
     static void AppendTargetColumn(SelectStringBuilder stringBuilder, in INavigationNode navigation, IPropertyModel property)
     {
@@ -52,12 +63,5 @@ internal readonly struct AppendTarget : INavigationVisitor
       stringBuilder.Append(navigation.Index);
       stringBuilder.Append(']');
     }
-  }
-
-  public readonly void VisitLeaf(INavigationLeaf navigation)
-  {
-    _stringBuilder.Append("[");
-    _stringBuilder.Append(navigation.Target.TableName);
-    _stringBuilder.Append(']');
   }
 }

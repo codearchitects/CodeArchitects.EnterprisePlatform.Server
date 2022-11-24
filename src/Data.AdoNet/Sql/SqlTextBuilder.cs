@@ -15,17 +15,19 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
 
   public string BuildSelectText(INavigationRoot root)
   {
-    if (_cache.TryGetSelectText(root.CacheKey, out string? text))
-      return text;
+    IEntityModel entity = root.Entity;
+    IReadOnlyList<INavigation> navigations = root.Navigations;
+    NavigationCacheKey key = new NavigationCacheKey(entity, navigations);
 
-    IEntityModel entity = root.Target;
+    if (_cache.TryGetSelectText(key, out string? text))
+      return text;
 
     SelectStringBuilder stringBuilder = new();
 
     stringBuilder.Append("SELECT ");
     stringBuilder.AppendJoin(", ", entity.Properties, AppendTargetColumn);
     stringBuilder.Append(", ");
-    stringBuilder.AppendChildrenColumns(root.Children);
+    stringBuilder.AppendChildrenColumns(navigations);
     stringBuilder.AppendLine();
     stringBuilder.AppendLine("FROM (");
     stringBuilder.Append("SELECT ");
@@ -35,11 +37,11 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
     stringBuilder.Append(entity.TableName);
     stringBuilder.AppendLine("]");
     stringBuilder.Append("WHERE ");
-    stringBuilder.AppendJoin(", ", entity.PrimaryKey.Properties, AppendWhereCondition);
+    stringBuilder.AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWhereCondition);
     stringBuilder.AppendLine();
     stringBuilder.Append(") AS t");
 
-    foreach (INavigation child in root.Children)
+    foreach (INavigation child in navigations)
     {
       stringBuilder.AppendLine();
       stringBuilder.Append("LEFT JOIN ");
@@ -50,7 +52,10 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
       stringBuilder.AppendJoinConditions(child);
     }
 
-    return stringBuilder.ToString();
+    text = stringBuilder.ToString();
+    _cache.AddSelectText(key, text);
+
+    return text;
 
     static void AppendTargetColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
     {

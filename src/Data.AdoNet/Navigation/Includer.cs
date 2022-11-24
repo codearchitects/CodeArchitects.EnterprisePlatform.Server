@@ -5,23 +5,23 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class Includer<TEntity> : IIncluder<TEntity>
+internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
   where TEntity : class
 {
-  private readonly IEntityModel _entity;
+  private readonly List<INavigation> _navigations;
 
   public Includer(IEntityModel entity)
   {
-    _entity = entity;
+    Entity = entity;
+    _navigations = new();
   }
 
-  public string BuildSelectQuery()
-  {
-    throw new NotImplementedException();
-  }
+  public IEntityModel Entity { get; }
+
+  public IReadOnlyList<INavigation> Navigations => _navigations;
 
   public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression)
-  where T : class
+    where T : class
   {
     if (includeExpression.Body is not MemberExpression member)
       throw new ArgumentException("", nameof(includeExpression)); // TODO: Support other expressions
@@ -33,8 +33,8 @@ internal class Includer<TEntity> : IIncluder<TEntity>
       _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
     };
 
-    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
-      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+    if (!Entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(navigation));
 
     // _navigationSpecs.Add(navigationModel);
 
@@ -54,8 +54,8 @@ internal class Includer<TEntity> : IIncluder<TEntity>
       _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
     };
 
-    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
-      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+    if (!Entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(navigation));
 
     // _navigationSpecs.Add(navigationModel);
 
@@ -73,10 +73,10 @@ internal class Includer<TEntity> : IIncluder<TEntity>
   {
     // TODO: string[] paths = navigation.Split('.');
 
-    if (!_entity.TryGetNavigation(navigation, out INavigationModel navigationModel))
-      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{_entity.Name}'.", nameof(navigation));
+    if (!Entity.TryGetNavigation(navigation, out INavigationModel model))
+      throw new ArgumentException($"Navigation '{navigation}' does not exist on entity '{Entity.Name}'.", nameof(navigation));
 
-    // _navigationSpecs.Add(navigationModel);
+    _navigations.Add(new IncluderLeaf(model));
 
     return this;
   }

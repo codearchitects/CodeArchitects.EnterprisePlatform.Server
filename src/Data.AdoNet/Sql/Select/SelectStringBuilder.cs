@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
@@ -16,31 +17,37 @@ internal readonly struct SelectStringBuilder
     _stringBuilder = new();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void Append(string value)
   {
     _stringBuilder.Append(value);
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void Append(char value)
   {
     _stringBuilder.Append(value);
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void Append(int value)
   {
     _stringBuilder.Append(value);
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void AppendLine()
   {
     _stringBuilder.AppendLine();
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public void AppendLine(string value)
   {
     _stringBuilder.AppendLine(value);
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public override string ToString()
   {
     return _stringBuilder.ToString();
@@ -91,7 +98,7 @@ internal readonly struct SelectStringBuilder
 
   public void AppendJoinConditions(INavigation navigation)
   {
-    new AppendJoinCondition(this).Visit(navigation);
+    new AppendJoinConditions(this).Visit(navigation);
   }
 
   public void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)

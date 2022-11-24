@@ -2,15 +2,15 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal interface INavigation
+internal interface INavigation : IEquatable<INavigation>
 {
   int Index { get; }
   IEntityModel Target { get; }
   INavigationModel Model { get; }
 
-  void Accept<TVisitor>(in TVisitor visitor)
-    where TVisitor : INavigationVisitor;
+  TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+    where TVisitor : INavigationVisitor<TResult>;
 
-  void Accept<TVisitor, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : INavigationVisitor<TState>;
+  TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+    where TVisitor : INavigationVisitor<TResult, TState>;
 }
