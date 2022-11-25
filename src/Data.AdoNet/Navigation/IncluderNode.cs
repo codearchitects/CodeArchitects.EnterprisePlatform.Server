@@ -19,8 +19,6 @@ internal abstract class IncluderNode
 
   public void AddLeaf(ReadOnlySpan<char> path)
   {
-    INavigationModel model;
-
     int index = 0;
     int length = path.Length;
 
@@ -32,6 +30,7 @@ internal abstract class IncluderNode
       index++;
     }
 
+    INavigationModel model;
     if (index == length)
     {
       model = GetNavigationModel(path);
