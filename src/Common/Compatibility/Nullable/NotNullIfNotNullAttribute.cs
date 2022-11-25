@@ -8,6 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that the output will be non-<see langword="null"/> if the named parameter is non-<see langword="null"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class NotNullIfNotNullAttribute : Attribute
 {
   /// <summary>

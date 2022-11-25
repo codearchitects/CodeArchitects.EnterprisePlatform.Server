@@ -8,7 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that an output is not <see langword="null"/> even if the corresponding type allows it.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class NotNullAttribute : Attribute
 {
   /// <summary>

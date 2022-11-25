@@ -8,7 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that the method or property will ensure that the listed field and property members have non-<see langword="null"/> values when returning with the specified return value condition.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class MemberNotNullWhenAttribute : Attribute
 {
   /// <summary>

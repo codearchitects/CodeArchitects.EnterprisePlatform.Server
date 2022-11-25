@@ -8,7 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that <see langword="null"/> is disallowed as an input even if the corresponding type allows it.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class DisallowNullAttribute : Attribute
 {
   /// <summary>

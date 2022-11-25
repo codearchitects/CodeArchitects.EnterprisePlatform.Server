@@ -8,7 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that a method that will never return under any circumstance.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class DoesNotReturnAttribute : Attribute
 {
   /// <summary>

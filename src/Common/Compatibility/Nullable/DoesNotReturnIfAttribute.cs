@@ -8,7 +8,7 @@ namespace System.Diagnostics.CodeAnalysis;
 /// Specifies that the method will not return if the associated <see cref="bool"/> parameter is passed the specified value.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class DoesNotReturnIfAttribute : Attribute
 {
   /// <summary>
