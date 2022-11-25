@@ -2,8 +2,6 @@
 
 #if !NETCOREAPP2_0_OR_GREATER
 
-internal delegate void AppendAction<in T>(StringBuilder stringBuilder, T current);
-
 internal static partial class StringBuilderExtensions
 {
   public static StringBuilder AppendJoin(this StringBuilder stringBuilder, string separator, params object?[] values)
