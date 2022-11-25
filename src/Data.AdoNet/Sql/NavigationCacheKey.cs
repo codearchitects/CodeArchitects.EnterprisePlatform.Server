@@ -6,9 +6,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 internal readonly struct NavigationCacheKey : IEquatable<NavigationCacheKey>
 {
   private readonly IEntityModel _root;
-  private readonly IReadOnlyList<INavigation> _navigations;
+  private readonly IReadOnlyCollection<INavigation> _navigations;
 
-  public NavigationCacheKey(IEntityModel root, IReadOnlyList<INavigation> navigations)
+  public NavigationCacheKey(IEntityModel root, IReadOnlyCollection<INavigation> navigations)
   {
     _root = root;
     _navigations = navigations;
@@ -22,22 +22,9 @@ internal readonly struct NavigationCacheKey : IEquatable<NavigationCacheKey>
 
   public readonly bool Equals(NavigationCacheKey other)
   {
-    if (!ReferenceEquals(_root, other._root))
-      return false;
-
-    IReadOnlyList<INavigation> navigations = _navigations;
-    IReadOnlyList<INavigation> otherNavigations = other._navigations;
-
-    if (navigations.Count != otherNavigations.Count)
-      return false;
-
-    for (int i = 0; i < navigations.Count; i++)
-    {
-      if (!navigations[i].Equals(otherNavigations[i]))
-        return false;
-    }
-
-    return true;
+    return
+      ReferenceEquals(other._root, _root) &&
+      NavigationCollection.Equal(other._navigations, _navigations);
   }
 
   public readonly override bool Equals(object obj)

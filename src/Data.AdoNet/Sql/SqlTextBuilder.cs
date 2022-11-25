@@ -16,7 +16,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
   public string BuildSelectText(INavigationRoot root)
   {
     IEntityModel entity = root.Entity;
-    IReadOnlyList<INavigation> navigations = root.Navigations;
+    IReadOnlyCollection<INavigation> navigations = root.Navigations;
     NavigationCacheKey key = new NavigationCacheKey(entity, navigations);
 
     if (_cache.TryGetSelectText(key, out string? text))

@@ -30,16 +30,16 @@ internal class IncluderLeaf : INavigationLeaf
 
   public bool Equals(INavigation other)
   {
-    return new EqualityVisitor(Index).Visit(other);
+    return new EqualityVisitor(this).Visit(other);
   }
 
   private readonly struct EqualityVisitor : INavigationVisitor<bool>
   {
-    private readonly int _index;
+    private readonly INavigationLeaf _navigation;
 
-    public EqualityVisitor(int index)
+    public EqualityVisitor(INavigationLeaf navigation)
     {
-      _index = index;
+      _navigation = navigation;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,7 +50,7 @@ internal class IncluderLeaf : INavigationLeaf
 
     public readonly bool VisitLeaf(INavigationLeaf navigation)
     {
-      return navigation.Index == _index;
+      return navigation.Index == _navigation.Index;
     }
 
     public readonly bool VisitNode(INavigationNode navigation)

@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal interface INavigation : IEquatable<INavigation>
+internal interface INavigation
 {
   int Index { get; }
   IEntityModel Target { get; }

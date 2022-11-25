@@ -18,31 +18,31 @@ internal readonly struct SelectStringBuilder
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public void Append(string value)
+  public readonly void Append(string value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public void Append(char value)
+  public readonly void Append(char value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public void Append(int value)
+  public readonly void Append(int value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public void AppendLine()
+  public readonly void AppendLine()
   {
     _stringBuilder.AppendLine();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public void AppendLine(string value)
+  public readonly void AppendLine(string value)
   {
     _stringBuilder.AppendLine(value);
   }
@@ -53,23 +53,23 @@ internal readonly struct SelectStringBuilder
     return _stringBuilder.ToString();
   }
 
-  public void AppendJoin<T>(string separator, IEnumerable<T> values, AppendAction<T> append)
+  public readonly void AppendJoin<T>(string separator, IEnumerable<T> values, AppendAction<T> append)
   {
-    using IEnumerator<T> en = values.GetEnumerator();
+    using IEnumerator<T> enumerator = values.GetEnumerator();
 
-    if (!en.MoveNext())
+    if (!enumerator.MoveNext())
       return;
 
-    append(this, en.Current);
+    append(this, enumerator.Current);
 
-    while (en.MoveNext())
+    while (enumerator.MoveNext())
     {
       _stringBuilder.Append(separator);
-      append(this, en.Current);
+      append(this, enumerator.Current);
     }
   }
 
-  public void AppendJoin<TState, T>(string separator, in TState state, IEnumerable<T> values, AppendAction<TState, T> append)
+  public readonly void AppendJoin<TState, T>(string separator, in TState state, IEnumerable<T> values, AppendAction<TState, T> append)
   {
     using IEnumerator<T> en = values.GetEnumerator();
 
@@ -86,22 +86,22 @@ internal readonly struct SelectStringBuilder
   }
 
 
-  public void AppendColumns(INavigation navigation)
+  public readonly void AppendColumns(INavigation navigation)
   {
     new AppendColumns(this).Visit(navigation);
   }
 
-  public void AppendTarget(INavigation navigation)
+  public readonly void AppendTarget(INavigation navigation)
   {
     new AppendTarget(this).Visit(navigation);
   }
 
-  public void AppendJoinConditions(INavigation navigation)
+  public readonly void AppendJoinConditions(INavigation navigation)
   {
     new AppendJoinConditions(this).Visit(navigation);
   }
 
-  public void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
+  public readonly void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
   {
     Append('t');
     Append(state.Index);
@@ -126,12 +126,12 @@ internal readonly struct SelectStringBuilder
   }
 
 
-  public void AppendChildrenColumns(IReadOnlyList<INavigation> children)
+  public readonly void AppendChildrenColumns(IReadOnlyCollection<INavigation> children)
   {
     AppendJoin(", ", children, static (stringBuilder, child) => stringBuilder.AppendColumns(child));
   }
 
-  public void AppendNodeColumns(int index, INavigationNode navigation)
+  public readonly void AppendNodeColumns(int index, INavigationNode navigation)
   {
     IndexPair state = new(index, navigation.Index);
 
@@ -150,7 +150,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
+  public readonly void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Index);
 
@@ -162,7 +162,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
+  public readonly void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Index);
 

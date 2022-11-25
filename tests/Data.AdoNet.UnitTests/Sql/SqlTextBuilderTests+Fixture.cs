@@ -333,7 +333,7 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationNode(INavigationModel Model, IReadOnlyList<INavigation> Children) : INavigationNode
+  private record NavigationNode(INavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationNode
   {
     public int Index => Model.Id;
 
