@@ -1,46 +1,24 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.Navigation;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class IncluderNode<TEntity> : IExpressionIncluder<TEntity>, INavigationNode
-  where TEntity : class
+internal class IncluderNode : IncluderBase, INavigationNode
 {
-  private readonly Dictionary<int, INavigation> _navigations;
-
   public IncluderNode(INavigationModel model)
   {
-    _navigations = new();
     Model = model;
   }
 
-  public IReadOnlyCollection<INavigation> Children => _navigations.Values;
-
   public int Index => Model.Id;
-
-  public IEntityModel Target => Model.To;
 
   public INavigationModel Model { get; }
 
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression)
-    where T : class
-  {
-    throw new NotImplementedException();
-  }
+  protected override IEntityModel Target => Model.To;
 
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
-    where T : class
-  {
-    throw new NotImplementedException();
-  }
+  IEntityModel INavigation.Target => Target;
 
-  public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, IEnumerable<T>?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
-    where T : class
-  {
-    throw new NotImplementedException();
-  }
+  IReadOnlyCollection<INavigation> INavigationNode.Children => Children;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>

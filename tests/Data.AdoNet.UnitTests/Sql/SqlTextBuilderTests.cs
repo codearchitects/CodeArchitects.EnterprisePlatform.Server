@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Navigation.FluentMock;
+using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
@@ -10,9 +11,9 @@ public partial class SqlTextBuilderTests
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(Model.RootEntity)
+      .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(Model.RootToChildANavigation)));
+        new NavigationLeaf(RootToChildANavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1]
@@ -38,10 +39,10 @@ public partial class SqlTextBuilderTests
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(Model.RootEntity)
+      .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(Model.RootToChildANavigation),
-        new NavigationLeaf(Model.RootToChildBNavigation)));
+        new NavigationLeaf(RootToChildANavigation),
+        new NavigationLeaf(RootToChildBNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2]
@@ -68,18 +69,18 @@ public partial class SqlTextBuilderTests
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(Model.RootEntity)
+      .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(Model.RootToChildBNavigation),
-        new NavigationNode(Model.RootToChildANavigation, new INavigation[]
+        new NavigationLeaf(RootToChildBNavigation),
+        new NavigationNode(RootToChildANavigation, new INavigation[]
         {
-          new NavigationNode(Model.ChildAToChildDNavigation, new INavigation[]
+          new NavigationNode(ChildAToChildDNavigation, new INavigation[]
           {
-            new NavigationLeaf(Model.ChildDToChildENavigation)
+            new NavigationLeaf(ChildDToChildENavigation)
           }),
-          new NavigationLeaf(Model.ChildAToChildFNavigation)
+          new NavigationLeaf(ChildAToChildFNavigation)
         }),
-        new NavigationLeaf(Model.RootToChildCNavigation)));
+        new NavigationLeaf(RootToChildCNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2], t1.[Id_1], t1.[Name_1], t1.[RootId_1], t1.[Id_4], t1.[Name_4], t1.[ChildAId_4], t1.[Id_6], t1.[Name_6], t1.[ChildDId_6], t1.[Id_5], t1.[Name_5], t1.[ChildAId_5], t3.[Id] AS [Id_3], t3.[Name] AS [Name_3], t3.[RootId] AS [RootId_3]
@@ -116,9 +117,9 @@ public partial class SqlTextBuilderTests
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(Model.ChildAEntity)
+      .SetEntity(ChildAEntity)
       .SetNavigations(
-        new NavigationLeaf(Model.ChildAToRootNavigation)));
+        new NavigationLeaf(ChildAToRootNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[RootId], t7.[Id] AS [Id_7], t7.[Name] AS [Name_7]
