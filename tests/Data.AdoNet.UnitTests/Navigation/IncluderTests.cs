@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Fixtures;
-using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture;
+﻿using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture;
 using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
@@ -7,7 +6,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 public class IncluderTests
 {
   [Fact]
-  public void Include_ShouldIncludeLeafNavigation_WhenDepth1()
+  public void IncludeLiteral_ShouldIncludeLeafNavigation_WhenDepth1()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -17,11 +16,25 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId);
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
+  public void IncludeExpr_ShouldIncludeLeafNavigation_WhenDepth1()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => root.ChildA);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -33,12 +46,44 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId)
-      .And.ContainSingle(nav => nav.Index == RootToChildBId);
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeLeafNavigation_WhenDepth1AndIncludedMultipleTimes()
+  public void IncludeExpr_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA)
+      .Include(root => root.ChildB);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(2)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeObj_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => new { root.ChildA, root.ChildB });
+
+    // Assert
+    includer.Navigations.Should().HaveCount(2)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeLeafNavigation_WhenDepth1AndIncludedMultipleTimes()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -50,11 +95,27 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId);
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeNodeNavigation_WhenDepth2()
+  public void IncludeExpr_ShouldIncludeLeafNavigation_WhenDepth1AndIncludedMultipleTimes()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA)
+      .Include(root => root.ChildA);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -64,13 +125,46 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
       .Which.As<INavigationNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildDId);
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsLeaf()
+  public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => root.ChildA!.ChildD);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeThen_ShouldIncludeNodeNavigation_WhenDepth2()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => root.ChildA, includer => includer
+      .Include(childA => childA.ChildD));
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsLeaf()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -82,13 +176,31 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
       .Which.As<INavigationNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildDId);
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
+  public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsLeaf()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA)
+      .Include(root => root.ChildA!.ChildD);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
@@ -100,37 +212,169 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
       .Which.As<INavigationNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildDId)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildFId);
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeAllNavigations()
+  public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
     Includer<Root> includer = new(RootEntity);
 
     // Act
     includer
-      .Include($"{nameof(Root.ChildA)}.{nameof(ChildA.ChildD)}")
+      .Include(root => root.ChildA!.ChildD)
+      .Include(root => root.ChildA!.ChildF);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeObj_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => new { root.ChildA!.ChildD, root.ChildA!.ChildF });
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeThen_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA, _ => _
+        .Include(childA => childA.ChildD))
+      .Include(root => root.ChildA, _ => _
+        .Include(childA => childA.ChildF));
+
+    // Assert
+    includer.Navigations.Should().HaveCount(1)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeAllNavigations()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include($"{nameof(Root.ChildA)}.{nameof(ChildA.ChildD)}.{nameof(ChildD.ChildE)}")
       .Include($"{nameof(Root.ChildA)}.{nameof(ChildA.ChildF)}")
       .Include(nameof(Root.ChildB))
       .Include(nameof(Root.ChildC));
 
     // Assert
     includer.Navigations.Should().HaveCount(3)
-      .And.ContainSingle(nav => nav.Index == RootToChildBId)
-      .And.ContainSingle(nav => nav.Index == RootToChildCId)
-      .And.ContainSingle(nav => nav.Index == RootToChildAId)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
       .Which.As<INavigationNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildDId)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildFId);
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf);
   }
 
   [Fact]
-  public void Include_ShouldIncludeAllNavigationsAlsoBackwards()
+  public void IncludeExpr_ShouldIncludeAllNavigations()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA!.ChildD!.ChildE)
+      .Include(root => root.ChildA!.ChildF)
+      .Include(root => root.ChildB)
+      .Include(root => root.ChildC);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(3)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeObj_ShouldIncludeAllNavigations()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer.Include(root => new { root.ChildA!.ChildD!.ChildE, root.ChildA!.ChildF, root.ChildB, root.ChildC });
+
+    // Assert
+    includer.Navigations.Should().HaveCount(3)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeThen_ShouldIncludeAllNavigations()
+  {
+    // Arrange
+    Includer<Root> includer = new(RootEntity);
+
+    // Act
+    includer
+      .Include(root => root.ChildA, _ => _
+        .Include(childA => childA.ChildD, _ => _
+          .Include(childD => childD.ChildE))
+        .Include(childA => childA.ChildF))
+      .Include(root => root.ChildB)
+      .Include(root => root.ChildC);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(3)
+      .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == RootToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildDId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeLiteral_ShouldIncludeAllNavigationsAlsoBackwards()
   {
     // Arrange
     Includer<ChildD> includer = new(ChildDEntity);
@@ -144,13 +388,86 @@ public class IncluderTests
 
     // Assert
     includer.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Index == ChildDToChildEId)
-      .And.ContainSingle(nav => nav.Index == ChildDToChildAId)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildAId && nav is INavigationNode)
       .Which.As<INavigationNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Index == ChildAToChildFId)
-        .And.ContainSingle(nav => nav.Index == ChildAToRootId)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToRootId && nav is INavigationNode)
         .Which.As<INavigationNode>().Children.Should().HaveCount(2)
-          .And.ContainSingle(nav => nav.Index == RootToChildBId)
-          .And.ContainSingle(nav => nav.Index == RootToChildCId);
+          .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+          .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeExpr_ShouldIncludeAllNavigationsAlsoBackwards()
+  {
+    // Arrange
+    Includer<ChildD> includer = new(ChildDEntity);
+
+    // Act
+    includer
+      .Include(childD => childD.ChildA!.ChildF)
+      .Include(childD => childD.ChildA!.Root!.ChildB)
+      .Include(childD => childD.ChildA!.Root!.ChildC)
+      .Include(childD => childD.ChildE);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(2)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToRootId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+          .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeObj_ShouldIncludeAllNavigationsAlsoBackwards()
+  {
+    // Arrange
+    Includer<ChildD> includer = new(ChildDEntity);
+
+    // Act
+    includer.Include(childD => new { childD.ChildA!.ChildF, childD.ChildA!.Root!.ChildB, childD.ChildA!.Root!.ChildC, childD.ChildE });
+
+    // Assert
+    includer.Navigations.Should().HaveCount(2)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToRootId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+          .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf);
+  }
+
+  [Fact]
+  public void IncludeThen_ShouldIncludeAllNavigationsAlsoBackwards()
+  {
+    // Arrange
+    Includer<ChildD> includer = new(ChildDEntity);
+
+    // Act
+    includer
+      .Include(childD => childD.ChildA, _ => _
+        .Include(childA => childA.ChildF)
+        .Include(childA => childA.Root, _ => _
+          .Include(root => root.ChildB)
+          .Include(root => root.ChildC)))
+      .Include(childD => childD.ChildE);
+
+    // Assert
+    includer.Navigations.Should().HaveCount(2)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildEId && nav is INavigationLeaf)
+      .And.ContainSingle(nav => nav.Index == ChildDToChildAId && nav is INavigationNode)
+      .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Index == ChildAToChildFId && nav is INavigationLeaf)
+        .And.ContainSingle(nav => nav.Index == ChildAToRootId && nav is INavigationNode)
+        .Which.As<INavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Index == RootToChildBId && nav is INavigationLeaf)
+          .And.ContainSingle(nav => nav.Index == RootToChildCId && nav is INavigationLeaf);
   }
 }

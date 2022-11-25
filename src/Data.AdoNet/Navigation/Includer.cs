@@ -1,94 +1,117 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class Includer<TEntity> : IncluderBase, IIncluder<TEntity>, INavigationRoot
+internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
   where TEntity : class
 {
-  public Includer(IEntityModel entity)
+  private readonly IncluderNode _node;
+
+  private Includer(IncluderNode node)
   {
-    Target = entity;
+    _node = node;
   }
 
-  public IReadOnlyCollection<INavigation> Navigations => Children;
+  public Includer(IEntityModel entity)
+  {
+    _node = new IncluderRoot(entity);
+  }
 
-  public IEntityModel Entity => Target;
+  public IEntityModel Entity => _node.Target;
 
-  protected override IEntityModel Target { get; }
-
-  // entity => entity.Child;
-  // entity => new { entity.Child1, entity.Child2 }
-  // entity => entity.Child.GrandChild;
-  // entity => new { entity.Child1, entity.Child2.GrandChild }
+  public IReadOnlyCollection<INavigation> Navigations => _node.Children;
 
   public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression)
     where T : class
   {
-    throw new NotImplementedException();
-    //if (includeExpression.Body is not MemberExpression member)
-    //  throw new ArgumentException("", nameof(includeExpression)); // TODO: Support other expressions
+    try
+    {
+      switch (includeExpression.Body)
+      {
+        case MemberExpression memberExpression:
+          _node.AddLeaf(memberExpression);
+          break;
 
-    //string navigationName = member.Member switch
-    //{
-    //  PropertyInfo property => property.Name,
-    //  FieldInfo field => field.Name,
-    //  _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
-    //};
+        case NewExpression newExpression:
+          if (!newExpression.Type.IsAnonymousType())
+            throw new ArgumentException("Invalid include expression.", nameof(includeExpression));
 
-    //if (!Entity.TryGetNavigation(navigationName, out INavigationModel model))
-    //  throw new ArgumentException($"Navigation '{navigationName}' does not exist on entity '{Entity.Name}'.", nameof(includeExpression));
+          foreach (Expression argument in newExpression.Arguments)
+          {
+            _node.AddLeaf((MemberExpression)argument);
+          }
+          break;
 
-    //if (!_navigations.ContainsKey(model.Id))
-    //{
-    //  _navigations.Add(model.Id, new IncluderLeaf(model));
-    //}
+        default:
+          throw new ArgumentException("Invalid include expression.", nameof(includeExpression));
+      }
 
-    //return this;
+      return this;
+    }
+    catch (IncludeException ex)
+    {
+      throw GetWrappedException(nameof(includeExpression), ex);
+    }
   }
 
   public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
     where T : class
   {
-    throw new NotImplementedException();
-    //if (includeExpression.Body is not MemberExpression member)
-    //  throw new ArgumentException("", nameof(includeExpression)); // TODO: Support other expressions
+    if (includeExpression.Body is not MemberExpression memberExpression)
+      throw new ArgumentException("Invalid include expression.", nameof(includeExpression));
 
-    //string navigationName = member.Member switch
-    //{
-    //  PropertyInfo property => property.Name,
-    //  FieldInfo field => field.Name,
-    //  _ => throw new ArgumentException($"The specified member is not a property or a field.", nameof(includeExpression))
-    //};
-
-    //if (!Entity.TryGetNavigation(navigationName, out INavigationModel model))
-    //  throw new ArgumentException($"Navigation '{navigationName}' does not exist on entity '{Entity.Name}'.", nameof(includeExpression));
-
-    //if (!_navigations.TryGetValue(model.Id, out INavigation? navigation) && navigation is IncluderNode<T> node)
-    //{
-    //  thenInclude(node);
-    //  return this;
-    //}
-
-    //node = new IncluderNode<T>(model);
-    //thenInclude(node);
-    //_navigations[model.Id] = node;
-
-    //return this;
+    try
+    {
+      return Include(memberExpression, thenInclude);
+    }
+    catch (IncludeException ex)
+    {
+      throw GetWrappedException(nameof(includeExpression), ex);
+    }
   }
 
   public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, IEnumerable<T>?>> includeExpression, Action<IExpressionIncluder<T>> thenInclude)
     where T : class
   {
-    return this;
+    if (includeExpression.Body is not MemberExpression memberExpression)
+      throw new ArgumentException("Invalid include expression.", nameof(includeExpression));
+
+    try
+    {
+      return Include(memberExpression, thenInclude);
+    }
+    catch (IncludeException ex)
+    {
+      throw GetWrappedException(nameof(includeExpression), ex);
+    }
   }
 
   public IStringIncluder<TEntity> Include(string navigation)
   {
-    if (!TryInclude(navigation.AsSpan()))
-      throw new ArgumentException($"'{navigation}' is an invalid navigation path for entity '{Target.Type.Name}'.", nameof(navigation));
+    try
+    {
+      _node.AddLeaf(navigation.AsSpan());
+
+      return this;
+    }
+    catch (IncludeException ex)
+    {
+      throw GetWrappedException(nameof(navigation), ex);
+    }
+  }
+
+  private IExpressionIncluder<TEntity> Include<T>(MemberExpression memberExpression, Action<IExpressionIncluder<T>> thenInclude)
+    where T : class
+  {
+    NavigationNode childNode = _node.AddNode(memberExpression);
+    thenInclude(new Includer<T>(childNode));
 
     return this;
   }
+
+  private static ArgumentException GetWrappedException(string parameterName, IncludeException ex)
+    => new ArgumentException("Invalid include expression. See inner exception for details", parameterName, ex);
 }

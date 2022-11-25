@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class IncluderLeaf : INavigationLeaf
+internal class NavigationLeaf : INavigationLeaf
 {
-  public IncluderLeaf(INavigationModel model)
+  public NavigationLeaf(INavigationModel model)
   {
     Model = model;
   }
