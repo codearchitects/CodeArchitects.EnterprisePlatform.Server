@@ -53,7 +53,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     }
     catch (IncludeException ex)
     {
-      throw GetWrappedException(nameof(includeExpression), ex);
+      throw WrapIncludeException(ex, nameof(includeExpression));
     }
   }
 
@@ -69,7 +69,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     }
     catch (IncludeException ex)
     {
-      throw GetWrappedException(nameof(includeExpression), ex);
+      throw WrapIncludeException(ex, nameof(includeExpression));
     }
   }
 
@@ -85,7 +85,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     }
     catch (IncludeException ex)
     {
-      throw GetWrappedException(nameof(includeExpression), ex);
+      throw WrapIncludeException(ex, nameof(includeExpression));
     }
   }
 
@@ -99,7 +99,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     }
     catch (IncludeException ex)
     {
-      throw GetWrappedException(nameof(navigation), ex);
+      throw WrapIncludeException(ex, nameof(navigation));
     }
   }
 
@@ -112,6 +112,6 @@ internal class Includer<TEntity> : IIncluder<TEntity>, INavigationRoot
     return this;
   }
 
-  private static ArgumentException GetWrappedException(string parameterName, IncludeException ex)
+  private static ArgumentException WrapIncludeException(IncludeException ex, string parameterName)
     => new ArgumentException("Invalid include expression. See inner exception for details", parameterName, ex);
 }
