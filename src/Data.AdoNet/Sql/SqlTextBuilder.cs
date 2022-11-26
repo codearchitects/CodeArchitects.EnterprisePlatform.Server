@@ -24,59 +24,16 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
 
     SelectStringBuilder stringBuilder = new();
 
-    stringBuilder.Append("SELECT ");
-    stringBuilder.AppendJoin(", ", entity.Properties, AppendTargetColumn);
-    stringBuilder.Append(", ");
-    stringBuilder.AppendChildrenColumns(navigations);
-    stringBuilder.AppendLine();
-    stringBuilder.AppendLine("FROM (");
-    stringBuilder.Append("SELECT ");
-    stringBuilder.AppendJoin(", ", entity.Properties, AppendColumn);
-    stringBuilder.AppendLine();
-    stringBuilder.Append("FROM [");
-    stringBuilder.Append(entity.TableName);
-    stringBuilder.AppendLine("]");
-    stringBuilder.Append("WHERE ");
-    stringBuilder.AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWhereCondition);
-    stringBuilder.AppendLine();
-    stringBuilder.Append(") AS t");
+    stringBuilder.AppendSelectFrom(entity, navigations);
 
     foreach (INavigation child in navigations)
     {
-      stringBuilder.AppendLine();
-      stringBuilder.Append("LEFT JOIN ");
-      stringBuilder.AppendTarget(child);
-      stringBuilder.Append(" AS t");
-      stringBuilder.Append(child.Index);
-      stringBuilder.Append(" ON ");
-      stringBuilder.AppendJoinConditions(child);
+      stringBuilder.AppendLeftJoin(child);
     }
 
     text = stringBuilder.ToString();
     _cache.AddSelectText(key, text);
 
     return text;
-
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
-    {
-      stringBuilder.Append("t.[");
-      stringBuilder.Append(property.ColumnName);
-      stringBuilder.Append(']');
-    }
-
-    static void AppendColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
-    {
-      stringBuilder.Append('[');
-      stringBuilder.Append(property.ColumnName);
-      stringBuilder.Append(']');
-    }
-
-    static void AppendWhereCondition(SelectStringBuilder stringBuilder, IPrimaryKeyPropertyModel property)
-    {
-      stringBuilder.Append('[');
-      stringBuilder.Append(property.ColumnName);
-      stringBuilder.Append("] = @p");
-      stringBuilder.Append(property.Index);
-    }
   }
 }

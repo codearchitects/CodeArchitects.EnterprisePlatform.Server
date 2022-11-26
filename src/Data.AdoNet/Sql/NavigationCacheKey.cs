@@ -23,7 +23,7 @@ internal readonly struct NavigationCacheKey : IEquatable<NavigationCacheKey>
   public readonly bool Equals(NavigationCacheKey other)
   {
     return
-      ReferenceEquals(other._root, _root) &&
+      other._root.Equals(_root) &&
       NavigationCollection.Equal(other._navigations, _navigations);
   }
 

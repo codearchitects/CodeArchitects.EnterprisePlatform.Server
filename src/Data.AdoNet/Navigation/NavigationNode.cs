@@ -10,9 +10,9 @@ internal class NavigationNode : IncluderNode, INavigationNode
     Model = model;
   }
 
-  public int Index => Model.Id;
-
   public INavigationModel Model { get; }
+
+  public int Index => Model.Id;
 
   public override IEntityModel Target => Model.To;
 

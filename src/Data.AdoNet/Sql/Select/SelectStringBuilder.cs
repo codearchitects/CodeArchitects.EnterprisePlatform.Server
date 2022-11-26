@@ -71,20 +71,73 @@ internal readonly struct SelectStringBuilder
 
   public readonly void AppendJoin<TState, T>(string separator, in TState state, IEnumerable<T> values, AppendAction<TState, T> append)
   {
-    using IEnumerator<T> en = values.GetEnumerator();
+    using IEnumerator<T> enumerator = values.GetEnumerator();
 
-    if (!en.MoveNext())
+    if (!enumerator.MoveNext())
       return;
 
-    append(this, in state, en.Current);
+    append(this, in state, enumerator.Current);
 
-    while (en.MoveNext())
+    while (enumerator.MoveNext())
     {
       _stringBuilder.Append(separator);
-      append(this, in state, en.Current);
+      append(this, in state, enumerator.Current);
     }
   }
 
+
+  public void AppendSelectFrom(IEntityModel entity, IReadOnlyCollection<INavigation> navigations)
+  {
+    Append("SELECT ");
+    AppendJoin(", ", entity.Properties, AppendTargetColumn);
+    Append(", ");
+    AppendChildrenColumns(navigations);
+    AppendLine();
+    AppendLine("FROM (");
+    Append("SELECT ");
+    AppendJoin(", ", entity.Properties, AppendColumn);
+    AppendLine();
+    Append("FROM [");
+    Append(entity.TableName);
+    AppendLine("]");
+    Append("WHERE ");
+    AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWhereCondition);
+    AppendLine();
+    Append(") AS t");
+
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
+    {
+      stringBuilder.Append("t.[");
+      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(']');
+    }
+
+    static void AppendColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
+    {
+      stringBuilder.Append('[');
+      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(']');
+    }
+
+    static void AppendWhereCondition(SelectStringBuilder stringBuilder, IPrimaryKeyPropertyModel property)
+    {
+      stringBuilder.Append('[');
+      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append("] = @p");
+      stringBuilder.Append(property.Index);
+    }
+  }
+
+  public readonly void AppendLeftJoin(INavigation child)
+  {
+    AppendLine();
+    Append("LEFT JOIN ");
+    AppendTarget(child);
+    Append(" AS t");
+    Append(child.Index);
+    Append(" ON ");
+    AppendJoinConditions(child);
+  }
 
   public readonly void AppendColumns(INavigation navigation)
   {

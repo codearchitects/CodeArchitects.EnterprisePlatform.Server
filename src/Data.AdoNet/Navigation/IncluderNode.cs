@@ -40,7 +40,7 @@ internal abstract class IncluderNode
     }
 
     model = GetNavigationModel(path[..index]);
-    NavigationNode node = AddOrUpdateNode(model);
+    NavigationNode node = GetOrUpdateNode(model);
 
     node.AddLeaf(path[(index + 1)..]);
   }
@@ -64,10 +64,10 @@ internal abstract class IncluderNode
 
     INavigationModel model = node.GetNavigationModel(memberExpression.Member);
 
-    return node.AddOrUpdateNode(model);
+    return node.GetOrUpdateNode(model);
   }
 
-  private NavigationNode AddOrUpdateNode(INavigationModel model)
+  private NavigationNode GetOrUpdateNode(INavigationModel model)
   {
     if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not NavigationNode childNode)
     {

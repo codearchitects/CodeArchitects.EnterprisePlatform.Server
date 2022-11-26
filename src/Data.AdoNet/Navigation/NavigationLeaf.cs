@@ -10,11 +10,11 @@ internal class NavigationLeaf : INavigationLeaf
     Model = model;
   }
 
+  public INavigationModel Model { get; }
+
   public int Index => Model.Id;
 
   public IEntityModel Target => Model.To;
-
-  public INavigationModel Model { get; }
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>

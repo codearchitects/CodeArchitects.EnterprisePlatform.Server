@@ -2,8 +2,14 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal interface IMaterializer<TEntity>
+internal interface IMaterializer<TEntity, TKey>
   where TEntity : class
+  where TKey : IEquatable<TKey>
 {
-  Task<TEntity?> MaterializeAsync(DbDataReader dataReader);
+  // TODO: Optimize when only one element is expected
+  void Setup(ICollection<TEntity> entities);
+
+  void ReadRow(DbDataReader reader);
+
+  void Reset();
 }

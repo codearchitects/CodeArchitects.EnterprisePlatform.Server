@@ -9,9 +9,9 @@ internal class Executor<TEntity, TKey> : IExecutor<TEntity, TKey>
   where TKey : IEquatable<TKey>
 {
   private readonly ICommandBuilder<TEntity, TKey> _builder;
-  private readonly IMaterializer<TEntity> _materializer;
+  private readonly IMaterializer<TEntity, TKey> _materializer;
 
-  public Executor(ICommandBuilder<TEntity, TKey> builder, IMaterializer<TEntity> materializer)
+  public Executor(ICommandBuilder<TEntity, TKey> builder, IMaterializer<TEntity, TKey> materializer)
   {
     _builder = builder;
     _materializer = materializer;
@@ -23,6 +23,7 @@ internal class Executor<TEntity, TKey> : IExecutor<TEntity, TKey>
 
     DbDataReader dataReader = await command.ExecuteReaderAsync(cancellationToken);
 
-    return await _materializer.MaterializeAsync(dataReader);
+    return null;
+    // return await _materializer.MaterializeAsync(dataReader);
   }
 }
