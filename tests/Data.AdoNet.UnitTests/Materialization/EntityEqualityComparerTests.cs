@@ -3,11 +3,11 @@ using CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-public partial class EntityEqualityComparerTypeBuilderTests
+public partial class EntityEqualityComparerTests
 {
   private readonly EntityEqualityComparerTypeBuilder _sut;
 
-  public EntityEqualityComparerTypeBuilderTests()
+  public EntityEqualityComparerTests()
   {
     _sut = new(DynamicAssembly.CreateModule());
   }

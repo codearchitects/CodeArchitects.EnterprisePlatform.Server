@@ -8,6 +8,12 @@ internal abstract class EntityEqualityComparer<TEntity, TKey> : IEqualityCompare
 
   public bool Equals(TEntity x, TEntity y)
   {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
     return EqualityComparer<TKey>.Default.Equals(GetKey(x), GetKey(y));
   }
 

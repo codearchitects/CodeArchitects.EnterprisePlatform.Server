@@ -9,14 +9,16 @@ internal class IdentityCollectionFactory : IIdentityCollectionFactory
     _comparers = comparers;
   }
 
-  public IdentityHashSet<T> CreateHashSet<T>()
+  public IdentityHashSet<TEntity> CreateHashSet<TEntity>()
+    where TEntity : class
   {
-    return new IdentityHashSet<T>((IEqualityComparer<T>)_comparers[typeof(T)]);
+    return new IdentityHashSet<TEntity>((IEqualityComparer<TEntity>)_comparers[typeof(TEntity)]);
   }
 
-  public IdentityList<T> CreateList<T>()
+  public IdentityList<TEntity> CreateList<TEntity>()
+    where TEntity : class
   {
-    return new IdentityList<T>((IEqualityComparer<T>)_comparers[typeof(T)]);
+    return new IdentityList<TEntity>((IEqualityComparer<TEntity>)_comparers[typeof(TEntity)]);
   }
 
   public static IdentityCollectionFactory Create(IEnumerable<EntityEmitResult> results)

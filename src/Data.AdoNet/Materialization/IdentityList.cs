@@ -1,16 +1,20 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal class IdentityList<T> : List<T>, IIdentityCollection<T>, IIdentityList
+internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntity>, IIdentityList
+  where TEntity : class
 {
-  private readonly HashSet<T> _identitySet;
+  private readonly HashSet<TEntity> _identitySet;
 
-  public IdentityList(IEqualityComparer<T> comparer)
+  public IdentityList(IEqualityComparer<TEntity> comparer)
   {
     _identitySet = new(comparer);
   }
 
-  public void AddEntity(T entity)
+  public void AddEntity(TEntity? entity)
   {
+    if (entity is null)
+      return;
+
     if (_identitySet.Contains(entity))
       return;
 

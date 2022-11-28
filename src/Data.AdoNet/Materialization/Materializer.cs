@@ -19,16 +19,18 @@ internal class Materializer : IMaterializer, IMaterializerHub
     _identityLists = new();
   }
 
-  public IdentityList<T> CreateList<T>()
+  public IdentityList<TEntity> CreateList<TEntity>()
+    where TEntity : class
   {
-    IdentityList<T> result = _collectionFactory.CreateList<T>();
+    IdentityList<TEntity> result = _collectionFactory.CreateList<TEntity>();
     _identityLists.Add(result);
     return result;
   }
 
-  public IdentityHashSet<T> CreateHashSet<T>()
+  public IdentityHashSet<TEntity> CreateHashSet<TEntity>()
+    where TEntity : class
   {
-    return _collectionFactory.CreateHashSet<T>();
+    return _collectionFactory.CreateHashSet<TEntity>();
   }
 
   public IMaterializer<TEntity, TKey> GetMaterializer<TEntity, TKey>(IEntityModel target)

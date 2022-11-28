@@ -16,6 +16,7 @@ internal class MaterializerTypeBuilder
   private static readonly MethodInfo s_getIndexMethod;
   private static readonly MethodInfo s_createListMethod;
   private static readonly MethodInfo s_createHashSetMethod;
+  private static readonly ConstructorInfo s_invalidOperationExceptionConstructor;
 
   static MaterializerTypeBuilder()
   {
@@ -59,6 +60,10 @@ internal class MaterializerTypeBuilder
       name: nameof(IMaterializerHub.CreateHashSet),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
+
+    s_invalidOperationExceptionConstructor = typeof(InvalidOperationException).GetRequiredConstructor(
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: new[] { typeof(string) });
 
     static MethodInfo GetGetValueMethod(string name) => typeof(DbDataReader).GetRequiredMethod(
       name: $"Get{name}",
@@ -214,7 +219,9 @@ internal class MaterializerTypeBuilder
 
   private static MethodInfo OverrideReadNavigationMethod(TypeBuilder type, FieldInfo hubField, IReadOnlyDictionary<int, FieldInfo> materializerFields, IEntityModel entity)
   {
-    IReadOnlyList<INavigationModel> navigations = entity.Navigations;
+    IReadOnlyList<INavigationModel> navigations = entity.Navigations
+      .Where(nav => nav.MemberAccess is not MemberAccess.None)
+      .ToList();
 
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
       name: "ReadNavigation",
@@ -228,19 +235,18 @@ internal class MaterializerTypeBuilder
       .Range(0, navigations.Count)
       .Select(_ => il.DefineLabel())
       .ToArray();
-    Label[] readLabels = Enumerable
-      .Range(0, navigations.Count)
-      .Select(_ => il.DefineLabel())
-      .ToArray();
+    Label throwLabel = il.DefineLabel();
 
     il.LoadArg(4);                               // $navigation
     il.Emit(OpCodes.Callvirt, s_getModelMethod); // $model
     il.Emit(OpCodes.Callvirt, s_getIndexMethod); // $index
     il.Emit(OpCodes.Switch, cases);              // -
+    il.Emit(OpCodes.Br_S, throwLabel);
 
     for (int i = 0; i < navigations.Count; i++)
     {
       INavigationModel navigation = navigations[i];
+
       // TODO: Support fields
       Debug.Assert(navigation.MemberAccess is MemberAccess.Property);
 
@@ -254,35 +260,29 @@ internal class MaterializerTypeBuilder
       if (navigation.IsCollection)
       {
         MethodInfo createCollectionMethod = GetCreateCollectionMethod(navigation.Type);
-      
-        il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $property
-        il.Emit(OpCodes.Brtrue_S, readLabels[i]); // -
-        continue;
+        Label readLabel = il.DefineLabel();
+        
+        il.Emit(OpCodes.Callvirt, navigation.Property!.GetMethod); // $property
+        il.Emit(OpCodes.Brtrue_S, readLabel); // -
+        
         il.LoadArg(3); // $entity
         il.LoadFields(hubField); // $entity, $hub
         il.Emit(OpCodes.Callvirt, createCollectionMethod); // $entity, $collection
-        il.Emit(OpCodes.Call, navigation.Property!.SetMethod); // -
-      
+        il.Emit(OpCodes.Callvirt, navigation.Property!.SetMethod); // -
+
+        il.MarkLabel(readLabel);
         il.LoadArg(3); // $entity
-        il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $property
+        il.Emit(OpCodes.Callvirt, navigation.Property!.GetMethod); // $property
         il.Emit(OpCodes.Castclass, typeof(IIdentityCollection<>).MakeGenericType(navigation.To.Type)); // $property
       }
 
-      il.LoadArg(1); // $entity/$property, $reader
-      il.Emit(OpCodes.Ldarga_S, 1); // $entity/$property, $reader, &offset
-      il.LoadArg(4); // $entity/$property, $reader, &offset, $navigation
-      il.LoadArg(0);
-      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]); // $entity/$property, $reader, &offset, $navigation, &materializer
+      il.LoadArg(0); // $entity/$property, $this
+      il.LoadArg(1); // $entity/$property, $this, $reader
+      il.LoadArg(2); // $entity/$property, $this, $reader, &offset
+      il.LoadArg(4); // $entity/$property, $this, $reader, &offset, $navigation
+      il.LoadArg(0); // $entity/$property, $this, $reader, &offset, $navigation, $this
+      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]); // $entity/$property, $this, $reader, &offset, $navigation, &materializer
 
-      il.Emit(OpCodes.Pop);
-      il.Emit(OpCodes.Pop);
-      il.Emit(OpCodes.Pop);
-      il.Emit(OpCodes.Pop);
-      il.Emit(OpCodes.Pop);
-      il.MarkLabel(readLabels[i]); // DELETE ME
-      continue;
-
-      il.MarkLabel(readLabels[i]);
       il.Emit(OpCodes.Call, materializeNavigationMethod); // $entity/$property, $navigationEntity
       if (navigation.IsCollection)
       {
@@ -295,10 +295,16 @@ internal class MaterializerTypeBuilder
       }
       else
       {
-        il.Emit(OpCodes.Call, navigation.Property!.SetMethod); // -
+        il.Emit(OpCodes.Callvirt, navigation.Property!.SetMethod); // -
       }
+
+      il.Emit(OpCodes.Ret);
     }
-    il.Emit(OpCodes.Ret);
+
+    il.MarkLabel(throwLabel);
+    il.Emit(OpCodes.Ldstr, "Invalid navigation.");
+    il.Emit(OpCodes.Newobj, s_invalidOperationExceptionConstructor);
+    il.Emit(OpCodes.Throw);
 
     return method;
   }
@@ -337,14 +343,14 @@ internal class MaterializerTypeBuilder
       typeDefinition == typeof(IReadOnlyList<>) ||
       typeDefinition == typeof(IList<>) ||
       typeDefinition == typeof(List<>))
-      return s_createListMethod;
+      return s_createListMethod.MakeGenericMethod(navigationType.GetGenericArguments());
 
     if (
       typeDefinition == typeof(IEnumerable<>) ||
       typeDefinition == typeof(IReadOnlyCollection<>) ||
       typeDefinition == typeof(ICollection<>) ||
       typeDefinition == typeof(HashSet<>))
-      return s_createHashSetMethod;
+      return s_createHashSetMethod.MakeGenericMethod(navigationType.GetGenericArguments());
 
     throw new InvalidOperationException("Navigation must be a collection.");
   }

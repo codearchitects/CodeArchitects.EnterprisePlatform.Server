@@ -54,6 +54,7 @@ internal static class WithNavigationOnParent
 
     INavigationModel childANavigation = NavigationModelBuilder.Build(_ => _
       .SetId(1)
+      .SetIndex(0)
       .SetType(typeof(ChildA))
       .SetIsOnDependent(true)
       .SetIsCollection(false)
@@ -66,6 +67,7 @@ internal static class WithNavigationOnParent
 
     INavigationModel childrenBNavigation = NavigationModelBuilder.Build(_ => _
       .SetId(2)
+      .SetIndex(1)
       .SetType(typeof(ICollection<ChildB>))
       .SetIsOnDependent(true)
       .SetIsCollection(true)
@@ -126,8 +128,8 @@ internal static class WithNavigationOnParent
       .SetIndex(2)
       // .SetKeyIndex(0)
       .SetType(typeof(Guid))
-      .SetMemberAccess(MemberAccess.None)
-      .SetProperty(null)
+      .SetMemberAccess(MemberAccess.Property)
+      .SetProperty(typeof(ChildA).GetRequiredProperty(nameof(ChildA.ParentId), BindingFlags.Instance | BindingFlags.Public))
       /*.SetNavigation(parentNavigation)*/);
 
     return EntityModelBuilder.Build(_ => _
@@ -142,7 +144,7 @@ internal static class WithNavigationOnParent
       .SetInitializer(_ => _
         .SetConstructor(typeof(ChildA).GetRequiredConstructor())
         .SetConstructorProperties()
-        .SetInitializerProperties(idProperty, nameProperty))
+        .SetInitializerProperties(idProperty, nameProperty, parentIdProperty))
       .SetNavigations(parentNavigation));
   }
 
@@ -180,8 +182,8 @@ internal static class WithNavigationOnParent
       .SetIndex(2)
       // .SetKeyIndex(0)
       .SetType(typeof(Guid))
-      .SetMemberAccess(MemberAccess.None)
-      .SetProperty(null)
+      .SetMemberAccess(MemberAccess.Property)
+      .SetProperty(typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId), BindingFlags.Instance | BindingFlags.Public))
       /*.SetNavigation(parentNavigation)*/);
 
     return EntityModelBuilder.Build(_ => _
@@ -196,8 +198,27 @@ internal static class WithNavigationOnParent
       .SetInitializer(_ => _
         .SetConstructor(typeof(ChildB).GetRequiredConstructor())
         .SetConstructorProperties()
-        .SetInitializerProperties(idProperty, nameProperty))
+        .SetInitializerProperties(idProperty, nameProperty, parentIdProperty))
       .SetNavigations(parentNavigation));
+  }
+
+  public class ChildBEqualityComparer : IEqualityComparer<ChildB>
+  {
+    bool IEqualityComparer<ChildB>.Equals(ChildB? x, ChildB? y)
+    {
+      if (x is null)
+        return y is null;
+
+      if (y is null)
+        return false;
+
+      return x.Id == y.Id;
+    }
+
+    int IEqualityComparer<ChildB>.GetHashCode(ChildB obj)
+    {
+      return obj.Id.GetHashCode();
+    }
   }
 
   public record FakeDbDataRow(Parent Parent, ChildA? ChildA, ChildB? ChildB);
@@ -221,34 +242,69 @@ internal static class WithNavigationOnParent
 
     public override Guid GetGuid(int ordinal)
     {
-      return ordinal switch
+      if (_enumerator.Current.ChildA is null)
       {
-        0 => Parent.Id,
-        2 => ChildA.Id,
-        4 => ChildA.ParentId,
-        7 => ChildB.ParentId,
-        _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
-      };
+        return ordinal switch
+        {
+          0 => Parent.Id,
+          4 => ChildB.ParentId,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
+      else
+      {
+        return ordinal switch
+        {
+          0 => Parent.Id,
+          2 => ChildA.Id,
+          4 => ChildA.ParentId,
+          7 => ChildB.ParentId,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
     }
 
     public override int GetInt32(int ordinal)
     {
-      return ordinal switch
+      if (_enumerator.Current.ChildA is null)
       {
-        5 => ChildB.Id,
-        _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
-      };
+        return ordinal switch
+        {
+          2 => ChildB.Id,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
+      else
+      {
+        return ordinal switch
+        {
+          7 => ChildB.Id,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
     }
 
     public override string GetString(int ordinal)
     {
-      return ordinal switch
+      if (_enumerator.Current.ChildA is null)
       {
-        1 => Parent.Name ?? throw NullValueException,
-        3 => ChildA.Name ?? throw NullValueException,
-        6 => ChildA.Name ?? throw NullValueException,
-        _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
-      };
+        return ordinal switch
+        {
+          1 => Parent.Name ?? throw NullValueException,
+          3 => ChildB.Name ?? throw NullValueException,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
+      else
+      {
+        return ordinal switch
+        {
+          1 => Parent.Name ?? throw NullValueException,
+          3 => ChildA.Name ?? throw NullValueException,
+          6 => ChildB.Name ?? throw NullValueException,
+          _ => throw new ArgumentException("Invalid ordinal.", nameof(ordinal))
+        };
+      }
     }
 
     public override bool IsDBNull(int ordinal)
