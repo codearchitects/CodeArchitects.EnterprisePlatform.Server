@@ -24,6 +24,8 @@ internal class MockEntityModel : IEntityModel
 
   public IReadOnlyList<INavigationModel> Navigations => _mock.Navigations;
 
+  public IInitializerModel Initializer => _mock.Initializer;
+
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel)
   {
     foreach (INavigationModel navigation in Navigations)
@@ -42,7 +44,7 @@ internal class MockEntityModel : IEntityModel
 
 internal static class MockEntityModelExtensions
 {
-  public static IEntityModel AsMocked(this IEntityModel mock)
+  public static IEntityModel Mocked(this IEntityModel mock)
   {
     return new MockEntityModel(mock);
   }

@@ -19,26 +19,16 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
 
   protected abstract int PropertyCount { get; }
 
-  protected abstract TKey ReadKey(DbDataReader reader, int offset);
+  protected abstract bool TryReadKey(DbDataReader reader, int offset, out TKey key);
 
   protected abstract TEntity ReadEntity(DbDataReader reader, int offset);
 
   protected abstract void ReadNavigation(DbDataReader reader, ref int offset, TEntity entity, INavigation navigation);
 
-  public void ReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations, IIdentityCollection<TEntity> collection)
+  public TEntity? ReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations)
   {
-    TEntity entity = GetOrReadEntity(reader, ref offset, navigations);
-    collection.AddEntity(entity);
-  }
-
-  public void ReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations, ref TEntity? reference)
-  {
-    reference = GetOrReadEntity(reader, ref offset, navigations);
-  }
-
-  private TEntity GetOrReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations)
-  {
-    TKey key = ReadKey(reader, offset);
+    if (!TryReadKey(reader, offset, out TKey key))
+      return null;
 
     if (!_entities.TryGetValue(key, out TEntity? entity))
     {
@@ -64,22 +54,12 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
   }
 
   // Implicit
-  protected void ReadCollectionNavigation<TNavigationEntity, TNavigationKey>(DbDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer, IIdentityCollection<TNavigationEntity> collection)
+  protected TNavigationEntity? MaterializeNavigation<TNavigationEntity, TNavigationKey>(DbDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer)
     where TNavigationEntity : class
     where TNavigationKey : IEquatable<TNavigationKey>
   {
     materializer ??= _hub.GetMaterializer<TNavigationEntity, TNavigationKey>(navigation.Target);
 
-    materializer.ReadEntity(reader, ref offset, navigation.Children, collection);
-  }
-
-  // Implicit
-  protected void ReadCollectionReference<TNavigationEntity, TNavigationKey>(DbDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer, ref TNavigationEntity? reference)
-    where TNavigationEntity : class
-    where TNavigationKey : IEquatable<TNavigationKey>
-  {
-    materializer ??= _hub.GetMaterializer<TNavigationEntity, TNavigationKey>(navigation.Target);
-
-    materializer.ReadEntity(reader, ref offset, navigation.Children, ref reference);
+    return materializer.ReadEntity(reader, ref offset, navigation.Children);
   }
 }

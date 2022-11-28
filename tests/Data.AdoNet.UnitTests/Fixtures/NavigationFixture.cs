@@ -74,13 +74,13 @@ internal static class NavigationFixture
 
   public static class Model
   {
-    public static readonly IEntityModel RootEntity = CreateRootEntity().AsMocked();
-    public static readonly IEntityModel ChildAEntity = CreateChildAEntity().AsMocked();
-    public static readonly IEntityModel ChildBEntity = CreateChildBEntity().AsMocked();
-    public static readonly IEntityModel ChildCEntity = CreateChildCEntity().AsMocked();
-    public static readonly IEntityModel ChildDEntity = CreateChildDEntity().AsMocked();
-    public static readonly IEntityModel ChildEEntity = CreateChildEEntity().AsMocked();
-    public static readonly IEntityModel ChildFEntity = CreateChildFEntity().AsMocked();
+    public static readonly IEntityModel RootEntity = CreateRootEntity().Mocked();
+    public static readonly IEntityModel ChildAEntity = CreateChildAEntity().Mocked();
+    public static readonly IEntityModel ChildBEntity = CreateChildBEntity().Mocked();
+    public static readonly IEntityModel ChildCEntity = CreateChildCEntity().Mocked();
+    public static readonly IEntityModel ChildDEntity = CreateChildDEntity().Mocked();
+    public static readonly IEntityModel ChildEEntity = CreateChildEEntity().Mocked();
+    public static readonly IEntityModel ChildFEntity = CreateChildFEntity().Mocked();
 
     public static readonly INavigationModel RootToChildANavigation = CreateRootToChildANavigation();
     public static readonly INavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();

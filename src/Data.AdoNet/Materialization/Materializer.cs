@@ -54,7 +54,7 @@ internal class Materializer : IMaterializer, IMaterializerHub
     while (await reader.ReadAsync(cancellationToken))
     {
       int offset = 0;
-      materializer.ReadEntity(reader, ref offset, navigations, ref entity);
+      entity = materializer.ReadEntity(reader, ref offset, navigations);
     }
 
     foreach (IIdentityList list in _identityLists)

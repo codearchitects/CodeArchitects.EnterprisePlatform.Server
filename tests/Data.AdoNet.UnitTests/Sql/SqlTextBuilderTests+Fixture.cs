@@ -11,6 +11,8 @@ public partial class SqlTextBuilderTests
 
     public IEntityModel Target => Model.To;
 
+    public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
+
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
       where TVisitor : INavigationVisitor<TResult>
     {

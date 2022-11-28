@@ -47,11 +47,14 @@ internal class MaterializerTypeBuilder
     };
 
     s_getModelMethod = typeof(INavigation).GetRequiredMethod($"get_{nameof(INavigation.Model)}");
+    
     s_getIndexMethod = typeof(INavigationModel).GetRequiredMethod($"get_{nameof(INavigationModel.Index)}");
+    
     s_createListMethod = typeof(IMaterializerHub).GetRequiredMethod(
       name: nameof(IMaterializerHub.CreateList),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
+    
     s_createHashSetMethod = typeof(IMaterializerHub).GetRequiredMethod(
       name: nameof(IMaterializerHub.CreateHashSet),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
@@ -173,7 +176,7 @@ internal class MaterializerTypeBuilder
     IReadOnlyList<INavigationModel> navigations = entity.Navigations;
 
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
-      name: "ReadEntity",
+      name: "ReadNavigation",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
       types: new[] { typeof(DbDataReader), typeof(int).MakeByRefType(), entity.Type, typeof(INavigation) });
 
@@ -186,60 +189,68 @@ internal class MaterializerTypeBuilder
       .ToArray();
     Label readLabel = il.DefineLabel();
 
-    il.LoadArg(1); // $reader
-    il.Emit(OpCodes.Ldarga_S, 1); // $reader, &offset
-    il.LoadArg(4); // $reader, &offset, $navigation
-    il.LoadArg(4);                               // $reader, &offset, $navigation, $navigation
-    il.Emit(OpCodes.Callvirt, s_getModelMethod); // $reader, &offset, $navigation, $model
-    il.Emit(OpCodes.Callvirt, s_getIndexMethod); // $reader, &offset, $navigation, $index
-    il.Emit(OpCodes.Switch, cases);              // $reader, &offset, $navigation
+    il.LoadArg(4);                               // $navigation
+    il.Emit(OpCodes.Callvirt, s_getModelMethod); // $model
+    il.Emit(OpCodes.Callvirt, s_getIndexMethod); // $index
+    il.Emit(OpCodes.Switch, cases);              // -
 
     for (int i = 0; i < navigations.Count; i++)
     {
       INavigationModel navigation = navigations[i];
+      // TODO: Support fields
+      Debug.Assert(navigation.MemberAccess is MemberAccess.Property);
 
-      string methodName = navigation.IsCollection
-        ? "ReadReferenceNavigation"
-        : "ReadCollectionNavigation";
-      Type lastParameterType = navigation.IsCollection
-        ? typeof(IIdentityCollection<>).MakeGenericType(navigation.To.Type.UnderlyingSystemType)
-        : navigation.To.Type.UnderlyingSystemType.MakeByRefType();
-
-      MethodInfo readNavigationMethod = type.BaseType!.GetRequiredMethod(
-        name: methodName,
+      MethodInfo materializeNavigationMethod = type.BaseType!.GetRequiredMethod(
+        name: "MaterializeNavigation",
         bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
         types: new[] {
           typeof(DbDataReader),
           typeof(int).MakeByRefType(),
           typeof(INavigation),
-          typeof(IMaterializer<,>).MakeGenericType(navigation.To.Type.UnderlyingSystemType, navigation.To.PrimaryKey.Type.UnderlyingSystemType).MakeByRefType(),
-          lastParameterType
+          typeof(IMaterializer<,>).MakeGenericType(navigation.To.Type.UnderlyingSystemType, navigation.To.PrimaryKey.Type.UnderlyingSystemType).MakeByRefType()
         });
 
-      // TODO: Support fields
-      Debug.Assert(navigation.MemberAccess is MemberAccess.Property);
-      MethodInfo createCollectionMethod = GetCreateCollectionMethod(navigation.Type);
-
       il.MarkLabel(cases[i]);
-      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]); // $reader, &offset, $navigation, &materializer
+      il.LoadArg(3); // $entity
       if (navigation.IsCollection)
       {
-        il.LoadArg(3);                                         // $reader, &offset, $navigation, &materializer, $entity
-        il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $reader, &offset, $navigation, &materializer, $property
-        il.Emit(OpCodes.Brtrue_S, readLabel);                  // $reader, &offset, $navigation, &materializer
+        MethodInfo createCollectionMethod = GetCreateCollectionMethod(navigation.Type);
 
-        il.LoadArg(3);                                         // $reader, &offset, $navigation, &materializer, $entity
-        il.LoadFields(hubField);                               // $reader, &offset, $navigation, &materializer, $entity, $hub
-        il.Emit(OpCodes.Callvirt, createCollectionMethod);     // $reader, &offset, $navigation, &materializer, $entity, $collection
-        il.Emit(OpCodes.Call, navigation.Property!.SetMethod); // $reader, &offset, $navigation, &materializer
+        il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $property
+        il.Emit(OpCodes.Brtrue_S, readLabel); // -
+
+        il.LoadArg(3); // $entity
+        il.LoadFields(hubField); // $entity, $hub
+        il.Emit(OpCodes.Callvirt, createCollectionMethod); // $entity, $collection
+        il.Emit(OpCodes.Call, navigation.Property!.SetMethod); // -
+
+        il.LoadArg(3); // $entity
+        il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $property
+        il.Emit(OpCodes.Castclass, typeof(IIdentityCollection<>).MakeGenericType(navigation.ElementType)); // $property
       }
 
+      il.LoadArg(1); // $entity/$property, $reader
+      il.Emit(OpCodes.Ldarga_S, 1); // $entity/$property, $reader, &offset
+      il.LoadArg(4); // $entity/$property, $reader, &offset, $navigation
+      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]); // $entity/$property, $reader, &offset, $navigation, &materializer
+
       il.MarkLabel(readLabel);
-      il.LoadArg(3);                                         // $reader, &offset, $navigation, &materializer, $entity
-      il.Emit(OpCodes.Call, navigation.Property!.GetMethod); // $reader, &offset, $navigation, &materializer, $property
+      il.Emit(OpCodes.Call, materializeNavigationMethod); // $entity/$property, $navigationEntity
+      if (navigation.IsCollection)
+      {
+        MethodInfo addEntityMethod = typeof(IIdentityCollection<>).MakeGenericType(navigation.ElementType).GetRequiredMethod(
+          name: nameof(IIdentityCollection<object>.AddEntity),
+          bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+          types: new[] { navigation.ElementType });
 
-
+        il.Emit(OpCodes.Callvirt, addEntityMethod); // -
+      }
+      else
+      {
+        il.Emit(OpCodes.Call, navigation.Property!.SetMethod); // -
+      }
     }
+    il.Emit(OpCodes.Ret);
 
     return method;
   }
