@@ -9,3 +9,4 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(INavigationModel))]
 [assembly: GenerateFluentMockFor(typeof(IKeyPair))]
 [assembly: GenerateFluentMockFor(typeof(INavigationRoot))]
+[assembly: GenerateFluentMockFor(typeof(IInitializerModel))]

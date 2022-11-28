@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.AdoNet.Navigation;
+﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
@@ -11,7 +10,7 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
   protected readonly IMaterializerHub _hub;
   private readonly Dictionary<TKey, TEntity> _entities;
 
-  public Materializer(IMaterializerHub hub)
+  protected Materializer(IMaterializerHub hub)
   {
     _hub = hub;
     _entities = new();
@@ -19,7 +18,7 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
 
   protected abstract int PropertyCount { get; }
 
-  protected abstract bool TryReadKey(DbDataReader reader, int offset, out TKey key);
+  protected abstract TKey ReadKey(DbDataReader reader, int offset);
 
   protected abstract TEntity ReadEntity(DbDataReader reader, int offset);
 
@@ -27,19 +26,14 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
 
   public TEntity? ReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations)
   {
-    if (!TryReadKey(reader, offset, out TKey key))
+    if (reader.IsDBNull(offset))
       return null;
+
+    TKey key = ReadKey(reader, offset);
 
     if (!_entities.TryGetValue(key, out TEntity? entity))
     {
       entity = ReadEntity(reader, offset);
-
-      foreach (INavigation navigation in navigations)
-      {
-        if (!navigation.Model.IsCollection)
-          continue;
-      }
-
       _entities.Add(key, entity);
     }
 
