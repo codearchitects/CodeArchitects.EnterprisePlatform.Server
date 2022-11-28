@@ -78,9 +78,9 @@ internal class MaterializerTypeBuilder
     _module = module;
   }
 
-  public Type BuildMaterializerType(IEntityModel entity)
+  public Type Build(IEntityModel entity)
   {
-    Type baseType = typeof(Materializer<,>).MakeGenericType(entity.Type.UnderlyingSystemType, entity.PrimaryKey.Type.UnderlyingSystemType);
+    Type baseType = typeof(Materializer<,>).MakeGenericType(entity.Type, entity.PrimaryKey.Type);
 
     FieldInfo hubField = baseType.GetRequiredField(
       name: "_hub",
@@ -94,6 +94,8 @@ internal class MaterializerTypeBuilder
     IReadOnlyDictionary<int, FieldInfo> materializerFields = entity.Navigations.ToDictionary(
       keySelector: navigation => navigation.Id,
       elementSelector: navigation => DefineNavigationMaterializerField(type, navigation));
+
+    DefineConstructor(type);
 
     OverrideReadKeyMethod(type, entity.PrimaryKey);
 
@@ -110,8 +112,29 @@ internal class MaterializerTypeBuilder
 
     return type.DefineField(
       fieldName: $"_{navigation.Name}Materializer",
-      type: typeof(IMaterializer<,>).MakeGenericType(target.Type.UnderlyingSystemType, target.PrimaryKey.Type.UnderlyingSystemType),
+      type: typeof(IMaterializer<,>).MakeGenericType(target.Type, target.PrimaryKey.Type),
       attributes: FieldAttributes.Private);
+  }
+
+  private static ConstructorInfo DefineConstructor(TypeBuilder type)
+  {
+    ConstructorInfo baseConstructor = type.BaseType!.GetRequiredConstructor(
+      bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
+      types: new[] { typeof(IMaterializerHub) });
+
+    ConstructorBuilder constructor = type.DefineConstructor(
+      attributes: MethodAttributes.Public,
+      callingConvention: CallingConventions.HasThis,
+      parameterTypes: new[] { typeof(IMaterializerHub) });
+
+    ILGenerator il = constructor.GetILGenerator();
+
+    il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Ldarg_1);
+    il.Emit(OpCodes.Call, baseConstructor);
+    il.Emit(OpCodes.Ret);
+
+    return constructor;
   }
 
   private static MethodInfo OverrideReadKeyMethod(TypeBuilder type, IPrimaryKeyModel primaryKey)
@@ -207,7 +230,7 @@ internal class MaterializerTypeBuilder
           typeof(DbDataReader),
           typeof(int).MakeByRefType(),
           typeof(INavigation),
-          typeof(IMaterializer<,>).MakeGenericType(navigation.To.Type.UnderlyingSystemType, navigation.To.PrimaryKey.Type.UnderlyingSystemType).MakeByRefType()
+          typeof(IMaterializer<,>).MakeGenericType(navigation.To.Type, navigation.To.PrimaryKey.Type).MakeByRefType()
         });
 
       il.MarkLabel(cases[i]);
@@ -257,7 +280,7 @@ internal class MaterializerTypeBuilder
 
   private static void LoadColumnValue(ILGenerator il, IPropertyModel property)
   {
-    MethodInfo readMethod = GetReadMethod(s_getValueMethods, property.Type.UnderlyingSystemType);
+    MethodInfo readMethod = GetReadMethod(s_getValueMethods, property.Type);
     OpCode callOpcode = readMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt;
 
     il.LoadArg(1);                   // Push $dataReader                | Stack: ..., $dataReader

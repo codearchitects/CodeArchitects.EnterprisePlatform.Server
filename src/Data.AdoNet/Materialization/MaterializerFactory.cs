@@ -19,11 +19,11 @@ internal class MaterializerFactory : IMaterializerFactory
     return (IMaterializer<TEntity, TKey>)_factories[typeof(TEntity)](hub);
   }
 
-  public static MaterializerFactory Create(IEnumerable<MaterializerTypeInfo> infos)
+  public static MaterializerFactory Create(IEnumerable<EntityEmitResult> infos)
   {
     Dictionary<Type, Func<IMaterializerHub, object>> factories = new Dictionary<Type, Func<IMaterializerHub, object>>();
 
-    foreach (MaterializerTypeInfo info in infos)
+    foreach (EntityEmitResult info in infos)
     {
       ConstructorInfo constructor = info.MaterializerType.GetRequiredConstructor(
         bindingAttr: BindingFlags.Instance | BindingFlags.Public,
