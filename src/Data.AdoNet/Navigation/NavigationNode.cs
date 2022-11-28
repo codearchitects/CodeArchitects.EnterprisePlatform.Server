@@ -12,7 +12,7 @@ internal class NavigationNode : IncluderNode, INavigationNode
 
   public INavigationModel Model { get; }
 
-  public int Index => Model.Id;
+  public int Id => Model.Id;
 
   public override IEntityModel Target => Model.To;
 
@@ -56,7 +56,7 @@ internal class NavigationNode : IncluderNode, INavigationNode
     public readonly bool VisitNode(INavigationNode navigation)
     {
       return
-        navigation.Index == _navigation.Index &&
+        navigation.Id == _navigation.Id &&
         NavigationCollection.Equal(navigation.Children, _navigation.Children);
     }
   }

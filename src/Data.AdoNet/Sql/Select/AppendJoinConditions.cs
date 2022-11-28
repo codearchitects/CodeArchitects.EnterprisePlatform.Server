@@ -30,7 +30,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
       stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Index);
+      stringBuilder.Append(navigation.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(pair.ToProperty.ColumnName);
       stringBuilder.Append(']');
@@ -48,11 +48,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
       stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Index);
+      stringBuilder.Append(navigation.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(pair.ToProperty.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Index);
+      stringBuilder.Append(navigation.Id);
       stringBuilder.Append(']');
     }
   }

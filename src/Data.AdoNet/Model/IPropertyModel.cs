@@ -1,8 +1,7 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IPropertyModel
+internal interface IPropertyModel : IPropertyBase
 {
-  string Name { get; }
   string ColumnName { get; }
   short Index { get; }
 }

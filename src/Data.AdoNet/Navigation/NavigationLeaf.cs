@@ -12,9 +12,11 @@ internal class NavigationLeaf : INavigationLeaf
 
   public INavigationModel Model { get; }
 
-  public int Index => Model.Id;
+  public int Id => Model.Id;
 
   public IEntityModel Target => Model.To;
+
+  public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
@@ -50,7 +52,7 @@ internal class NavigationLeaf : INavigationLeaf
 
     public readonly bool VisitLeaf(INavigationLeaf navigation)
     {
-      return navigation.Index == _navigation.Index;
+      return navigation.Id == _navigation.Id;
     }
 
     public readonly bool VisitNode(INavigationNode navigation)

@@ -7,7 +7,7 @@ public partial class SqlTextBuilderTests
 {
   private record NavigationLeaf(INavigationModel Model) : INavigationLeaf
   {
-    public int Index => Model.Id;
+    public int Id => Model.Id;
 
     public IEntityModel Target => Model.To;
 
@@ -31,7 +31,7 @@ public partial class SqlTextBuilderTests
 
   private record NavigationNode(INavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationNode
   {
-    public int Index => Model.Id;
+    public int Id => Model.Id;
 
     public IEntityModel Target => Model.To;
 

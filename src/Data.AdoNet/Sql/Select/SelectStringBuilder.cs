@@ -134,7 +134,7 @@ internal readonly struct SelectStringBuilder
     Append("LEFT JOIN ");
     AppendTarget(child);
     Append(" AS t");
-    Append(child.Index);
+    Append(child.Id);
     Append(" ON ");
     AppendJoinConditions(child);
   }
@@ -186,7 +186,7 @@ internal readonly struct SelectStringBuilder
 
   public readonly void AppendNodeColumns(int index, INavigationNode navigation)
   {
-    IndexPair state = new(index, navigation.Index);
+    IndexPair state = new(index, navigation.Id);
 
     AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetUnaliasedColumn);
     Append(", ");
@@ -205,7 +205,7 @@ internal readonly struct SelectStringBuilder
 
   public readonly void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
   {
-    IndexPair state = new(index, navigation.Index);
+    IndexPair state = new(index, navigation.Id);
 
     AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetAliasedColumn);
 
@@ -217,7 +217,7 @@ internal readonly struct SelectStringBuilder
 
   public readonly void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
   {
-    IndexPair state = new(index, navigation.Index);
+    IndexPair state = new(index, navigation.Id);
 
     AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetUnliasedColumn);
 

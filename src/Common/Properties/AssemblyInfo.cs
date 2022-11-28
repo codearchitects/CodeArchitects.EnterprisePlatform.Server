@@ -10,6 +10,7 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore5")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.Shared")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Emit")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore")]

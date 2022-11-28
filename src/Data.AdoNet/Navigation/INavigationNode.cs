@@ -2,5 +2,4 @@
 
 internal interface INavigationNode : INavigation
 {
-  IReadOnlyCollection<INavigation> Children { get; }
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -9,12 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.4" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data\CodeArchitects.Platform.Data.csproj" />
-    <ProjectReference Include="..\Emit\CodeArchitects.Platform.Emit.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
   </ItemGroup>
 
 </Project>

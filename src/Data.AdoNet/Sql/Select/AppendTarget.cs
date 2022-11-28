@@ -45,7 +45,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       _stringBuilder.Append("LEFT JOIN ");
       _stringBuilder.AppendTarget(child);
       _stringBuilder.Append(" AS t");
-      _stringBuilder.Append(child.Index);
+      _stringBuilder.Append(child.Id);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
       _stringBuilder.AppendLine();
@@ -62,7 +62,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append("] AS [");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Index);
+      stringBuilder.Append(navigation.Id);
       stringBuilder.Append(']');
     }
   }

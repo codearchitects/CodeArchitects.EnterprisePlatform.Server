@@ -4,9 +4,10 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal interface INavigation : IEquatable<INavigation>
 {
-  int Index { get; }
+  int Id { get; }
   IEntityModel Target { get; }
   INavigationModel Model { get; }
+  IReadOnlyCollection<INavigation> Children { get; }
 
   TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>;

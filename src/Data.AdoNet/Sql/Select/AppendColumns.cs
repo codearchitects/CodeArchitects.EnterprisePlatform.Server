@@ -20,13 +20,13 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
 
   public readonly VoidResult VisitLeaf(INavigationLeaf navigation)
   {
-    _stringBuilder.AppendLeafAliasedColumns(navigation.Index, navigation);
+    _stringBuilder.AppendLeafAliasedColumns(navigation.Id, navigation);
     return VoidResult.Instance;
   }
 
   public readonly VoidResult VisitNode(INavigationNode navigation)
   {
-    _stringBuilder.AppendNodeColumns(navigation.Index, navigation);
+    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
     return VoidResult.Instance;
   }
 }

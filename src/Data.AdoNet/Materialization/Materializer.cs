@@ -1,44 +1,68 @@
-﻿using System.Data.Common;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKey>
-  where TEntity : class
-  where TKey : IEquatable<TKey>
+internal class Materializer : IMaterializer, IMaterializerHub
 {
-  private readonly HashSet<TKey> _keys;
-  private ICollection<TEntity>? _entities;
+  private readonly IMaterializerFactory _factory;
+  private readonly IIdentityCollectionFactory _collectionFactory;
+  private readonly Dictionary<IEntityModel, object> _materializers;
+  private readonly List<IIdentityList> _identityLists;
 
-  public Materializer()
+  public Materializer(IMaterializerFactory factory, IIdentityCollectionFactory collectionFactory)
   {
-    _keys = new();
+    _factory = factory;
+    _collectionFactory = collectionFactory;
+    _materializers = new();
+    _identityLists = new();
   }
 
-  public void ReadRow(DbDataReader reader)
+  public IdentityList<T> CreateList<T>()
   {
-    if (_entities is null)
-      throw new InvalidOperationException("Materializer was not set up.");
-
-    TKey key = ReadKey(reader);
-    if (_keys.Contains(key))
-      return;
-
-    _entities.Add(ReadRest(key, reader));
-    _keys.Add(key);
+    IdentityList<T> result = _collectionFactory.CreateList<T>();
+    _identityLists.Add(result);
+    return result;
   }
 
-  public void Reset()
+  public IdentityHashSet<T> CreateHashSet<T>()
   {
-    _keys.Clear();
-    _entities = null;
+    return _collectionFactory.CreateHashSet<T>();
   }
 
-  public void Setup(ICollection<TEntity> entities)
+  public IMaterializer<TEntity, TKey> GetMaterializer<TEntity, TKey>(IEntityModel target)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
   {
-    _entities = entities;
+    if (!_materializers.TryGetValue(target, out object? materializer))
+    {
+      materializer = _factory.CreateMaterializer<TEntity, TKey>(this);
+      _materializers.Add(target, materializer);
+    }
+
+    return (IMaterializer<TEntity, TKey>)materializer;
   }
 
-  protected abstract TKey ReadKey(DbDataReader reader);
+  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, IEntityModel target, IReadOnlyCollection<INavigation> navigations, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IMaterializer<TEntity, TKey> materializer = GetMaterializer<TEntity, TKey>(target);
 
-  protected abstract TEntity ReadRest(TKey key, DbDataReader reader);
+    TEntity? entity = null;
+    while (await reader.ReadAsync(cancellationToken))
+    {
+      int offset = 0;
+      materializer.ReadEntity(reader, ref offset, navigations, ref entity);
+    }
+
+    foreach (IIdentityList list in _identityLists)
+    {
+      list.PopulateList();
+    }
+    _identityLists.Clear();
+
+    return entity;
+  }
 }

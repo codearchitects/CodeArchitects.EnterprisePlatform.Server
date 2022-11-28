@@ -1,11 +1,8 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.AdoNet.Navigation;
-
-namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal interface IMaterializerFactory
 {
-  IMaterializer<TEntity, TKey> CreateMaterializer<TEntity, TKey>(IEntityModel entity, IEnumerable<INavigation> navigations)
+  IMaterializer<TEntity, TKey> CreateMaterializer<TEntity, TKey>(IMaterializerHub hub)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 }

@@ -8,6 +8,7 @@ internal interface IEntityModel
   string TableName { get; }
   Type Type { get; }
 
+  IInitializerModel Initializer { get; }
   IPrimaryKeyModel PrimaryKey { get; }
 
   IReadOnlyList<IPropertyModel> Properties { get; }
