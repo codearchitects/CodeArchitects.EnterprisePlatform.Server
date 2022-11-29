@@ -3,31 +3,33 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationNode : IncluderNode, INavigationNode
+internal class NavigationSkipLeaf : INavigationSkipLeaf
 {
-  public NavigationNode(INavigationModel model)
+  public NavigationSkipLeaf(ISkipNavigationModel model)
   {
     Model = model;
   }
 
-  public INavigationModel Model { get; }
+  public ISkipNavigationModel Model { get; }
 
   INavigationModelBase INavigation.Model => Model;
 
   public int Id => Model.Id;
 
-  public override IEntityModel Target => Model.To;
+  public IEntityModel Target => Model.To;
+
+  public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitNode(this);
+    return visitor.VisitSkipLeaf(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitNode(this, in state);
+    return visitor.VisitSkipLeaf(this, in state);
   }
 
   public bool Equals(INavigation other)
@@ -37,9 +39,9 @@ internal class NavigationNode : IncluderNode, INavigationNode
 
   private readonly struct EqualityVisitor : INavigationVisitor<bool>
   {
-    private readonly INavigationNode _navigation;
+    private readonly INavigationSkipLeaf _navigation;
 
-    public EqualityVisitor(INavigationNode navigation)
+    public EqualityVisitor(INavigationSkipLeaf navigation)
     {
       _navigation = navigation;
     }
@@ -57,14 +59,12 @@ internal class NavigationNode : IncluderNode, INavigationNode
 
     public readonly bool VisitNode(INavigationNode navigation)
     {
-      return
-        navigation.Id == _navigation.Id &&
-        NavigationCollection.Equal(navigation.Children, _navigation.Children);
+      return false;
     }
 
     public bool VisitSkipLeaf(INavigationSkipLeaf navigation)
     {
-      return false;
+      return navigation.Id == _navigation.Id;
     }
 
     public bool VisitSkipNode(INavigationSkipNode navigation)

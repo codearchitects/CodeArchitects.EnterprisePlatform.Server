@@ -56,4 +56,14 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
       stringBuilder.Append(']');
     }
   }
+
+  public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidResult VisitSkipNode(INavigationSkipNode navigation)
+  {
+    throw new NotImplementedException();
+  }
 }

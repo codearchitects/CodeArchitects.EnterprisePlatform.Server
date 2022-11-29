@@ -29,4 +29,14 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
     _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
     return VoidResult.Instance;
   }
+
+  public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidResult VisitSkipNode(INavigationSkipNode navigation)
+  {
+    throw new NotImplementedException();
+  }
 }

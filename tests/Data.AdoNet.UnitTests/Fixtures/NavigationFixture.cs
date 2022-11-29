@@ -13,6 +13,15 @@ internal static class NavigationFixture
     public ChildA? ChildA { get; }
     public ChildB? ChildB { get; }
     public ChildC? ChildC { get; }
+    public ICollection<ManyToMany>? MTMEntities { get; set; }
+  }
+
+  public class ManyToMany
+  {
+    public int Id { get; }
+    public string? Name { get; }
+
+    public ICollection<Root>? Roots { get; set; }
   }
 
   public class ChildA
@@ -81,6 +90,7 @@ internal static class NavigationFixture
     public static readonly IEntityModel ChildDEntity = CreateChildDEntity().Mocked();
     public static readonly IEntityModel ChildEEntity = CreateChildEEntity().Mocked();
     public static readonly IEntityModel ChildFEntity = CreateChildFEntity().Mocked();
+    public static readonly IEntityModel ManyToManyEntity = CreateManyToManyEntity().Mocked();
 
     public static readonly INavigationModel RootToChildANavigation = CreateRootToChildANavigation();
     public static readonly INavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
@@ -90,6 +100,8 @@ internal static class NavigationFixture
     public static readonly INavigationModel ChildDToChildENavigation = CreateChildDToChildENavigation();
     public static readonly INavigationModel ChildAToRootNavigation = CreateChildAToRootNavigation();
     public static readonly INavigationModel ChildDToChildANavigation = CreateChildDToChildANavigation();
+    public static readonly ISkipNavigationModel RootToManyToManyNavigation = CreateRootToManyToManyNavigation();
+    public static readonly ISkipNavigationModel ManyToManyToRootNavigation = CreateManyToManyToRootNavigation();
 
     public const int RootToChildAId = 1;
     public const int RootToChildBId = 2;
@@ -99,6 +111,8 @@ internal static class NavigationFixture
     public const int ChildDToChildEId = 6;
     public const int ChildAToRootId = 7;
     public const int ChildDToChildAId = 8;
+    public const int RootToManyToManyId = 9;
+    public const int ManyToManyToRootId = 10;
 
     private static IEntityModel CreateRootEntity()
     {
@@ -106,7 +120,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(Root.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(Root))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -116,10 +130,32 @@ internal static class NavigationFixture
           .SetProperties(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
-          .Returns(() => new[] {
+          .Returns(() => new INavigationModelBase[] {
             RootToChildANavigation,
             RootToChildBNavigation,
-            RootToChildCNavigation
+            RootToChildCNavigation,
+            RootToManyToManyNavigation
+          })));
+    }
+
+    private static IEntityModel CreateManyToManyEntity()
+    {
+      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+        .SetColumnName(nameof(ManyToMany.Id))
+        .SetIndex(0));
+
+      return EntityModelBuilder.Build(_ => _
+        .SetTableName(nameof(ManyToMany))
+        .SetProperties(_ => _
+          .Add(idProperty)
+          .Add(_ => _
+            .SetColumnName(nameof(ManyToMany.Name))))
+        .SetPrimaryKey(_ => _
+          .SetProperties(idProperty))
+        .Setup(mock => mock
+          .Setup(x => x.Navigations)
+          .Returns(() => new[] {
+            ManyToManyToRootNavigation
           })));
     }
 
@@ -129,7 +165,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildA.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildA))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -154,7 +190,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildB.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildB))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -172,7 +208,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildC.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildC))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -190,7 +226,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildD.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildD))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -214,7 +250,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildE.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildE))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -232,7 +268,7 @@ internal static class NavigationFixture
         .SetColumnName(nameof(ChildF.Id))
         .SetIndex(0));
 
-      return EntityModelBuilder.Build(MockBehavior.Strict, _ => _
+      return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildF))
         .SetProperties(_ => _
           .Add(idProperty)
@@ -246,7 +282,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateRootToChildANavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(RootToChildAId)
         .SetTo(ChildAEntity)
         .SetName(nameof(Root.ChildA))
@@ -258,9 +294,30 @@ internal static class NavigationFixture
               .SetColumnName(nameof(ChildA.RootId))))));
     }
 
+    private static ISkipNavigationModel CreateRootToManyToManyNavigation()
+    {
+      return SkipNavigationModelBuilder.Build(_ => _
+        .SetId(RootToManyToManyId)
+        .SetTo(ManyToManyEntity)
+        .SetName(nameof(Root.MTMEntities))
+        .SetJoinTableName("RootManyToMany")
+        .SetFromKeys(_ => _
+          .Add(_ => _
+            .SetFromProperty(_ => _
+              .SetColumnName(nameof(Root.Id)))
+            .SetToProperty(_ => _
+              .SetColumnName("RootId"))))
+        .SetToKeys(_ => _
+          .Add(_ => _
+            .SetFromProperty(_ => _
+              .SetColumnName("ManyToManyId"))
+            .SetToProperty(_ => _
+              .SetColumnName(nameof(ManyToMany.Id))))));
+    }
+
     private static INavigationModel CreateRootToChildBNavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(RootToChildBId)
         .SetTo(ChildBEntity)
         .SetName(nameof(Root.ChildB))
@@ -274,7 +331,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateRootToChildCNavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(RootToChildCId)
         .SetTo(ChildCEntity)
         .SetName(nameof(Root.ChildC))
@@ -288,7 +345,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateChildAToChildDNavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(ChildAToChildDId)
         .SetTo(ChildDEntity)
         .SetName(nameof(ChildA.ChildD))
@@ -302,7 +359,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateChildAToChildFNavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(ChildAToChildFId)
         .SetTo(ChildFEntity)
         .SetName(nameof(ChildA.ChildF))
@@ -316,7 +373,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateChildDToChildENavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(ChildDToChildEId)
         .SetTo(ChildEEntity)
         .SetName(nameof(ChildD.ChildE))
@@ -330,7 +387,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateChildAToRootNavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(ChildAToRootId)
         .SetTo(RootEntity)
         .SetName(nameof(ChildA.Root))
@@ -344,7 +401,7 @@ internal static class NavigationFixture
 
     private static INavigationModel CreateChildDToChildANavigation()
     {
-      return NavigationModelBuilder.Build(MockBehavior.Strict, _ => _
+      return NavigationModelBuilder.Build(_ => _
         .SetId(ChildDToChildAId)
         .SetTo(ChildAEntity)
         .SetName(nameof(ChildD.ChildA))
@@ -354,6 +411,27 @@ internal static class NavigationFixture
               .SetColumnName(nameof(ChildD.ChildAId)))
             .SetToProperty(_ => _
               .SetColumnName(nameof(ChildA.Id))))));
+    }
+
+    private static ISkipNavigationModel CreateManyToManyToRootNavigation()
+    {
+      return SkipNavigationModelBuilder.Build(_ => _
+        .SetId(ManyToManyToRootId)
+        .SetTo(RootEntity)
+        .SetName(nameof(ManyToMany.Roots))
+        .SetJoinTableName("RootManyToMany")
+        .SetFromKeys(_ => _
+          .Add(_ => _
+            .SetFromProperty(_ => _
+              .SetColumnName(nameof(ManyToMany.Id)))
+            .SetToProperty(_ => _
+              .SetColumnName("ManyToManyId"))))
+        .SetToKeys(_ => _
+          .Add(_ => _
+            .SetFromProperty(_ => _
+              .SetColumnName("RootId"))
+            .SetToProperty(_ => _
+              .SetColumnName(nameof(Root.Id))))));
     }
   }
 }

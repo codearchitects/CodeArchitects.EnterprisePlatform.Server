@@ -12,7 +12,7 @@ internal interface IEntityModel
   IPrimaryKeyModel PrimaryKey { get; }
 
   IReadOnlyList<IPropertyModel> Properties { get; }
-  IReadOnlyList<INavigationModel> Navigations { get; }
+  IReadOnlyList<INavigationModelBase> Navigations { get; }
 
-  bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel);
+  bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModelBase? navigationModel);
 }

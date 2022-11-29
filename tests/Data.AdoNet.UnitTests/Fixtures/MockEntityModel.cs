@@ -22,13 +22,13 @@ internal class MockEntityModel : IEntityModel
 
   public IReadOnlyList<IPropertyModel> Properties => _mock.Properties;
 
-  public IReadOnlyList<INavigationModel> Navigations => _mock.Navigations;
+  public IReadOnlyList<INavigationModelBase> Navigations => _mock.Navigations;
 
   public IInitializerModel Initializer => _mock.Initializer;
 
-  public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel)
+  public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModelBase? navigationModel)
   {
-    foreach (INavigationModel navigation in Navigations)
+    foreach (INavigationModelBase navigation in Navigations)
     {
       if (navigation.Name == name.ToString())
       {

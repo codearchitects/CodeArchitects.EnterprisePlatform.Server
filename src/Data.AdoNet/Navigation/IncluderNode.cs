@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -32,7 +33,7 @@ internal abstract class IncluderNode
       index++;
     }
 
-    INavigationModel model;
+    INavigationModelBase model;
     if (index == length)
     {
       model = GetNavigationModel(path);
@@ -42,7 +43,7 @@ internal abstract class IncluderNode
     }
 
     model = GetNavigationModel(path[..index]);
-    NavigationNode node = GetOrUpdateNode(model);
+    IncluderNode node = GetOrUpdateNode(model);
 
     node.AddLeaf(path[(index + 1)..]);
   }
@@ -53,42 +54,59 @@ internal abstract class IncluderNode
       ? AddNode(childMemberExpression)
       : this;
 
-    INavigationModel model = node.GetNavigationModel(memberExpression.Member);
+    INavigationModelBase model = node.GetNavigationModel(memberExpression.Member);
 
     node.TryAddLeaf(model);
   }
 
-  public NavigationNode AddNode(MemberExpression memberExpression)
+  public IncluderNode AddNode(MemberExpression memberExpression)
   {
     IncluderNode node = memberExpression.Expression is MemberExpression childMemberExpression
       ? AddNode(childMemberExpression)
       : this;
 
-    INavigationModel model = node.GetNavigationModel(memberExpression.Member);
+    INavigationModelBase model = node.GetNavigationModel(memberExpression.Member);
 
     return node.GetOrUpdateNode(model);
   }
 
-  private NavigationNode GetOrUpdateNode(INavigationModel model)
+  private IncluderNode GetOrUpdateNode(INavigationModelBase model)
   {
-    if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not NavigationNode childNode)
+    if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not IncluderNode node)
     {
-      childNode = new(model);
-      _children[model.Id] = childNode;
+      switch (model)
+      {
+        case INavigationModel navigationModel:
+          NavigationNode navigationNode = new(navigationModel);
+          _children[model.Id] = navigationNode;
+          return navigationNode;
+        case ISkipNavigationModel skipNavigationModel:
+          NavigationSkipNode navigationSkipNode = new(skipNavigationModel);
+          _children[model.Id] = navigationSkipNode;
+          return navigationSkipNode;
+        default:
+          throw Errors.Unreacheable;
+      }
     }
 
-    return childNode;
+    return node;
   }
 
-  private void TryAddLeaf(INavigationModel model)
+  private void TryAddLeaf(INavigationModelBase model)
   {
     if (!_children.ContainsKey(model.Id))
     {
-      _children.Add(model.Id, new NavigationLeaf(model));
+      INavigation leaf = model switch
+      {
+        INavigationModel navigationModel         => new NavigationLeaf(navigationModel),
+        ISkipNavigationModel skipNavigationModel => new NavigationSkipLeaf(skipNavigationModel),
+        _                                        => throw Errors.Unreacheable
+      };
+      _children.Add(model.Id, leaf);
     }
   }
 
-  private INavigationModel GetNavigationModel(MemberInfo member)
+  private INavigationModelBase GetNavigationModel(MemberInfo member)
   {
     string navigationName = member switch
     {
@@ -97,15 +115,15 @@ internal abstract class IncluderNode
       _                     => throw new IncludeException("A member of the include expression was not a property or a field.")
     };
 
-    if (!Target.TryGetNavigation(navigationName, out INavigationModel? model))
+    if (!Target.TryGetNavigation(navigationName, out INavigationModelBase? model))
       throw new IncludeException($"Navigation '{navigationName}' was not found on entity '{Target.Name}'.");
 
     return model;
   }
 
-  private INavigationModel GetNavigationModel(ReadOnlySpan<char> navigationName)
+  private INavigationModelBase GetNavigationModel(ReadOnlySpan<char> navigationName)
   {
-    if (!Target.TryGetNavigation(navigationName, out INavigationModel? model))
+    if (!Target.TryGetNavigation(navigationName, out INavigationModelBase? model))
       throw new IncludeException($"Navigation '{navigationName.ToString()}' was not found on entity '{Target.Name}'.");
 
     return model;

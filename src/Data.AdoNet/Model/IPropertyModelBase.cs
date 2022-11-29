@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IPropertyBase
+internal interface IPropertyModelBase
 {
   string Name { get; }
   Type Type { get; }

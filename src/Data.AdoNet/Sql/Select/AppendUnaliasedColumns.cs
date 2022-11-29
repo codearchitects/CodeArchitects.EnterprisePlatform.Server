@@ -31,4 +31,14 @@ internal readonly struct AppendUnaliasedColumns : INavigationVisitor<VoidResult,
 
     return VoidResult.Instance;
   }
+
+  public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation, in int state)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidResult VisitSkipNode(INavigationSkipNode navigation, in int state)
+  {
+    throw new NotImplementedException();
+  }
 }

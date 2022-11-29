@@ -65,6 +65,38 @@ public partial class SqlTextBuilderTests
   }
 
   [Fact]
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToMany()
+  {
+    // Arrange
+    INavigationRoot root = NavigationRootBuilder.Build(_ => _
+      .SetEntity(RootEntity)
+      .SetNavigations(
+        new NavigationSkipLeaf(RootToManyToManyNavigation)));
+
+    string expectedSql = """
+      SELECT t.[Id], t.[Name], t9.[Id] AS [Id_9], t9.[Name] AS [Name_9]
+      FROM (
+      SELECT [Id], [Name]
+      FROM [Root]
+      WHERE [Id] = @p0
+      ) AS t
+      LEFT JOIN (
+      SELECT t9.[Id], t9.[Name], t.[RootId]
+      FROM [RootManyToMany] AS t
+      INNER JOIN [ManyToMany] AS t9 ON t.[ManyToManyId] = t9.[Id]
+      ) AS t9 ON t.[Id] = t9.[RootId]
+      """;
+
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
+
+    // Act
+    string sql = sut.BuildSelectText(root);
+
+    // Assert
+    sql.Should().Be(expectedSql);
+  }
+
+  [Fact]
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeAll()
   {
     // Arrange

@@ -3,9 +3,9 @@
 internal class ThenIncluder<TEntity> : IncluderBase<TEntity>
   where TEntity : class
 {
-  private readonly NavigationNode _node;
+  private readonly IncluderNode _node;
 
-  public ThenIncluder(NavigationNode node)
+  public ThenIncluder(IncluderNode node)
   {
     _node = node;
   }

@@ -12,6 +12,8 @@ internal class NavigationLeaf : INavigationLeaf
 
   public INavigationModel Model { get; }
 
+  INavigationModelBase INavigation.Model => Model;
+
   public int Id => Model.Id;
 
   public IEntityModel Target => Model.To;
@@ -56,6 +58,16 @@ internal class NavigationLeaf : INavigationLeaf
     }
 
     public readonly bool VisitNode(INavigationNode navigation)
+    {
+      return false;
+    }
+
+    public bool VisitSkipLeaf(INavigationSkipLeaf navigation)
+    {
+      return false;
+    }
+
+    public bool VisitSkipNode(INavigationSkipNode navigation)
     {
       return false;
     }

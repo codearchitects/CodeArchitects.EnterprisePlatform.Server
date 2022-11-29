@@ -52,7 +52,7 @@ internal static class WithNavigationOnParent
       .SetMemberAccess(MemberAccess.Property)
       .SetProperty(typeof(Parent).GetRequiredProperty(nameof(Parent.Name), BindingFlags.Instance | BindingFlags.Public)));
 
-    INavigationModel childANavigation = NavigationModelBuilder.Build(_ => _
+    INavigationModelBase childANavigation = NavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetIndex(0)
       .SetType(typeof(ChildA))
@@ -65,7 +65,7 @@ internal static class WithNavigationOnParent
         .SetPrimaryKey(_ => _
           .SetType(typeof(Guid)))));
 
-    INavigationModel childrenBNavigation = NavigationModelBuilder.Build(_ => _
+    INavigationModelBase childrenBNavigation = NavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetIndex(1)
       .SetType(typeof(ICollection<ChildB>))
@@ -111,7 +111,7 @@ internal static class WithNavigationOnParent
       .SetMemberAccess(MemberAccess.Property)
       .SetProperty(typeof(ChildA).GetRequiredProperty(nameof(ChildA.Name), BindingFlags.Instance | BindingFlags.Public)));
 
-    INavigationModel parentNavigation = NavigationModelBuilder.Build(_ => _
+    INavigationModelBase parentNavigation = NavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetType(typeof(Parent))
       .SetIsOnDependent(false)
@@ -165,7 +165,7 @@ internal static class WithNavigationOnParent
       .SetMemberAccess(MemberAccess.Property)
       .SetProperty(typeof(ChildB).GetRequiredProperty(nameof(ChildB.Name), BindingFlags.Instance | BindingFlags.Public)));
 
-    INavigationModel parentNavigation = NavigationModelBuilder.Build(_ => _
+    INavigationModelBase parentNavigation = NavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetType(typeof(Parent))
       .SetIsOnDependent(false)

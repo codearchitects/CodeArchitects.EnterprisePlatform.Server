@@ -80,7 +80,7 @@ internal abstract class IncluderBase<TEntity> : IExpressionIncluder<TEntity>
   private IExpressionIncluder<TEntity> Include<T>(MemberExpression memberExpression, Action<IExpressionIncluder<T>> thenInclude)
     where T : class
   {
-    NavigationNode childNode = Node.AddNode(memberExpression);
+    IncluderNode childNode = Node.AddNode(memberExpression);
     thenInclude(new ThenIncluder<T>(childNode));
 
     return this;
