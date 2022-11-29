@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using CodeArchitects.Platform.Data.AdoNet.Navigation.FluentMock;
 using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql;
@@ -10,10 +9,10 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOne()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(RootEntity)
-      .SetNavigations(
-        new NavigationSimpleLeaf(RootToChildANavigation)));
+    NavigationSpec spec = new(RootEntity, new INavigation[]
+    {
+      new NavigationSimpleLeaf(RootToChildANavigation)
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1]
@@ -28,7 +27,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -38,11 +37,11 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeTwo()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(RootEntity)
-      .SetNavigations(
-        new NavigationSimpleLeaf(RootToChildANavigation),
-        new NavigationSimpleLeaf(RootToChildBNavigation)));
+    NavigationSpec spec = new(RootEntity, new INavigation[]
+    {
+      new NavigationSimpleLeaf(RootToChildANavigation),
+      new NavigationSimpleLeaf(RootToChildBNavigation)
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2]
@@ -58,7 +57,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -68,10 +67,10 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsLeaf()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(RootEntity)
-      .SetNavigations(
-        new NavigationSkipLeaf(RootToManyToManyNavigation)));
+    NavigationSpec spec = new(RootEntity, new INavigation[]
+    {
+      new NavigationSkipLeaf(RootToManyToManyNavigation)
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t9.[Id] AS [Id_9], t9.[Name] AS [Name_9]
@@ -90,7 +89,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -100,10 +99,9 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeAll()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(RootEntity)
-      .SetNavigations(
-        new NavigationSimpleLeaf(RootToChildBNavigation),
+    NavigationSpec spec = new(RootEntity, new INavigation[]
+    {
+      new NavigationSimpleLeaf(RootToChildBNavigation),
         new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
         {
           new NavigationSimpleNode(ChildAToChildDNavigation, new INavigation[]
@@ -112,7 +110,8 @@ public partial class SqlTextBuilderTests
           }),
           new NavigationSimpleLeaf(ChildAToChildFNavigation)
         }),
-        new NavigationSimpleLeaf(RootToChildCNavigation)));
+        new NavigationSimpleLeaf(RootToChildCNavigation)
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2], t1.[Id_1], t1.[Name_1], t1.[RootId_1], t1.[Id_4], t1.[Name_4], t1.[ChildAId_4], t1.[Id_6], t1.[Name_6], t1.[ChildDId_6], t1.[Id_5], t1.[Name_5], t1.[ChildAId_5], t3.[Id] AS [Id_3], t3.[Name] AS [Name_3], t3.[RootId] AS [RootId_3]
@@ -138,7 +137,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -148,10 +147,10 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOneInverseDepth1()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(ChildAEntity)
-      .SetNavigations(
-        new NavigationSimpleLeaf(ChildAToRootNavigation)));
+    NavigationSpec spec = new(ChildAEntity, new INavigation[]
+    {
+      new NavigationSimpleLeaf(ChildAToRootNavigation)
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[RootId], t7.[Id] AS [Id_7], t7.[Name] AS [Name_7]
@@ -166,7 +165,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -176,13 +175,13 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOneInverseDepth2()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(ChildAEntity)
-      .SetNavigations(
-        new NavigationSimpleNode(ChildAToRootNavigation, new INavigation[]
-        {
-          new NavigationSimpleLeaf(RootToChildBNavigation),
-        })));
+    NavigationSpec spec = new(ChildAEntity, new INavigation[]
+    {
+      new NavigationSimpleNode(ChildAToRootNavigation, new INavigation[]
+      {
+        new NavigationSimpleLeaf(RootToChildBNavigation),
+      })
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[RootId], t7.[Id_7], t7.[Name_7], t7.[Id_2], t7.[Name_2], t7.[RootId_2]
@@ -201,7 +200,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -211,13 +210,13 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsLeafAfterNode()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(ChildGEntity)
-      .SetNavigations(
-        new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
-        {
-          new NavigationSkipLeaf(ManyToManyToRootNavigation)
-        })));
+    NavigationSpec spec = new(ChildGEntity, new INavigation[]
+    {
+      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      {
+        new NavigationSkipLeaf(ManyToManyToRootNavigation)
+      })
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[MTMEntityId], t11.[Id_11], t11.[Name_11], t11.[Id_10], t11.[Name_10]
@@ -240,7 +239,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -250,16 +249,16 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsNodeDepth1()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(ChildGEntity)
-      .SetNavigations(
-        new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+    NavigationSpec spec = new(ChildGEntity, new INavigation[]
+    {
+      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      {
+        new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
         {
-          new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
-          {
-            new NavigationSimpleLeaf(RootToChildANavigation)
-          })
-        })));
+          new NavigationSimpleLeaf(RootToChildANavigation)
+        })
+      })
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[MTMEntityId], t11.[Id_11], t11.[Name_11], t11.[Id_10], t11.[Name_10], t11.[Id_1], t11.[Name_1], t11.[RootId_1]
@@ -286,7 +285,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);
@@ -296,19 +295,19 @@ public partial class SqlTextBuilderTests
   public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsNodeDepth2()
   {
     // Arrange
-    INavigationRoot root = NavigationRootBuilder.Build(_ => _
-      .SetEntity(ChildGEntity)
-      .SetNavigations(
-        new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+    NavigationSpec spec = new(ChildGEntity, new INavigation[]
+    {
+      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      {
+        new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
         {
-          new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
+          new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
           {
-            new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
-            {
-              new NavigationSimpleLeaf(ChildAToChildDNavigation)
-            })
+            new NavigationSimpleLeaf(ChildAToChildDNavigation)
           })
-        })));
+        })
+      })
+    });
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[MTMEntityId], t11.[Id_11], t11.[Name_11], t11.[Id_10], t11.[Name_10], t11.[Id_1], t11.[Name_1], t11.[RootId_1], t11.[Id_4], t11.[Name_4], t11.[ChildAId_4]
@@ -339,7 +338,7 @@ public partial class SqlTextBuilderTests
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
 
     // Act
-    string sql = sut.BuildSelectText(root);
+    string sql = sut.BuildSelectText(spec);
 
     // Assert
     sql.Should().Be(expectedSql);

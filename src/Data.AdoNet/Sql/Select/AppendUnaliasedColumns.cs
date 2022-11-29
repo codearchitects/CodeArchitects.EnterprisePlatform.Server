@@ -13,19 +13,19 @@ internal readonly struct AppendUnaliasedColumns : INavigationVisitor<VoidResult,
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Visit(INavigation navigation, int index)
+  public void Visit(INavigation navigation, int index)
   {
     navigation.Accept<AppendUnaliasedColumns, VoidResult, int>(in this, in index);
   }
 
-  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation, in int index)
+  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation, in int index)
   {
     _stringBuilder.AppendLeafUnaliasedColumns(index, navigation);
 
     return VoidResult.Instance;
   }
 
-  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation, in int index)
+  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation, in int index)
   {
     _stringBuilder.AppendNodeColumns(index, navigation);
 

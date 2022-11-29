@@ -18,31 +18,31 @@ internal readonly struct SelectStringBuilder
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Append(string value)
+  public void Append(string value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Append(char value)
+  public void Append(char value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Append(int value)
+  public void Append(int value)
   {
     _stringBuilder.Append(value);
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void AppendLine()
+  public void AppendLine()
   {
     _stringBuilder.AppendLine();
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void AppendLine(string value)
+  public void AppendLine(string value)
   {
     _stringBuilder.AppendLine(value);
   }
@@ -53,7 +53,7 @@ internal readonly struct SelectStringBuilder
     return _stringBuilder.ToString();
   }
 
-  public readonly void AppendJoin<T>(string separator, IEnumerable<T> values, AppendAction<T> append)
+  public void AppendJoin<T>(string separator, IEnumerable<T> values, AppendAction<T> append)
   {
     using IEnumerator<T> enumerator = values.GetEnumerator();
 
@@ -69,7 +69,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public readonly void AppendJoin<TState, T>(string separator, in TState state, IEnumerable<T> values, AppendAction<TState, T> append)
+  public void AppendJoin<TState, T>(string separator, in TState state, IEnumerable<T> values, AppendAction<TState, T> append)
   {
     using IEnumerator<T> enumerator = values.GetEnumerator();
 
@@ -128,7 +128,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public readonly void AppendLeftJoin(INavigation child)
+  public void AppendLeftJoin(INavigation child)
   {
     AppendLine();
     Append("LEFT JOIN ");
@@ -139,22 +139,22 @@ internal readonly struct SelectStringBuilder
     AppendJoinConditions(child);
   }
 
-  public readonly void AppendColumns(INavigation navigation)
+  public void AppendColumns(INavigation navigation)
   {
     new AppendColumns(this).Visit(navigation);
   }
 
-  public readonly void AppendTarget(INavigation navigation)
+  public void AppendTarget(INavigation navigation)
   {
     new AppendTarget(this).Visit(navigation);
   }
 
-  public readonly void AppendJoinConditions(INavigation navigation)
+  public void AppendJoinConditions(INavigation navigation)
   {
     new AppendJoinConditions(this).Visit(navigation);
   }
 
-  public readonly void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
+  public void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
   {
     Append('t');
     Append(state.Index);
@@ -179,12 +179,12 @@ internal readonly struct SelectStringBuilder
   }
 
 
-  public readonly void AppendChildrenColumns(IReadOnlyCollection<INavigation> children)
+  public void AppendChildrenColumns(IReadOnlyCollection<INavigation> children)
   {
     AppendJoin(", ", children, static (stringBuilder, child) => stringBuilder.AppendColumns(child));
   }
 
-  public readonly void AppendNodeColumns(int index, INavigationNode navigation)
+  public void AppendNodeColumns(int index, INavigationNode navigation)
   {
     IndexPair state = new(index, navigation.Model.Id);
 
@@ -203,7 +203,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public readonly void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
+  public void AppendLeafAliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Model.Id);
 
@@ -215,7 +215,7 @@ internal readonly struct SelectStringBuilder
     }
   }
 
-  public readonly void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
+  public void AppendLeafUnaliasedColumns(int index, INavigationLeaf navigation)
   {
     IndexPair state = new(index, navigation.Model.Id);
 

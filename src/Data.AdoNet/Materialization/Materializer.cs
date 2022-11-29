@@ -46,10 +46,11 @@ internal class Materializer : IMaterializer, IMaterializerHub
     return (IMaterializer<TEntity, TKey>)materializer;
   }
 
-  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, IEntityModel target, IReadOnlyCollection<INavigation> navigations, CancellationToken cancellationToken)
+  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec spec, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    var (target, navigations) = spec;
     IMaterializer<TEntity, TKey> materializer = GetMaterializer<TEntity, TKey>(target);
 
     TEntity? entity = null;

@@ -14,12 +14,12 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Visit(INavigation navigation)
+  public void Visit(INavigation navigation)
   {
     navigation.Accept<AppendJoinConditions, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
+  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
 
@@ -37,7 +37,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     }
   }
 
-  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
+  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
 

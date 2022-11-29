@@ -13,32 +13,36 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Visit(INavigation navigation)
+  public void Visit(INavigation navigation)
   {
     navigation.Accept<AppendColumns, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
+  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
     _stringBuilder.AppendLeafAliasedColumns(navigation.Model.Id, navigation);
+
     return VoidResult.Instance;
   }
 
-  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
+  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
     _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
+
     return VoidResult.Instance;
   }
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
     _stringBuilder.AppendLeafAliasedColumns(navigation.Model.Id, navigation);
+
     return VoidResult.Instance;
   }
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
     _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
+
     return VoidResult.Instance;
   }
 }

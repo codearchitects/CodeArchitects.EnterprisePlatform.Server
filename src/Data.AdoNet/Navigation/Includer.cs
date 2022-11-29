@@ -15,7 +15,7 @@ internal class Includer<TEntity> : IncluderBase<TEntity>, IIncluder<TEntity>
 
   protected override IncluderNode Node => _root;
 
-  public INavigationRoot Root => _root;
+  public NavigationSpec Spec => new NavigationSpec(_root);
 
   public IStringIncluder<TEntity> Include(string navigation)
   {

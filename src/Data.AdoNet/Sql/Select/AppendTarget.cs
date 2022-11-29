@@ -14,12 +14,12 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public readonly void Visit(INavigation navigation)
+  public void Visit(INavigation navigation)
   {
     navigation.Accept<AppendTarget, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
+  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
     _stringBuilder.Append("[");
     _stringBuilder.Append(navigation.Target.TableName);
@@ -28,7 +28,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     return VoidResult.Instance;
   }
 
-  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
+  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");

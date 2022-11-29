@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationRoot : IncluderNode, INavigationRoot
+internal class NavigationRoot : IncluderNode
 {
   public NavigationRoot(IEntityModel target)
   {
@@ -10,8 +10,4 @@ internal class NavigationRoot : IncluderNode, INavigationRoot
   }
 
   public override IEntityModel Target { get; }
-
-  public IEntityModel Entity => Target;
-
-  public IReadOnlyCollection<INavigation> Navigations => Children;
 }

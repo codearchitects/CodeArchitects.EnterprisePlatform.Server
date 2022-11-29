@@ -1,29 +1,30 @@
-﻿using System.Collections.Concurrent;
+﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
 internal class SqlTextCache : ISqlTextCache
 {
-  private readonly IDictionary<NavigationCacheKey, string> _selectTexts;
+  private readonly IDictionary<NavigationSpec, string> _selectTexts;
 
-  public SqlTextCache(IDictionary<NavigationCacheKey, string> selectTexts)
+  public SqlTextCache(IDictionary<NavigationSpec, string> selectTexts)
   {
     _selectTexts = selectTexts;
   }
 
-  public void AddSelectText(NavigationCacheKey key, string text)
+  public void AddSelectText(NavigationSpec spec, string text)
   {
-    _selectTexts.Add(key, text);
+    _selectTexts.Add(spec, text);
   }
 
-  public bool TryGetSelectText(NavigationCacheKey key, [NotNullWhen(true)] out string? text)
+  public bool TryGetSelectText(NavigationSpec spec, [NotNullWhen(true)] out string? text)
   {
-    return _selectTexts.TryGetValue(key, out text);
+    return _selectTexts.TryGetValue(spec, out text);
   }
 
   public static SqlTextCache Create()
   {
-    return new(new ConcurrentDictionary<NavigationCacheKey, string>());
+    return new(new ConcurrentDictionary<NavigationSpec, string>());
   }
 }
