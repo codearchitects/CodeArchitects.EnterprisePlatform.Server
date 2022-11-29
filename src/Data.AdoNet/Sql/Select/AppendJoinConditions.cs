@@ -89,8 +89,6 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
       stringBuilder.Append(navigation.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(pair.ToProperty.ColumnName);
-      stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Id);
       stringBuilder.Append(']');
     }
   }
