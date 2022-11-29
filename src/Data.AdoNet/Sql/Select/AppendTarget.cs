@@ -19,7 +19,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     navigation.Accept<AppendTarget, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitLeaf(INavigationLeaf navigation)
+  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
     _stringBuilder.Append("[");
     _stringBuilder.Append(navigation.Target.TableName);
@@ -28,11 +28,11 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     return VoidResult.Instance;
   }
 
-  public readonly VoidResult VisitNode(INavigationNode navigation)
+  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", in navigation, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
@@ -55,7 +55,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, in INavigationNode navigation, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IPropertyModel property)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(property.ColumnName);
@@ -69,11 +69,82 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendLine("(");
+    _stringBuilder.Append("SELECT ");
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.Append(", ");
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
+    _stringBuilder.AppendLine();
+    _stringBuilder.Append("FROM [");
+    _stringBuilder.Append(navigation.Model.JoinTableName);
+    _stringBuilder.Append("] AS t");
+    _stringBuilder.Append(navigation.Id);
+    _stringBuilder.AppendLine();
+    _stringBuilder.Append("INNER JOIN [");
+    _stringBuilder.Append(navigation.Target.TableName);
+    _stringBuilder.Append("] AS t ON ");
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeys, AppendJoinCondition);
+    _stringBuilder.AppendLine();
+    _stringBuilder.Append(")");
+
+    return VoidResult.Instance;
+
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IPropertyModel property)
+    {
+      stringBuilder.Append("t.[");
+      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(']');
+    }
+
+    static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
+    {
+      stringBuilder.Append('t');
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(".[");
+      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(']');
+    }
+
+    static void AppendJoinCondition(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
+    {
+      stringBuilder.Append('t');
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(".[");
+      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append("] = t.[");
+      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(']');
+    }
   }
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendLine("(");
+    _stringBuilder.Append("SELECT ");
+    // _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
+    // _stringBuilder.Append(", ");
+    // _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
+    // _stringBuilder.Append(", ");
+    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
+
+    return VoidResult.Instance;
+
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IPropertyModel property)
+    {
+      stringBuilder.Append("t.[");
+      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append('_');
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(']');
+    }
+
+    static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
+    {
+      stringBuilder.Append('t');
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(".[");
+      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(']');
+    }
   }
 }

@@ -33,7 +33,7 @@ internal abstract class IncluderNode
       index++;
     }
 
-    INavigationModelBase model;
+    INavigationModel model;
     if (index == length)
     {
       model = GetNavigationModel(path);
@@ -54,7 +54,7 @@ internal abstract class IncluderNode
       ? AddNode(childMemberExpression)
       : this;
 
-    INavigationModelBase model = node.GetNavigationModel(memberExpression.Member);
+    INavigationModel model = node.GetNavigationModel(memberExpression.Member);
 
     node.TryAddLeaf(model);
   }
@@ -65,18 +65,18 @@ internal abstract class IncluderNode
       ? AddNode(childMemberExpression)
       : this;
 
-    INavigationModelBase model = node.GetNavigationModel(memberExpression.Member);
+    INavigationModel model = node.GetNavigationModel(memberExpression.Member);
 
     return node.GetOrUpdateNode(model);
   }
 
-  private IncluderNode GetOrUpdateNode(INavigationModelBase model)
+  private IncluderNode GetOrUpdateNode(INavigationModel model)
   {
     if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not IncluderNode node)
     {
       switch (model)
       {
-        case INavigationModel navigationModel:
+        case ISimpleNavigationModel navigationModel:
           NavigationNode navigationNode = new(navigationModel);
           _children[model.Id] = navigationNode;
           return navigationNode;
@@ -92,13 +92,13 @@ internal abstract class IncluderNode
     return node;
   }
 
-  private void TryAddLeaf(INavigationModelBase model)
+  private void TryAddLeaf(INavigationModel model)
   {
     if (!_children.ContainsKey(model.Id))
     {
       INavigation leaf = model switch
       {
-        INavigationModel navigationModel         => new NavigationLeaf(navigationModel),
+        ISimpleNavigationModel navigationModel         => new NavigationLeaf(navigationModel),
         ISkipNavigationModel skipNavigationModel => new NavigationSkipLeaf(skipNavigationModel),
         _                                        => throw Errors.Unreacheable
       };
@@ -106,7 +106,7 @@ internal abstract class IncluderNode
     }
   }
 
-  private INavigationModelBase GetNavigationModel(MemberInfo member)
+  private INavigationModel GetNavigationModel(MemberInfo member)
   {
     string navigationName = member switch
     {
@@ -115,15 +115,15 @@ internal abstract class IncluderNode
       _                     => throw new IncludeException("A member of the include expression was not a property or a field.")
     };
 
-    if (!Target.TryGetNavigation(navigationName, out INavigationModelBase? model))
+    if (!Target.TryGetNavigation(navigationName, out INavigationModel? model))
       throw new IncludeException($"Navigation '{navigationName}' was not found on entity '{Target.Name}'.");
 
     return model;
   }
 
-  private INavigationModelBase GetNavigationModel(ReadOnlySpan<char> navigationName)
+  private INavigationModel GetNavigationModel(ReadOnlySpan<char> navigationName)
   {
-    if (!Target.TryGetNavigation(navigationName, out INavigationModelBase? model))
+    if (!Target.TryGetNavigation(navigationName, out INavigationModel? model))
       throw new IncludeException($"Navigation '{navigationName.ToString()}' was not found on entity '{Target.Name}'.");
 
     return model;

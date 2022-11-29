@@ -6,7 +6,7 @@ internal interface INavigation : IEquatable<INavigation>
 {
   int Id { get; }
   IEntityModel Target { get; }
-  INavigationModelBase Model { get; }
+  INavigationModel Model { get; }
   IReadOnlyCollection<INavigation> Children { get; }
 
   TResult Accept<TVisitor, TResult>(in TVisitor visitor)

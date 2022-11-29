@@ -19,13 +19,13 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     navigation.Accept<AppendJoinConditions, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitLeaf(INavigationLeaf navigation)
+  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
-    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.Keys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, in INavigationLeaf navigation, IKeyPair pair)
+    static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSimpleLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
@@ -37,13 +37,13 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     }
   }
 
-  public readonly VoidResult VisitNode(INavigationNode navigation)
+  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
-    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.Keys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, in INavigationNode navigation, IKeyPair pair)
+    static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
@@ -59,11 +59,39 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendCondition);
+
+    return VoidResult.Instance;
+
+    static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
+    {
+      stringBuilder.Append("t.[");
+      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append("] = t");
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(".[");
+      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(']');
+    }
   }
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendCondition);
+
+    return VoidResult.Instance;
+
+    static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
+    {
+      stringBuilder.Append("t.[");
+      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append("] = t");
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(".[");
+      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append('_');
+      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(']');
+    }
   }
 }

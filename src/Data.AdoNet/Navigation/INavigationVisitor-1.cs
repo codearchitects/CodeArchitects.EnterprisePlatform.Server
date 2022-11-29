@@ -2,8 +2,8 @@
 
 internal interface INavigationVisitor<TResult>
 {
-  TResult VisitNode(INavigationNode navigation);
-  TResult VisitLeaf(INavigationLeaf navigation);
+  TResult VisitSimpleNode(INavigationSimpleNode navigation);
+  TResult VisitSimpleLeaf(INavigationSimpleLeaf navigation);
   TResult VisitSkipNode(INavigationSkipNode navigation);
   TResult VisitSkipLeaf(INavigationSkipLeaf navigation);
 }

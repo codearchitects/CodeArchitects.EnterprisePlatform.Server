@@ -13,7 +13,7 @@ public partial class SqlTextBuilderTests
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
       .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(RootToChildANavigation)));
+        new NavigationSimpleLeaf(RootToChildANavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1]
@@ -41,8 +41,8 @@ public partial class SqlTextBuilderTests
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
       .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(RootToChildANavigation),
-        new NavigationLeaf(RootToChildBNavigation)));
+        new NavigationSimpleLeaf(RootToChildANavigation),
+        new NavigationSimpleLeaf(RootToChildBNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2]
@@ -65,7 +65,7 @@ public partial class SqlTextBuilderTests
   }
 
   [Fact]
-  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToMany()
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsLeaf()
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
@@ -81,9 +81,9 @@ public partial class SqlTextBuilderTests
       WHERE [Id] = @p0
       ) AS t
       LEFT JOIN (
-      SELECT t9.[Id], t9.[Name], t.[RootId]
-      FROM [RootManyToMany] AS t
-      INNER JOIN [ManyToMany] AS t9 ON t.[ManyToManyId] = t9.[Id]
+      SELECT t.[Id], t.[Name], t9.[RootId]
+      FROM [RootManyToMany] AS t9
+      INNER JOIN [ManyToMany] AS t ON t9.[ManyToManyId] = t.[Id]
       ) AS t9 ON t.[Id] = t9.[RootId]
       """;
 
@@ -103,16 +103,16 @@ public partial class SqlTextBuilderTests
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
       .SetEntity(RootEntity)
       .SetNavigations(
-        new NavigationLeaf(RootToChildBNavigation),
-        new NavigationNode(RootToChildANavigation, new INavigation[]
+        new NavigationSimpleLeaf(RootToChildBNavigation),
+        new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
         {
-          new NavigationNode(ChildAToChildDNavigation, new INavigation[]
+          new NavigationSimpleNode(ChildAToChildDNavigation, new INavigation[]
           {
-            new NavigationLeaf(ChildDToChildENavigation)
+            new NavigationSimpleLeaf(ChildDToChildENavigation)
           }),
-          new NavigationLeaf(ChildAToChildFNavigation)
+          new NavigationSimpleLeaf(ChildAToChildFNavigation)
         }),
-        new NavigationLeaf(RootToChildCNavigation)));
+        new NavigationSimpleLeaf(RootToChildCNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2], t1.[Id_1], t1.[Name_1], t1.[RootId_1], t1.[Id_4], t1.[Name_4], t1.[ChildAId_4], t1.[Id_6], t1.[Name_6], t1.[ChildDId_6], t1.[Id_5], t1.[Name_5], t1.[ChildAId_5], t3.[Id] AS [Id_3], t3.[Name] AS [Name_3], t3.[RootId] AS [RootId_3]
@@ -145,13 +145,13 @@ public partial class SqlTextBuilderTests
   }
 
   [Fact]
-  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOneInverse()
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOneInverseDepth1()
   {
     // Arrange
     INavigationRoot root = NavigationRootBuilder.Build(_ => _
       .SetEntity(ChildAEntity)
       .SetNavigations(
-        new NavigationLeaf(ChildAToRootNavigation)));
+        new NavigationSimpleLeaf(ChildAToRootNavigation)));
 
     string expectedSql = """
       SELECT t.[Id], t.[Name], t.[RootId], t7.[Id] AS [Id_7], t7.[Name] AS [Name_7]
@@ -161,6 +161,126 @@ public partial class SqlTextBuilderTests
       WHERE [Id] = @p0
       ) AS t
       LEFT JOIN [Root] AS t7 ON t.[RootId] = t7.[Id]
+      """;
+
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
+
+    // Act
+    string sql = sut.BuildSelectText(root);
+
+    // Assert
+    sql.Should().Be(expectedSql);
+  }
+
+  [Fact]
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeOneInverseDepth2()
+  {
+    // Arrange
+    INavigationRoot root = NavigationRootBuilder.Build(_ => _
+      .SetEntity(ChildAEntity)
+      .SetNavigations(
+        new NavigationSimpleNode(ChildAToRootNavigation, new INavigation[]
+        {
+          new NavigationSimpleLeaf(RootToChildBNavigation),
+        })));
+
+    string expectedSql = """
+      SELECT t.[Id], t.[Name], t.[RootId], t7.[Id_7], t7.[Name_7], t7.[Id_2], t7.[Name_2], t7.[RootId_2]
+      FROM (
+      SELECT [Id], [Name], [RootId]
+      FROM [ChildA]
+      WHERE [Id] = @p0
+      ) AS t
+      LEFT JOIN (
+      SELECT t.[Id] AS [Id_7], t.[Name] AS [Name_7], t2.[Id] AS [Id_2], t2.[Name] AS [Name_2], t2.[RootId] AS [RootId_2]
+      FROM [Root] AS t
+      LEFT JOIN [ChildB] AS t2 ON t.[Id] = t2.[RootId]
+      ) AS t7 ON t.[RootId] = t7.[Id_7]
+      """;
+
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
+
+    // Act
+    string sql = sut.BuildSelectText(root);
+
+    // Assert
+    sql.Should().Be(expectedSql);
+  }
+
+  [Fact]
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsLeafAfterNode()
+  {
+    // Arrange
+    INavigationRoot root = NavigationRootBuilder.Build(_ => _
+      .SetEntity(ChildGEntity)
+      .SetNavigations(
+        new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+        {
+          new NavigationSkipLeaf(ManyToManyToRootNavigation)
+        })));
+
+    string expectedSql = """
+      SELECT t.[Id], t.[Name], t.[MTMEntityId], t11.[Id_11], t11.[Name_11], t11.[Id_10], t11.[Name_10]
+      FROM (
+      SELECT [Id], [Name], [MTMEntityId]
+      FROM [ChildG]
+      WHERE [Id] = @p0
+      ) AS t
+      LEFT JOIN (
+      SELECT t.[Id] AS [Id_11], t.[Name] AS [Name_11], t10.[Id] AS [Id_10], t10.[Name] AS [Name_10]
+      FROM [ManyToMany] AS t
+      LEFT JOIN (
+      SELECT t.[Id], t.[Name], t10.[ManyToManyId]
+      FROM [RootManyToMany] AS t10
+      INNER JOIN [Root] AS t ON t10.[RootId] = t.[Id]
+      ) AS t10 ON t.[Id] = t10.[ManyToManyId]
+      ) AS t11 ON t.[MTMEntityId] = t11.[Id_11]
+      """;
+
+    SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());
+
+    // Act
+    string sql = sut.BuildSelectText(root);
+
+    // Assert
+    sql.Should().Be(expectedSql);
+  }
+
+  [Fact]
+  public void BuildSelectText_ShouldReturnCorrectSql_WhenIncludeManyToManyAsNode()
+  {
+    // Arrange
+    INavigationRoot root = NavigationRootBuilder.Build(_ => _
+      .SetEntity(ChildGEntity)
+      .SetNavigations(
+        new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+        {
+          new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
+          {
+            new NavigationSimpleLeaf(RootToChildANavigation)
+          })
+        })));
+
+    string expectedSql = """
+      SELECT t.[Id], t.[Name], t.[MTMEntityId], t11.[Id_11], t11.[Name_11], t11.[Id_10], t11.[Name_10], t11.[Id_1], t11.[Name_1], t11.[RootId_1]
+      FROM (
+        SELECT [Id], [Name], [MTMEntityId]
+        FROM [ChildG]
+        WHERE [Id] = @p0
+      ) AS t
+      LEFT JOIN (
+        SELECT t.[Id] AS [Id_11], t.[Name] AS [Name_11], t10.[Id_10], t10.[Name_10], t10.[Id_1], t10.[Name_1], t10.[RootId_1]
+        FROM [ManyToMany] AS t
+        LEFT JOIN (
+          SELECT t.[Id_10], t.[Name_10], t10.[ManyToManyId], t.[Id_1], t.[Name_1], t.[RootId_1]
+          FROM [RootManyToMany] AS t10
+          INNER JOIN (
+            SELECT t.[Id] AS [Id_10], t.[Name] AS [Name_10], t1.[Id] AS [Id_1], t1.[Name] AS [Name_1], t1.[RootId] AS [RootId_1]
+            FROM [Root] AS t
+            LEFT JOIN [ChildA] AS t1 ON t.[Id] = t1.[RootId]
+          ) AS t ON t10.[RootId] = t.[Id_10]
+        ) AS t10 ON t.[Id] = t10.[ManyToManyId]
+      ) AS t11 ON t.[MTMEntityId] = t11.[Id_11]
       """;
 
     SqlTextBuilder sut = new(Mock.Of<ISqlTextCache>());

@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
 public partial class SqlTextBuilderTests
 {
-  private record NavigationLeaf(INavigationModel Model) : INavigationLeaf
+  private record NavigationSimpleLeaf(ISimpleNavigationModel Model) : INavigationSimpleLeaf
   {
     public int Id => Model.Id;
 
@@ -13,18 +13,18 @@ public partial class SqlTextBuilderTests
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
-    INavigationModelBase INavigation.Model => Model;
+    INavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
       where TVisitor : INavigationVisitor<TResult>
     {
-      return visitor.VisitLeaf(this);
+      return visitor.VisitSimpleLeaf(this);
     }
 
     public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
       where TVisitor : INavigationVisitor<TResult, TState>
     {
-      return visitor.VisitLeaf(this, in state);
+      return visitor.VisitSimpleLeaf(this, in state);
     }
 
     public bool Equals(INavigation? other)
@@ -41,7 +41,7 @@ public partial class SqlTextBuilderTests
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
-    INavigationModelBase INavigation.Model => Model;
+    INavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
       where TVisitor : INavigationVisitor<TResult>
@@ -61,22 +61,22 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationNode(INavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationNode
+  private record NavigationSimpleNode(ISimpleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
   {
     public int Id => Model.Id;
 
     public IEntityModel Target => Model.To;
 
-    INavigationModelBase INavigation.Model => Model;
+    INavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
     {
-      return visitor.VisitNode(this);
+      return visitor.VisitSimpleNode(this);
     }
 
     public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state) where TVisitor : INavigationVisitor<TResult, TState>
     {
-      return visitor.VisitNode(this, in state);
+      return visitor.VisitSimpleNode(this, in state);
     }
 
     public bool Equals(INavigation? other)
@@ -91,7 +91,7 @@ public partial class SqlTextBuilderTests
 
     public IEntityModel Target => Model.To;
 
-    INavigationModelBase INavigation.Model => Model;
+    INavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
     {

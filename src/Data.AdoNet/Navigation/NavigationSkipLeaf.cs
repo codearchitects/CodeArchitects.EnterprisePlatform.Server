@@ -12,7 +12,7 @@ internal class NavigationSkipLeaf : INavigationSkipLeaf
 
   public ISkipNavigationModel Model { get; }
 
-  INavigationModelBase INavigation.Model => Model;
+  INavigationModel INavigation.Model => Model;
 
   public int Id => Model.Id;
 
@@ -52,12 +52,12 @@ internal class NavigationSkipLeaf : INavigationSkipLeaf
       return navigation.Accept<EqualityVisitor, bool>(in this);
     }
 
-    public readonly bool VisitLeaf(INavigationLeaf navigation)
+    public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
     {
       return false;
     }
 
-    public readonly bool VisitNode(INavigationNode navigation)
+    public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
     {
       return false;
     }

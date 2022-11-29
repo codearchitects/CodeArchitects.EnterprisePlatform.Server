@@ -3,16 +3,16 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationLeaf : INavigationLeaf
+internal class NavigationLeaf : INavigationSimpleLeaf
 {
-  public NavigationLeaf(INavigationModel model)
+  public NavigationLeaf(ISimpleNavigationModel model)
   {
     Model = model;
   }
 
-  public INavigationModel Model { get; }
+  public ISimpleNavigationModel Model { get; }
 
-  INavigationModelBase INavigation.Model => Model;
+  INavigationModel INavigation.Model => Model;
 
   public int Id => Model.Id;
 
@@ -23,13 +23,13 @@ internal class NavigationLeaf : INavigationLeaf
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitLeaf(this);
+    return visitor.VisitSimpleLeaf(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitLeaf(this, in state);
+    return visitor.VisitSimpleLeaf(this, in state);
   }
 
   public bool Equals(INavigation other)
@@ -39,9 +39,9 @@ internal class NavigationLeaf : INavigationLeaf
 
   private readonly struct EqualityVisitor : INavigationVisitor<bool>
   {
-    private readonly INavigationLeaf _navigation;
+    private readonly INavigationSimpleLeaf _navigation;
 
-    public EqualityVisitor(INavigationLeaf navigation)
+    public EqualityVisitor(INavigationSimpleLeaf navigation)
     {
       _navigation = navigation;
     }
@@ -52,12 +52,12 @@ internal class NavigationLeaf : INavigationLeaf
       return navigation.Accept<EqualityVisitor, bool>(in this);
     }
 
-    public readonly bool VisitLeaf(INavigationLeaf navigation)
+    public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
     {
       return navigation.Id == _navigation.Id;
     }
 
-    public readonly bool VisitNode(INavigationNode navigation)
+    public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
     {
       return false;
     }

@@ -1,7 +1,10 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface INavigationModel : INavigationModelBase
+internal interface INavigationModel : IPropertyModelBase
 {
-  bool IsOnDependent { get; }
-  IReadOnlyList<IKeyPair> Keys { get; }
+  int Id { get; }
+  int Index { get; }
+  bool IsCollection { get; }
+  IEntityModel From { get; }
+  IEntityModel To { get; }
 }

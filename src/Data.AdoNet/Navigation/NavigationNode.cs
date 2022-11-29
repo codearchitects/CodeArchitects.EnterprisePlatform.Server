@@ -3,16 +3,16 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationNode : IncluderNode, INavigationNode
+internal class NavigationNode : IncluderNode, INavigationSimpleNode
 {
-  public NavigationNode(INavigationModel model)
+  public NavigationNode(ISimpleNavigationModel model)
   {
     Model = model;
   }
 
-  public INavigationModel Model { get; }
+  public ISimpleNavigationModel Model { get; }
 
-  INavigationModelBase INavigation.Model => Model;
+  INavigationModel INavigation.Model => Model;
 
   public int Id => Model.Id;
 
@@ -21,13 +21,13 @@ internal class NavigationNode : IncluderNode, INavigationNode
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitNode(this);
+    return visitor.VisitSimpleNode(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitNode(this, in state);
+    return visitor.VisitSimpleNode(this, in state);
   }
 
   public bool Equals(INavigation other)
@@ -37,9 +37,9 @@ internal class NavigationNode : IncluderNode, INavigationNode
 
   private readonly struct EqualityVisitor : INavigationVisitor<bool>
   {
-    private readonly INavigationNode _navigation;
+    private readonly INavigationSimpleNode _navigation;
 
-    public EqualityVisitor(INavigationNode navigation)
+    public EqualityVisitor(INavigationSimpleNode navigation)
     {
       _navigation = navigation;
     }
@@ -50,12 +50,12 @@ internal class NavigationNode : IncluderNode, INavigationNode
       return navigation.Accept<EqualityVisitor, bool>(in this);
     }
 
-    public readonly bool VisitLeaf(INavigationLeaf navigation)
+    public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
     {
       return false;
     }
 
-    public readonly bool VisitNode(INavigationNode navigation)
+    public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
     {
       return
         navigation.Id == _navigation.Id &&

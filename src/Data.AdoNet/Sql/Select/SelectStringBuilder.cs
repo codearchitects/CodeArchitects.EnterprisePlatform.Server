@@ -6,7 +6,7 @@ using System.Text;
 namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
 
 internal delegate void AppendAction<in T>(SelectStringBuilder stringBuilder, T current);
-internal delegate void AppendAction<TState, in T>(SelectStringBuilder stringBuilder, in TState state, T current);
+internal delegate void AppendAction<TState, in T>(SelectStringBuilder stringBuilder, TState state, T current);
 
 internal readonly struct SelectStringBuilder
 {
@@ -76,12 +76,12 @@ internal readonly struct SelectStringBuilder
     if (!enumerator.MoveNext())
       return;
 
-    append(this, in state, enumerator.Current);
+    append(this, state, enumerator.Current);
 
     while (enumerator.MoveNext())
     {
       _stringBuilder.Append(separator);
-      append(this, in state, enumerator.Current);
+      append(this, state, enumerator.Current);
     }
   }
 
@@ -188,16 +188,16 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Id);
 
-    AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetUnaliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetUnaliasedColumn);
     Append(", ");
-    AppendJoin(", ", in index, navigation.Children, AppendChildrenColumns);
+    AppendJoin(", ", index, navigation.Children, AppendChildrenColumns);
 
-    static void AppendTargetUnaliasedColumn(SelectStringBuilder stringBuilder, in IndexPair state, IPropertyModel property)
+    static void AppendTargetUnaliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
     {
       stringBuilder.AppendTargetUnaliasedColumn(in state, property);
     }
 
-    static void AppendChildrenColumns(SelectStringBuilder stringBuilder, in int index, INavigation child)
+    static void AppendChildrenColumns(SelectStringBuilder stringBuilder, int index, INavigation child)
     {
       new AppendUnaliasedColumns(stringBuilder).Visit(child, index);
     }
@@ -207,9 +207,9 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Id);
 
-    AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetAliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetAliasedColumn);
 
-    static void AppendTargetAliasedColumn(SelectStringBuilder stringBuilder, in IndexPair state, IPropertyModel property)
+    static void AppendTargetAliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
     {
       stringBuilder.AppendTargetAliasedColumn(in state, property);
     }
@@ -219,9 +219,9 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Id);
 
-    AppendJoin(", ", in state, navigation.Target.Properties, AppendTargetUnliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetUnliasedColumn);
 
-    static void AppendTargetUnliasedColumn(SelectStringBuilder stringBuilder, in IndexPair state, IPropertyModel property)
+    static void AppendTargetUnliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
     {
       stringBuilder.AppendTargetUnaliasedColumn(in state, property);
     }

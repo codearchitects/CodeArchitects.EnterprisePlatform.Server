@@ -18,13 +18,13 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
     navigation.Accept<AppendColumns, VoidResult>(in this);
   }
 
-  public readonly VoidResult VisitLeaf(INavigationLeaf navigation)
+  public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
     _stringBuilder.AppendLeafAliasedColumns(navigation.Id, navigation);
     return VoidResult.Instance;
   }
 
-  public readonly VoidResult VisitNode(INavigationNode navigation)
+  public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
     _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
     return VoidResult.Instance;
@@ -32,11 +32,13 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendLeafAliasedColumns(navigation.Id, navigation);
+    return VoidResult.Instance;
   }
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
-    throw new NotImplementedException();
+    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
+    return VoidResult.Instance;
   }
 }

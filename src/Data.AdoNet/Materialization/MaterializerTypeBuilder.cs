@@ -49,7 +49,7 @@ internal class MaterializerTypeBuilder
 
     s_getModelMethod = typeof(INavigation).GetRequiredMethod($"get_{nameof(INavigation.Model)}");
     
-    s_getIndexMethod = typeof(INavigationModelBase).GetRequiredMethod($"get_{nameof(INavigationModelBase.Index)}");
+    s_getIndexMethod = typeof(INavigationModel).GetRequiredMethod($"get_{nameof(INavigationModel.Index)}");
     
     s_createListMethod = typeof(IIdentityCollectionFactory).GetRequiredMethod(
       name: nameof(IMaterializerHub.CreateList),
@@ -113,7 +113,7 @@ internal class MaterializerTypeBuilder
     return type.CreateTypeInfo()!;
   }
 
-  private static FieldInfo DefineNavigationMaterializerField(TypeBuilder type, INavigationModelBase navigation)
+  private static FieldInfo DefineNavigationMaterializerField(TypeBuilder type, INavigationModel navigation)
   {
     IEntityModel target = navigation.To;
 
@@ -219,7 +219,7 @@ internal class MaterializerTypeBuilder
 
   private static MethodInfo OverrideReadNavigationMethod(TypeBuilder type, FieldInfo hubField, IReadOnlyDictionary<int, FieldInfo> materializerFields, IEntityModel entity)
   {
-    IReadOnlyList<INavigationModelBase> navigations = entity.Navigations
+    IReadOnlyList<INavigationModel> navigations = entity.Navigations
       .Where(nav => nav.MemberAccess is not MemberAccess.None)
       .ToList();
 
@@ -245,7 +245,7 @@ internal class MaterializerTypeBuilder
 
     for (int i = 0; i < navigations.Count; i++)
     {
-      INavigationModelBase navigation = navigations[i];
+      INavigationModel navigation = navigations[i];
 
       // TODO: Support fields
       Debug.Assert(navigation.MemberAccess is MemberAccess.Property);
