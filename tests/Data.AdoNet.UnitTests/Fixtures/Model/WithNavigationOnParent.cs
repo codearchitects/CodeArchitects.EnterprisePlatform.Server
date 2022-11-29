@@ -55,6 +55,7 @@ internal static class WithNavigationOnParent
     INavigationModel childANavigation = SimpleNavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetIndex(0)
+      .SetName(nameof(Parent.ChildA))
       .SetType(typeof(ChildA))
       .SetIsOnDependent(true)
       .SetIsCollection(false)
@@ -68,6 +69,7 @@ internal static class WithNavigationOnParent
     INavigationModel childrenBNavigation = SimpleNavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetIndex(1)
+      .SetName(nameof(Parent.ChildrenB))
       .SetType(typeof(ICollection<ChildB>))
       .SetIsOnDependent(true)
       .SetIsCollection(true)
