@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
+﻿using System.Diagnostics;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntity>, IIdentityList
   where TEntity : class
@@ -23,6 +25,8 @@ internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntit
 
   public void PopulateList()
   {
+    Debug.Assert(Count == 0);
+    
     AddRange(_identitySet);
   }
 }

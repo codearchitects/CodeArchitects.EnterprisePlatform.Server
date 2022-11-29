@@ -7,8 +7,6 @@ public partial class SqlTextBuilderTests
 {
   private record NavigationSimpleLeaf(ISimpleNavigationModel Model) : INavigationSimpleLeaf
   {
-    public int Id => Model.Id;
-
     public IEntityModel Target => Model.To;
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
@@ -35,8 +33,6 @@ public partial class SqlTextBuilderTests
 
   private record NavigationSkipLeaf(ISkipNavigationModel Model) : INavigationSkipLeaf
   {
-    public int Id => Model.Id;
-
     public IEntityModel Target => Model.To;
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
@@ -63,8 +59,6 @@ public partial class SqlTextBuilderTests
 
   private record NavigationSimpleNode(ISimpleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
   {
-    public int Id => Model.Id;
-
     public IEntityModel Target => Model.To;
 
     INavigationModel INavigation.Model => Model;
@@ -87,8 +81,6 @@ public partial class SqlTextBuilderTests
 
   private record NavigationSkipNode(ISkipNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSkipNode
   {
-    public int Id => Model.Id;
-
     public IEntityModel Target => Model.To;
 
     INavigationModel INavigation.Model => Model;

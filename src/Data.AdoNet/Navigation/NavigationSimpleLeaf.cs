@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationLeaf : INavigationSimpleLeaf
+internal class NavigationSimpleLeaf : INavigationSimpleLeaf
 {
-  public NavigationLeaf(ISimpleNavigationModel model)
+  public NavigationSimpleLeaf(ISimpleNavigationModel model)
   {
     Model = model;
   }
@@ -13,8 +13,6 @@ internal class NavigationLeaf : INavigationSimpleLeaf
   public ISimpleNavigationModel Model { get; }
 
   INavigationModel INavigation.Model => Model;
-
-  public int Id => Model.Id;
 
   public IEntityModel Target => Model.To;
 
@@ -54,7 +52,7 @@ internal class NavigationLeaf : INavigationSimpleLeaf
 
     public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
     {
-      return navigation.Id == _navigation.Id;
+      return navigation.Model.Id == _navigation.Model.Id;
     }
 
     public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)

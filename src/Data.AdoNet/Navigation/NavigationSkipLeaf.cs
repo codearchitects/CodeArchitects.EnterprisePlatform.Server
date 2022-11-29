@@ -14,8 +14,6 @@ internal class NavigationSkipLeaf : INavigationSkipLeaf
 
   INavigationModel INavigation.Model => Model;
 
-  public int Id => Model.Id;
-
   public IEntityModel Target => Model.To;
 
   public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
@@ -64,7 +62,7 @@ internal class NavigationSkipLeaf : INavigationSkipLeaf
 
     public bool VisitSkipLeaf(INavigationSkipLeaf navigation)
     {
-      return navigation.Id == _navigation.Id;
+      return navigation.Model.Id == _navigation.Model.Id;
     }
 
     public bool VisitSkipNode(INavigationSkipNode navigation)

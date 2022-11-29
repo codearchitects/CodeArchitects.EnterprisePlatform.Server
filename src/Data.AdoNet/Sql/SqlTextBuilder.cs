@@ -13,10 +13,18 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
     _cache = cache;
   }
 
+  public string BuildSelectText(IEntityModel entity)
+  {
+    return BuildSelectTextCore(entity, Array.Empty<INavigation>());
+  }
+
   public string BuildSelectText(INavigationRoot root)
   {
-    IEntityModel entity = root.Entity;
-    IReadOnlyCollection<INavigation> navigations = root.Navigations;
+    return BuildSelectTextCore(root.Entity, root.Navigations);
+  }
+
+  private string BuildSelectTextCore(IEntityModel entity, IReadOnlyCollection<INavigation> navigations)
+  {
     NavigationCacheKey key = new NavigationCacheKey(entity, navigations);
 
     if (_cache.TryGetSelectText(key, out string? text))

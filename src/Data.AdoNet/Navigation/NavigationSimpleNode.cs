@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationNode : IncluderNode, INavigationSimpleNode
+internal class NavigationSimpleNode : IncluderNode, INavigationSimpleNode
 {
-  public NavigationNode(ISimpleNavigationModel model)
+  public NavigationSimpleNode(ISimpleNavigationModel model)
   {
     Model = model;
   }
@@ -13,8 +13,6 @@ internal class NavigationNode : IncluderNode, INavigationSimpleNode
   public ISimpleNavigationModel Model { get; }
 
   INavigationModel INavigation.Model => Model;
-
-  public int Id => Model.Id;
 
   public override IEntityModel Target => Model.To;
 
@@ -58,7 +56,7 @@ internal class NavigationNode : IncluderNode, INavigationSimpleNode
     public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
     {
       return
-        navigation.Id == _navigation.Id &&
+        navigation.Model.Id == _navigation.Model.Id &&
         NavigationCollection.Equal(navigation.Children, _navigation.Children);
     }
 

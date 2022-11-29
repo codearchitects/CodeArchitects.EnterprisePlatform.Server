@@ -63,7 +63,7 @@ public partial class MaterializerTypeBuilderTests
     int offset = 0;
 
     INavigation childANavigation = Mock.Of<INavigation>(nav =>
-      nav.Id == 1 &&
+      nav.Model.Id == 1 &&
       nav.Target == WithNavigationOnParent.ChildAModel &&
       nav.Children == Array.Empty<INavigation>() &&
       nav.Model.Index == 0, MockBehavior.Strict);
@@ -101,7 +101,7 @@ public partial class MaterializerTypeBuilderTests
     int offset = 0;
 
     INavigation childBNavigation = Mock.Of<INavigation>(nav =>
-      nav.Id == 2 &&
+      nav.Model.Id == 2 &&
       nav.Target == WithNavigationOnParent.ChildBModel &&
       nav.Children == Array.Empty<INavigation>() &&
       nav.Model.Index == 1, MockBehavior.Strict);

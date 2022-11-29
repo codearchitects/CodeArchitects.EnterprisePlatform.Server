@@ -20,25 +20,25 @@ internal readonly struct AppendColumns : INavigationVisitor<VoidResult>
 
   public readonly VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
-    _stringBuilder.AppendLeafAliasedColumns(navigation.Id, navigation);
+    _stringBuilder.AppendLeafAliasedColumns(navigation.Model.Id, navigation);
     return VoidResult.Instance;
   }
 
   public readonly VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
-    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
+    _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
     return VoidResult.Instance;
   }
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
-    _stringBuilder.AppendLeafAliasedColumns(navigation.Id, navigation);
+    _stringBuilder.AppendLeafAliasedColumns(navigation.Model.Id, navigation);
     return VoidResult.Instance;
   }
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
-    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
+    _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
     return VoidResult.Instance;
   }
 }

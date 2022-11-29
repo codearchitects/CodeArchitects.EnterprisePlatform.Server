@@ -47,7 +47,7 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
     return entity;
   }
 
-  // Implicit
+  // Used implicitly
   protected TNavigationEntity? MaterializeNavigation<TNavigationEntity, TNavigationKey>(DbDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer)
     where TNavigationEntity : class
     where TNavigationKey : IEquatable<TNavigationKey>

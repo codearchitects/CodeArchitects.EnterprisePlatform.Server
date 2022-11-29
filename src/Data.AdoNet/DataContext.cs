@@ -85,7 +85,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
-  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, IReadOnlyCollection<string> paths, CancellationToken cancellationToken = default)
+  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, INavigationRoot navigation, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {

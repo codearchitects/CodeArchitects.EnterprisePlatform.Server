@@ -14,8 +14,6 @@ internal class NavigationSkipNode : IncluderNode, INavigationSkipNode
 
   INavigationModel INavigation.Model => Model;
 
-  public int Id => Model.Id;
-
   public override IEntityModel Target => Model.To;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
@@ -66,7 +64,7 @@ internal class NavigationSkipNode : IncluderNode, INavigationSkipNode
     public bool VisitSkipNode(INavigationSkipNode navigation)
     {
       return
-        navigation.Id == _navigation.Id &&
+        navigation.Model.Id == _navigation.Model.Id &&
         NavigationCollection.Equal(navigation.Children, _navigation.Children);
     }
   }

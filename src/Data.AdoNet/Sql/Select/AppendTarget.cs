@@ -45,7 +45,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       _stringBuilder.Append("LEFT JOIN ");
       _stringBuilder.AppendTarget(child);
       _stringBuilder.Append(" AS t");
-      _stringBuilder.Append(child.Id);
+      _stringBuilder.Append(child.Model.Id);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
       _stringBuilder.AppendLine();
@@ -62,7 +62,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append("] AS [");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
     }
   }
@@ -82,7 +82,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append("INNER JOIN [");
     _stringBuilder.Append(navigation.Target.TableName);
     _stringBuilder.Append("] AS t");
-    _stringBuilder.Append(navigation.Id);
+    _stringBuilder.Append(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeys, AppendJoinCondition);
     _stringBuilder.AppendLine();
@@ -93,7 +93,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IPropertyModel property)
     {
       stringBuilder.Append('t');
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append(']');
@@ -111,7 +111,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
       stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(pair.ToProperty.ColumnName);
       stringBuilder.Append(']');
@@ -122,7 +122,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendNodeColumns(navigation.Id, navigation);
+    _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
     _stringBuilder.AppendLine();
@@ -144,14 +144,14 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       _stringBuilder.Append("LEFT JOIN ");
       _stringBuilder.AppendTarget(child);
       _stringBuilder.Append(" AS t");
-      _stringBuilder.Append(child.Id);
+      _stringBuilder.Append(child.Model.Id);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
       _stringBuilder.AppendLine();
     }
 
     _stringBuilder.Append(") AS t");
-    _stringBuilder.Append(navigation.Id);
+    _stringBuilder.Append(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeys, AppendJoinCondition);
     _stringBuilder.AppendLine();
@@ -166,7 +166,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append("] AS [");
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
     }
 
@@ -182,11 +182,11 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromProperty.ColumnName);
       stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
       stringBuilder.Append(pair.ToProperty.ColumnName);
       stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Id);
+      stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
     }
   }
