@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Helpers;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Emit;
-using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -43,7 +43,7 @@ internal class EntityEqualityComparerTypeBuilder
     foreach (IPrimaryKeyPropertyModel property in entity.PrimaryKey.Properties)
     {
       il.LoadArg(1);
-      il.Emit(OpCodes.Callvirt, property.Property!.GetMethod); // TODO: Support fields
+      il.GetMember(property);
     }
 
     if (entity.PrimaryKey.IsComposite)

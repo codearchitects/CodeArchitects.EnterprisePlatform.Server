@@ -4,7 +4,7 @@ using CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-public partial class MaterializerTests
+public partial class MaterializerTypeBuilderTests
 {
   private static readonly MaterializerTypeBuilder s_typeBuilder = new(DynamicAssembly.CreateModule());
   private static readonly Type s_parentMaterializerType = s_typeBuilder.Build(WithNavigationOnParent.ParentModel);
@@ -13,7 +13,7 @@ public partial class MaterializerTests
 
   private readonly Materializer<WithNavigationOnParent.Parent, Guid> _sut;
 
-  public MaterializerTests()
+  public MaterializerTypeBuilderTests()
   {
     Mock<IMaterializerHub> hubMock = new(MockBehavior.Strict);
 
