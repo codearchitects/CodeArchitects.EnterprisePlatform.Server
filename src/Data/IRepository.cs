@@ -13,5 +13,6 @@ public interface IRepository<TEntity, TKey>
   Task<TEntity?> FindAsync(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default);
   Task InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
   Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+  Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default);
   Task RemoveAsync(TKey key, CancellationToken cancellationToken = default);
 }

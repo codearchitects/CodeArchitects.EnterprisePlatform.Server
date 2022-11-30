@@ -41,4 +41,9 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
   {
     return _context.RemoveAsync<TEntity, TKey>(key, cancellationToken);
   }
+
+  public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
+  {
+    return _context.RemoveAsync<TEntity, TKey>(entity, cancellationToken);
+  }
 }

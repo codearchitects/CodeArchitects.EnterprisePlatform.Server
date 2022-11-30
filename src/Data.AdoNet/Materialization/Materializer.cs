@@ -43,7 +43,9 @@ internal class Materializer : IMaterializer, IMaterializerHub
     return rowReader.ReadRow(reader, ref offset, this, navigations);
   }
 
-  public async Task<object?> ReadEntityAsync(DbDataReader reader, NavigationSpec spec, CancellationToken cancellationToken)
+  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
   {
     RowReader rowReader = _readerFactory.GetRowReader(spec.Entity);
 
@@ -60,6 +62,6 @@ internal class Materializer : IMaterializer, IMaterializerHub
     }
     _identityLists.Clear();
 
-    return entity;
+    return (TEntity?)entity;
   }
 }

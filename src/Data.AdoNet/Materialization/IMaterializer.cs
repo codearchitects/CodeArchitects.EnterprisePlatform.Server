@@ -5,5 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal interface IMaterializer
 {
-  Task<object?> ReadEntityAsync(DbDataReader reader, NavigationSpec spec, CancellationToken cancellationToken);
+  Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
 }

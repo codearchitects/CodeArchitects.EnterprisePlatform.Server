@@ -1,13 +1,15 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Executor;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
 internal readonly struct NavigationContext
 {
-  public NavigationContext(int navigationId, object?[] keyValues)
+  public NavigationContext(object parent, INavigationModel navigationModel)
   {
-    NavigationId = navigationId;
-    KeyValues = keyValues;
+    Parent = parent;
+    NavigationModel = navigationModel;
   }
 
-  public int NavigationId { get; }
-  public object?[] KeyValues { get; }
+  public object Parent { get; }
+  public INavigationModel NavigationModel { get; }
 }

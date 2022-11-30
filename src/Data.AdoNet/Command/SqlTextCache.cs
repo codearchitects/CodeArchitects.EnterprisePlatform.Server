@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql;
+namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal class SqlTextCache : ISqlTextCache
 {

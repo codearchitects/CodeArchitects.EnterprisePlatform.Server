@@ -1,3 +1,3 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
 
 internal readonly record struct IndexPair(int Index, int NavigationIndex);

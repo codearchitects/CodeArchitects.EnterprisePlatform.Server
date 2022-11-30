@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
+namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
 
 internal delegate void AppendAction<in T>(SelectStringBuilder stringBuilder, T current);
 internal delegate void AppendAction<TState, in T>(SelectStringBuilder stringBuilder, TState state, T current);
@@ -124,7 +124,7 @@ internal readonly struct SelectStringBuilder
       stringBuilder.Append('[');
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append("] = @p");
-      stringBuilder.Append(property.Index);
+      stringBuilder.Append(property.KeyIndex);
     }
   }
 

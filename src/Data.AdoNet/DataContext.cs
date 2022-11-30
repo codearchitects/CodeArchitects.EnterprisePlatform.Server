@@ -28,31 +28,27 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel entityModel = EnsureEntity<TEntity>();
-    EnsureKey<TKey>(entityModel);
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
-    return FindAsyncCore<TEntity, TKey>(key, NavigationSpec.FromEntity(entityModel), cancellationToken);
+    return FindAsyncCore(key, NavigationSpec.FromEntity(entityModel), cancellationToken);
   }
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel entityModel = EnsureEntity<TEntity>();
-    EnsureKey<TKey>(entityModel);
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
-    Includer<TEntity> includer = new(entityModel);
+    Includer<TEntity, TKey> includer = new(entityModel);
     includeAction(includer);
 
-    return FindAsyncCore<TEntity, TKey>(key, includer.Spec, cancellationToken);
+    return FindAsyncCore(key, includer.Spec, cancellationToken);
   }
 
   public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel entityModel = EnsureEntity<TEntity>();
-    EnsureKey<TKey>(entityModel);
 
     // -- Parent --
     // Create command
@@ -102,7 +98,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
-  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, NavigationSpec spec, CancellationToken cancellationToken = default)
+  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
@@ -117,17 +113,13 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     }
   }
 
-  private IEntityModel EnsureEntity<TEntity>()
+  private IEntityModel<TEntity, TKey> EnsureEntity<TEntity, TKey>()
+    where TEntity : class
+    where TKey : IEquatable<TKey>
   {
-    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel entityModel))
+    if (!_model.TryGetEntity<TEntity, TKey>(out IEntityModel<TEntity, TKey> entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;
-  }
-
-  private void EnsureKey<TKey>(IEntityModel entityModel)
-  {
-    if (entityModel.PrimaryKey.Type != typeof(TKey))
-      throw new InvalidOperationException($"Expected key of type '{entityModel.PrimaryKey.Type.Name}' for entity of type '{entityModel.Type.Name}', but '{typeof(TKey).Name}' was provided.");
   }
 }

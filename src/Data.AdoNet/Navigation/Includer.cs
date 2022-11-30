@@ -3,19 +3,20 @@ using CodeArchitects.Platform.Data.Navigation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class Includer<TEntity> : IncluderBase<TEntity>, IIncluder<TEntity>
+internal class Includer<TEntity, TKey> : IncluderBase<TEntity>, IIncluder<TEntity>
   where TEntity : class
+  where TKey : IEquatable<TKey>
 {
-  private readonly NavigationRoot _root;
+  private readonly NavigationRoot<TEntity, TKey> _root;
 
-  public Includer(IEntityModel entity)
+  public Includer(IEntityModel<TEntity, TKey> entity)
   {
-    _root = new NavigationRoot(entity);
+    _root = new NavigationRoot<TEntity, TKey>(entity);
   }
 
   protected override IncluderNode Node => _root;
 
-  public NavigationSpec Spec => NavigationSpec.FromNavigation(_root);
+  public NavigationSpec<TEntity, TKey> Spec => NavigationSpec.FromNavigation(_root);
 
   public IStringIncluder<TEntity> Include(string navigation)
   {

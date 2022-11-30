@@ -16,9 +16,13 @@ internal readonly record struct NavigationSpec(IEntityModel Entity, IReadOnlyCol
     return Entity.GetHashCode() + Navigations.Count;
   }
 
-  public static NavigationSpec FromEntity(IEntityModel entity)
-    => new NavigationSpec(entity, Array.Empty<INavigation>());
+  public static NavigationSpec<TEntity, TKey> FromEntity<TEntity, TKey>(IEntityModel<TEntity, TKey> entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+    => new NavigationSpec<TEntity, TKey>(entity, Array.Empty<INavigation>());
 
-  public static NavigationSpec FromNavigation(NavigationRoot root)
-    => new NavigationSpec(root.Target, root.Children);
+  public static NavigationSpec<TEntity, TKey> FromNavigation<TEntity, TKey>(NavigationRoot<TEntity, TKey> root)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+    => new NavigationSpec<TEntity, TKey>(root.Entity, root.Children);
 }

@@ -14,5 +14,5 @@ internal interface IPrimaryKeyModel
   
   IReadOnlyList<IPrimaryKeyPropertyModel> Properties { get; }
 
-  ConstructorInfo? TupleConstructor { get; }
+  ConstructorInfo? TupleConstructor { get; } // TODO: This must be the constructor of Tuple, not ValueTuple
 }

@@ -2,7 +2,7 @@
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Runtime.CompilerServices;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
+namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
 
 internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 {
@@ -76,7 +76,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");
-    _stringBuilder.Append(navigation.Model.JoinTableName);
+    _stringBuilder.Append(navigation.Model.JoinEntity.TableName);
     _stringBuilder.Append("] AS t");
     _stringBuilder.AppendLine();
     _stringBuilder.Append("INNER JOIN [");
@@ -127,7 +127,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");
-    _stringBuilder.Append(navigation.Model.JoinTableName);
+    _stringBuilder.Append(navigation.Model.JoinEntity.TableName);
     _stringBuilder.AppendLine("] AS t");
     _stringBuilder.AppendLine("INNER JOIN (");
     _stringBuilder.Append("SELECT ");

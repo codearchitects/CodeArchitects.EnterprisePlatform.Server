@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Diagnostics.CodeAnalysis;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql;
+namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ISqlTextCache
 {

@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Runtime.CompilerServices;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql.Select;
+namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
 
 internal readonly struct AppendUnaliasedColumns : INavigationVisitor<VoidResult, int>
 {

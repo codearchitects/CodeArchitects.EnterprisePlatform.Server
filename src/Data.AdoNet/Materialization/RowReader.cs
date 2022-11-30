@@ -28,10 +28,14 @@ internal class RowReader : IRowReader
       return null;
 
     object key = _keyReader(reader, offset);
-    if (hub.TryGetExisting(new(_model, key), out object? entity))
+    IdentityCacheKey cacheKey = new(_model, key);
+
+    if (hub.TryGetExisting(cacheKey, out object? entity))
       return entity;
 
     entity = _entityReader(reader, offset);
+    hub.AddMaterialized(cacheKey, entity);
+
     offset += _model.Properties.Count;
 
     foreach (INavigation navigation in navigations)
