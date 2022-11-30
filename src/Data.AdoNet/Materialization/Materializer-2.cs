@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Data.Common;
+using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
@@ -18,13 +18,13 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
 
   protected abstract int PropertyCount { get; }
 
-  protected abstract TKey ReadKey(DbDataReader reader, int offset);
+  protected abstract TKey ReadKey(IDataReader reader, int offset);
 
-  protected abstract TEntity ReadEntity(DbDataReader reader, int offset);
+  protected abstract TEntity ReadEntity(IDataReader reader, int offset);
 
-  protected abstract void ReadNavigation(DbDataReader reader, ref int offset, TEntity entity, INavigation navigation);
+  protected abstract void ReadNavigation(IDataReader reader, ref int offset, TEntity entity, INavigation navigation);
 
-  public TEntity? ReadEntity(DbDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations)
+  public TEntity? ReadEntity(IDataReader reader, ref int offset, IReadOnlyCollection<INavigation> navigations)
   {
     if (reader.IsDBNull(offset))
       return null;
@@ -48,7 +48,7 @@ internal abstract class Materializer<TEntity, TKey> : IMaterializer<TEntity, TKe
   }
 
   // Used implicitly
-  protected TNavigationEntity? MaterializeNavigation<TNavigationEntity, TNavigationKey>(DbDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer)
+  protected TNavigationEntity? MaterializeNavigation<TNavigationEntity, TNavigationKey>(IDataReader reader, ref int offset, INavigation navigation, ref IMaterializer<TNavigationEntity, TNavigationKey>? materializer)
     where TNavigationEntity : class
     where TNavigationKey : IEquatable<TNavigationKey>
   {

@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Helpers;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Emit;
-using System.Data.Common;
+using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -65,15 +65,15 @@ internal class MaterializerTypeBuilder
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
 
-    static MethodInfo GetGetValueMethod(string name) => typeof(DbDataReader).GetRequiredMethod(
+    static MethodInfo GetGetValueMethod(string name) => typeof(IDataRecord).GetRequiredMethod(
       name: $"Get{name}",
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
 
-    static MethodInfo GetGetNullableValueMethod(string name) => typeof(DbDataReaderExtensions).GetRequiredMethod(
+    static MethodInfo GetGetNullableValueMethod(string name) => typeof(DataRecordExtensions).GetRequiredMethod(
       name: $"GetNullable{name}",
       bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(DbDataReader), typeof(int) });
+      types: new[] { typeof(IDataRecord), typeof(int) });
   }
 
   private readonly ModuleBuilder _module;
@@ -170,14 +170,14 @@ internal class MaterializerTypeBuilder
   /*
    * Generates the following method when primaryKey is simple:
    * 
-   * protected override {{primaryKey.Type}} ReadKey(DbDataReader reader, int offset)
+   * protected override {{primaryKey.Type}} ReadKey(IDataReader reader, int offset)
    * {
    *   return reader.{%GetKeyValue%}({{primaryKey.Properties[0].Index}} + offset);
    * }
    * 
    * Generates the following method when primaryKey is composite:
    * 
-   * protected override {{primaryKey.Type}} ReadKey(DbDataReader reader, int offset)
+   * protected override {{primaryKey.Type}} ReadKey(IDataReader reader, int offset)
    * {
    *   return (reader.{%GetKeyValue%}({{primaryKey.Properties[0].Index}} + offset), {%...%}, reader.{%GetKeyValue%}({{primaryKey.Properties[^1].Index}} + offset));
    * }
@@ -187,7 +187,7 @@ internal class MaterializerTypeBuilder
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
       name: "ReadKey",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
-      types: new[] { typeof(DbDataReader), typeof(int) });
+      types: new[] { typeof(IDataReader), typeof(int) });
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final);
     ILGenerator il = method.GetILGenerator();
@@ -215,7 +215,7 @@ internal class MaterializerTypeBuilder
   /*
    * Generates the following method:
    * 
-   * protected {{entity.Type}} ReadEntity(DbDataReader reader, int offset)
+   * protected {{entity.Type}} ReadEntity(IDataReader reader, int offset)
    * {
    *   return new {{entity.Type}}(reader.{%GetKeyValue%}({{initializer.ConstructorProperties[0].Index}} + offset), {%...%}, reader.{%GetKeyValue%}({{initializer.ConstructorProperties[^1].Index}} + offset))
    *   {
@@ -230,7 +230,7 @@ internal class MaterializerTypeBuilder
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
       name: "ReadEntity",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
-      types: new[] { typeof(DbDataReader), typeof(int) });
+      types: new[] { typeof(IDataReader), typeof(int) });
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final);
     ILGenerator il = method.GetILGenerator();
@@ -255,7 +255,7 @@ internal class MaterializerTypeBuilder
   /*
    * Generates the following method (with Navigation.ElementType = Navigation.Type.GetGenericArguments()[0])
    * 
-   * protected override ReadNavigation(DbDataReader reader, ref int offset, {{entity.Type}} entity, INavigation navigation)
+   * protected override ReadNavigation(IDataReader reader, ref int offset, {{entity.Type}} entity, INavigation navigation)
    * {
    *   switch (navigation.Model.Id)
    *   {
@@ -285,7 +285,7 @@ internal class MaterializerTypeBuilder
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
       name: "ReadNavigation",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
-      types: new[] { typeof(DbDataReader), typeof(int).MakeByRefType(), entity.Type, typeof(INavigation) });
+      types: new[] { typeof(IDataReader), typeof(int).MakeByRefType(), entity.Type, typeof(INavigation) });
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final);
     ILGenerator il = method.GetILGenerator();
@@ -295,69 +295,70 @@ internal class MaterializerTypeBuilder
       .Select(_ => il.DefineLabel())
       .ToArray();
 
-    il.LoadArg(4);                                                                                     // Push $navigation                                              | Stack: $navigation
-    il.Emit(OpCodes.Callvirt, s_getModelMethod);                                                       // Load $navigation.Model := $model                              | Stack: $model
-    il.Emit(OpCodes.Callvirt, s_getIndexMethod);                                                       // Load $model.Index := $index                                   | Stack: $index
-    il.Emit(OpCodes.Switch, cases);                                                                    // Switch on $index to *CASES*                                   | Stack: -
-                                                                                                       //                                                               | 
-    il.Emit(OpCodes.Ldstr, "Invalid navigation.");                                                     // Push error message := $message                                | Stack: $message
-    il.Emit(OpCodes.Newobj, s_invalidOperationExceptionConstructor);                                   // Call new InvalidOperationException := $exception              | Stack: $exception
-    il.Emit(OpCodes.Throw);                                                                            // Throw                                                         | Stack: -
-                                                                                                       //                                                               | 
-    for (int i = 0; i < navigations.Count; i++)                                                        //                                                               | 
-    {                                                                                                  //                                                               | 
-      INavigationModel navigation = navigations[i];                                                    //                                                               | 
-                                                                                                       //                                                               | 
-      MethodInfo materializeNavigationMethod = type.BaseType!.GetRequiredMethod(                       //                                                               | 
-        name: "MaterializeNavigation",                                                                 //                                                               | 
-        bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic)                                   //                                                               | 
-        .MakeGenericMethod(navigation.To.Type, navigation.To.PrimaryKey.Type);                         //                                                               | 
-                                                                                                       //                                                               | 
-      il.MarkLabel(cases[i]);                                                                          // *CASES[i]*                                                    | Stack: -
-      il.LoadArg(3);                                                                                   // Push $entity                                                  | Stack: $entity
-      if (navigation.IsCollection)                                                                     //                                                               | 
-      {                                                                                                //                                                               | 
-        MethodInfo createCollectionMethod = GetCreateCollectionMethod(navigation.Type);                //                                                               | 
-        Label readLabel = il.DefineLabel();                                                            //                                                               | 
-                                                                                                       //                                                               | 
-        il.GetMember(navigation);                                                                      // Get $entity.Member := $member                                 | Stack: $member
-        il.Emit(OpCodes.Brtrue_S, readLabel);                                                          // If $member is null, jump to *READ*                            | Stack: -
-                                                                                                       //                                                               | 
-        il.LoadArg(3);                                                                                 // Push $entity                                                  | Stack: $entity
-        il.LoadFields(hubField);                                                                       // Load $this._hub := $hub                                       | Stack: $entity, $hub
-        il.Emit(OpCodes.Callvirt, createCollectionMethod);                                             // Call $hub.{%CreateCollection%} := $collection                 | Stack: $entity, $collection
-        il.SetMember(navigation);                                                                      // Set $entity.Member = $collection                              | Stack: -
-                                                                                                       //                                                               | 
-        il.MarkLabel(readLabel);                                                                       // *READ*                                                        | Stack: -
-        il.LoadArg(3);                                                                                 // Push $entity                                                  | Stack: $entity
-        il.GetMember(navigation);                                                                      // Get $entity.Member := $member                                 | Stack: $member
-        il.Emit(OpCodes.Castclass, typeof(IIdentityCollection<>).MakeGenericType(navigation.To.Type)); // Cast $member to IIdentityCollection<{{navigation.To.Type}}>   | Stack: $member
-      }                                                                                                //                                                               | 
-                                                                                                       //                                                               | 
-      il.LoadArg(0);                                                                                   // Push $this                                                    | Stack: $entity/$member, $this
-      il.LoadArg(1);                                                                                   // Push $reader                                                  | Stack: $entity/$member, $this, $reader
-      il.LoadArg(2);                                                                                   // Push &offset                                                  | Stack: $entity/$member, $this, $reader, &offset
-      il.LoadArg(4);                                                                                   // Push $navigation                                              | Stack: $entity/$member, $this, $reader, &offset, $navigation
-      il.LoadArg(0);                                                                                   // Push $this                                                    | Stack: $entity/$member, $this, $reader, &offset, $navigation, $this
-      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]);                                      // Load $this.&materializer                                      | Stack: $entity/$member, $this, $reader, &offset, $navigation, &materializer
-                                                                                                       //                                                               |
-      il.Emit(OpCodes.Call, materializeNavigationMethod);                                              // Call $this.MaterializeNavigation := $navigationEntity         | Stack: $entity/$member, $navigationEntity
-      if (navigation.IsCollection)                                                                     //                                                               | 
-      {                                                                                                //                                                               | 
-        MethodInfo addEntityMethod = typeof(IIdentityCollection<>)                                     //                                                               | 
-          .MakeGenericType(navigation.To.Type)                                                         //                                                               | 
-          .GetRequiredMethod(                                                                          //                                                               | 
-            name: nameof(IIdentityCollection<object>.AddEntity),                                       //                                                               | 
-            bindingAttr: BindingFlags.Instance | BindingFlags.Public,                                  //                                                               | 
-            types: new[] { navigation.To.Type });                                                      //                                                               | 
-                                                                                                       //                                                               | 
-        il.Emit(OpCodes.Callvirt, addEntityMethod);                                                    // Call $member.AddEntity                                        | Stack: -
-      }                                                                                                //                                                               | 
-      else                                                                                             //                                                               | 
-      {                                                                                                //                                                               | 
-        il.SetMember(navigation);                                                                      // Set $entity.Member := $navigationEntity                       | Stack: -
-      }                                                                                                //                                                               | 
-                                                                                                       // Return                                                        | Stack: -
+    il.LoadArg(4);                                                                               // Push $navigation                                            | Stack: $navigation
+    il.Emit(OpCodes.Callvirt, s_getModelMethod);                                                 // Load $navigation.Model := $model                            | Stack: $model
+    il.Emit(OpCodes.Callvirt, s_getIndexMethod);                                                 // Load $model.Index := $index                                 | Stack: $index
+    il.Emit(OpCodes.Switch, cases);                                                              // Switch on $index to *CASES*                                 | Stack: -
+                                                                                                 //                                                             | 
+    il.Emit(OpCodes.Ldstr, "Invalid navigation.");                                               // Push error message := $message                              | Stack: $message
+    il.Emit(OpCodes.Newobj, s_invalidOperationExceptionConstructor);                             // Call new InvalidOperationException := $exception            | Stack: $exception
+    il.Emit(OpCodes.Throw);                                                                      // Throw                                                       | Stack: -
+                                                                                                 //                                                             | 
+    for (int i = 0; i < navigations.Count; i++)                                                  //                                                             | 
+    {                                                                                            //                                                             | 
+      INavigationModel navigation = navigations[i];                                              //                                                             | 
+                                                                                                 //                                                             | 
+      MethodInfo materializeNavigationMethod = type.BaseType!.GetRequiredMethod(                 //                                                             | 
+        name: "MaterializeNavigation",                                                           //                                                             | 
+        bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic)                             //                                                             | 
+        .MakeGenericMethod(navigation.To.Type, navigation.To.PrimaryKey.Type);                   //                                                             | 
+                                                                                                 //                                                             | 
+      il.MarkLabel(cases[i]);                                                                    // *CASES[i]*                                                  | Stack: -
+      il.LoadArg(3);                                                                             // Push $entity                                                | Stack: $entity
+      if (navigation.IsCollection)                                                               //                                                             | 
+      {                                                                                          //                                                             | 
+        MethodInfo createCollectionMethod = GetCreateCollectionMethod(navigation.Type);          //                                                             | 
+        Type collectionType = typeof(IIdentityCollection<>).MakeGenericType(navigation.To.Type); //                                                             | 
+        Label readLabel = il.DefineLabel();                                                      //                                                             | 
+                                                                                                 //                                                             | 
+        il.GetMember(navigation);                                                                // Get $entity.Member := $member                               | Stack: $member
+        il.Emit(OpCodes.Brtrue_S, readLabel);                                                    // If $member is null, jump to *READ*                          | Stack: -
+                                                                                                 //                                                             | 
+        il.LoadArg(3);                                                                           // Push $entity                                                | Stack: $entity
+        il.LoadFields(hubField);                                                                 // Load $this._hub := $hub                                     | Stack: $entity, $hub
+        il.Emit(OpCodes.Callvirt, createCollectionMethod);                                       // Call $hub.{%CreateCollection%} := $collection               | Stack: $entity, $collection
+        il.SetMember(navigation);                                                                // Set $entity.Member = $collection                            | Stack: -
+                                                                                                 //                                                             | 
+        il.MarkLabel(readLabel);                                                                 // *READ*                                                      | Stack: -
+        il.LoadArg(3);                                                                           // Push $entity                                                | Stack: $entity
+        il.GetMember(navigation);                                                                // Get $entity.Member := $member                               | Stack: $member
+        il.Emit(OpCodes.Castclass, collectionType);                                              // Cast $member to IIdentityCollection<{{navigation.To.Type}}> | Stack: $member
+      }                                                                                          //                                                             | 
+                                                                                                 //                                                             | 
+      il.LoadArg(0);                                                                             // Push $this                                                  | Stack: $entity/$member, $this
+      il.LoadArg(1);                                                                             // Push $reader                                                | Stack: $entity/$member, $this, $reader
+      il.LoadArg(2);                                                                             // Push &offset                                                | Stack: $entity/$member, $this, $reader, &offset
+      il.LoadArg(4);                                                                             // Push $navigation                                            | Stack: $entity/$member, $this, $reader, &offset, $navigation
+      il.LoadArg(0);                                                                             // Push $this                                                  | Stack: $entity/$member, $this, $reader, &offset, $navigation, $this
+      il.Emit(OpCodes.Ldflda, materializerFields[navigation.Id]);                                // Load $this.&materializer                                    | Stack: $entity/$member, $this, $reader, &offset, $navigation, &materializer
+                                                                                                 //                                                             |
+      il.Emit(OpCodes.Call, materializeNavigationMethod);                                        // Call $this.MaterializeNavigation := $navigationEntity       | Stack: $entity/$member, $navigationEntity
+      if (navigation.IsCollection)                                                               //                                                             | 
+      {                                                                                          //                                                             | 
+        MethodInfo addEntityMethod = typeof(IIdentityCollection<>)                               //                                                             | 
+          .MakeGenericType(navigation.To.Type)                                                   //                                                             | 
+          .GetRequiredMethod(                                                                    //                                                             | 
+            name: nameof(IIdentityCollection<object>.AddEntity),                                 //                                                             | 
+            bindingAttr: BindingFlags.Instance | BindingFlags.Public,                            //                                                             | 
+            types: new[] { navigation.To.Type });                                                //                                                             | 
+                                                                                                 //                                                             | 
+        il.Emit(OpCodes.Callvirt, addEntityMethod);                                              // Call $member.AddEntity                                      | Stack: -
+      }                                                                                          //                                                             | 
+      else                                                                                       //                                                             | 
+      {                                                                                          //                                                             | 
+        il.SetMember(navigation);                                                                // Set $entity.Member := $navigationEntity                     | Stack: -
+      }                                                                                          //                                                             | 
+                                                                                                 // Return                                                      | Stack: -
       il.Emit(OpCodes.Ret);
     }
 

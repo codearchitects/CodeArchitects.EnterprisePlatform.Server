@@ -51,6 +51,11 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+    EnsureKey<TKey>(entityModel);
+
+
+
     throw new NotImplementedException();
   }
 
