@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
 internal interface IExecutor
 {
-  Task<TEntity?> ExecuteSelectCommandAsync<TEntity, TKey>(DbCommand command, TKey key, NavigationSpec spec, CancellationToken cancellationToken)
+  Task<TEntity?> ExecuteSelectCommandAsync<TEntity, TKey>(DbConnection connection, TKey key, NavigationSpec spec, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 }

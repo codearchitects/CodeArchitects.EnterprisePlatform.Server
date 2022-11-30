@@ -31,7 +31,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     IEntityModel entityModel = EnsureEntity<TEntity>();
     EnsureKey<TKey>(entityModel);
 
-    return FindAsyncCore<TEntity, TKey>(key, new NavigationSpec(entityModel), cancellationToken);
+    return FindAsyncCore<TEntity, TKey>(key, NavigationSpec.FromEntity(entityModel), cancellationToken);
   }
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
@@ -54,7 +54,19 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     IEntityModel entityModel = EnsureEntity<TEntity>();
     EnsureKey<TKey>(entityModel);
 
-
+    // -- Parent --
+    // Create command
+    // Set text
+    // Set parameters
+    // Execute command
+    // Process results
+    // (** Foreach navigation on Parent **)
+    // -- ChildA --
+    // Create command
+    // Set text
+    // Set parameters
+    // Execute command
+    // Process results
 
     throw new NotImplementedException();
   }
@@ -94,12 +106,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    using DbCommand command = Connection.CreateCommand();
-
     await Connection.OpenAsync(cancellationToken);
     try
     {
-      return await _executor.ExecuteSelectCommandAsync<TEntity, TKey>(command, key, spec, cancellationToken);
+      return await _executor.ExecuteSelectCommandAsync<TEntity, TKey>(Connection, key, spec, cancellationToken);
     }
     finally
     {
