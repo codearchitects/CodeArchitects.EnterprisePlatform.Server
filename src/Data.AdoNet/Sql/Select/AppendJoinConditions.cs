@@ -21,7 +21,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
   {
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.KeyPairs, AppendCondition);
 
     return VoidResult.Instance;
 
@@ -39,7 +39,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
   {
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.Keys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.KeyPairs, AppendCondition);
 
     return VoidResult.Instance;
 

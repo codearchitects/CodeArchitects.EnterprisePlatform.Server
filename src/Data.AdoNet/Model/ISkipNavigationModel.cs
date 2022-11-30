@@ -2,7 +2,11 @@
 
 internal interface ISkipNavigationModel : INavigationModel
 {
-  string JoinTableName { get; }
+  IEntityModel JoinEntity { get; }
+  
   IReadOnlyList<IKeyPair> FromKeys { get; }
+
   IReadOnlyList<IKeyPair> ToKeys { get; }
+
+  object CreateJoin(object from, object to);
 }

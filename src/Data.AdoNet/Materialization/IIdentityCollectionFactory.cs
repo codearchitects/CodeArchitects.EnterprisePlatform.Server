@@ -2,9 +2,5 @@
 
 internal interface IIdentityCollectionFactory
 {
-  IdentityList<TEntity> CreateList<TEntity>()
-    where TEntity : class;
-
-  IdentityHashSet<TEntity> CreateHashSet<TEntity>()
-    where TEntity : class;
+  IIdentityCollection CreateCollection(Type propertyType);
 }

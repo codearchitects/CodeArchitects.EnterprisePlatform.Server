@@ -1,63 +1,57 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal class Materializer : IMaterializer, IMaterializerHub
 {
-  private readonly IMaterializerFactory _factory;
   private readonly IIdentityCollectionFactory _collectionFactory;
-  private readonly Dictionary<IEntityModel, object> _materializers;
+  private readonly IRowReaderProvider _readerFactory;
+  private readonly Dictionary<IdentityCacheKey, object> _materializedEntities;
   private readonly List<IIdentityList> _identityLists;
 
-  public Materializer(IMaterializerFactory factory, IIdentityCollectionFactory collectionFactory)
+  public Materializer(IIdentityCollectionFactory collectionFactory, IRowReaderProvider readerFactory)
   {
-    _factory = factory;
     _collectionFactory = collectionFactory;
-    _materializers = new();
+    _readerFactory = readerFactory;
+    _materializedEntities = new();
     _identityLists = new();
   }
 
-  public IdentityList<TEntity> CreateList<TEntity>()
-    where TEntity : class
+  public void AddMaterialized(IdentityCacheKey key, object materialized)
   {
-    IdentityList<TEntity> result = _collectionFactory.CreateList<TEntity>();
-    _identityLists.Add(result);
-    return result;
+    _materializedEntities.Add(key, materialized);
   }
 
-  public IdentityHashSet<TEntity> CreateHashSet<TEntity>()
-    where TEntity : class
+  public bool TryGetExisting(IdentityCacheKey key, [NotNullWhen(true)] out object? existing)
   {
-    return _collectionFactory.CreateHashSet<TEntity>();
+    return _materializedEntities.TryGetValue(key, out existing);
   }
 
-  public IMaterializer<TEntity, TKey> GetMaterializer<TEntity, TKey>(IEntityModel target)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
+  public IIdentityCollection CreateCollection(Type propertyType)
   {
-    if (!_materializers.TryGetValue(target, out object? materializer))
-    {
-      materializer = _factory.CreateMaterializer<TEntity, TKey>(this);
-      _materializers.Add(target, materializer);
-    }
-
-    return (IMaterializer<TEntity, TKey>)materializer;
+    return _collectionFactory.CreateCollection(propertyType);
   }
 
-  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec spec, CancellationToken cancellationToken)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
+  public object? ReadRow(IDataReader reader, ref int offset, IEntityModel model, IReadOnlyCollection<INavigation> navigations)
   {
-    var (target, navigations) = spec;
-    IMaterializer<TEntity, TKey> materializer = GetMaterializer<TEntity, TKey>(target);
+    RowReader rowReader = _readerFactory.GetRowReader(model);
 
-    TEntity? entity = null;
+    return rowReader.ReadRow(reader, ref offset, this, navigations);
+  }
+
+  public async Task<object?> ReadEntityAsync(DbDataReader reader, NavigationSpec spec, CancellationToken cancellationToken)
+  {
+    RowReader rowReader = _readerFactory.GetRowReader(spec.Entity);
+
+    object? entity = null;
     while (await reader.ReadAsync(cancellationToken))
     {
       int offset = 0;
-      entity = materializer.ReadEntity(reader, ref offset, navigations);
+      entity = rowReader.ReadRow(reader, ref offset, this, spec.Navigations);
     }
 
     foreach (IIdentityList list in _identityLists)

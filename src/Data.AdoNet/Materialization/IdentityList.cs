@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntity>, IIdentityList
+internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection, IIdentityList
   where TEntity : class
 {
   private readonly HashSet<TEntity> _identitySet;
@@ -12,7 +12,7 @@ internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntit
     _identitySet = new(comparer);
   }
 
-  public void AddEntity(TEntity? entity)
+  public void AddEntity(object? entity)
   {
     if (entity is null)
       return;
@@ -20,7 +20,7 @@ internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection<TEntit
     if (_identitySet.Contains(entity))
       return;
 
-    _identitySet.Add(entity);
+    _identitySet.Add((TEntity)entity);
   }
 
   public void PopulateList()

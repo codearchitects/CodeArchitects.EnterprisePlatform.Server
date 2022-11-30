@@ -1,7 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal interface IIdentityCollection<TEntity>
-  where TEntity : class
+internal interface IIdentityCollection
 {
-  void AddEntity(TEntity? entity);
+  void AddEntity(object? entity);
 }

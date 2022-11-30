@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection<TEntity>
+internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection
   where TEntity : class
 {
   public IdentityHashSet(IEqualityComparer<TEntity> comparer)
@@ -8,11 +8,11 @@ internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection<
   {
   }
 
-  public void AddEntity(TEntity? entity)
+  public void AddEntity(object? entity)
   {
     if (entity is null)
       return;
 
-    Add(entity);
+    Add((TEntity)entity);
   }
 }

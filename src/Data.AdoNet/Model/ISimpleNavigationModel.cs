@@ -2,6 +2,5 @@
 
 internal interface ISimpleNavigationModel : INavigationModel
 {
-  bool IsOnDependent { get; }
-  IReadOnlyList<IKeyPair> Keys { get; }
+  IReadOnlyList<IKeyPair> KeyPairs { get; }
 }
