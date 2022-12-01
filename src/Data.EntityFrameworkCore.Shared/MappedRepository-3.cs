@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-internal abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEntity, TKey>
+public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEntity, TKey>
   where TTable : class
   where TEntity : class
   where TKey : IEquatable<TKey>
