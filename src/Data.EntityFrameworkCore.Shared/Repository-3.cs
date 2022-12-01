@@ -10,8 +10,10 @@ public class Repository<TDbContext, TEntity, TKey> : Repository<TEntity, TKey>
   public Repository(IDataContext<TDbContext> context)
     : base(context)
   {
-    DbContext = context.DbContext;
+    Context = context;
   }
 
-  protected new TDbContext DbContext { get; }
+  protected new IDataContext<TDbContext> Context { get; }
+
+  protected new TDbContext DbContext => Context.DbContext;
 }
