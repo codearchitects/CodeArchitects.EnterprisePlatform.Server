@@ -49,22 +49,6 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-
-    // -- Parent --
-    // Create command
-    // Set text
-    // Set parameters
-    // Execute command
-    // Process results
-    // (** Foreach navigation on Parent **)
-    // -- ChildA --
-    // Create command
-    // Set text
-    // Set parameters
-    // Execute command
-    // Process results
-
-    throw new NotImplementedException();
   }
 
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
