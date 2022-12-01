@@ -1,9 +1,9 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
+namespace CodeArchitects.Platform.Data.AdoNet.Fixtures.Model;
 
-internal static class NavigationFixture
+internal static class DeepNavigation
 {
   public class Root
   {
@@ -92,15 +92,15 @@ internal static class NavigationFixture
 
   public static class Model
   {
-    public static readonly IEntityModel RootEntity = CreateRootEntity().Mocked();
-    public static readonly IEntityModel ChildAEntity = CreateChildAEntity().Mocked();
-    public static readonly IEntityModel ChildBEntity = CreateChildBEntity().Mocked();
-    public static readonly IEntityModel ChildCEntity = CreateChildCEntity().Mocked();
-    public static readonly IEntityModel ChildDEntity = CreateChildDEntity().Mocked();
-    public static readonly IEntityModel ChildEEntity = CreateChildEEntity().Mocked();
-    public static readonly IEntityModel ChildFEntity = CreateChildFEntity().Mocked();
-    public static readonly IEntityModel ManyToManyEntity = CreateManyToManyEntity().Mocked();
-    public static readonly IEntityModel ChildGEntity = CreateChildGEntity().Mocked();
+    public static readonly IEntityModel<Root, int> RootEntity = CreateRootEntity().Mocked<Root, int>();
+    public static readonly IEntityModel<ChildA, int> ChildAEntity = CreateChildAEntity().Mocked<ChildA, int>();
+    public static readonly IEntityModel<ChildB, int> ChildBEntity = CreateChildBEntity().Mocked<ChildB, int>();
+    public static readonly IEntityModel<ChildC, int> ChildCEntity = CreateChildCEntity().Mocked<ChildC, int>();
+    public static readonly IEntityModel<ChildD, int> ChildDEntity = CreateChildDEntity().Mocked<ChildD, int>();
+    public static readonly IEntityModel<ChildE, int> ChildEEntity = CreateChildEEntity().Mocked<ChildE, int>();
+    public static readonly IEntityModel<ChildF, int> ChildFEntity = CreateChildFEntity().Mocked<ChildF, int>();
+    public static readonly IEntityModel<ManyToMany, int> ManyToManyEntity = CreateManyToManyEntity().Mocked<ManyToMany, int>();
+    public static readonly IEntityModel<ChildG, int> ChildGEntity = CreateChildGEntity().Mocked<ChildG, int>();
 
     public static readonly ISimpleNavigationModel RootToChildANavigation = CreateRootToChildANavigation();
     public static readonly ISimpleNavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
@@ -130,7 +130,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(Root.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(Root))
@@ -154,7 +154,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildA.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildA))
@@ -179,7 +179,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildB.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildB))
@@ -197,7 +197,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildC.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildC))
@@ -215,7 +215,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildD.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildD))
@@ -239,7 +239,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildE.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildE))
@@ -257,7 +257,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildF.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildF))
@@ -275,7 +275,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ManyToMany.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ManyToMany))
@@ -296,7 +296,7 @@ internal static class NavigationFixture
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildG.Id))
-        .SetIndex(0));
+        .SetKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildG))
@@ -322,7 +322,7 @@ internal static class NavigationFixture
         .SetId(RootToChildAId)
         .SetTo(ChildAEntity)
         .SetName(nameof(Root.ChildA))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(Root.Id)))
@@ -336,7 +336,7 @@ internal static class NavigationFixture
         .SetId(RootToChildBId)
         .SetTo(ChildBEntity)
         .SetName(nameof(Root.ChildB))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(Root.Id)))
@@ -350,7 +350,7 @@ internal static class NavigationFixture
         .SetId(RootToChildCId)
         .SetTo(ChildCEntity)
         .SetName(nameof(Root.ChildC))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(Root.Id)))
@@ -364,7 +364,7 @@ internal static class NavigationFixture
         .SetId(ChildAToChildDId)
         .SetTo(ChildDEntity)
         .SetName(nameof(ChildA.ChildD))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildA.Id)))
@@ -378,7 +378,7 @@ internal static class NavigationFixture
         .SetId(ChildAToChildFId)
         .SetTo(ChildFEntity)
         .SetName(nameof(ChildA.ChildF))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildA.Id)))
@@ -392,7 +392,7 @@ internal static class NavigationFixture
         .SetId(ChildDToChildEId)
         .SetTo(ChildEEntity)
         .SetName(nameof(ChildD.ChildE))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildD.Id)))
@@ -406,7 +406,7 @@ internal static class NavigationFixture
         .SetId(ChildAToRootId)
         .SetTo(RootEntity)
         .SetName(nameof(ChildA.Root))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildA.RootId)))
@@ -420,7 +420,7 @@ internal static class NavigationFixture
         .SetId(ChildDToChildAId)
         .SetTo(ChildAEntity)
         .SetName(nameof(ChildD.ChildA))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildD.ChildAId)))
@@ -434,7 +434,8 @@ internal static class NavigationFixture
         .SetId(RootToManyToManyId)
         .SetTo(ManyToManyEntity)
         .SetName(nameof(Root.MTMEntities))
-        .SetJoinTableName("RootManyToMany")
+        .SetJoinEntity(_ => _
+          .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -455,7 +456,8 @@ internal static class NavigationFixture
         .SetId(ManyToManyToRootId)
         .SetTo(RootEntity)
         .SetName(nameof(ManyToMany.Roots))
-        .SetJoinTableName("RootManyToMany")
+        .SetJoinEntity(_ => _
+          .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -476,7 +478,7 @@ internal static class NavigationFixture
         .SetId(ChildGToManyToManyId)
         .SetTo(ManyToManyEntity)
         .SetName(nameof(ChildG.MTMEntity))
-        .SetKeys(_ => _
+        .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
               .SetColumnName(nameof(ChildG.MTMEntityId)))

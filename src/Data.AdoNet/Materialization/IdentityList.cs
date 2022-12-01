@@ -12,11 +12,8 @@ internal class IdentityList<TEntity> : List<TEntity>, IIdentityCollection, IIden
     _identitySet = new(comparer);
   }
 
-  public void AddEntity(object? entity)
+  public void AddEntity(object entity)
   {
-    if (entity is null)
-      return;
-
     if (_identitySet.Contains(entity))
       return;
 

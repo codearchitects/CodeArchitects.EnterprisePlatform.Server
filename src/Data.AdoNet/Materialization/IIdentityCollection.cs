@@ -2,5 +2,5 @@
 
 internal interface IIdentityCollection
 {
-  void AddEntity(object? entity);
+  void AddEntity(object entity);
 }

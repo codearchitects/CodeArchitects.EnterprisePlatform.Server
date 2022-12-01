@@ -1,5 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Model.DeepNavigation.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 

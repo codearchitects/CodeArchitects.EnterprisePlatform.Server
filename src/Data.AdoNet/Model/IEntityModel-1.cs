@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IEntityModel<TEntity, TKey> : IEntityModel
+public interface IEntityModel<TEntity, TKey> : IEntityModel
   where TEntity : class
   where TKey : IEquatable<TKey>
 {

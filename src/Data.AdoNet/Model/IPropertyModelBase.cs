@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IPropertyModelBase
+public interface IPropertyModelBase
 {
   string Name { get; }
   

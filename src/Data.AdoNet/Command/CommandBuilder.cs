@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Command.Select;
-using CodeArchitects.Platform.Data.AdoNet.Executor;
+﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data.Common;
@@ -8,11 +7,11 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal class CommandBuilder : ICommandBuilder // TODO: Support multiple database providers
 {
-  private readonly ISqlTextCache _cache;
+  private readonly ISqlTextBuilder _sqlBuilder;
 
-  public CommandBuilder(ISqlTextCache cache)
+  public CommandBuilder(ISqlTextBuilder sqlBuilder)
   {
-    _cache = cache;
+    _sqlBuilder = sqlBuilder;
   }
 
   public void BuildSelectCommand<TEntity, TKey>(DbCommand command, TKey key, NavigationSpec<TEntity, TKey> spec)
@@ -21,7 +20,7 @@ internal class CommandBuilder : ICommandBuilder // TODO: Support multiple databa
   {
     IEntityModel<TEntity, TKey> model = spec.Entity;
 
-    command.CommandText = GetSelectText(spec);
+    command.CommandText = _sqlBuilder.BuildSelectText(spec);
 
     if (model.PrimaryKey.IsComposite)
     {
@@ -37,13 +36,13 @@ internal class CommandBuilder : ICommandBuilder // TODO: Support multiple databa
     }
   }
 
-  public void BuildInsertCommand(DbCommand command, object entity, NavigationContext context)
+  public void BuildInsertCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context)
   {
     command.Parameters.Clear();
     throw new NotImplementedException();
   }
 
-  public void BuildUpdateCommand(DbCommand command, object entity, NavigationContext context)
+  public void BuildUpdateCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context)
   {
     command.Parameters.Clear();
     throw new NotImplementedException();
@@ -74,25 +73,5 @@ internal class CommandBuilder : ICommandBuilder // TODO: Support multiple databa
     parameter.ParameterName = name;
     parameter.Value = value;
     command.Parameters.Add(parameter);
-  }
-
-  private string GetSelectText(NavigationSpec spec)
-  {
-    if (_cache.TryGetSelectText(spec, out string? text))
-      return text;
-
-    SelectStringBuilder stringBuilder = new();
-
-    stringBuilder.AppendSelectFrom(spec.Entity, spec.Navigations);
-
-    foreach (INavigation child in spec.Navigations)
-    {
-      stringBuilder.AppendLeftJoin(child);
-    }
-
-    text = stringBuilder.ToString();
-    _cache.AddSelectText(spec, text);
-
-    return text;
   }
 }

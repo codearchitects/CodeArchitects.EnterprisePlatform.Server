@@ -1,5 +1,5 @@
-﻿using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture;
-using static CodeArchitects.Platform.Data.AdoNet.Fixtures.NavigationFixture.Model;
+﻿using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Model.DeepNavigation;
+using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Model.DeepNavigation.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
@@ -9,7 +9,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeLeafNavigation_WhenDepth1()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(nameof(Root.ChildA));
@@ -23,7 +23,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeLeafNavigation_WhenDepth1()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => root.ChildA);
@@ -37,7 +37,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -54,7 +54,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -71,7 +71,7 @@ public class IncluderTests
   public void IncludeObj_ShouldIncludeMultipleLeafNavigations_WhenDepth1()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => new { root.ChildA, root.ChildB });
@@ -86,7 +86,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeLeafNavigation_WhenDepth1AndIncludedMultipleTimes()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -102,7 +102,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeLeafNavigation_WhenDepth1AndIncludedMultipleTimes()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -118,7 +118,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include($"{nameof(Root.ChildA)}.{nameof(ChildA.ChildD)}");
@@ -134,7 +134,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => root.ChildA!.ChildD);
@@ -150,7 +150,7 @@ public class IncluderTests
   public void IncludeThen_ShouldIncludeNodeNavigation_WhenDepth2()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => root.ChildA, includer => includer
@@ -167,7 +167,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsLeaf()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -185,7 +185,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsLeaf()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -203,7 +203,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -222,7 +222,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -241,7 +241,7 @@ public class IncluderTests
   public void IncludeObj_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => new { root.ChildA!.ChildD, root.ChildA!.ChildF });
@@ -258,7 +258,7 @@ public class IncluderTests
   public void IncludeThen_ShouldIncludeNodeNavigation_WhenDepth2AndIncludedFirstTimeAsNode()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -279,7 +279,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeAllNavigations()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -304,7 +304,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeAllNavigations()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -329,7 +329,7 @@ public class IncluderTests
   public void IncludeObj_ShouldIncludeAllNavigations()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer.Include(root => new { root.ChildA!.ChildD!.ChildE, root.ChildA!.ChildF, root.ChildB, root.ChildC });
@@ -350,7 +350,7 @@ public class IncluderTests
   public void IncludeThen_ShouldIncludeAllNavigations()
   {
     // Arrange
-    Includer<Root> includer = new(RootEntity);
+    Includer<Root, int> includer = new(RootEntity);
 
     // Act
     includer
@@ -377,7 +377,7 @@ public class IncluderTests
   public void IncludeLiteral_ShouldIncludeAllNavigationsAlsoBackwards()
   {
     // Arrange
-    Includer<ChildD> includer = new(ChildDEntity);
+    Includer<ChildD, int> includer = new(ChildDEntity);
 
     // Act
     includer
@@ -402,7 +402,7 @@ public class IncluderTests
   public void IncludeExpr_ShouldIncludeAllNavigationsAlsoBackwards()
   {
     // Arrange
-    Includer<ChildD> includer = new(ChildDEntity);
+    Includer<ChildD, int> includer = new(ChildDEntity);
 
     // Act
     includer
@@ -427,7 +427,7 @@ public class IncluderTests
   public void IncludeObj_ShouldIncludeAllNavigationsAlsoBackwards()
   {
     // Arrange
-    Includer<ChildD> includer = new(ChildDEntity);
+    Includer<ChildD, int> includer = new(ChildDEntity);
 
     // Act
     includer.Include(childD => new { childD.ChildA!.ChildF, childD.ChildA!.Root!.ChildB, childD.ChildA!.Root!.ChildC, childD.ChildE });
@@ -448,7 +448,7 @@ public class IncluderTests
   public void IncludeThen_ShouldIncludeAllNavigationsAlsoBackwards()
   {
     // Arrange
-    Includer<ChildD> includer = new(ChildDEntity);
+    Includer<ChildD, int> includer = new(ChildDEntity);
 
     // Act
     includer

@@ -57,7 +57,7 @@ internal class RowReaderProvider : IRowReaderProvider
     _readers = readers;
   }
 
-  public RowReader GetRowReader(IEntityModel entity)
+  public IRowReader GetRowReader(IEntityModel entity)
   {
     return _readers.GetOrAdd(entity, CreateRowReader);
   }

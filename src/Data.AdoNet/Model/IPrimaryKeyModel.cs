@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IPrimaryKeyModel
+public interface IPrimaryKeyModel
 {
   [MemberNotNullWhen(true, nameof(TupleConstructor))]
   bool IsComposite { get; }

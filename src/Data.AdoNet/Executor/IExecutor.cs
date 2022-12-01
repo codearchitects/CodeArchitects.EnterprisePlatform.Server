@@ -21,4 +21,8 @@ internal interface IExecutor
   Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbConnection connection, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
+
+  void VisitGraph<TState>(object node, IEntityModel model, TState state, VisitNodeCallback<TState> callback);
+
+  Task VisitGraphAsync<TState>(object node, IEntityModel model, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken);
 }

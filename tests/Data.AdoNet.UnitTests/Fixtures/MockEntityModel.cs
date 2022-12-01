@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockEntityModel : IEntityModel
+internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
+  where TEntity : class
+  where TKey : IEquatable<TKey>
 {
   private readonly IEntityModel _mock;
 
@@ -26,6 +28,8 @@ internal class MockEntityModel : IEntityModel
 
   public IInitializerModel Initializer => _mock.Initializer;
 
+  IPrimaryKeyModel<TKey> IEntityModel<TEntity, TKey>.PrimaryKey => throw new NotImplementedException();
+
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel)
   {
     foreach (INavigationModel navigation in Navigations)
@@ -44,8 +48,10 @@ internal class MockEntityModel : IEntityModel
 
 internal static class MockEntityModelExtensions
 {
-  public static IEntityModel Mocked(this IEntityModel mock)
+  public static IEntityModel<TEntity, TKey> Mocked<TEntity, TKey>(this IEntityModel mock)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
   {
-    return new MockEntityModel(mock);
+    return new MockEntityModel<TEntity, TKey>(mock);
   }
 }

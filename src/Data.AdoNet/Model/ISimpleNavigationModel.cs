@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface ISimpleNavigationModel : INavigationModel
+public interface ISimpleNavigationModel : INavigationModel
 {
   IReadOnlyList<IKeyPair> KeyPairs { get; }
 }

@@ -98,6 +98,24 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
+  public void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
+    where TEntity : class
+  {
+    IEntityModel model = EnsureEntity<TEntity>();
+
+    callback(entity, model, default, state);
+    _executor.VisitGraph(entity, model, state, callback);
+  }
+
+  public async Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+    where TEntity : class
+  {
+    IEntityModel model = EnsureEntity<TEntity>();
+    
+    await callback(entity, model, default, state, cancellationToken);
+    await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  }
+
   private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -105,7 +123,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     await Connection.OpenAsync(cancellationToken);
     try
     {
-      return await _executor.ExecuteSelectCommandAsync<TEntity, TKey>(Connection, key, spec, cancellationToken);
+      return await _executor.ExecuteSelectCommandAsync(Connection, key, spec, cancellationToken);
     }
     finally
     {
@@ -117,7 +135,15 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (!_model.TryGetEntity<TEntity, TKey>(out IEntityModel<TEntity, TKey> entityModel))
+    if (!_model.TryGetEntity(out IEntityModel<TEntity, TKey> entityModel))
+      throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
+
+    return entityModel;
+  }
+
+  private IEntityModel EnsureEntity<TEntity>()
+  {
+    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;

@@ -21,6 +21,28 @@ internal class Materializer : IMaterializer, IMaterializerHub
     _identityLists = new();
   }
 
+  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IRowReader rowReader = _readerFactory.GetRowReader(spec.Entity);
+
+    object? entity = null;
+    while (await reader.ReadAsync(cancellationToken))
+    {
+      int offset = 0;
+      entity = rowReader.ReadRow(reader, ref offset, this, spec.Navigations);
+    }
+
+    foreach (IIdentityList list in _identityLists)
+    {
+      list.PopulateList();
+    }
+    _identityLists.Clear();
+
+    return (TEntity?)entity;
+  }
+
   public void AddMaterialized(IdentityCacheKey key, object materialized)
   {
     _materializedEntities.Add(key, materialized);
@@ -38,30 +60,8 @@ internal class Materializer : IMaterializer, IMaterializerHub
 
   public object? ReadRow(IDataReader reader, ref int offset, IEntityModel model, IReadOnlyCollection<INavigation> navigations)
   {
-    RowReader rowReader = _readerFactory.GetRowReader(model);
+    IRowReader rowReader = _readerFactory.GetRowReader(model);
 
     return rowReader.ReadRow(reader, ref offset, this, navigations);
-  }
-
-  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    RowReader rowReader = _readerFactory.GetRowReader(spec.Entity);
-
-    object? entity = null;
-    while (await reader.ReadAsync(cancellationToken))
-    {
-      int offset = 0;
-      entity = rowReader.ReadRow(reader, ref offset, this, spec.Navigations);
-    }
-
-    foreach (IIdentityList list in _identityLists)
-    {
-      list.PopulateList();
-    }
-    _identityLists.Clear();
-
-    return (TEntity?)entity;
   }
 }

@@ -1,0 +1,8 @@
+﻿using CodeArchitects.Platform.Data.AdoNet.Navigation;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Command;
+
+internal interface ISqlTextBuilder
+{
+  string BuildSelectText(NavigationSpec spec);
+}

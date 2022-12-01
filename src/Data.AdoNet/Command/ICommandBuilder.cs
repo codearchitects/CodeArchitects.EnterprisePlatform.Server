@@ -11,9 +11,9 @@ internal interface ICommandBuilder
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  void BuildInsertCommand(DbCommand command, object entity, NavigationContext context);
+  void BuildInsertCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context);
 
-  void BuildUpdateCommand(DbCommand command, object entity, NavigationContext context);
+  void BuildUpdateCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context);
 
   void BuildDeleteCommand<TEntity, TKey>(DbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class

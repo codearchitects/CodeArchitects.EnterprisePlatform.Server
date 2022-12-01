@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface INavigationModel : IPropertyModelBase
+public interface INavigationModel : IPropertyModelBase
 {
   int Id { get; }
 

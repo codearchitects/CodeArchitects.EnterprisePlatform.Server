@@ -6,5 +6,5 @@ internal readonly record struct NavigationSpec<TEntity, TKey>(IEntityModel<TEnti
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public static implicit operator NavigationSpec(NavigationSpec<TEntity, TKey> spec) => new NavigationSpec(spec.Entity, spec.Navigations);
+  public static implicit operator NavigationSpec(NavigationSpec<TEntity, TKey> spec) => new(spec.Entity, spec.Navigations);
 }

@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface ISkipNavigationModel : INavigationModel
+public interface ISkipNavigationModel : INavigationModel
 {
   IEntityModel JoinEntity { get; }
   

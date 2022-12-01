@@ -8,11 +8,8 @@ internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection
   {
   }
 
-  public void AddEntity(object? entity)
+  public void AddEntity(object entity)
   {
-    if (entity is null)
-      return;
-
     Add((TEntity)entity);
   }
 }

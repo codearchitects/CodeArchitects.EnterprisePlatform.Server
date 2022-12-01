@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
+using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
@@ -31,4 +32,10 @@ public interface IDataContext
     where TKey : IEquatable<TKey>;
 
   Task BatchExecuteAsync(Execution<IDbConnection> execution, CancellationToken cancellationToken = default);
+
+  void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
+    where TEntity : class;
+
+  Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+    where TEntity : class;
 }

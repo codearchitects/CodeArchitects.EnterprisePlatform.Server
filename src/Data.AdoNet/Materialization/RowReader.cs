@@ -41,6 +41,9 @@ internal class RowReader : IRowReader
     foreach (INavigation navigation in navigations)
     {
       object? navigationEntity = hub.ReadRow(reader, ref offset, navigation.Target, navigation.Children);
+      if (navigationEntity is null)
+        continue;
+
       if (navigation.Model.IsCollection)
       {
         IIdentityCollection collection = navigation.Model.Accessor.Get(entity) is { } obj
@@ -48,11 +51,10 @@ internal class RowReader : IRowReader
           : hub.CreateCollection(navigation.Model.ElementType);
 
         collection.AddEntity(navigationEntity);
+        continue;
       }
-      else
-      {
-        navigation.Model.Accessor.Set(entity, navigationEntity);
-      }
+
+      navigation.Model.Accessor.Set(entity, navigationEntity);
     }
 
     return entity;

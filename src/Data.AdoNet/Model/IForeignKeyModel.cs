@@ -1,8 +1,10 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-internal interface IForeignKeyModel
+public interface IForeignKeyModel
 {
   bool IsComposite { get; }
+
   Type Type { get; }
+  
   IReadOnlyList<IForeignKeyPropertyModel> Properties { get; }
 }

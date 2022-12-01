@@ -4,5 +4,5 @@ namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal interface IRowReaderProvider
 {
-  RowReader GetRowReader(IEntityModel entity);
+  IRowReader GetRowReader(IEntityModel entity);
 }

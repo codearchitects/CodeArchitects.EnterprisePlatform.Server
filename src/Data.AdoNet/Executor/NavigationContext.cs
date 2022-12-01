@@ -2,14 +2,4 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
-internal readonly struct NavigationContext
-{
-  public NavigationContext(object parent, INavigationModel navigationModel)
-  {
-    Parent = parent;
-    NavigationModel = navigationModel;
-  }
-
-  public object Parent { get; }
-  public INavigationModel NavigationModel { get; }
-}
+public readonly record struct NavigationContext(object Parent, INavigationModel NavigationModel);
