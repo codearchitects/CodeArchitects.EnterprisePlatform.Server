@@ -139,7 +139,7 @@ public class TestFixture : IAsyncLifetime
     }
   }
 
-  public Task SetUpAsync(ITestOutputHelper output)
+  public Task SetupAsync(ITestOutputHelper output)
   {
     _localData.Initialize(output);
 

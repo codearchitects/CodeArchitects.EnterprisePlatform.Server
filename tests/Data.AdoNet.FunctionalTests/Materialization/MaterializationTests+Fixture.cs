@@ -19,7 +19,7 @@ public partial class MaterializationTests
 
     private static readonly Faker<Parent> s_faker = new Faker<Parent>()
       .RuleFor(parent => parent.Id, Guid.NewGuid)
-      .RuleFor(parent => parent.Name, faker => faker.Address.FullAddress());
+      .RuleFor(parent => parent.Name, faker => faker.Name.FullName());
 
     public static Parent One() => s_faker.Generate();
   }
@@ -34,7 +34,7 @@ public partial class MaterializationTests
 
     private static readonly Faker<ChildA> s_faker = new Faker<ChildA>()
       .RuleFor(childA => childA.Id, faker => faker.Random.Int())
-      .RuleFor(childA => childA.Name, faker => faker.Address.FullAddress());
+      .RuleFor(childA => childA.Name, faker => faker.Name.FullName());
 
     public static ChildA One(Guid parentId)
     {
@@ -59,7 +59,7 @@ public partial class MaterializationTests
 
     private static readonly Faker<ChildB> s_faker = new Faker<ChildB>()
       .RuleFor(childB => childB.Id, faker => faker.Random.Int())
-      .RuleFor(childB => childB.Name, faker => faker.Address.FullAddress());
+      .RuleFor(childB => childB.Name, faker => faker.Name.FullName());
 
     public static ChildB One(Guid parentId)
     {
@@ -84,7 +84,7 @@ public partial class MaterializationTests
 
     private static readonly Faker<ChildC> s_faker = new Faker<ChildC>()
       .RuleFor(childC => childC.Id, faker => faker.Random.Int())
-      .RuleFor(childC => childC.Name, faker => faker.Address.FullAddress());
+      .RuleFor(childC => childC.Name, faker => faker.Name.FullName());
 
     public static ChildC One(Guid parentId)
     {
@@ -110,22 +110,22 @@ public partial class MaterializationTests
 
     public int Id { get; set; }
     public string? Name { get; set; }
-    public Guid ChildAId { get; set; }
+    public int ChildAId { get; set; }
 
     private static readonly Faker<ChildD> s_faker = new Faker<ChildD>()
       .CustomInstantiator(faker => new ChildD(faker.Random.Int()))
-      .RuleFor(childC => childC.Name, faker => faker.Address.FullAddress());
+      .RuleFor(childC => childC.Name, faker => faker.Name.FullName());
 
     public static ChildD One() => s_faker.Generate();
 
-    public static ChildD One(Guid childAId)
+    public static ChildD One(int childAId)
     {
       ChildD childC = s_faker.Generate();
       childC.ChildAId = childAId;
       return childC;
     }
 
-    public static List<ChildD> Many(int count, Guid childAId)
+    public static List<ChildD> Many(int count, int childAId)
     {
       var list = s_faker.Generate(count);
       list.ForEach(item => item.ChildAId = childAId);
@@ -137,10 +137,14 @@ public partial class MaterializationTests
   {
     public static readonly IEntityModel<Parent, Guid> ParentModel = CreateParentModel();
     public static readonly IEntityModel<ChildA, int> ChildAModel = CreateChildAModel();
+    public static readonly IEntityModel<ChildB, int> ChildBModel = CreateChildBModel();
     public static readonly IEntityModel<ChildC, int> ChildCModel = CreateChildCModel();
+    public static readonly IEntityModel<ChildD, int> ChildDModel = CreateChildDModel();
 
     public static readonly ISimpleNavigationModel ParentToChildANavigation = CreateParentToChildANavigation();
+    public static readonly ISimpleNavigationModel ParentToChildBNavigation = CreateParentToChildBNavigation();
     public static readonly ISimpleNavigationModel ParentToChildCNavigation = CreateParentToChildCNavigation();
+    public static readonly ISimpleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
 
     private static IEntityModel<Parent, Guid> CreateParentModel()
     {
@@ -211,6 +215,46 @@ public partial class MaterializationTests
       return entity.Mocked<ChildA, int>();
     }
 
+    private static IEntityModel<ChildB, int> CreateChildBModel()
+    {
+      PropertyInfo idPropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.Id));
+      PropertyInfo namePropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.Name));
+      PropertyInfo parentIdPropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId));
+
+      Mock<IAccessor> primaryKeyAccessor = new(MockBehavior.Strict);
+      primaryKeyAccessor
+        .Setup(x => x.Get(It.IsAny<ChildB>()))
+        .Returns<object>(childB => ((ChildB)childB).Id);
+
+      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+        .SetIndex(0)
+        .SetType(typeof(int))
+        .SetMember(idPropertyInfo));
+      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .SetIndex(1)
+        .SetType(typeof(string))
+        .SetMember(namePropertyInfo));
+      IPropertyModel parentIdProperty = PropertyModelBuilder.Build(_ => _
+        .SetIndex(2)
+        .SetType(typeof(Guid))
+        .SetMember(parentIdPropertyInfo));
+
+      IEntityModel entity = EntityModelBuilder.Build(_ => _
+        .SetType(typeof(ChildB))
+        .SetPrimaryKey(PrimaryKeyModelBuilder.Build(_ => _
+          .SetProperties(idProperty)
+          .SetIsComposite(false)
+          .SetType(typeof(int))
+          .SetAccessor(primaryKeyAccessor.Object)))
+        .SetProperties(idProperty, nameProperty, parentIdProperty)
+        .SetInitializer(_ => _
+          .SetConstructor(typeof(ChildB).GetRequiredConstructor())
+          .SetConstructorProperties()
+          .SetInitializerProperties(idProperty, nameProperty, parentIdProperty)));
+
+      return entity.Mocked<ChildB, int>();
+    }
+
     private static IEntityModel<ChildC, int> CreateChildCModel()
     {
       PropertyInfo idPropertyInfo = typeof(ChildC).GetRequiredProperty(nameof(ChildC.Id));
@@ -245,6 +289,46 @@ public partial class MaterializationTests
       return entity.Mocked<ChildC, int>();
     }
 
+    private static IEntityModel<ChildD, int> CreateChildDModel()
+    {
+      PropertyInfo idPropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.Id));
+      PropertyInfo namePropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.Name));
+      PropertyInfo childAIdPropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildAId));
+
+      Mock<IAccessor> primaryKeyAccessor = new(MockBehavior.Strict);
+      primaryKeyAccessor
+        .Setup(x => x.Get(It.IsAny<ChildD>()))
+        .Returns<object>(childB => ((ChildD)childB).Id);
+
+      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+        .SetIndex(0)
+        .SetType(typeof(int))
+        .SetMember(idPropertyInfo));
+      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .SetIndex(1)
+        .SetType(typeof(string))
+        .SetMember(namePropertyInfo));
+      IPropertyModel childAIdProperty = PropertyModelBuilder.Build(_ => _
+        .SetIndex(2)
+        .SetType(typeof(int))
+        .SetMember(childAIdPropertyInfo));
+
+      IEntityModel entity = EntityModelBuilder.Build(_ => _
+        .SetType(typeof(ChildD))
+        .SetPrimaryKey(PrimaryKeyModelBuilder.Build(_ => _
+          .SetProperties(idProperty)
+          .SetIsComposite(false)
+          .SetType(typeof(int))
+          .SetAccessor(primaryKeyAccessor.Object)))
+        .SetProperties(idProperty, nameProperty, childAIdProperty)
+        .SetInitializer(_ => _
+          .SetConstructor(typeof(ChildD).GetRequiredConstructor())
+          .SetConstructorProperties(idProperty)
+          .SetInitializerProperties(nameProperty, childAIdProperty)));
+
+      return entity.Mocked<ChildD, int>();
+    }
+
     private static ISimpleNavigationModel CreateParentToChildANavigation()
     {
       Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
@@ -263,6 +347,24 @@ public partial class MaterializationTests
         .SetAccessor(accessorMock.Object));
     }
 
+    private static ISimpleNavigationModel CreateParentToChildBNavigation()
+    {
+      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
+      accessorMock
+        .Setup(x => x.Get(It.IsAny<Parent>()))
+        .Returns<object>(parent => ((Parent)parent).ChildrenB);
+      accessorMock
+        .Setup(x => x.Set(It.IsAny<Parent>(), It.IsAny<HashSet<ChildB>>()))
+        .Callback<object, object>((parent, childrenB) => ((Parent)parent).ChildrenB = (HashSet<ChildB>)childrenB);
+
+      return SimpleNavigationModelBuilder.Build(_ => _
+        .SetFrom(ParentModel)
+        .SetTo(ChildBModel)
+        .SetIsCollection(true)
+        .SetCollectionKind(CollectionKind.HashSet)
+        .SetAccessor(accessorMock.Object));
+    }
+
     private static ISimpleNavigationModel CreateParentToChildCNavigation()
     {
       Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
@@ -277,6 +379,24 @@ public partial class MaterializationTests
         .SetFrom(ParentModel)
         .SetTo(ChildCModel)
         .SetIsCollection(false)
+        .SetAccessor(accessorMock.Object));
+    }
+
+    private static ISimpleNavigationModel CreateChildAToChildDNavigation()
+    {
+      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
+      accessorMock
+        .Setup(x => x.Get(It.IsAny<ChildA>()))
+        .Returns<object>(parent => ((ChildA)parent).ChildrenD);
+      accessorMock
+        .Setup(x => x.Set(It.IsAny<ChildA>(), It.IsAny<List<ChildD>>()))
+        .Callback<object, object>((parent, childrenD) => ((ChildA)parent).ChildrenD = (List<ChildD>)childrenD);
+
+      return SimpleNavigationModelBuilder.Build(_ => _
+        .SetFrom(ChildAModel)
+        .SetTo(ChildDModel)
+        .SetIsCollection(true)
+        .SetCollectionKind(CollectionKind.List)
         .SetAccessor(accessorMock.Object));
     }
   }
