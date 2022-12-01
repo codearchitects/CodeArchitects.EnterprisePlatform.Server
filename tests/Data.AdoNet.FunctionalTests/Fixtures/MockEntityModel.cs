@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
+// TODO: Remove and use real model
 internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>

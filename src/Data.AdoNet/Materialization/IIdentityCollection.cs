@@ -3,4 +3,5 @@
 internal interface IIdentityCollection
 {
   void AddEntity(object entity);
+  void Populate();
 }

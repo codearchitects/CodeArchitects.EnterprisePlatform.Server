@@ -1,6 +1,8 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal interface IIdentityCollectionFactory
 {
-  IIdentityCollection CreateCollection(Type propertyType);
+  IIdentityCollection CreateCollection(INavigationModel navigation);
 }

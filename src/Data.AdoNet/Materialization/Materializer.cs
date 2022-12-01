@@ -9,23 +9,23 @@ namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 internal class Materializer : IMaterializer, IMaterializerHub
 {
   private readonly IIdentityCollectionFactory _collectionFactory;
-  private readonly IRowReaderProvider _readerFactory;
+  private readonly IRowReaderProvider _readerProvider;
   private readonly Dictionary<IdentityCacheKey, object> _materializedEntities;
-  private readonly List<IIdentityList> _identityLists;
+  private readonly List<IIdentityCollection> _identityCollections;
 
-  public Materializer(IIdentityCollectionFactory collectionFactory, IRowReaderProvider readerFactory)
+  public Materializer(IIdentityCollectionFactory collectionFactory, IRowReaderProvider readerProvider)
   {
     _collectionFactory = collectionFactory;
-    _readerFactory = readerFactory;
+    _readerProvider = readerProvider;
     _materializedEntities = new();
-    _identityLists = new();
+    _identityCollections = new();
   }
 
   public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IRowReader rowReader = _readerFactory.GetRowReader(spec.Entity);
+    IRowReader rowReader = _readerProvider.GetRowReader(spec.Entity);
 
     object? entity = null;
     while (await reader.ReadAsync(cancellationToken))
@@ -34,11 +34,11 @@ internal class Materializer : IMaterializer, IMaterializerHub
       entity = rowReader.ReadRow(reader, ref offset, this, spec.Navigations);
     }
 
-    foreach (IIdentityList list in _identityLists)
+    foreach (IIdentityCollection list in _identityCollections)
     {
-      list.PopulateList();
+      list.Populate();
     }
-    _identityLists.Clear();
+    _identityCollections.Clear();
 
     return (TEntity?)entity;
   }
@@ -53,14 +53,16 @@ internal class Materializer : IMaterializer, IMaterializerHub
     return _materializedEntities.TryGetValue(key, out existing);
   }
 
-  public IIdentityCollection CreateCollection(Type propertyType)
+  public IIdentityCollection CreateCollection(INavigationModel navigation)
   {
-    return _collectionFactory.CreateCollection(propertyType);
+    IIdentityCollection collection = _collectionFactory.CreateCollection(navigation);
+    _identityCollections.Add(collection);
+    return collection;
   }
 
   public object? ReadRow(IDataReader reader, ref int offset, IEntityModel model, IReadOnlyCollection<INavigation> navigations)
   {
-    IRowReader rowReader = _readerFactory.GetRowReader(model);
+    IRowReader rowReader = _readerProvider.GetRowReader(model);
 
     return rowReader.ReadRow(reader, ref offset, this, navigations);
   }

@@ -14,6 +14,7 @@ internal class RowReaderProvider : IRowReaderProvider
   {
     s_getValueMethods = new Dictionary<Type, MethodInfo>()
     {
+      [typeof(object)]    = GetGetValueMethod("Value"),
       [typeof(bool)]      = GetGetValueMethod("Boolean"),
       [typeof(byte)]      = GetGetValueMethod("Byte"),
       [typeof(char)]      = GetGetValueMethod("Char"),
@@ -78,7 +79,10 @@ internal class RowReaderProvider : IRowReaderProvider
     KeyReader CreateSimpleKeyReader()
     {
       Expression<KeyReader> keyReaderExpr = Expression.Lambda<KeyReader>(
-        body: MakeGetValueCallExpression(entity.PrimaryKey.Type),
+        body: Expression.Call(
+          method: s_getValueMethods[typeof(object)],
+          instance: readerParam,
+          arguments: offsetParam),
         parameters: new[] { readerParam, offsetParam });
 
       return keyReaderExpr.Compile();
@@ -89,7 +93,7 @@ internal class RowReaderProvider : IRowReaderProvider
       Expression<KeyReader> keyReaderExpr = Expression.Lambda<KeyReader>(
         body: Expression.New(
           constructor: entity.PrimaryKey.TupleConstructor,
-          arguments: entity.PrimaryKey.Properties.Select(property => MakeGetValueCallExpression(property.Type))),
+          arguments: entity.PrimaryKey.Properties.Select(property => MakeGetValueCallExpression(property.Type, property.Index))),
         parameters: new[] { readerParam, offsetParam });
 
       return keyReaderExpr.Compile();
@@ -101,28 +105,31 @@ internal class RowReaderProvider : IRowReaderProvider
         body: Expression.MemberInit(
           newExpression: Expression.New(
             entity.Initializer.Constructor,
-            arguments: entity.Initializer.ConstructorProperties.Select(property => MakeGetValueCallExpression(property.Type))),
+            arguments: entity.Initializer.ConstructorProperties.Select(property => MakeGetValueCallExpression(property.Type, property.Index))),
           bindings: entity.Initializer.InitializerProperties.Select(property => Expression.Bind(
             member: property.Member,
-            expression: MakeGetValueCallExpression(property.Type)))),
+            expression: MakeGetValueCallExpression(property.Type, property.Index)))),
         parameters: new[] { readerParam, offsetParam });
 
       return readerExpr.Compile();
     }
 
-    Expression MakeGetValueCallExpression(Type type)
+    Expression MakeGetValueCallExpression(Type type, int index)
     {
       MethodInfo readMethod = GetReadMethod(type);
+      Expression indexExpr = Expression.Add(
+        left: offsetParam,
+        right: Expression.Constant(index));
 
       return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
         ? Expression.Call(
             method: readMethod,
             arg0: readerParam,
-            arg1: offsetParam)
+            arg1: indexExpr)
         : Expression.Call(
             instance: readerParam,
             method: readMethod,
-            arguments: offsetParam);
+            arguments: indexExpr);
     }
 
     static MethodInfo GetReadMethod(Type type)

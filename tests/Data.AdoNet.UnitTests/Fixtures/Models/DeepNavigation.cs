@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Fixtures.Model;
+namespace CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
 
 internal static class DeepNavigation
 {

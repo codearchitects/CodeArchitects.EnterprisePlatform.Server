@@ -30,11 +30,11 @@ internal class RowReader : IRowReader
     object key = _keyReader(reader, offset);
     IdentityCacheKey cacheKey = new(_model, key);
 
-    if (hub.TryGetExisting(cacheKey, out object? entity))
-      return entity;
-
-    entity = _entityReader(reader, offset);
-    hub.AddMaterialized(cacheKey, entity);
+    if (!hub.TryGetExisting(cacheKey, out object? entity))
+    {
+      entity = _entityReader(reader, offset);
+      hub.AddMaterialized(cacheKey, entity);
+    }
 
     offset += _model.Properties.Count;
 
@@ -46,9 +46,16 @@ internal class RowReader : IRowReader
 
       if (navigation.Model.IsCollection)
       {
-        IIdentityCollection collection = navigation.Model.Accessor.Get(entity) is { } obj
-          ? (IIdentityCollection)obj
-          : hub.CreateCollection(navigation.Model.ElementType);
+        IIdentityCollection collection;
+        if (navigation.Model.Accessor.Get(entity) is { } property)
+        {
+          collection = (IIdentityCollection)property;
+        }
+        else
+        {
+          collection = hub.CreateCollection(navigation.Model);
+          navigation.Model.Accessor.Set(entity, collection);
+        }
 
         collection.AddEntity(navigationEntity);
         continue;

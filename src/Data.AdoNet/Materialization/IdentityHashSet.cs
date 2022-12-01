@@ -12,4 +12,8 @@ internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection
   {
     Add((TEntity)entity);
   }
+
+  public void Populate()
+  {
+  }
 }

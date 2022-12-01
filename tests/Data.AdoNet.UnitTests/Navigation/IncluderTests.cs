@@ -1,5 +1,5 @@
-﻿using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Model.DeepNavigation;
-using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Model.DeepNavigation.Model;
+﻿using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Models.DeepNavigation;
+using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Models.DeepNavigation.Model;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 

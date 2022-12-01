@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CodeArchitects.Platform.Data.AdoNet.Model;
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 public interface INavigationModel : IPropertyModelBase
 {
@@ -12,14 +10,13 @@ public interface INavigationModel : IPropertyModelBase
 
   bool IsOnDependent { get; }
 
-  [MemberNotNullWhen(true, nameof(ElementType))]
   bool IsCollection { get; }
-  
-  Type? ElementType { get; }
   
   IEntityModel From { get; }
   
   IEntityModel To { get; }
 
   IForeignKeyModel ForeignKey { get; }
+
+  CollectionKind CollectionKind { get; }
 }
