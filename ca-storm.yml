@@ -88,9 +88,9 @@ components:
   - name: CodeArchitects.Platform.Messaging.UnitTests
     path: tests\Messaging.UnitTests
     type: dotnet-test
-  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
-    path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Data.IntegrationTests
-    path: tests\Data.IntegrationTests
-    type: dotnet-test
+  # - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+  #   path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
+  #   type: dotnet-test
+  # - name: CodeArchitects.Platform.Data.IntegrationTests
+  #   path: tests\Data.IntegrationTests
+  #   type: dotnet-test
