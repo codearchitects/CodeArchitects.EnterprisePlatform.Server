@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet;
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Visitors;
 
 public class VoidResult
 {

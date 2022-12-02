@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Sql;
+namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 public partial class SqlTextBuilderTests
 {

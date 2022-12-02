@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
