@@ -14,8 +14,6 @@ internal abstract class IncluderNode
     _children = new();
   }
 
-  protected bool IsFrozen { get; private set; }
-
   public abstract IEntityModel Target { get; }
 
   public IReadOnlyCollection<INavigation> Children => _children.Values;
