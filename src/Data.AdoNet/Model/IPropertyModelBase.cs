@@ -15,10 +15,10 @@ public interface IPropertyModelBase
   
   PropertyInfo? Property { get; }
 
-  [MemberNotNullWhen(true, nameof(Member), nameof(Getter), nameof(Setter))]
+  [MemberNotNullWhen(true, nameof(Member), nameof(GetValue), nameof(SetValue))]
   bool HasMember { get; }
 
-  Getter<object?>? Getter { get; }
+  Getter<object?>? GetValue { get; }
 
-  Setter<object?>? Setter { get; }
+  Setter<object?>? SetValue { get; }
 }

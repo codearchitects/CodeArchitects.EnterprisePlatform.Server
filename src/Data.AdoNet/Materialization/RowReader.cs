@@ -51,21 +51,21 @@ internal class RowReader : IRowReader
       if (navigation.Model.IsCollection)
       {
         IIdentityCollection collection;
-        if (navigationModel.Getter(entity) is { } property)
+        if (navigationModel.GetValue(entity) is { } property)
         {
           collection = (IIdentityCollection)property;
         }
         else
         {
           collection = hub.CreateCollection(navigationModel);
-          navigationModel.Setter(entity, collection);
+          navigationModel.SetValue(entity, collection);
         }
 
         collection.AddEntity(navigationEntity);
         continue;
       }
 
-      navigationModel.Setter(entity, navigationEntity);
+      navigationModel.SetValue(entity, navigationEntity);
     }
 
     return entity;

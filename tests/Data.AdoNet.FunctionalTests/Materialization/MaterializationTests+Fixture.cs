@@ -141,10 +141,10 @@ public partial class MaterializationTests
     public static readonly IEntityModel<ChildC, int> ChildCModel = CreateChildCModel();
     public static readonly IEntityModel<ChildD, int> ChildDModel = CreateChildDModel();
 
-    public static readonly ISimpleNavigationModel ParentToChildANavigation = CreateParentToChildANavigation();
-    public static readonly ISimpleNavigationModel ParentToChildBNavigation = CreateParentToChildBNavigation();
-    public static readonly ISimpleNavigationModel ParentToChildCNavigation = CreateParentToChildCNavigation();
-    public static readonly ISimpleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ParentToChildANavigation = CreateParentToChildANavigation();
+    public static readonly ISimpleAccessibleNavigationModel ParentToChildBNavigation = CreateParentToChildBNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ParentToChildCNavigation = CreateParentToChildCNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
 
     private static IEntityModel<Parent, Guid> CreateParentModel()
     {
@@ -154,11 +154,15 @@ public partial class MaterializationTests
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(Guid))
-        .SetMember(idPropertyInfo));
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
-        .SetMember(namePropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
 
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(Parent))
@@ -181,23 +185,24 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ParentId));
 
-      Mock<IAccessor> primaryKeyAccessor = new(MockBehavior.Strict);
-      primaryKeyAccessor
-        .Setup(x => x.Get(It.IsAny<ChildA>()))
-        .Returns<object>(childA => ((ChildA)childA).Id);
-
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
-        .SetMember(idPropertyInfo));
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
-        .SetMember(namePropertyInfo));
-      IPropertyModel parentIdProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
+      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
-        .SetMember(parentIdPropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(parentIdPropertyInfo)));
 
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildA))
@@ -205,7 +210,9 @@ public partial class MaterializationTests
           .SetProperties(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
-          .SetAccessor(primaryKeyAccessor.Object)))
+          .Setup(mock => mock
+            .Setup(x => x.GetValue)
+            .Returns(idPropertyInfo.GetValue))))
         .SetProperties(idProperty, nameProperty, parentIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildA).GetRequiredConstructor())
@@ -221,23 +228,24 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId));
 
-      Mock<IAccessor> primaryKeyAccessor = new(MockBehavior.Strict);
-      primaryKeyAccessor
-        .Setup(x => x.Get(It.IsAny<ChildB>()))
-        .Returns<object>(childB => ((ChildB)childB).Id);
-
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
-        .SetMember(idPropertyInfo));
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
-        .SetMember(namePropertyInfo));
-      IPropertyModel parentIdProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
+      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
-        .SetMember(parentIdPropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(parentIdPropertyInfo)));
 
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildB))
@@ -245,7 +253,9 @@ public partial class MaterializationTests
           .SetProperties(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
-          .SetAccessor(primaryKeyAccessor.Object)))
+          .Setup(mock => mock
+            .Setup(x => x.GetValue)
+            .Returns(idPropertyInfo.GetValue))))
         .SetProperties(idProperty, nameProperty, parentIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildB).GetRequiredConstructor())
@@ -264,15 +274,21 @@ public partial class MaterializationTests
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
-        .SetMember(idPropertyInfo));
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
-        .SetMember(namePropertyInfo));
-      IPropertyModel parentIdProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
+      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
-        .SetMember(parentIdPropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(parentIdPropertyInfo)));
 
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildC))
@@ -295,23 +311,24 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.Name));
       PropertyInfo childAIdPropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildAId));
 
-      Mock<IAccessor> primaryKeyAccessor = new(MockBehavior.Strict);
-      primaryKeyAccessor
-        .Setup(x => x.Get(It.IsAny<ChildD>()))
-        .Returns<object>(childB => ((ChildD)childB).Id);
-
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
-        .SetMember(idPropertyInfo));
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
-        .SetMember(namePropertyInfo));
-      IPropertyModel childAIdProperty = PropertyModelBuilder.Build(_ => _
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
+      IOrdinaryPropertyModel childAIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(int))
-        .SetMember(childAIdPropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(childAIdPropertyInfo)));
 
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildD))
@@ -319,7 +336,9 @@ public partial class MaterializationTests
           .SetProperties(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
-          .SetAccessor(primaryKeyAccessor.Object)))
+          .Setup(mock => mock
+            .Setup(x => x.GetValue)
+            .Returns(idPropertyInfo.GetValue))))
         .SetProperties(idProperty, nameProperty, childAIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildD).GetRequiredConstructor())
@@ -329,75 +348,71 @@ public partial class MaterializationTests
       return entity.Mocked<ChildD, int>();
     }
 
-    private static ISimpleNavigationModel CreateParentToChildANavigation()
+    private static ISimpleAccessibleNavigationModel CreateParentToChildANavigation()
     {
-      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
-      accessorMock
-        .Setup(x => x.Get(It.IsAny<Parent>()))
-        .Returns<object>(parent => ((Parent)parent).ChildrenA);
-      accessorMock
-        .Setup(x => x.Set(It.IsAny<Parent>(), It.IsAny<List<ChildA>>()))
-        .Callback<object, object>((parent, childrenA) => ((Parent)parent).ChildrenA = (List<ChildA>)childrenA);
+      PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenA));
 
-      return SimpleNavigationModelBuilder.Build(_ => _
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetFrom(ParentModel)
         .SetTo(ChildAModel)
         .SetIsCollection(true)
         .SetCollectionKind(CollectionKind.List)
-        .SetAccessor(accessorMock.Object));
+        .Setup(mock => mock
+          .Setup(x => x.GetValue)
+          .Returns(propertyInfo.GetValue))
+        .Setup(mock => mock
+          .Setup(x => x.SetValue)
+          .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleNavigationModel CreateParentToChildBNavigation()
+    private static ISimpleAccessibleNavigationModel CreateParentToChildBNavigation()
     {
-      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
-      accessorMock
-        .Setup(x => x.Get(It.IsAny<Parent>()))
-        .Returns<object>(parent => ((Parent)parent).ChildrenB);
-      accessorMock
-        .Setup(x => x.Set(It.IsAny<Parent>(), It.IsAny<HashSet<ChildB>>()))
-        .Callback<object, object>((parent, childrenB) => ((Parent)parent).ChildrenB = (HashSet<ChildB>)childrenB);
+      PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenB));
 
-      return SimpleNavigationModelBuilder.Build(_ => _
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetFrom(ParentModel)
         .SetTo(ChildBModel)
         .SetIsCollection(true)
         .SetCollectionKind(CollectionKind.HashSet)
-        .SetAccessor(accessorMock.Object));
+        .Setup(mock => mock
+          .Setup(x => x.GetValue)
+          .Returns(propertyInfo.GetValue))
+        .Setup(mock => mock
+          .Setup(x => x.SetValue)
+          .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleNavigationModel CreateParentToChildCNavigation()
+    private static ISimpleAccessibleNavigationModel CreateParentToChildCNavigation()
     {
-      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
-      accessorMock
-        .Setup(x => x.Get(It.IsAny<Parent>()))
-        .Returns<object>(parent => ((Parent)parent).ChildC);
-      accessorMock
-        .Setup(x => x.Set(It.IsAny<Parent>(), It.IsAny<ChildC>()))
-        .Callback<object, object>((parent, childC) => ((Parent)parent).ChildC = (ChildC)childC);
+      PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildC));
 
-      return SimpleNavigationModelBuilder.Build(_ => _
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetFrom(ParentModel)
         .SetTo(ChildCModel)
         .SetIsCollection(false)
-        .SetAccessor(accessorMock.Object));
+        .Setup(mock => mock
+          .Setup(x => x.GetValue)
+          .Returns(propertyInfo.GetValue))
+        .Setup(mock => mock
+          .Setup(x => x.SetValue)
+          .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleNavigationModel CreateChildAToChildDNavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildAToChildDNavigation()
     {
-      Mock<IAccessor> accessorMock = new(MockBehavior.Strict);
-      accessorMock
-        .Setup(x => x.Get(It.IsAny<ChildA>()))
-        .Returns<object>(parent => ((ChildA)parent).ChildrenD);
-      accessorMock
-        .Setup(x => x.Set(It.IsAny<ChildA>(), It.IsAny<List<ChildD>>()))
-        .Callback<object, object>((parent, childrenD) => ((ChildA)parent).ChildrenD = (List<ChildD>)childrenD);
+      PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildrenD));
 
-      return SimpleNavigationModelBuilder.Build(_ => _
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetFrom(ChildAModel)
         .SetTo(ChildDModel)
         .SetIsCollection(true)
         .SetCollectionKind(CollectionKind.List)
-        .SetAccessor(accessorMock.Object));
+        .Setup(mock => mock
+          .Setup(x => x.GetValue)
+          .Returns(propertyInfo.GetValue))
+        .Setup(mock => mock
+          .Setup(x => x.SetValue)
+          .Returns(propertyInfo.SetValue)));
     }
   }
 }

@@ -1,11 +1,14 @@
 ﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
 public interface IAccessiblePropertyModelBase : IPropertyModelBase
 {
-  new Getter<object?> Getter { get; }
+  new MemberInfo Member { get; }
 
-  new Setter<object?> Setter { get; }
+  new Getter<object?> GetValue { get; }
+
+  new Setter<object?> SetValue { get; }
 }

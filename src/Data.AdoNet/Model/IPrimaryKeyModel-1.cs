@@ -6,9 +6,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 public interface IPrimaryKeyModel<TKey> : IPrimaryKeyModel
   where TKey : IEquatable<TKey>
 {
-  Getter<TKey> Getter { get; }
+  new Getter<TKey> GetValue { get; }
 
-  Setter<TKey> Setter { get; }
+  new Setter<TKey> SetValue { get; }
 
   object GetKeyComponent(TKey key, int index);
 }

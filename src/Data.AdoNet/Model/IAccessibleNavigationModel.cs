@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 

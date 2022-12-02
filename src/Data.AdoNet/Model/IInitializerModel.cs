@@ -8,7 +8,7 @@ public interface IInitializerModel
 {
   ConstructorInfo Constructor { get; }
   
-  IReadOnlyList<IPropertyModel> ConstructorProperties { get; }
+  IReadOnlyList<IAccessiblePropertyModel> ConstructorProperties { get; }
   
-  IReadOnlyList<IPropertyModel> InitializerProperties { get; }
+  IReadOnlyList<IAccessiblePropertyModel> InitializerProperties { get; }
 }

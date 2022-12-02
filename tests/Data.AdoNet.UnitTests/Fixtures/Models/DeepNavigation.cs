@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
 
@@ -102,17 +103,17 @@ internal static class DeepNavigation
     public static readonly IEntityModel<ManyToMany, int> ManyToManyEntity = CreateManyToManyEntity().Mocked<ManyToMany, int>();
     public static readonly IEntityModel<ChildG, int> ChildGEntity = CreateChildGEntity().Mocked<ChildG, int>();
 
-    public static readonly ISimpleNavigationModel RootToChildANavigation = CreateRootToChildANavigation();
-    public static readonly ISimpleNavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
-    public static readonly ISimpleNavigationModel RootToChildCNavigation = CreateRootToChildCNavigation();
-    public static readonly ISimpleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
-    public static readonly ISimpleNavigationModel ChildAToChildFNavigation = CreateChildAToChildFNavigation();
-    public static readonly ISimpleNavigationModel ChildDToChildENavigation = CreateChildDToChildENavigation();
-    public static readonly ISimpleNavigationModel ChildAToRootNavigation = CreateChildAToRootNavigation();
-    public static readonly ISimpleNavigationModel ChildDToChildANavigation = CreateChildDToChildANavigation();
-    public static readonly ISkipNavigationModel RootToManyToManyNavigation = CreateRootToManyToManyNavigation();
-    public static readonly ISkipNavigationModel ManyToManyToRootNavigation = CreateManyToManyToRootNavigation();
-    public static readonly ISimpleNavigationModel ChildGToManyToManyNavigation = CreateChildGToManyToManyNavigation();
+    public static readonly ISimpleAccessibleNavigationModel RootToChildANavigation = CreateRootToChildANavigation();
+    public static readonly ISimpleAccessibleNavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
+    public static readonly ISimpleAccessibleNavigationModel RootToChildCNavigation = CreateRootToChildCNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildAToChildFNavigation = CreateChildAToChildFNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildDToChildENavigation = CreateChildDToChildENavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildAToRootNavigation = CreateChildAToRootNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildDToChildANavigation = CreateChildDToChildANavigation();
+    public static readonly ISkipAccessibleNavigationModel RootToManyToManyNavigation = CreateRootToManyToManyNavigation();
+    public static readonly ISkipAccessibleNavigationModel ManyToManyToRootNavigation = CreateManyToManyToRootNavigation();
+    public static readonly ISimpleAccessibleNavigationModel ChildGToManyToManyNavigation = CreateChildGToManyToManyNavigation();
 
     public const int RootToChildAId = 1;
     public const int RootToChildBId = 2;
@@ -316,12 +317,16 @@ internal static class DeepNavigation
           })));
     }
 
-    private static ISimpleNavigationModel CreateRootToChildANavigation()
+    private static ISimpleAccessibleNavigationModel CreateRootToChildANavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildA));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(RootToChildAId)
         .SetTo(ChildAEntity)
-        .SetName(nameof(Root.ChildA))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -330,12 +335,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildA.RootId))))));
     }
 
-    private static ISimpleNavigationModel CreateRootToChildBNavigation()
+    private static ISimpleAccessibleNavigationModel CreateRootToChildBNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildB));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(RootToChildBId)
         .SetTo(ChildBEntity)
-        .SetName(nameof(Root.ChildB))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -344,12 +353,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildB.RootId))))));
     }
 
-    private static ISimpleNavigationModel CreateRootToChildCNavigation()
+    private static ISimpleAccessibleNavigationModel CreateRootToChildCNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildC));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(RootToChildCId)
         .SetTo(ChildCEntity)
-        .SetName(nameof(Root.ChildC))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -358,12 +371,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildC.RootId))))));
     }
 
-    private static ISimpleNavigationModel CreateChildAToChildDNavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildAToChildDNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildD));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildAToChildDId)
         .SetTo(ChildDEntity)
-        .SetName(nameof(ChildA.ChildD))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -372,12 +389,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildD.ChildAId))))));
     }
 
-    private static ISimpleNavigationModel CreateChildAToChildFNavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildAToChildFNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildF));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildAToChildFId)
         .SetTo(ChildFEntity)
-        .SetName(nameof(ChildA.ChildF))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -386,12 +407,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildF.ChildAId))))));
     }
 
-    private static ISimpleNavigationModel CreateChildDToChildENavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildDToChildENavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildE));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildDToChildEId)
         .SetTo(ChildEEntity)
-        .SetName(nameof(ChildD.ChildE))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -400,12 +425,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildE.ChildDId))))));
     }
 
-    private static ISimpleNavigationModel CreateChildAToRootNavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildAToRootNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.Root));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildAToRootId)
         .SetTo(RootEntity)
-        .SetName(nameof(ChildA.Root))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -414,12 +443,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(Root.Id))))));
     }
 
-    private static ISimpleNavigationModel CreateChildDToChildANavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildDToChildANavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildA));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildDToChildAId)
         .SetTo(ChildAEntity)
-        .SetName(nameof(ChildD.ChildA))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _
@@ -428,12 +461,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ChildA.Id))))));
     }
 
-    private static ISkipNavigationModel CreateRootToManyToManyNavigation()
+    private static ISkipAccessibleNavigationModel CreateRootToManyToManyNavigation()
     {
-      return SkipNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.MTMEntities));
+
+      return SkipAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(RootToManyToManyId)
         .SetTo(ManyToManyEntity)
-        .SetName(nameof(Root.MTMEntities))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
@@ -450,12 +487,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(ManyToMany.Id))))));
     }
 
-    private static ISkipNavigationModel CreateManyToManyToRootNavigation()
+    private static ISkipAccessibleNavigationModel CreateManyToManyToRootNavigation()
     {
-      return SkipNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ManyToMany).GetRequiredProperty(nameof(ManyToMany.Roots));
+
+      return SkipAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ManyToManyToRootId)
         .SetTo(RootEntity)
-        .SetName(nameof(ManyToMany.Roots))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
@@ -472,12 +513,16 @@ internal static class DeepNavigation
               .SetColumnName(nameof(Root.Id))))));
     }
 
-    private static ISimpleNavigationModel CreateChildGToManyToManyNavigation()
+    private static ISimpleAccessibleNavigationModel CreateChildGToManyToManyNavigation()
     {
-      return SimpleNavigationModelBuilder.Build(_ => _
+      PropertyInfo propertyInfo = typeof(ChildG).GetRequiredProperty(nameof(ChildG.MTMEntity));
+
+      return SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetId(ChildGToManyToManyId)
         .SetTo(ManyToManyEntity)
-        .SetName(nameof(ChildG.MTMEntity))
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
             .SetFromProperty(_ => _

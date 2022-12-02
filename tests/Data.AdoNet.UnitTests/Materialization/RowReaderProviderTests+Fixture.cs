@@ -27,24 +27,25 @@ public partial class RowReaderProviderTests
       PropertyInfo namePropertyInfo = typeof(EntityWithConstructor).GetRequiredProperty(nameof(EntityWithConstructor.Name), BindingFlags.Instance | BindingFlags.Public);
 
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetName(nameof(EntityWithConstructor.Id))
         .SetType(typeof(int))
         .SetIndex(0)
         .SetHasMember(true)
         .SetProperty(idPropertyInfo)
-        .SetMember(idPropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(idPropertyInfo)));
 
-      IPropertyModel nameProperty = PropertyModelBuilder.Build(_ => _
-        .SetName(nameof(EntityWithConstructor.Name))
+      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
         .SetType(typeof(string))
         .SetIndex(1)
         .SetHasMember(true)
         .SetProperty(namePropertyInfo)
-        .SetMember(namePropertyInfo));
+        .Setup(mock => mock
+          .Setup(x => x.Member)
+          .Returns(namePropertyInfo)));
 
       IEntityModel entityWithConstructor = EntityModelBuilder.Build(_ => _
         .SetType(typeof(EntityWithConstructor))
-        .SetName(nameof(EntityWithConstructor))
         .SetProperties(idProperty, nameProperty)
         .SetPrimaryKey(_ => _
           .SetIsComposite(false)

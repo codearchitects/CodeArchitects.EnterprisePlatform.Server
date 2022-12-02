@@ -17,4 +17,8 @@ public interface IPrimaryKeyModel
   IReadOnlyList<IPrimaryKeyPropertyModel> Properties { get; }
 
   ConstructorInfo? TupleConstructor { get; } // TODO: This must be the constructor of Tuple, not ValueTuple
+
+  Getter<object?> GetValue { get; }
+
+  Setter<object?> SetValue { get; }
 }

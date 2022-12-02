@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-// TODO: Remove and use real model
 internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>
@@ -14,8 +13,6 @@ internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
   {
     _mock = mock;
   }
-
-  public string Name => _mock.Name;
 
   public string TableName => _mock.TableName;
 
@@ -29,15 +26,20 @@ internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
 
   public IInitializerModel Initializer => _mock.Initializer;
 
+  public IReadOnlyList<IForeignKeyModel> ForeignKeys => _mock.ForeignKeys;
+
   IPrimaryKeyModel<TKey> IEntityModel<TEntity, TKey>.PrimaryKey => new MockPrimaryKeyModel<TKey>(PrimaryKey);
 
-  public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel)
+  public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigationModel)
   {
     foreach (INavigationModel navigation in Navigations)
     {
-      if (navigation.Name == name.ToString())
+      if (navigation is not IAccessibleNavigationModel accessibleNavigation)
+        continue;
+
+      if (accessibleNavigation.Member.Name == name.ToString())
       {
-        navigationModel = navigation;
+        navigationModel = accessibleNavigation;
         return true;
       }
     }

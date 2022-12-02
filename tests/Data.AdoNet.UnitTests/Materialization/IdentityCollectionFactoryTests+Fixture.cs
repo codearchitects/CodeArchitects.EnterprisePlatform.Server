@@ -22,10 +22,10 @@ public partial class IdentityCollectionFactoryTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(Entity))
         .SetPrimaryKey(_ => _
-          .SetType(typeof(int))
-          .SetAccessor(Mock.Of<IAccessor>(MockBehavior.Strict)))).Mocked<Entity, int>();
+          .SetType(typeof(int))))
+        .Mocked<Entity, int>();
 
-      INavigationModel navigation = SimpleNavigationModelBuilder.Build(_ => _
+      INavigationModel navigation = SimpleAccessibleNavigationModelBuilder.Build(_ => _
         .SetCollectionKind(_collectionKind)
         .SetTo(entity));
 

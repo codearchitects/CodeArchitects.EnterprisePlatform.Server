@@ -5,13 +5,13 @@ namespace CodeArchitects.Platform.Data.AdoNet.Sql;
 
 public partial class SqlTextBuilderTests
 {
-  private record NavigationSimpleLeaf(ISimpleNavigationModel Model) : INavigationSimpleLeaf
+  private record NavigationSimpleLeaf(ISimpleAccessibleNavigationModel Model) : INavigationSimpleLeaf
   {
     public IEntityModel Target => Model.To;
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
-    INavigationModel INavigation.Model => Model;
+    IAccessibleNavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
       where TVisitor : INavigationVisitor<TResult>
@@ -31,13 +31,13 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSkipLeaf(ISkipNavigationModel Model) : INavigationSkipLeaf
+  private record NavigationSkipLeaf(ISkipAccessibleNavigationModel Model) : INavigationSkipLeaf
   {
     public IEntityModel Target => Model.To;
 
     public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
-    INavigationModel INavigation.Model => Model;
+    IAccessibleNavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
       where TVisitor : INavigationVisitor<TResult>
@@ -57,11 +57,11 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSimpleNode(ISimpleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
+  private record NavigationSimpleNode(ISimpleAccessibleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
   {
     public IEntityModel Target => Model.To;
 
-    INavigationModel INavigation.Model => Model;
+    IAccessibleNavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
     {
@@ -79,11 +79,13 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSkipNode(ISkipNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSkipNode
+  private record NavigationSkipNode(ISkipAccessibleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSkipNode
   {
     public IEntityModel Target => Model.To;
 
-    INavigationModel INavigation.Model => Model;
+    ISkipAccessibleNavigationModel INavigationSkipNode.Model => Model;
+
+    IAccessibleNavigationModel INavigation.Model => Model;
 
     public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
     {

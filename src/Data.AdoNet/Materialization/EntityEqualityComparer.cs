@@ -33,6 +33,6 @@ internal class EntityEqualityComparer<TEntity, TKey> : IEqualityComparer<TEntity
 
   public static EntityEqualityComparer<TEntity, TKey> GetDefault(IEntityModel<TEntity, TKey> entity)
   {
-    return s_instance ??= new(entity.PrimaryKey.Getter);
+    return s_instance ??= new(entity.PrimaryKey.GetValue);
   }
 }

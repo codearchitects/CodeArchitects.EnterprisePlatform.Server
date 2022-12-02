@@ -106,13 +106,13 @@ internal class CommandBuilder : ICommandBuilder // TODO: Support multiple databa
       INavigationModel navigationModel = property.Navigation;
 
       if (navigationModel.Inverse.Id == context.NavigationModel.Id)
-        return property.PrimaryKeyProperty.Getter(context.Parent);
+        return property.PrimaryKeyProperty.GetValue(context.Parent);
 
-      if (navigationModel.HasMember && navigationModel.Getter(_node) is { } navigation)
-        return property.PrimaryKeyProperty.Getter(navigation);
+      if (navigationModel.HasMember && navigationModel.GetValue(_node) is { } navigation)
+        return property.PrimaryKeyProperty.GetValue(navigation);
 
       if (property.HasMember)
-        return property.Getter(_node);
+        return property.GetValue(_node);
 
       return null;
     }
@@ -129,7 +129,7 @@ internal class CommandBuilder : ICommandBuilder // TODO: Support multiple databa
 
     private object? VisitAccessibleProperty(IAccessiblePropertyModel property)
     {
-      return property.Getter(_node);
+      return property.GetValue(_node);
     }
   }
 }
