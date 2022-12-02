@@ -1,6 +1,8 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
@@ -40,6 +42,9 @@ internal class RowReader : IRowReader
 
     foreach (INavigation navigation in navigations)
     {
+      INavigationModel navigationModel = navigation.Model;
+      EnsureHasMember(navigationModel.HasMember);
+
       object? navigationEntity = hub.ReadRow(reader, ref offset, navigation.Target, navigation.Children);
       if (navigationEntity is null)
         continue;
@@ -47,23 +52,30 @@ internal class RowReader : IRowReader
       if (navigation.Model.IsCollection)
       {
         IIdentityCollection collection;
-        if (navigation.Model.Accessor.Get(entity) is { } property)
+        if (navigationModel.Getter(entity) is { } property)
         {
           collection = (IIdentityCollection)property;
         }
         else
         {
-          collection = hub.CreateCollection(navigation.Model);
-          navigation.Model.Accessor.Set(entity, collection);
+          collection = hub.CreateCollection(navigationModel);
+          navigationModel.Setter(entity, collection);
         }
 
         collection.AddEntity(navigationEntity);
         continue;
       }
 
-      navigation.Model.Accessor.Set(entity, navigationEntity);
+      navigationModel.Setter(entity, navigationEntity);
     }
 
     return entity;
+  }
+
+  [Conditional("DEBUG")]
+  private static void EnsureHasMember([DoesNotReturnIf(false)] bool hasMember)
+  {
+    if (!hasMember)
+      throw new InvalidOperationException("Expected accessible navigation.");
   }
 }

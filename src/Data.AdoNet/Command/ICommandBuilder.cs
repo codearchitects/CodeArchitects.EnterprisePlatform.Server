@@ -1,21 +1,21 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Data.Common;
+using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ICommandBuilder
 {
-  void BuildSelectCommand<TEntity, TKey>(DbCommand command, TKey key, NavigationSpec<TEntity, TKey> spec)
+  void BuildSelectCommand<TEntity, TKey>(IDbCommand command, TKey key, NavigationSpec<TEntity, TKey> spec)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  void BuildInsertCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context);
+  void BuildInsertCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context);
 
-  void BuildUpdateCommand(DbCommand command, object node, IEntityModel model, in NavigationContext context);
+  void BuildUpdateCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context);
 
-  void BuildDeleteCommand<TEntity, TKey>(DbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
+  void BuildDeleteCommand<TEntity, TKey>(IDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 }

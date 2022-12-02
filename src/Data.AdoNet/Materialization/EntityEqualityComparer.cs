@@ -8,11 +8,11 @@ internal class EntityEqualityComparer<TEntity, TKey> : IEqualityComparer<TEntity
 {
   private static EntityEqualityComparer<TEntity, TKey>? s_instance;
 
-  private readonly IAccessor<TKey> _keyAccessor;
+  private readonly Getter<TKey> _keyGetter;
 
-  public EntityEqualityComparer(IAccessor<TKey> keyAccessor)
+  public EntityEqualityComparer(Getter<TKey> keyGetter)
   {
-    _keyAccessor = keyAccessor;
+    _keyGetter = keyGetter;
   }
 
   public bool Equals(TEntity x, TEntity y)
@@ -23,16 +23,16 @@ internal class EntityEqualityComparer<TEntity, TKey> : IEqualityComparer<TEntity
     if (y is null)
       return false;
 
-    return EqualityComparer<TKey>.Default.Equals(_keyAccessor.Get(x), _keyAccessor.Get(y));
+    return EqualityComparer<TKey>.Default.Equals(_keyGetter(x), _keyGetter(y));
   }
 
   public int GetHashCode(TEntity obj)
   {
-    return EqualityComparer<TKey>.Default.GetHashCode(_keyAccessor.Get(obj));
+    return EqualityComparer<TKey>.Default.GetHashCode(_keyGetter(obj));
   }
 
   public static EntityEqualityComparer<TEntity, TKey> GetDefault(IEntityModel<TEntity, TKey> entity)
   {
-    return s_instance ??= new(entity.PrimaryKey.Accessor);
+    return s_instance ??= new(entity.PrimaryKey.Getter);
   }
 }

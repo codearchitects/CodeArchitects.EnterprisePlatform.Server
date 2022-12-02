@@ -49,6 +49,12 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync((connection, cancellationToken) =>
+    {
+      return _executor.ExecuteInsertCommandAsync(connection, entity, model, cancellationToken);
+    }, cancellationToken);
   }
 
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)

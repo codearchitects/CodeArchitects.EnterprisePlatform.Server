@@ -3,7 +3,9 @@
 public interface IPrimaryKeyModel<TKey> : IPrimaryKeyModel
   where TKey : IEquatable<TKey>
 {
-  new IAccessor<TKey> Accessor { get; }
+  Getter<TKey> Getter { get; }
+
+  Setter<TKey> Setter { get; }
 
   object GetKeyComponent(TKey key, int index);
 }

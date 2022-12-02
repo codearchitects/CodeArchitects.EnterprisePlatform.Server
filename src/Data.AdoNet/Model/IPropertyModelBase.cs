@@ -15,8 +15,10 @@ public interface IPropertyModelBase
   
   PropertyInfo? Property { get; }
 
-  [MemberNotNullWhen(true, nameof(Member), nameof(Accessor))]
+  [MemberNotNullWhen(true, nameof(Member), nameof(Getter), nameof(Setter))]
   bool HasMember { get; }
-  
-  IAccessor Accessor { get; }
+
+  Getter<object?>? Getter { get; }
+
+  Setter<object?>? Setter { get; }
 }
