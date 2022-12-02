@@ -1,0 +1,62 @@
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using System.Reflection;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
+
+internal class MockForeignKeyPropertyModel : IForeignKeyPropertyModel
+{
+  private readonly IForeignKeyPropertyModel _mock;
+
+  public MockForeignKeyPropertyModel(IForeignKeyPropertyModel mock)
+  {
+    _mock = mock;
+  }
+
+  public short ForeignKeyIndex => _mock.ForeignKeyIndex;
+
+  public IPrimaryKeyPropertyModel PrimaryKeyProperty => _mock.PrimaryKeyProperty;
+
+  public INavigationModel Navigation => _mock.Navigation;
+
+  public bool IsPrimaryKey => _mock.IsPrimaryKey;
+
+  public bool IsForeignKey => _mock.IsForeignKey;
+
+  public string ColumnName => _mock.ColumnName;
+
+  public short Index => _mock.Index;
+
+  public Type Type => _mock.Type;
+
+  public MemberInfo? Member => _mock.Member;
+
+  public FieldInfo? Field => _mock.Field;
+
+  public PropertyInfo? Property => _mock.Property;
+
+  public bool HasMember => _mock.HasMember;
+
+  public Getter<object?>? GetValue => _mock.GetValue;
+
+  public Setter<object?>? SetValue => _mock.SetValue;
+
+  public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+    where TVisitor : IPropertyModelVisitor<TResult>
+  {
+    return visitor.VisitForeignKey(this);
+  }
+
+  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+    where TVisitor : IPropertyModelVisitor<TResult, TState>
+  {
+    return visitor.VisitForeignKey(this, in state);
+  }
+}
+
+internal static class MockForeignKeyPropertyModelExtensions
+{
+  public static IForeignKeyPropertyModel Mocked(this IForeignKeyPropertyModel mock)
+  {
+    return new MockForeignKeyPropertyModel(mock);
+  }
+}

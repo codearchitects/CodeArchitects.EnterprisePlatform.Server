@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IPropertyModelVisitor<TResult, TState>
+public interface IPropertyModelVisitor<out TResult, TState>
 {
   TResult VisitPrimaryKey(IPrimaryKeyPropertyModel property, in TState state);
   TResult VisitForeignKey(IForeignKeyPropertyModel property, in TState state);

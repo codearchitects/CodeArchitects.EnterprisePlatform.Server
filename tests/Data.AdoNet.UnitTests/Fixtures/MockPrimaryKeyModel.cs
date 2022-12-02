@@ -40,3 +40,11 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
     return key;
   }
 }
+
+internal static class MockPrimaryKeyPropertyModelExtensions
+{
+  public static IPrimaryKeyPropertyModel Mocked(this IPrimaryKeyPropertyModel mock)
+  {
+    return new MockPrimaryKeyPropertyModel(mock);
+  }
+}
