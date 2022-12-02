@@ -131,7 +131,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(Root.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(Root))
@@ -155,7 +155,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildA.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildA))
@@ -180,7 +180,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildB.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildB))
@@ -198,7 +198,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildC.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildC))
@@ -216,7 +216,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildD.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildD))
@@ -240,7 +240,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildE.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildE))
@@ -258,7 +258,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildF.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildF))
@@ -276,7 +276,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ManyToMany.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ManyToMany))
@@ -297,7 +297,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
         .SetColumnName(nameof(ChildG.Id))
-        .SetKeyIndex(0));
+        .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildG))

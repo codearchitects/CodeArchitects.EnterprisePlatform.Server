@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IForeignKeyPropertyModel : IPropertyModel
 {
-  short KeyIndex { get; }
+  short ForeignKeyIndex { get; }
 
   IPrimaryKeyPropertyModel PrimaryKeyProperty { get; }
 

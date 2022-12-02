@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ICommandBuilder
 {
-  void BuildSelectCommand<TEntity, TKey>(IDbCommand command, TKey key, NavigationSpec<TEntity, TKey> spec)
+  void BuildSelectCommand<TEntity, TKey>(IDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 

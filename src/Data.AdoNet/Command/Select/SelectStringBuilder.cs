@@ -124,7 +124,7 @@ internal readonly struct SelectStringBuilder
       stringBuilder.Append('[');
       stringBuilder.Append(property.ColumnName);
       stringBuilder.Append("] = @p");
-      stringBuilder.Append(property.KeyIndex);
+      stringBuilder.Append(property.PrimaryKeyIndex);
     }
   }
 

@@ -7,6 +7,8 @@ public interface IPropertyModel : IPropertyModelBase
 {
   bool IsPrimaryKey { get; }
 
+  bool IsForeignKey { get; }
+
   string ColumnName { get; }
   
   short Index { get; }

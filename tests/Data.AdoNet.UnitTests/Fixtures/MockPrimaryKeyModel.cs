@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
@@ -33,6 +34,9 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
 
   public object GetKeyComponent(TKey key, int index)
   {
-    throw new NotImplementedException();
+    if (key is ITuple tuple)
+      return tuple[index]!;
+
+    return key;
   }
 }
