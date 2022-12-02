@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
+[Experimental]
 public interface IPrimaryKeyModel
 {
   [MemberNotNullWhen(true, nameof(TupleConstructor))]

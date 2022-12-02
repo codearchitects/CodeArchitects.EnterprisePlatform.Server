@@ -5,14 +5,14 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationSimpleLeaf : INavigationSimpleLeaf
 {
-  public NavigationSimpleLeaf(ISimpleNavigationModel model)
+  public NavigationSimpleLeaf(ISimpleAccessibleNavigationModel model)
   {
     Model = model;
   }
 
-  public ISimpleNavigationModel Model { get; }
+  public ISimpleAccessibleNavigationModel Model { get; }
 
-  INavigationModel INavigation.Model => Model;
+  IAccessibleNavigationModel INavigation.Model => Model;
 
   public IEntityModel Target => Model.To;
 

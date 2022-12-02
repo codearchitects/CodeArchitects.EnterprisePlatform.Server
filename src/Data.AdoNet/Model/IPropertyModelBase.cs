@@ -1,12 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
+[Experimental]
 public interface IPropertyModelBase
 {
-  string Name { get; }
-  
   Type Type { get; }
   
   MemberInfo? Member { get; }

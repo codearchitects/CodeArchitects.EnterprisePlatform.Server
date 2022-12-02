@@ -1,5 +1,8 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.CodeAnalysis;
 
+namespace CodeArchitects.Platform.Data.AdoNet.Model;
+
+[Experimental]
 public interface IPrimaryKeyModel<TKey> : IPrimaryKeyModel
   where TKey : IEquatable<TKey>
 {

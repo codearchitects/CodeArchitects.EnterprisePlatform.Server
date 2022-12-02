@@ -1,11 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
+[Experimental]
 public interface IEntityModel
 {
-  string Name { get; }
-
   string TableName { get; }
   
   Type Type { get; }
@@ -14,9 +14,11 @@ public interface IEntityModel
   
   IPrimaryKeyModel PrimaryKey { get; }
 
+  IReadOnlyList<IForeignKeyModel> ForeignKeys { get; }
+
   IReadOnlyList<IPropertyModel> Properties { get; }
   
   IReadOnlyList<INavigationModel> Navigations { get; }
 
-  bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out INavigationModel? navigationModel);
+  bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigationModel);
 }

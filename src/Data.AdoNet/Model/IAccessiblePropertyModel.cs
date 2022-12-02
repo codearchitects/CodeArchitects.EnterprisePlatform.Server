@@ -3,9 +3,6 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public enum CollectionKind
+public interface IAccessiblePropertyModel : IPropertyModel, IAccessiblePropertyModelBase
 {
-  None,
-  List,
-  HashSet
 }

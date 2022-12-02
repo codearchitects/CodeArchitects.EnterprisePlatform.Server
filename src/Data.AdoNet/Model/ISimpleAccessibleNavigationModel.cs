@@ -3,9 +3,6 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public enum CollectionKind
+public interface ISimpleAccessibleNavigationModel : ISimpleNavigationModel, IAccessibleNavigationModel
 {
-  None,
-  List,
-  HashSet
 }

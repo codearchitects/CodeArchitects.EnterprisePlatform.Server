@@ -5,14 +5,14 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationSkipLeaf : INavigationSkipLeaf
 {
-  public NavigationSkipLeaf(ISkipNavigationModel model)
+  public NavigationSkipLeaf(ISkipAccessibleNavigationModel model)
   {
     Model = model;
   }
 
-  public ISkipNavigationModel Model { get; }
+  public ISkipAccessibleNavigationModel Model { get; }
 
-  INavigationModel INavigation.Model => Model;
+  IAccessibleNavigationModel INavigation.Model => Model;
 
   public IEntityModel Target => Model.To;
 

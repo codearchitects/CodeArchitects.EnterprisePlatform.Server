@@ -1,6 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
+﻿namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class VoidResult
+public class VoidResult
 {
   public static readonly VoidResult Instance = new VoidResult();
 

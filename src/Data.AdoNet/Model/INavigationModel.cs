@@ -1,5 +1,8 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.CodeAnalysis;
 
+namespace CodeArchitects.Platform.Data.AdoNet.Model;
+
+[Experimental]
 public interface INavigationModel : IPropertyModelBase
 {
   int Id { get; }
@@ -16,7 +19,11 @@ public interface INavigationModel : IPropertyModelBase
   
   IEntityModel To { get; }
 
+  IPrimaryKeyModel PrimaryKey { get; }
+
   IForeignKeyModel ForeignKey { get; }
+
+  INavigationModel Inverse { get; }
 
   CollectionKind CollectionKind { get; }
 }

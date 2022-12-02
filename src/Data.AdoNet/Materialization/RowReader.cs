@@ -42,8 +42,7 @@ internal class RowReader : IRowReader
 
     foreach (INavigation navigation in navigations)
     {
-      INavigationModel navigationModel = navigation.Model;
-      EnsureHasMember(navigationModel.HasMember);
+      IAccessibleNavigationModel navigationModel = navigation.Model;
 
       object? navigationEntity = hub.ReadRow(reader, ref offset, navigation.Target, navigation.Children);
       if (navigationEntity is null)
@@ -70,12 +69,5 @@ internal class RowReader : IRowReader
     }
 
     return entity;
-  }
-
-  [Conditional("DEBUG")]
-  private static void EnsureHasMember([DoesNotReturnIf(false)] bool hasMember)
-  {
-    if (!hasMember)
-      throw new InvalidOperationException("Expected accessible navigation.");
   }
 }

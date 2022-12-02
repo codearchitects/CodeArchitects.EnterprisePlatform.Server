@@ -5,14 +5,14 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationSimpleNode : IncluderNode, INavigationSimpleNode
 {
-  public NavigationSimpleNode(ISimpleNavigationModel model)
+  public NavigationSimpleNode(ISimpleAccessibleNavigationModel model)
   {
     Model = model;
   }
 
-  public ISimpleNavigationModel Model { get; }
+  public ISimpleAccessibleNavigationModel Model { get; }
 
-  INavigationModel INavigation.Model => Model;
+  IAccessibleNavigationModel INavigation.Model => Model;
 
   public override IEntityModel Target => Model.To;
 

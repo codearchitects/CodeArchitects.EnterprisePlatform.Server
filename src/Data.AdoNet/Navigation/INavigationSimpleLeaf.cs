@@ -4,5 +4,5 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal interface INavigationSimpleLeaf : INavigationLeaf
 {
-  new ISimpleNavigationModel Model { get; }
+  new ISimpleAccessibleNavigationModel Model { get; }
 }

@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 internal interface INavigation : IEquatable<INavigation>
 {
   IEntityModel Target { get; }
-  INavigationModel Model { get; }
+  IAccessibleNavigationModel Model { get; }
   IReadOnlyCollection<INavigation> Children { get; }
 
   TResult Accept<TVisitor, TResult>(in TVisitor visitor)
