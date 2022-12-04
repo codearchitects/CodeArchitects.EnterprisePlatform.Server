@@ -11,4 +11,18 @@ public abstract class ModelConfiguration
   {
 
   }
+
+  protected void Aggregation<TFrom, TTo>(Action<NavigationModelBuilder<TFrom, TTo>> buildAction)
+    where TFrom : class
+    where TTo : class
+  {
+
+  }
+
+  protected void Composition<TFrom, TTo>(Action<NavigationModelBuilder<TFrom, TTo>> buildAction)
+    where TFrom : class
+    where TTo : class
+  {
+
+  }
 }
