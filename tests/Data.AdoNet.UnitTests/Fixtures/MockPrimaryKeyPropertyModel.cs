@@ -3,11 +3,11 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockPrimaryKeyPropertyModel : IPrimaryKeyPropertyModel
+internal class MockPrimaryKeyPropertyModel : IPrimaryKeyColumnModel
 {
-  private readonly IPrimaryKeyPropertyModel _mock;
+  private readonly IPrimaryKeyColumnModel _mock;
 
-  public MockPrimaryKeyPropertyModel(IPrimaryKeyPropertyModel mock)
+  public MockPrimaryKeyPropertyModel(IPrimaryKeyColumnModel mock)
   {
     _mock = mock;
   }
@@ -20,7 +20,7 @@ internal class MockPrimaryKeyPropertyModel : IPrimaryKeyPropertyModel
 
   public bool IsForeignKey => _mock.IsForeignKey;
 
-  public string ColumnName => _mock.ColumnName;
+  public string Name => _mock.Name;
 
   public short Index => _mock.Index;
 
@@ -39,13 +39,13 @@ internal class MockPrimaryKeyPropertyModel : IPrimaryKeyPropertyModel
   public bool HasMember => _mock.HasMember;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IPropertyModelVisitor<TResult>
+    where TVisitor : IColumnModelVisitor<TResult>
   {
     return visitor.VisitPrimaryKey(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IPropertyModelVisitor<TResult, TState>
+    where TVisitor : IColumnModelVisitor<TResult, TState>
   {
     return visitor.VisitPrimaryKey(this, in state);
   }

@@ -3,18 +3,18 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockForeignKeyPropertyModel : IForeignKeyPropertyModel
+internal class MockForeignKeyPropertyModel : IForeignKeyColumnModel
 {
-  private readonly IForeignKeyPropertyModel _mock;
+  private readonly IForeignKeyColumnModel _mock;
 
-  public MockForeignKeyPropertyModel(IForeignKeyPropertyModel mock)
+  public MockForeignKeyPropertyModel(IForeignKeyColumnModel mock)
   {
     _mock = mock;
   }
 
   public short ForeignKeyIndex => _mock.ForeignKeyIndex;
 
-  public IPrimaryKeyPropertyModel PrimaryKeyProperty => _mock.PrimaryKeyProperty;
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
 
   public INavigationModel Navigation => _mock.Navigation;
 
@@ -22,7 +22,7 @@ internal class MockForeignKeyPropertyModel : IForeignKeyPropertyModel
 
   public bool IsForeignKey => _mock.IsForeignKey;
 
-  public string ColumnName => _mock.ColumnName;
+  public string Name => _mock.Name;
 
   public short Index => _mock.Index;
 
@@ -43,13 +43,13 @@ internal class MockForeignKeyPropertyModel : IForeignKeyPropertyModel
   public Setter<object?>? SetValue => _mock.SetValue;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IPropertyModelVisitor<TResult>
+    where TVisitor : IColumnModelVisitor<TResult>
   {
     return visitor.VisitForeignKey(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IPropertyModelVisitor<TResult, TState>
+    where TVisitor : IColumnModelVisitor<TResult, TState>
   {
     return visitor.VisitForeignKey(this, in state);
   }
@@ -57,7 +57,7 @@ internal class MockForeignKeyPropertyModel : IForeignKeyPropertyModel
 
 internal static class MockForeignKeyPropertyModelExtensions
 {
-  public static IForeignKeyPropertyModel Mocked(this IForeignKeyPropertyModel mock)
+  public static IForeignKeyColumnModel Mocked(this IForeignKeyColumnModel mock)
   {
     return new MockForeignKeyPropertyModel(mock);
   }

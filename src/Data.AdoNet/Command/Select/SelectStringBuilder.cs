@@ -89,42 +89,42 @@ internal readonly struct SelectStringBuilder
   public void AppendSelectFrom(IEntityModel entity, IReadOnlyCollection<INavigation> navigations)
   {
     Append("SELECT ");
-    AppendJoin(", ", entity.Properties, AppendTargetColumn);
+    AppendJoin(", ", entity.Columns, AppendTargetColumn);
     Append(", ");
     AppendChildrenColumns(navigations);
     AppendLine();
     AppendLine("FROM (");
     Append("SELECT ");
-    AppendJoin(", ", entity.Properties, AppendColumn);
+    AppendJoin(", ", entity.Columns, AppendColumn);
     AppendLine();
     Append("FROM [");
     Append(entity.TableName);
     AppendLine("]");
     Append("WHERE ");
-    AppendJoin(" AND ", entity.PrimaryKey.Properties, AppendWhereCondition);
+    AppendJoin(" AND ", entity.PrimaryKey.Columns, AppendWhereCondition);
     AppendLine();
     Append(") AS t");
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, IColumnModel column)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append(']');
     }
 
-    static void AppendColumn(SelectStringBuilder stringBuilder, IPropertyModel property)
+    static void AppendColumn(SelectStringBuilder stringBuilder, IColumnModel column)
     {
       stringBuilder.Append('[');
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append(']');
     }
 
-    static void AppendWhereCondition(SelectStringBuilder stringBuilder, IPrimaryKeyPropertyModel property)
+    static void AppendWhereCondition(SelectStringBuilder stringBuilder, IPrimaryKeyColumnModel column)
     {
       stringBuilder.Append('[');
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append("] = @p");
-      stringBuilder.Append(property.PrimaryKeyIndex);
+      stringBuilder.Append(column.PrimaryKeyIndex);
     }
   }
 
@@ -154,25 +154,25 @@ internal readonly struct SelectStringBuilder
     new AppendJoinConditions(this).Visit(navigation);
   }
 
-  public void AppendTargetUnaliasedColumn(in IndexPair state, IPropertyModel property)
+  public void AppendTargetUnaliasedColumn(in IndexPair state, IColumnModel column)
   {
     Append('t');
     Append(state.Index);
     Append(".[");
-    Append(property.ColumnName);
+    Append(column.Name);
     Append('_');
     Append(state.NavigationIndex);
     Append(']');
   }
 
-  public void AppendTargetAliasedColumn(in IndexPair state, IPropertyModel property)
+  public void AppendTargetAliasedColumn(in IndexPair state, IColumnModel column)
   {
     Append('t');
     Append(state.Index);
     Append(".[");
-    Append(property.ColumnName);
+    Append(column.Name);
     Append("] AS [");
-    Append(property.ColumnName);
+    Append(column.Name);
     Append("_");
     Append(state.NavigationIndex);
     Append(']');
@@ -188,13 +188,13 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetUnaliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Columns, AppendTargetUnaliasedColumn);
     Append(", ");
     AppendJoin(", ", index, navigation.Children, AppendChildrenColumns);
 
-    static void AppendTargetUnaliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
+    static void AppendTargetUnaliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IColumnModel column)
     {
-      stringBuilder.AppendTargetUnaliasedColumn(in state, property);
+      stringBuilder.AppendTargetUnaliasedColumn(in state, column);
     }
 
     static void AppendChildrenColumns(SelectStringBuilder stringBuilder, int index, INavigation child)
@@ -207,11 +207,11 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetAliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Columns, AppendTargetAliasedColumn);
 
-    static void AppendTargetAliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
+    static void AppendTargetAliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IColumnModel column)
     {
-      stringBuilder.AppendTargetAliasedColumn(in state, property);
+      stringBuilder.AppendTargetAliasedColumn(in state, column);
     }
   }
 
@@ -219,11 +219,11 @@ internal readonly struct SelectStringBuilder
   {
     IndexPair state = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", state, navigation.Target.Properties, AppendTargetUnliasedColumn);
+    AppendJoin(", ", state, navigation.Target.Columns, AppendTargetUnliasedColumn);
 
-    static void AppendTargetUnliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IPropertyModel property)
+    static void AppendTargetUnliasedColumn(SelectStringBuilder stringBuilder, IndexPair state, IColumnModel column)
     {
-      stringBuilder.AppendTargetUnaliasedColumn(in state, property);
+      stringBuilder.AppendTargetUnaliasedColumn(in state, column);
     }
   }
 }

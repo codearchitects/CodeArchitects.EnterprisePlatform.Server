@@ -74,7 +74,7 @@ internal class RowReaderProvider : IRowReaderProvider
 
     EntityReader entityReader = CreateEntityReader();
 
-    return new RowReader(keyReader, entityReader, entity, entity.PrimaryKey.Properties[0].Index);
+    return new RowReader(keyReader, entityReader, entity, entity.PrimaryKey.Columns[0].Index);
 
     KeyReader CreateSimpleKeyReader()
     {
@@ -93,7 +93,7 @@ internal class RowReaderProvider : IRowReaderProvider
       Expression<KeyReader> keyReaderExpr = Expression.Lambda<KeyReader>(
         body: Expression.New(
           constructor: entity.PrimaryKey.TupleConstructor,
-          arguments: entity.PrimaryKey.Properties.Select(property => MakeGetValueCallExpression(property.Type, property.Index))),
+          arguments: entity.PrimaryKey.Columns.Select(column => MakeGetValueCallExpression(column.Type, column.Index))),
         parameters: new[] { readerParam, offsetParam });
 
       return keyReaderExpr.Compile();
@@ -105,10 +105,10 @@ internal class RowReaderProvider : IRowReaderProvider
         body: Expression.MemberInit(
           newExpression: Expression.New(
             entity.Initializer.Constructor,
-            arguments: entity.Initializer.ConstructorProperties.Select(property => MakeGetValueCallExpression(property.Type, property.Index))),
-          bindings: entity.Initializer.InitializerProperties.Select(property => Expression.Bind(
-            member: property.Member,
-            expression: MakeGetValueCallExpression(property.Type, property.Index)))),
+            arguments: entity.Initializer.ConstructorProperties.Select(column => MakeGetValueCallExpression(column.Type, column.Index))),
+          bindings: entity.Initializer.InitializerProperties.Select(column => Expression.Bind(
+            member: column.Member,
+            expression: MakeGetValueCallExpression(column.Type, column.Index)))),
         parameters: new[] { readerParam, offsetParam });
 
       return readerExpr.Compile();

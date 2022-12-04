@@ -26,7 +26,7 @@ public partial class RowReaderProviderTests
       PropertyInfo idPropertyInfo = typeof(EntityWithConstructor).GetRequiredProperty(nameof(EntityWithConstructor.Id), BindingFlags.Instance | BindingFlags.Public);
       PropertyInfo namePropertyInfo = typeof(EntityWithConstructor).GetRequiredProperty(nameof(EntityWithConstructor.Name), BindingFlags.Instance | BindingFlags.Public);
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetType(typeof(int))
         .SetIndex(0)
         .SetHasMember(true)
@@ -35,7 +35,7 @@ public partial class RowReaderProviderTests
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
 
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetType(typeof(string))
         .SetIndex(1)
         .SetHasMember(true)
@@ -46,11 +46,11 @@ public partial class RowReaderProviderTests
 
       IEntityModel entityWithConstructor = EntityModelBuilder.Build(_ => _
         .SetType(typeof(EntityWithConstructor))
-        .SetProperties(idProperty, nameProperty)
+        .SetColumns(idProperty, nameProperty)
         .SetPrimaryKey(_ => _
           .SetIsComposite(false)
           .SetType(typeof(int))
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .SetNavigations()
         .SetInitializer(_ => _
           .SetConstructor(typeof(EntityWithConstructor).GetRequiredConstructor(BindingFlags.Instance | BindingFlags.Public))

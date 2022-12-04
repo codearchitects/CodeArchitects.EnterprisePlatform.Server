@@ -3,11 +3,11 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IForeignKeyPropertyModel : IPropertyModel
+public interface IForeignKeyColumnModel : IColumnModel
 {
   short ForeignKeyIndex { get; }
 
-  IPrimaryKeyPropertyModel PrimaryKeyProperty { get; }
+  IPrimaryKeyColumnModel PrimaryKeyColumn { get; }
 
   INavigationModel Navigation { get; }
 }

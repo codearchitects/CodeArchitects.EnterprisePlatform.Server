@@ -3,11 +3,11 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyPropertyModel
+internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyColumnModel
 {
-  private readonly IPrimaryAndForeignKeyPropertyModel _mock;
+  private readonly IPrimaryAndForeignKeyColumnModel _mock;
 
-  public MockPrimaryAndForeignKeyPropertyModel(IPrimaryAndForeignKeyPropertyModel mock)
+  public MockPrimaryAndForeignKeyPropertyModel(IPrimaryAndForeignKeyColumnModel mock)
   {
     _mock = mock;
   }
@@ -24,7 +24,7 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyProp
 
   public short ForeignKeyIndex => _mock.ForeignKeyIndex;
 
-  public IPrimaryKeyPropertyModel PrimaryKeyProperty => _mock.PrimaryKeyProperty;
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
 
   public INavigationModel Navigation => _mock.Navigation;
 
@@ -32,7 +32,7 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyProp
 
   public bool IsForeignKey => _mock.IsForeignKey;
 
-  public string ColumnName => _mock.ColumnName;
+  public string Name => _mock.Name;
 
   public short Index => _mock.Index;
 
@@ -45,13 +45,13 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyProp
   public bool HasMember => _mock.HasMember;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IPropertyModelVisitor<TResult>
+    where TVisitor : IColumnModelVisitor<TResult>
   {
     return visitor.VisitPrimaryAndForeignKey(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IPropertyModelVisitor<TResult, TState>
+    where TVisitor : IColumnModelVisitor<TResult, TState>
   {
     return visitor.VisitPrimaryAndForeignKey(this, in state);
   }
@@ -59,7 +59,7 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyProp
 
 internal static class MockPrimaryAndForeignKeyPropertyModelExtensions
 {
-  public static IPrimaryAndForeignKeyPropertyModel Mocked(this IPrimaryAndForeignKeyPropertyModel mock)
+  public static IPrimaryAndForeignKeyColumnModel Mocked(this IPrimaryAndForeignKeyColumnModel mock)
   {
     return new MockPrimaryAndForeignKeyPropertyModel(mock);
   }

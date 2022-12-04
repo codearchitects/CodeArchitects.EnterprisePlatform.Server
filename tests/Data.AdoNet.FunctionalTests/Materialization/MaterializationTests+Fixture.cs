@@ -151,13 +151,13 @@ public partial class MaterializationTests
       PropertyInfo idPropertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.Id));
       PropertyInfo namePropertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.Name));
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(Guid))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
         .Setup(mock => mock
@@ -167,10 +167,10 @@ public partial class MaterializationTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(Parent))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)
+          .SetColumns(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(Guid)))
-        .SetProperties(idProperty, nameProperty)
+        .SetColumns(idProperty, nameProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(Parent).GetRequiredConstructor())
           .SetConstructorProperties()
@@ -185,19 +185,19 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ParentId));
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(namePropertyInfo)));
-      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
         .Setup(mock => mock
@@ -207,13 +207,13 @@ public partial class MaterializationTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildA))
         .SetPrimaryKey(PrimaryKeyModelBuilder.Build(_ => _
-          .SetProperties(idProperty)
+          .SetColumns(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
           .Setup(mock => mock
             .Setup(x => x.GetValue)
             .Returns(idPropertyInfo.GetValue))))
-        .SetProperties(idProperty, nameProperty, parentIdProperty)
+        .SetColumns(idProperty, nameProperty, parentIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildA).GetRequiredConstructor())
           .SetConstructorProperties()
@@ -228,19 +228,19 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId));
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(namePropertyInfo)));
-      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
         .Setup(mock => mock
@@ -250,13 +250,13 @@ public partial class MaterializationTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildB))
         .SetPrimaryKey(PrimaryKeyModelBuilder.Build(_ => _
-          .SetProperties(idProperty)
+          .SetColumns(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
           .Setup(mock => mock
             .Setup(x => x.GetValue)
             .Returns(idPropertyInfo.GetValue))))
-        .SetProperties(idProperty, nameProperty, parentIdProperty)
+        .SetColumns(idProperty, nameProperty, parentIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildB).GetRequiredConstructor())
           .SetConstructorProperties()
@@ -271,19 +271,19 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildC).GetRequiredProperty(nameof(ChildC.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildC).GetRequiredProperty(nameof(ChildC.ParentId));
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(namePropertyInfo)));
-      IOrdinaryPropertyModel parentIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(Guid))
         .Setup(mock => mock
@@ -293,10 +293,10 @@ public partial class MaterializationTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildC))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)
+          .SetColumns(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int)))
-        .SetProperties(idProperty, nameProperty, parentIdProperty)
+        .SetColumns(idProperty, nameProperty, parentIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildC).GetRequiredConstructor())
           .SetConstructorProperties()
@@ -311,19 +311,19 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.Name));
       PropertyInfo childAIdPropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildAId));
 
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(idPropertyInfo)));
-      IOrdinaryPropertyModel nameProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel nameProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(1)
         .SetType(typeof(string))
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(namePropertyInfo)));
-      IOrdinaryPropertyModel childAIdProperty = OrdinaryPropertyModelBuilder.Build(_ => _
+      IOrdinaryColumnModel childAIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
         .SetIndex(2)
         .SetType(typeof(int))
         .Setup(mock => mock
@@ -333,13 +333,13 @@ public partial class MaterializationTests
       IEntityModel entity = EntityModelBuilder.Build(_ => _
         .SetType(typeof(ChildD))
         .SetPrimaryKey(PrimaryKeyModelBuilder.Build(_ => _
-          .SetProperties(idProperty)
+          .SetColumns(idProperty)
           .SetIsComposite(false)
           .SetType(typeof(int))
           .Setup(mock => mock
             .Setup(x => x.GetValue)
             .Returns(idPropertyInfo.GetValue))))
-        .SetProperties(idProperty, nameProperty, childAIdProperty)
+        .SetColumns(idProperty, nameProperty, childAIdProperty)
         .SetInitializer(_ => _
           .SetConstructor(typeof(ChildD).GetRequiredConstructor())
           .SetConstructorProperties(idProperty)

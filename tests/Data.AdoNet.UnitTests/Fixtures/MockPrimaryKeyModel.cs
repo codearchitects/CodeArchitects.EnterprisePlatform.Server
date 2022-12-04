@@ -18,7 +18,7 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
 
   public Type Type => _mock.Type;
 
-  public IReadOnlyList<IPrimaryKeyPropertyModel> Properties => _mock.Properties;
+  public IReadOnlyList<IPrimaryKeyColumnModel> Columns => _mock.Columns;
 
   public ConstructorInfo? TupleConstructor => _mock.TupleConstructor;
 
@@ -41,7 +41,7 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
 
 internal static class MockPrimaryKeyPropertyModelExtensions
 {
-  public static IPrimaryKeyPropertyModel Mocked(this IPrimaryKeyPropertyModel mock)
+  public static IPrimaryKeyColumnModel Mocked(this IPrimaryKeyColumnModel mock)
   {
     return new MockPrimaryKeyPropertyModel(mock);
   }

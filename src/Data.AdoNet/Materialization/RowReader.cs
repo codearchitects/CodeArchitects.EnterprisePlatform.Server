@@ -36,7 +36,7 @@ internal class RowReader : IRowReader
       hub.AddMaterialized(cacheKey, entity);
     }
 
-    offset += _model.Properties.Count;
+    offset += _model.Columns.Count;
 
     foreach (INavigation navigation in navigations)
     {

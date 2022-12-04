@@ -29,11 +29,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSimpleLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
   }
@@ -47,11 +47,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append('_');
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
@@ -67,11 +67,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
   }
@@ -85,11 +85,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
     static void AppendCondition(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
   }

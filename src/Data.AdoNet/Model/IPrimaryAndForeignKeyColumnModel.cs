@@ -3,6 +3,6 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IOrdinaryPropertyModel : IPropertyModel, IAccessiblePropertyModel
+public interface IPrimaryAndForeignKeyColumnModel : IPrimaryKeyColumnModel, IForeignKeyColumnModel
 {
 }

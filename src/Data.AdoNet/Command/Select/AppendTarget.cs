@@ -33,7 +33,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
@@ -56,12 +56,12 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IColumnModel column)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append("] AS [");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append('_');
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
@@ -72,7 +72,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
     _stringBuilder.AppendLine();
@@ -91,30 +91,30 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IColumnModel column)
     {
       stringBuilder.Append('t');
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append(']');
     }
 
     static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
 
     static void AppendJoinCondition(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
   }
@@ -132,7 +132,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine("] AS t");
     _stringBuilder.AppendLine("INNER JOIN (");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Properties, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
@@ -160,12 +160,12 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IPropertyModel property)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IColumnModel column)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append("] AS [");
-      stringBuilder.Append(property.ColumnName);
+      stringBuilder.Append(column.Name);
       stringBuilder.Append('_');
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');
@@ -174,18 +174,18 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
 
     static void AppendJoinCondition(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromProperty.ColumnName);
+      stringBuilder.Append(pair.FromColumn.Name);
       stringBuilder.Append("] = t");
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToProperty.ColumnName);
+      stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append('_');
       stringBuilder.Append(navigation.Model.Id);
       stringBuilder.Append(']');

@@ -129,18 +129,18 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateRootEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(Root.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(Root.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(Root))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(Root.Name))))
+            .SetName(nameof(Root.Name))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
           .Returns(() => new INavigationModel[] {
@@ -153,20 +153,20 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildAEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildA.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildA.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildA))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildA.Name)))
+            .SetName(nameof(ChildA.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildA.RootId))))
+            .SetName(nameof(ChildA.RootId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
           .Returns(() => new[] {
@@ -178,56 +178,56 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildBEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildB.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildB.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildB))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildB.Name)))
+            .SetName(nameof(ChildB.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildB.RootId))))
+            .SetName(nameof(ChildB.RootId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)));
+          .SetColumns(idProperty)));
     }
 
     private static IEntityModel CreateChildCEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildC.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildC.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildC))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildC.Name)))
+            .SetName(nameof(ChildC.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildC.RootId))))
+            .SetName(nameof(ChildC.RootId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)));
+          .SetColumns(idProperty)));
     }
 
     private static IEntityModel CreateChildDEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildD.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildD.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildD))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildD.Name)))
+            .SetName(nameof(ChildD.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildD.ChildAId))))
+            .SetName(nameof(ChildD.ChildAId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
           .Returns(() => new[] {
@@ -238,54 +238,54 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildEEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildE.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildE.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildE))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildE.Name)))
+            .SetName(nameof(ChildE.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildE.ChildDId))))
+            .SetName(nameof(ChildE.ChildDId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)));
+          .SetColumns(idProperty)));
     }
 
     private static IEntityModel CreateChildFEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildF.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildF.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildF))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildF.Name)))
+            .SetName(nameof(ChildF.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildF.ChildAId))))
+            .SetName(nameof(ChildF.ChildAId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty)));
+          .SetColumns(idProperty)));
     }
 
     private static IEntityModel CreateManyToManyEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ManyToMany.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ManyToMany.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ManyToMany))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ManyToMany.Name))))
+            .SetName(nameof(ManyToMany.Name))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
           .Returns(() => new[] {
@@ -295,20 +295,20 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildGEntity()
     {
-      IPrimaryKeyPropertyModel idProperty = PrimaryKeyPropertyModelBuilder.Build(_ => _
-        .SetColumnName(nameof(ChildG.Id))
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+        .SetName(nameof(ChildG.Id))
         .SetPrimaryKeyIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildG))
-        .SetProperties(_ => _
+        .SetColumns(_ => _
           .Add(idProperty)
           .Add(_ => _
-            .SetColumnName(nameof(ChildG.Name)))
+            .SetName(nameof(ChildG.Name)))
           .Add(_ => _
-            .SetColumnName(nameof(ChildG.MTMEntityId))))
+            .SetName(nameof(ChildG.MTMEntityId))))
         .SetPrimaryKey(_ => _
-          .SetProperties(idProperty))
+          .SetColumns(idProperty))
         .Setup(mock => mock
           .Setup(x => x.Navigations)
           .Returns(() => new[]
@@ -329,10 +329,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(Root.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildA.RootId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(Root.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildA.RootId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateRootToChildBNavigation()
@@ -347,10 +347,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(Root.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildB.RootId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(Root.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildB.RootId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateRootToChildCNavigation()
@@ -365,10 +365,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(Root.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildC.RootId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(Root.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildC.RootId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildAToChildDNavigation()
@@ -383,10 +383,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildA.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildD.ChildAId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildA.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildD.ChildAId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildAToChildFNavigation()
@@ -401,10 +401,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildA.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildF.ChildAId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildA.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildF.ChildAId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildDToChildENavigation()
@@ -419,10 +419,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildD.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildE.ChildDId))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildD.Id)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildE.ChildDId))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildAToRootNavigation()
@@ -437,10 +437,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildA.RootId)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(Root.Id))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildA.RootId)))
+            .SetToColumn(_ => _
+              .SetName(nameof(Root.Id))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildDToChildANavigation()
@@ -455,10 +455,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildD.ChildAId)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ChildA.Id))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildD.ChildAId)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ChildA.Id))))));
     }
 
     private static ISkipAccessibleNavigationModel CreateRootToManyToManyNavigation()
@@ -475,16 +475,16 @@ internal static class DeepNavigation
           .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(Root.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName("RootId"))))
+            .SetFromColumn(_ => _
+              .SetName(nameof(Root.Id)))
+            .SetToColumn(_ => _
+              .SetName("RootId"))))
         .SetToKeys(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName("ManyToManyId"))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ManyToMany.Id))))));
+            .SetFromColumn(_ => _
+              .SetName("ManyToManyId"))
+            .SetToColumn(_ => _
+              .SetName(nameof(ManyToMany.Id))))));
     }
 
     private static ISkipAccessibleNavigationModel CreateManyToManyToRootNavigation()
@@ -501,16 +501,16 @@ internal static class DeepNavigation
           .SetTableName("RootManyToMany"))
         .SetFromKeys(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ManyToMany.Id)))
-            .SetToProperty(_ => _
-              .SetColumnName("ManyToManyId"))))
+            .SetFromColumn(_ => _
+              .SetName(nameof(ManyToMany.Id)))
+            .SetToColumn(_ => _
+              .SetName("ManyToManyId"))))
         .SetToKeys(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName("RootId"))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(Root.Id))))));
+            .SetFromColumn(_ => _
+              .SetName("RootId"))
+            .SetToColumn(_ => _
+              .SetName(nameof(Root.Id))))));
     }
 
     private static ISimpleAccessibleNavigationModel CreateChildGToManyToManyNavigation()
@@ -525,10 +525,10 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetKeyPairs(_ => _
           .Add(_ => _
-            .SetFromProperty(_ => _
-              .SetColumnName(nameof(ChildG.MTMEntityId)))
-            .SetToProperty(_ => _
-              .SetColumnName(nameof(ManyToMany.Id))))));
+            .SetFromColumn(_ => _
+              .SetName(nameof(ChildG.MTMEntityId)))
+            .SetToColumn(_ => _
+              .SetName(nameof(ManyToMany.Id))))));
     }
   }
 }

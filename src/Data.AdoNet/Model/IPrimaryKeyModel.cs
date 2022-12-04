@@ -12,7 +12,7 @@ public interface IPrimaryKeyModel
   
   Type Type { get; }
   
-  IReadOnlyList<IPrimaryKeyPropertyModel> Properties { get; }
+  IReadOnlyList<IPrimaryKeyColumnModel> Columns { get; }
 
   ConstructorInfo? TupleConstructor { get; } // TODO: This must be the constructor of Tuple, not ValueTuple
 
