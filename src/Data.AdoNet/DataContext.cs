@@ -39,7 +39,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
   {
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
-    Includer<TEntity, TKey> includer = new(entityModel);
+    RootIncluder<TEntity, TKey> includer = new(entityModel);
     includeAction(includer);
 
     return FindAsyncCore(key, includer.Spec, cancellationToken);

@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class ThenIncluder<TEntity> : IncluderBase<TEntity>
+internal class ThenIncluder<TEntity> : Includer<TEntity>
   where TEntity : class
 {
   private readonly IncluderNode _node;
