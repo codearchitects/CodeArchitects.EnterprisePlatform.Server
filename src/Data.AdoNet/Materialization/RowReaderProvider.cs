@@ -155,7 +155,7 @@ internal class RowReaderProvider : IRowReaderProvider
   [Conditional("DEBUG")]
   private static void EnsureCanReadSupportedTypes(IReadOnlyDictionary<Type, MethodInfo> getValueMethods)
   {
-    foreach (Type type in Configuration.SupportedColumnTypes)
+    foreach (Type type in ModelConfiguration.s_supportedColumnTypes)
     {
       Debug.Assert(getValueMethods.ContainsKey(type), $"Cannot read supported type '{type.Name}'.");
     }

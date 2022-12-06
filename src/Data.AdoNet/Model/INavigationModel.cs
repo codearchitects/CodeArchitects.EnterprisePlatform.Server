@@ -9,7 +9,7 @@ public interface INavigationModel : IMemberModelBase
 
   int Index { get; }
 
-  bool IsAggregation { get; }
+  AssociationKind AssociationKind { get; }
 
   bool IsOnDependent { get; }
 

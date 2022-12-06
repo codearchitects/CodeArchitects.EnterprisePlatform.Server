@@ -94,7 +94,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
         .Append(column.Name)
         .Append("] = ");
       
-      if (column is IForeignKeyColumnModel { HasMember: false, Navigation: { IsAggregation: true, HasMember: false } })
+      if (column is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.Aggregation, HasMember: false } })
       {
         stringBuilder
           .Append("COALESCE(@p")

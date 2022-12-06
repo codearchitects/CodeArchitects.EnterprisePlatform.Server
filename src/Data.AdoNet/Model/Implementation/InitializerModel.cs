@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Reflection;
+using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
@@ -29,10 +30,10 @@ internal class InitializerModel : IInitializerModel
     foreach (ParameterInfo parameter in constructor.GetParameters())
     {
       if (parameter.Name is null)
-        throw new ModelConstructionException($"Found nameless constructor parameter in type '{type.Name}'.");
+        throw new ModelConfigurationException($"Found nameless constructor parameter in type '{type.Name}'.");
 
       IAccessibleColumnModel column = columns.SingleOrDefault(col => col.Member.Name.MatchesCamelCaseConvention(parameter.Name))
-        ?? throw new ModelConstructionException($"Could not resolve a member of type '{type.Name}' corresponding to parameter named '{parameter.Name}' by convention.");
+        ?? throw new ModelConfigurationException($"Could not resolve a member of type '{type.Name}' corresponding to parameter named '{parameter.Name}' by convention.");
 
       constructorProperties.Add(column);
     }

@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal enum AssociationKind
+internal enum AssociationMultiplicity
 {
   OneToOne,
   OneToMany,

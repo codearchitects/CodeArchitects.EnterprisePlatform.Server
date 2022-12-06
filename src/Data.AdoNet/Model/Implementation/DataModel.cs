@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
+using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
@@ -40,5 +42,17 @@ internal class DataModel : IDataModel
 
     entity = (IEntityModel<TEntity, TKey>)untypedEntity;
     return true;
+  }
+
+  public static DataModel Create(IReadOnlyCollection<EntityModelBuilder> entityBuilders, IReadOnlyCollection<Association> associations)
+  {
+    DataModel model = new();
+
+    foreach (EntityModelBuilder entityBuilder in entityBuilders)
+    {
+      IEntityModel entity = entityBuilder.Build(associations.Where(association => association.To == entityBuilder.EntityType));
+
+      model.AddEntity(entity);
+    }
   }
 }

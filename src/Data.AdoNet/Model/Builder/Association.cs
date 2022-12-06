@@ -1,10 +1,13 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+﻿using System.Reflection;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal abstract record Association(
+  AssociationKind Kind,
   Type From,
   Type To,
-  string NavigationName,
-  string? InverseNavigationName)
+  MemberInfo? Navigation,
+  MemberInfo? InverseNavigation)
 {
-  public abstract AssociationKind Kind { get; }
+  public abstract AssociationMultiplicity Multiplicity { get; }
 }

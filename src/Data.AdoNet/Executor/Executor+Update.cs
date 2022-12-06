@@ -16,7 +16,7 @@ internal partial class Executor
       (Executor self, DbCommand command) = state;
       (object parent, INavigationModel navigationModel) = context;
 
-      if (!navigationModel.IsOnDependent && navigationModel.IsAggregation)
+      if (!navigationModel.IsOnDependent && navigationModel.AssociationKind is AssociationKind.Aggregation)
       {
         switch (self._trackingContext.GetTrackingState(node))
         {

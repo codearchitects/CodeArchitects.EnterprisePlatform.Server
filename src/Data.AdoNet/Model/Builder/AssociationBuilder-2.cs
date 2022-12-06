@@ -1,31 +1,36 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal class AssociationBuilder<TFrom, TTo> : AssociationBuilder, IAssociationBuilder<TFrom, TTo>
+internal class AssociationBuilder<TFrom, TTo> : AssociationBuilder, IAggregationBuilder<TFrom, TTo>, ICompositionBuilder<TFrom, TTo>
   where TFrom : class
   where TTo : class
 {
   private AssociationBuilder? _builder;
 
-  public override Association Build()
+  public override Association Build(AssociationKind kind)
   {
-    if (_builder is null)
-      throw new InvalidOperationException("");
-
-    return _builder.Build();
+    return _builder is not null
+      ? _builder.Build(kind)
+      : throw new ModelConfigurationException($"The multiplicity of the relationship '{typeof(TFrom).Name}' -> '{typeof(TTo).Name}' was not specified.");
   }
 
-  public IAssociationBuilderOTO<TFrom, TTo> OneToOne()
+  public IOTOAssociationBuilder<TFrom, TTo> OneToOne()
   {
-    throw new NotImplementedException();
+    OTOAssociationBuilder<TFrom, TTo> builder = new();
+    _builder = builder;
+    return builder;
   }
 
-  public IAssociationBuilderOTM<TFrom, TTo> OneToMany()
+  public IOTMAssociationBuilder<TFrom, TTo> OneToMany()
   {
-    throw new NotImplementedException();
+    OTMAssociationBuilder<TFrom, TTo> builder = new();
+    _builder = builder;
+    return builder;
   }
 
-  public IAssociationBuilderMTM<TFrom, TTo> ManyToMany()
+  public IMTMAssociationBuilder<TFrom, TTo> ManyToMany()
   {
-    throw new NotImplementedException();
+    MTMAssociationBuilder<TFrom, TTo> builder = new();
+    _builder = builder;
+    return builder;
   }
 }

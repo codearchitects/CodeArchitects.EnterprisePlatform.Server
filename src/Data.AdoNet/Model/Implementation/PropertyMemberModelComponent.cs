@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
@@ -23,7 +24,7 @@ internal class PropertyMemberModelComponent : AccessibleMemberModelComponent
   public static Getter<object?> BuildGetAccessor(PropertyInfo property)
   {
     if (property.GetMethod is null)
-      throw new ModelConstructionException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a getter.");
+      throw new ModelConfigurationException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a getter.");
 
     return (Getter<object?>)Delegate.CreateDelegate(typeof(Getter<object?>), property.GetMethod);
   }
@@ -34,7 +35,7 @@ internal class PropertyMemberModelComponent : AccessibleMemberModelComponent
       return (Setter<object?>)Delegate.CreateDelegate(typeof(Setter<object?>), property.SetMethod);
 
     if (!property.TryGetBackingFieldByConvention(out FieldInfo? backingField))
-      throw new ModelConstructionException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a setter or a backing field resolvable by convention.");
+      throw new ModelConfigurationException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a setter or a backing field resolvable by convention.");
 
     return FieldMemberModelComponent.BuildSetAccessor(backingField, property.Name);
   }
