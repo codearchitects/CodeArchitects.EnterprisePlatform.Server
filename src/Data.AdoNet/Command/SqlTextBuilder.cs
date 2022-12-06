@@ -74,7 +74,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
       .Append("UPDATE [")
       .Append(entity.TableName)
       .Append("] SET ")
-      .AppendJoin(", ", properties, AppendColumnUpdate)
+      .AppendJoin(", ", properties, static (stringBuilder, column) => AppendColumnUpdate(stringBuilder, column))
       .Append(" WHERE ")
       .AppendJoin(" AND ", entity.PrimaryKey.Columns, static (stringBuilder, column) => stringBuilder
         .Append('[')

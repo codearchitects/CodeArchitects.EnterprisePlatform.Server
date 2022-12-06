@@ -5,7 +5,7 @@ using System.Reflection;
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IPropertyModelBase
+public interface IMemberModelBase
 {
   Type Type { get; }
   

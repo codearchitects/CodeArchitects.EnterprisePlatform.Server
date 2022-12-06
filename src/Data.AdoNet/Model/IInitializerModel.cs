@@ -8,7 +8,7 @@ public interface IInitializerModel
 {
   ConstructorInfo Constructor { get; }
   
-  IReadOnlyList<IAccessibleColumnModel> ConstructorProperties { get; }
+  IReadOnlyCollection<IAccessibleColumnModel> ConstructorProperties { get; }
   
-  IReadOnlyList<IAccessibleColumnModel> InitializerProperties { get; }
+  IReadOnlyCollection<IAccessibleColumnModel> InitializerProperties { get; }
 }

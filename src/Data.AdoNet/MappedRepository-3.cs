@@ -1,7 +1,9 @@
-﻿using System.Data;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
+[Experimental]
 public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEntity, TKey>
   where TTable : class
   where TEntity : class

@@ -7,12 +7,10 @@ namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
 internal partial class Executor
 {
-  public async Task ExecuteUpdateCommandAsync<TEntity, TKey>(DbConnection connection, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  public async Task ExecuteUpdateCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    using DbCommand command = connection.CreateCommand();
-
     AsyncVisitNodeCallback<VisitGraphState> callback = static async delegate (object node, IEntityModel model, NavigationContext context, VisitGraphState state, CancellationToken cancellationToken)
     {
       (Executor self, DbCommand command) = state;

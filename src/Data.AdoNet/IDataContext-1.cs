@@ -7,5 +7,5 @@ public interface IDataContext<TDbConnection> : IDataContext
 {
   new TDbConnection Connection { get; }
 
-  Task BatchExecuteAsync(Execution<TDbConnection> execution, CancellationToken cancellationToken = default);
+  Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, CancellationToken cancellationToken = default);
 }

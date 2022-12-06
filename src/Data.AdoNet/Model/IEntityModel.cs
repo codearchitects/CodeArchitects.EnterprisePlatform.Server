@@ -18,9 +18,9 @@ public interface IEntityModel
 
   IReadOnlyList<IForeignKeyModel> ForeignKeys { get; }
 
-  IReadOnlyList<IColumnModel> Columns { get; }
+  IReadOnlyCollection<IColumnModel> Columns { get; }
   
-  IReadOnlyList<INavigationModel> Navigations { get; }
+  IReadOnlyCollection<INavigationModel> Navigations { get; }
 
   bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation);
 }

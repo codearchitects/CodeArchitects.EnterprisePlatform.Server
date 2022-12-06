@@ -4,7 +4,7 @@ using System.Reflection;
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IAccessiblePropertyModelBase : IPropertyModelBase
+public interface IAccessibleMemberModelBase : IMemberModelBase
 {
   new MemberInfo Member { get; }
 

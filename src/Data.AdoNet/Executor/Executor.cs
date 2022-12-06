@@ -34,8 +34,11 @@ internal partial class Executor : IExecutor
       if (navigationModel.IsCollection)
       {
         IEnumerable collection = (IEnumerable)child;
-        foreach (object element in collection)
+        foreach (object? element in collection)
         {
+          if (element is null)
+            continue;
+
           bool continueTracking = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
           if (!continueTracking)
             continue;
@@ -68,8 +71,11 @@ internal partial class Executor : IExecutor
       if (navigationModel.IsCollection)
       {
         IEnumerable collection = (IEnumerable)child;
-        foreach (object element in collection)
+        foreach (object? element in collection)
         {
+          if (element is null)
+            continue;
+
           bool continueTracking = await callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
           if (!continueTracking)
             continue;

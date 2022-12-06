@@ -11,9 +11,9 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 {
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor _executor;
-  private readonly IPersistenceModel _model;
+  private readonly IDataModel _model;
 
-  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IPersistenceModel model)
+  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
@@ -51,9 +51,11 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
   {
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
-    return _stateManager.ExecuteAsync((connection, cancellationToken) =>
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      return _executor.ExecuteInsertCommandAsync(connection, entity, model, cancellationToken);
+      using DbCommand command = connection.CreateCommand();
+      command.Transaction = transaction;
+      await _executor.ExecuteInsertCommandAsync(command, entity, model, cancellationToken);
     }, cancellationToken);
   }
 
@@ -78,12 +80,12 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     throw new NotImplementedException();
   }
 
-  public Task BatchExecuteAsync(Execution<TDbConnection> execution, CancellationToken cancellationToken = default)
+  public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, CancellationToken cancellationToken = default)
   {
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
-  public Task BatchExecuteAsync(Execution<IDbConnection> execution, CancellationToken cancellationToken = default)
+  public Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, CancellationToken cancellationToken = default)
   {
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
@@ -110,13 +112,15 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    DbCommand command = Connection.CreateCommand();
     await Connection.OpenAsync(cancellationToken);
     try
     {
-      return await _executor.ExecuteSelectCommandAsync(Connection, key, spec, cancellationToken);
+      return await _executor.ExecuteSelectCommandAsync(command, key, spec, cancellationToken);
     }
     finally
     {
+      command.Dispose();
       Connection.Close();
     }
   }
@@ -125,7 +129,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (!_model.TryGetEntity(out IEntityModel<TEntity, TKey> entityModel))
+    if (!_model.TryGetEntity(out IEntityModel<TEntity, TKey>? entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;
@@ -133,7 +137,7 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
   private IEntityModel EnsureEntity<TEntity>()
   {
-    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel entityModel))
+    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel? entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;

@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface INavigationModel : IPropertyModelBase
+public interface INavigationModel : IMemberModelBase
 {
   int Id { get; }
 

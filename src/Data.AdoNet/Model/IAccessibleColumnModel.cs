@@ -3,6 +3,6 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IAccessibleColumnModel : IColumnModel, IAccessiblePropertyModelBase
+public interface IAccessibleColumnModel : IColumnModel, IAccessibleMemberModelBase
 {
 }

@@ -1,0 +1,49 @@
+﻿using System.Reflection;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+
+internal class PropertyMemberModelComponent : AccessibleMemberModelComponent
+{
+  public PropertyMemberModelComponent(PropertyInfo property, Getter<object?> getValue, Setter<object?> setValue)
+    : base(getValue, setValue)
+  {
+    Property = property;
+  }
+
+  public new PropertyInfo Property { get; }
+
+  public override MemberInfo Member => Property;
+
+  protected override Type TypeCore => Property.PropertyType;
+
+  protected override FieldInfo? FieldCore => null;
+
+  protected override PropertyInfo? PropertyCore => Property;
+
+  public static Getter<object?> BuildGetAccessor(PropertyInfo property)
+  {
+    if (property.GetMethod is null)
+      throw new ModelConstructionException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a getter.");
+
+    return (Getter<object?>)Delegate.CreateDelegate(typeof(Getter<object?>), property.GetMethod);
+  }
+
+  public static Setter<object?> BuildSetAccessor(PropertyInfo property)
+  {
+    if (property.SetMethod is not null)
+      return (Setter<object?>)Delegate.CreateDelegate(typeof(Setter<object?>), property.SetMethod);
+
+    if (!property.TryGetBackingFieldByConvention(out FieldInfo? backingField))
+      throw new ModelConstructionException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a setter or a backing field resolvable by convention.");
+
+    return FieldMemberModelComponent.BuildSetAccessor(backingField, property.Name);
+  }
+
+  public static PropertyMemberModelComponent Create(PropertyInfo property)
+  {
+    Getter<object?> getValue = BuildGetAccessor(property);
+    Setter<object?> setValue = BuildSetAccessor(property);
+
+    return new PropertyMemberModelComponent(property, getValue, setValue);
+  }
+}

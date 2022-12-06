@@ -31,7 +31,7 @@ public interface IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task BatchExecuteAsync(Execution<IDbConnection> execution, CancellationToken cancellationToken = default);
+  Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, CancellationToken cancellationToken = default);
 
   void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
     where TEntity : class;

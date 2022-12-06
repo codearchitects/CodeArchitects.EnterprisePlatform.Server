@@ -6,20 +6,20 @@ public abstract class ModelConfiguration
 {
   protected abstract void Configure();
 
-  protected void Entity<TEntity>(Action<EntityModelBuilder<TEntity>> buildAction)
+  protected void Entity<TEntity>(Action<IEntityModelBuilder<TEntity>> buildAction)
     where TEntity : class
   {
 
   }
 
-  protected void Aggregation<TFrom, TTo>(Action<NavigationModelBuilder<TFrom, TTo>> buildAction)
+  protected void Aggregation<TFrom, TTo>(Action<IAssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
 
   }
 
-  protected void Composition<TFrom, TTo>(Action<NavigationModelBuilder<TFrom, TTo>> buildAction)
+  protected void Composition<TFrom, TTo>(Action<IAssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {

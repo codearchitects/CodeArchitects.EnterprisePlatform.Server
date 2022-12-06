@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -39,6 +40,8 @@ internal class RowReaderProvider : IRowReaderProvider
       [typeof(int?)]      = GetGetNullableValueMethod("Int32"),
       [typeof(long?)]     = GetGetNullableValueMethod("Int64")
     };
+
+    EnsureCanReadSupportedTypes(s_getValueMethods);
 
     static MethodInfo GetGetValueMethod(string name) => typeof(IDataRecord).GetRequiredMethod(
       name: $"Get{name}",
@@ -137,7 +140,7 @@ internal class RowReaderProvider : IRowReaderProvider
       if (type.IsEnum)
         return GetReadMethod(type.GetEnumUnderlyingType());
 
-      if (s_getValueMethods.TryGetValue(type, out MethodInfo method))
+      if (s_getValueMethods.TryGetValue(type, out MethodInfo? method))
         return method;
 
       throw new NotSupportedException($"Property type '{type.Name}' is not supported.");
@@ -147,5 +150,14 @@ internal class RowReaderProvider : IRowReaderProvider
   public static RowReaderProvider Create()
   {
     return new(new ConcurrentDictionary<IEntityModel, RowReader>());
+  }
+
+  [Conditional("DEBUG")]
+  private static void EnsureCanReadSupportedTypes(IReadOnlyDictionary<Type, MethodInfo> getValueMethods)
+  {
+    foreach (Type type in Configuration.SupportedColumnTypes)
+    {
+      Debug.Assert(getValueMethods.ContainsKey(type), $"Cannot read supported type '{type.Name}'.");
+    }
   }
 }

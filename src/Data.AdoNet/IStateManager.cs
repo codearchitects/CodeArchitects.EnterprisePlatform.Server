@@ -7,5 +7,5 @@ internal interface IStateManager<TDbConnection> : IStateManager
 {
   TDbConnection Connection { get; }
 
-  void AddExecution(Execution<TDbConnection> execution);
+  void AddExecution(Execution<TDbConnection, DbTransaction> execution);
 }

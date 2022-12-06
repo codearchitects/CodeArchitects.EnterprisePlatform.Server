@@ -6,19 +6,19 @@ namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
 internal interface IExecutor
 {
-  Task<TEntity?> ExecuteSelectCommandAsync<TEntity, TKey>(DbConnection connection, TKey key, in NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+  Task<TEntity?> ExecuteSelectCommandAsync<TEntity, TKey>(DbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
   
-  Task ExecuteInsertCommandAsync<TEntity, TKey>(DbConnection connection, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteInsertCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteUpdateCommandAsync<TEntity, TKey>(DbConnection connection, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteUpdateCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbConnection connection, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbCommand command, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 

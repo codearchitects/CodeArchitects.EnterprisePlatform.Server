@@ -1,4 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.Reflection;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Reflection;
 
@@ -111,5 +113,28 @@ internal static class ReflectionExtensions
         ? ConstructorInfo.TypeConstructorName
         : ConstructorInfo.ConstructorName;
     }
+  }
+
+  public static bool TryGetBackingFieldByConvention(this PropertyInfo property, [NotNullWhen(true)] out FieldInfo? backingField)
+  {
+    Type type = property.DeclaringType!;
+    string propertyName = property.Name;
+
+    foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+    {
+      string fieldName = field.Name;
+      if (
+        propertyName.MatchesAutoGenConvention(fieldName)          ||
+        propertyName.MatchesCamelCaseConvention(fieldName)        ||
+        propertyName.MatchesUnderscorePrefixConvention(fieldName) ||
+        propertyName.MatchesMemberPrefixConvention(fieldName))
+      {
+        backingField = field;
+        return true;
+      }
+    }
+
+    backingField = null;
+    return false;
   }
 }

@@ -3,24 +3,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class EntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
-  where TEntity : class
-  where TKey : IEquatable<TKey>
+internal abstract class EntityModel : IEntityModel
 {
   private string? _tableName;
   private readonly List<INavigationModel> _navigations;
   private readonly List<IForeignKeyModel> _foreignKeys;
 
-  public EntityModel(IInitializerModel initializer, IPrimaryKeyModel<TKey> primaryKey, IReadOnlyList<IColumnModel> columns)
+  public EntityModel(IInitializerModel initializer, IReadOnlyList<IColumnModel> columns)
   {
     Initializer = initializer;
-    PrimaryKey = primaryKey;
     Columns = columns;
     _navigations = new();
     _foreignKeys = new();
   }
-
-  public IPrimaryKeyModel<TKey> PrimaryKey { get; }
 
   [AllowNull]
   public string TableName
@@ -29,7 +24,7 @@ internal class EntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
     set => _tableName = value;
   }
 
-  public Type Type => typeof(TEntity);
+  public abstract Type Type { get; }
 
   public IInitializerModel Initializer { get; }
 
@@ -37,11 +32,13 @@ internal class EntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
 
   public IReadOnlyList<IForeignKeyModel> ForeignKeys => _foreignKeys;
 
-  public IReadOnlyList<IColumnModel> Columns { get; }
+  public IReadOnlyCollection<IColumnModel> Columns { get; }
 
-  public IReadOnlyList<INavigationModel> Navigations => _navigations;
+  public IReadOnlyCollection<INavigationModel> Navigations => _navigations;
 
-  IPrimaryKeyModel IEntityModel.PrimaryKey => PrimaryKey;
+  public IPrimaryKeyModel PrimaryKey => PrimaryKeyCore;
+
+  protected abstract IPrimaryKeyModel PrimaryKeyCore { get; }
 
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigationModel)
   {
@@ -61,5 +58,13 @@ internal class EntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
 
     navigationModel = null;
     return false;
+  }
+
+  public static EntityModel Create(Type entityType, IInitializerModel initializer, IReadOnlyList<IColumnModel> columns, IPrimaryKeyModel primaryKey)
+  {
+    Debug.Assert(typeof(IPrimaryKeyModel<>).MakeGenericType(primaryKey.Type).IsAssignableFrom(primaryKey.GetType()), $"Wrongly typed {nameof(IPrimaryKeyModel)} supplied.");
+
+    Type entityModelType = typeof(EntityModel<,>).MakeGenericType(entityType, primaryKey.Type);
+    return (EntityModel)Activator.CreateInstance(entityModelType, new object[] { initializer, columns, primaryKey })!;
   }
 }

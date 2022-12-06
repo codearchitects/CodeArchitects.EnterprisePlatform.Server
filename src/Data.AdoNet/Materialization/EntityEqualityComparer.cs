@@ -15,7 +15,7 @@ internal class EntityEqualityComparer<TEntity, TKey> : IEqualityComparer<TEntity
     _keyGetter = keyGetter;
   }
 
-  public bool Equals(TEntity x, TEntity y)
+  public bool Equals(TEntity? x, TEntity? y)
   {
     if (x is null)
       return y is null;

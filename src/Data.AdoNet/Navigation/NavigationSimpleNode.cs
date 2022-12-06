@@ -28,9 +28,9 @@ internal class NavigationSimpleNode : IncluderNode, INavigationSimpleNode
     return visitor.VisitSimpleNode(this, in state);
   }
 
-  public bool Equals(INavigation other)
+  public bool Equals(INavigation? other)
   {
-    return new EqualityVisitor(this).Visit(other);
+    return other is not null && new EqualityVisitor(this).Visit(other);
   }
 
   private readonly struct EqualityVisitor : INavigationVisitor<bool>

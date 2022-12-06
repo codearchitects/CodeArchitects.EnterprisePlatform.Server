@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CodeArchitects.Platform.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
+[Experimental]
 public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEntity, TKey>
   where TTable : class
   where TEntity : class

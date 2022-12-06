@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal interface IEntityModelBuilder<TEntity>
+public interface IEntityModelBuilder<TEntity>
   where TEntity : class
 {
   IEntityModelBuilder<TEntity> WithKey(params string[] keyNames);

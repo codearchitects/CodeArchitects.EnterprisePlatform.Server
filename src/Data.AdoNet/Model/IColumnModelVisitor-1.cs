@@ -7,6 +7,6 @@ public interface IColumnModelVisitor<out TResult>
 {
   TResult VisitForeignKey(IForeignKeyColumnModel column);
   TResult VisitOrdinary(IOrdinaryColumnModel column);
-  TResult VisitPrimaryKey(IPrimaryKeyColumnModel column);
   TResult VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel column);
+  TResult VisitPrimaryKey(IPrimaryKeyColumnModel column);
 }
