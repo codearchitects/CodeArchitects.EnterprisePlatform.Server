@@ -8,9 +8,9 @@ public interface IDataModel
 {
   IReadOnlyCollection<IEntityModel> Entities { get; }
 
-  bool TryGetEntity(Type entityType, [NotNullWhen(true)] out IEntityModel? entity);
+  bool TryGetEntity(string entityName, [NotNullWhen(true)] out IEntityModel? entity);
 
-  bool TryGetEntity<TEntity, TKey>([NotNullWhen(true)] out IEntityModel<TEntity, TKey>? entity)
+  bool TryGetEntity<TEntity, TKey>(string entityName, [NotNullWhen(true)] out IEntityModel<TEntity, TKey>? entity)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 }

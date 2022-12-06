@@ -1,5 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal class AssociationBuilder
+internal abstract class AssociationBuilder
 {
+  public abstract Association Build();
 }

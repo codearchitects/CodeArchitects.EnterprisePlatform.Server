@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public interface IDataContext<TDbConnection> : IDataContext
+public interface IAdoNetContext<TDbConnection> : IAdoNetContext
   where TDbConnection : DbConnection
 {
   new TDbConnection Connection { get; }

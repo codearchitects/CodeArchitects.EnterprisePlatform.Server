@@ -11,6 +11,8 @@ internal class JoinTableModel : IEntityModel
 
   public string TableName { get; }
 
+  public string Name => TableName;
+
   public Type Type => typeof(Dictionary<string, object>);
 
   public IInitializerModel Initializer => throw new NotImplementedException();
@@ -19,7 +21,7 @@ internal class JoinTableModel : IEntityModel
 
   public IPrimaryKeyModel PrimaryKey => throw new NotImplementedException();
 
-  public IReadOnlyList<IForeignKeyModel> ForeignKeys => throw new NotImplementedException();
+  public IReadOnlyCollection<IForeignKeyModel> ForeignKeys => throw new NotImplementedException();
 
   public IReadOnlyCollection<IColumnModel> Columns => throw new NotImplementedException();
 

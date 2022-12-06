@@ -6,7 +6,7 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
+internal class DataContext<TDbConnection> : IAdoNetContext<TDbConnection>
   where TDbConnection : DbConnection
 {
   private readonly IStateManager<TDbConnection> _stateManager;
@@ -22,22 +22,22 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
   public TDbConnection Connection => _stateManager.Connection;
 
-  IDbConnection IDataContext.Connection => _stateManager.Connection;
+  IDbConnection IAdoNetContext.Connection => _stateManager.Connection;
 
-  public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+  public Task<TEntity?> FindAsync<TEntity, TKey>(string entityName, TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>(entityName);
 
     return FindAsyncCore(key, NavigationSpec.FromEntity(entityModel), cancellationToken);
   }
 
-  public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
+  public Task<TEntity?> FindAsync<TEntity, TKey>(string entityName, TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>(entityName);
 
     RootIncluder<TEntity, TKey> includer = new(entityModel);
     includeAction(includer);
@@ -45,11 +45,11 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     return FindAsyncCore(key, includer.Spec, cancellationToken);
   }
 
-  public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public Task InsertAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>(entityName);
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
@@ -59,21 +59,21 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     }, cancellationToken);
   }
 
-  public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public Task UpdateAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     throw new NotImplementedException();
   }
 
-  public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public Task RemoveAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     throw new NotImplementedException();
   }
 
-  public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+  public Task RemoveAsync<TEntity, TKey>(string entityName, TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
@@ -90,10 +90,28 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     return _stateManager.ExecuteAsync(execution, cancellationToken);
   }
 
+  public void VisitGraph<TEntity, TState>(string entityName, TEntity entity, TState state, VisitNodeCallback<TState> callback)
+    where TEntity : class
+  {
+    IEntityModel model = EnsureEntity<TEntity>(entityName);
+
+    callback(entity, model, default, state);
+    _executor.VisitGraph(entity, model, state, callback);
+  }
+
+  public async Task VisitGraphAsync<TEntity, TState>(string entityName, TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+    where TEntity : class
+  {
+    IEntityModel model = EnsureEntity<TEntity>(entityName);
+
+    await callback(entity, model, default, state, cancellationToken);
+    await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  }
+
   public void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
     where TEntity : class
   {
-    IEntityModel model = EnsureEntity<TEntity>();
+    IEntityModel model = EnsureEntity<TEntity>(typeof(TEntity).Name);
 
     callback(entity, model, default, state);
     _executor.VisitGraph(entity, model, state, callback);
@@ -102,8 +120,8 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
   public async Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
     where TEntity : class
   {
-    IEntityModel model = EnsureEntity<TEntity>();
-    
+    IEntityModel model = EnsureEntity<TEntity>(typeof(TEntity).Name);
+
     await callback(entity, model, default, state, cancellationToken);
     await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
   }
@@ -125,20 +143,20 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     }
   }
 
-  private IEntityModel<TEntity, TKey> EnsureEntity<TEntity, TKey>()
+  private IEntityModel<TEntity, TKey> EnsureEntity<TEntity, TKey>(string entityName)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (!_model.TryGetEntity(out IEntityModel<TEntity, TKey>? entityModel))
-      throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
+    if (!_model.TryGetEntity(entityName, out IEntityModel<TEntity, TKey>? entityModel))
+      throw new InvalidOperationException($"'{entityName}' is not registered as a database entity.");
 
     return entityModel;
   }
 
-  private IEntityModel EnsureEntity<TEntity>()
+  private IEntityModel EnsureEntity<TEntity>(string entityName)
   {
-    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel? entityModel))
-      throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
+    if (!_model.TryGetEntity(entityName, out IEntityModel? entityModel))
+      throw new InvalidOperationException($"'{entityName}' is not registered as a database entity.");
 
     return entityModel;
   }

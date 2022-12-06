@@ -12,6 +12,12 @@ public abstract class ModelConfiguration
 
   }
 
+  protected void Entity<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>> buildAction)
+    where TEntity : class
+  {
+
+  }
+
   protected void Aggregation<TFrom, TTo>(Action<IAssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class

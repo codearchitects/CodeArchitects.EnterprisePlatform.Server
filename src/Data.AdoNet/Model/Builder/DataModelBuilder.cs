@@ -5,8 +5,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal class DataModelBuilder
 {
-  private readonly Dictionary<Type, EntityModelBuilder> _entityBuilders;
-	private readonly Dictionary<(Type, Type), AssociationBuilder> _associationBuilders;
+  private readonly Dictionary<string, EntityModelBuilder> _entityBuilders;
+	private readonly List<AssociationBuilder> _associationBuilders;
 
   public DataModelBuilder()
 	{
@@ -26,19 +26,28 @@ internal class DataModelBuilder
 		return model;
   }
 
-  public EntityModelBuilder<TEntity> GetEntityModelBuilder<TEntity>()
+  public EntityModelBuilder<TEntity> GetEntityModelBuilder<TEntity>(string entityName)
 		where TEntity : class
 	{
-		if (_entityBuilders.TryGetValue(typeof(TEntity), out EntityModelBuilder? builder))
-			return (EntityModelBuilder<TEntity>)builder;
+		if (_entityBuilders.TryGetValue(entityName, out EntityModelBuilder? builder))
+      return builder as EntityModelBuilder<TEntity>
+				?? throw new ModelConstructionException($"Duplicate entity name '{entityName}' for entities of type '{typeof(TEntity).Name}' and '{builder.EntityType.Name}'.");
 
-		EntityModelBuilder<TEntity> typedBuilder = new();
-		_entityBuilders.Add(typeof(TEntity), typedBuilder);
+    EntityModelBuilder<TEntity> typedBuilder = new(entityName);
+		_entityBuilders.Add(entityName, typedBuilder);
 
 		return typedBuilder;
   }
 
-	public AssociationBuilder<TFrom, TTo> Get
+	public AssociationBuilder<TFrom, TTo> GetAssociationBuilder<TFrom, TTo>()
+		where TFrom : class
+		where TTo : class
+	{
+		AssociationBuilder<TFrom, TTo> builder = new();
+		_associationBuilders.Add(builder);
+
+		return builder;
+	}
 
 	private IEntityModel BuildEntity(EntityModelBuilder entityBuilder)
 	{
@@ -48,18 +57,14 @@ internal class DataModelBuilder
 			.Select(AccessibleMemberModelComponent.Create)
 			.ToList();
 
-		entityBuilder.ke
-
 		HashSet<ColumnModel> columns = new();
 		foreach (AccessibleMemberModelComponent memberComponent in memberComponents)
 		{
 			if (Configuration.IsSupportedColumnType(memberComponent.Type))
 			{
 			}
-			else if (_entityBuilders.ContainsKey(memberComponent.Type))
-			{
-
-			}
 		}
+
+		throw null!;
 	}
 }

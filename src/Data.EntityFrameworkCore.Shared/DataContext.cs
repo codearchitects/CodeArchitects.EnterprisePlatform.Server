@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
+internal sealed class DataContext<TDbContext> : IEFCoreContext<TDbContext>
   where TDbContext : DbContext
 {
   private readonly IStateManager<TDbContext> _stateManager;
@@ -29,30 +29,30 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
 
   public TDbContext DbContext => _stateManager.DbContext;
 
-  DbContext IDataContext.DbContext => _stateManager.DbContext;
+  DbContext IEFCoreContext.DbContext => _stateManager.DbContext;
 
-  public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+  public Task<TEntity?> FindAsync<TEntity, TKey>(string entityName, TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
 
-    return DbContext.Set<TEntity>().FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
+    return DbContext.Set<TEntity>(entityName).FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
   }
 
-  public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
+  public Task<TEntity?> FindAsync<TEntity, TKey>(string entityName, TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
 
-    Includer<TEntity> includer = new(DbContext.Set<TEntity>());
+    Includer<TEntity> includer = new(DbContext.Set<TEntity>(entityName));
     includeAction(includer);
 
     return includer.Queryable.FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
   }
 
-  public async Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public async Task InsertAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
@@ -98,7 +98,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     await _stateManager.SaveAsync(cancellationToken);
   }
 
-  public async Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public async Task UpdateAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
@@ -262,27 +262,27 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     await _stateManager.SaveAsync(cancellationToken);
   }
 
-  public async Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  public async Task RemoveAsync<TEntity, TKey>(string entityName, TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    DbContext.Remove(entity);
+    DbContext.Set<TEntity>(entityName).Remove(entity);
 
     await _stateManager.SaveAsync(cancellationToken);
   }
 
-  public async Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+  public async Task RemoveAsync<TEntity, TKey>(string entityName, TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     if (!_defaultEntityFactory.TryCreate(key, out TEntity? entity))
     {
       // TODO: Log warning
-      entity = await FindAsync<TEntity, TKey>(key, cancellationToken)
+      entity = await FindAsync<TEntity, TKey>(entityName, key, cancellationToken)
         ?? throw new DbUpdateConcurrencyException("Entity was not found on the database."); // TODO: Improve message
     }
 
-    DbContext.Remove(entity);
+    DbContext.Set<TEntity>(entityName).Remove(entity);
 
     await _stateManager.SaveAsync(cancellationToken);
   }

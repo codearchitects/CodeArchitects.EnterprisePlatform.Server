@@ -2,18 +2,17 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public class Repository<TConnection, TEntity, TKey> : Repository<TEntity, TKey>
+public class AdoNetRepository<TConnection, TEntity, TKey> : AdoNetRepository<TEntity, TKey>
   where TConnection : DbConnection
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public Repository(IDataContext<TConnection> context)
+  public AdoNetRepository(IAdoNetContext<TConnection> context)
     : base(context)
   {
-    Context = context;
   }
 
-  protected new IDataContext<TConnection> Context { get; }
+  protected new IAdoNetContext<TConnection> Context => (IAdoNetContext<TConnection>)base.Context;
 
   protected new TConnection Connection => Context.Connection;
 }

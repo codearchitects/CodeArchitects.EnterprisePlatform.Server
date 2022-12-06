@@ -47,5 +47,5 @@ public interface IAssociationBuilderMTM<TFrom, TTo>
   IAssociationBuilderMTM<TFrom, TTo> InverseNavigation(Expression<Func<TTo, TFrom?>> expression);
   IAssociationBuilderMTM<TFrom, TTo> InverseNavigation(string navigationName);
   IAssociationBuilderMTM<TFrom, TTo> UsingJoinTable(string tableName);
-  IAssociationBuilderMTM<TFrom, TTo> UsingForeignKey(params string[] keyNames);
+  IAssociationBuilderMTM<TFrom, TTo> UsingForeignKeys(params string[] keyNames);
 }

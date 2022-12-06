@@ -8,6 +8,11 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBuilder<TEntity>
   where TEntity : class
 {
+  public EntityModelBuilder(string entityName)
+    : base(entityName)
+  {
+  }
+
   public override Type EntityType => typeof(TEntity);
 
   public IEntityModelBuilder<TEntity> Ignore(string memberName)

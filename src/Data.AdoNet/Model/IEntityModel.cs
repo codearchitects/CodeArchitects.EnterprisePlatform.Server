@@ -6,6 +6,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IEntityModel
 {
+  string Name { get; }
+
   string TableName { get; }
   
   Type Type { get; }
@@ -16,7 +18,7 @@ public interface IEntityModel
 
   IPrimaryKeyModel PrimaryKey { get; }
 
-  IReadOnlyList<IForeignKeyModel> ForeignKeys { get; }
+  IReadOnlyCollection<IForeignKeyModel> ForeignKeys { get; }
 
   IReadOnlyCollection<IColumnModel> Columns { get; }
   

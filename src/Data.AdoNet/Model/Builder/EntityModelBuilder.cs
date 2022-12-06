@@ -9,12 +9,13 @@ internal abstract class EntityModelBuilder
   protected readonly Dictionary<MemberInfo, string> _columnNames;
   protected readonly List<AssociationBuilder> _associationBuilders;
 
-  public EntityModelBuilder()
+  public EntityModelBuilder(string entityName)
   {
     _keys = new();
     _ignoredMembers = new();
     _columnNames = new();
     _associationBuilders = new();
+    EntityName = entityName;
   }
 
   public void AddAssociation(AssociationBuilder builder)
@@ -22,6 +23,7 @@ internal abstract class EntityModelBuilder
     _associationBuilders.Add(builder);
   }
 
+  public string EntityName { get; }
   public abstract Type EntityType { get; }
   public IReadOnlyCollection<AssociationBuilder> Associations => _associationBuilders;
   public IReadOnlyCollection<MemberInfo> Keys => _keys;

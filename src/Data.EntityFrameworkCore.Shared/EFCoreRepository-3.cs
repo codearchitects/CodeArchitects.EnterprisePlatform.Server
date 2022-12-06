@@ -2,18 +2,17 @@
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-public class Repository<TDbContext, TEntity, TKey> : Repository<TEntity, TKey>
+public class EFCoreRepository<TDbContext, TEntity, TKey> : EFCoreRepository<TEntity, TKey>
   where TDbContext : DbContext
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public Repository(IDataContext<TDbContext> context)
+  public EFCoreRepository(IEFCoreContext<TDbContext> context)
     : base(context)
   {
-    Context = context;
   }
 
-  protected new IDataContext<TDbContext> Context { get; }
+  protected new IEFCoreContext<TDbContext> Context => (IEFCoreContext<TDbContext>)base.Context;
 
   protected new TDbContext DbContext => Context.DbContext;
 }
