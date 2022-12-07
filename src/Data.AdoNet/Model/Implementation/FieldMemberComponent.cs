@@ -3,9 +3,9 @@ using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class FieldMemberModelComponent : AccessibleMemberModelComponent
+internal class FieldMemberComponent : AccessibleMemberComponent
 {
-  public FieldMemberModelComponent(FieldInfo field, Getter<object?> getValue, Setter<object?> setValue)
+  public FieldMemberComponent(FieldInfo field, Getter<object?> getValue, Setter<object?> setValue)
     : base(getValue, setValue)
   {
     Field = field;
@@ -48,11 +48,11 @@ internal class FieldMemberModelComponent : AccessibleMemberModelComponent
     return (Setter<object?>)setMethod.CreateDelegate(typeof(Setter<object?>));
   }
 
-  public static FieldMemberModelComponent Create(FieldInfo field)
+  public static FieldMemberComponent Create(FieldInfo field)
   {
     Getter<object?> getValue = BuildGetAccessor(field);
     Setter<object?> setValue = BuildSetAccessor(field);
 
-    return new FieldMemberModelComponent(field, getValue, setValue);
+    return new FieldMemberComponent(field, getValue, setValue);
   }
 }

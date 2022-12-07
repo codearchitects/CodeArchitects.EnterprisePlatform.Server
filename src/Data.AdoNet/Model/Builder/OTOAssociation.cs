@@ -9,7 +9,7 @@ internal record OTOAssociation(
   MemberInfo? Navigation,
   MemberInfo? InverseNavigation,
   IReadOnlyCollection<Name> ForeignKeyNames)
-  : Association(Kind, From, To, Navigation, InverseNavigation)
+  : DirectAssociation(Kind, From, To, Navigation, InverseNavigation, ForeignKeyNames)
 {
   public override AssociationMultiplicity Multiplicity => AssociationMultiplicity.OneToOne;
 }

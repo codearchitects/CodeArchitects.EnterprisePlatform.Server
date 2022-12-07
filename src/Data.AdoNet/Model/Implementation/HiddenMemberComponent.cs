@@ -2,9 +2,9 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class HiddenMemberModelComponent : MemberModelComponent
+internal class HiddenMemberComponent : MemberComponent
 {
-  public HiddenMemberModelComponent(Type type)
+  public HiddenMemberComponent(Type type)
   {
     TypeCore = type;
   }

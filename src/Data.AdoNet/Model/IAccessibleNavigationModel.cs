@@ -4,6 +4,6 @@ using System.Reflection;
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IAccessibleNavigationModel : INavigationModel, IAccessibleMemberModelBase
+public interface IAccessibleNavigationModel : INavigationModel, IAccessibleMemberModel
 {
 }

@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IColumnModel : IMemberModelBase
+public interface IColumnModel : IMemberModel
 {
   bool IsPrimaryKey { get; }
 

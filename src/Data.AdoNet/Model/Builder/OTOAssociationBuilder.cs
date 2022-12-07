@@ -36,9 +36,7 @@ internal class OTOAssociationBuilder<TFrom, TTo> : AssociationBuilder, IOTOAssoc
 
   public IOTOAssociationBuilder<TFrom, TTo> InverseNavigation(string navigationName)
   {
-    (MemberInfo member, _) = GetMemberAndType(typeof(TTo), navigationName);
-
-    _inverseNavigation = member;
+    _inverseNavigation = GetMember(typeof(TTo), navigationName);
 
     return this;
   }
@@ -55,8 +53,7 @@ internal class OTOAssociationBuilder<TFrom, TTo> : AssociationBuilder, IOTOAssoc
 
   public IOTOAssociationBuilder<TFrom, TTo> Navigation(string navigationName)
   {
-    (MemberInfo member, _) = GetMemberAndType(typeof(TFrom), navigationName);
-    _navigation = member;
+    _navigation = GetMember(typeof(TFrom), navigationName);
 
     return this;
   }

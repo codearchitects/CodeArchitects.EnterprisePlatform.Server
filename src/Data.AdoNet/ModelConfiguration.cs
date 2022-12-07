@@ -59,6 +59,15 @@ public abstract class ModelConfiguration
       _configured = true;
     }
 
+    foreach (Association association in _associations)
+    {
+      if (!_entityBuilders.Values.Any(builder => builder.EntityType == association.From))
+        throw new ModelConfigurationException($"An association '{association.From.Name}' -> '{association.To.Name}' was defined, but '{association.From.Name}' is not an entity type.");
+    
+      if (!_entityBuilders.Values.Any(builder => builder.EntityType == association.To))
+        throw new ModelConfigurationException($"An association '{association.From.Name}' -> '{association.To.Name}' was defined, but '{association.To.Name}' is not an entity type.");
+    }
+
     return DataModel.Create(_entityBuilders.Values, _associations);
   }
 

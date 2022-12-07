@@ -7,9 +7,11 @@ internal abstract class EntityModelBuilder : BuilderBase
     EntityName = entityName;
   }
 
-  public abstract IEntityModel Build(IEnumerable<Association> associationsTo);
-
   public abstract Type EntityType { get; }
 
   public string EntityName { get; }
+
+  public abstract void Complete(IReadOnlyCollection<Type> entityTypes, IEnumerable<Association> associations);
+
+  public abstract IEntityModel Build();
 }

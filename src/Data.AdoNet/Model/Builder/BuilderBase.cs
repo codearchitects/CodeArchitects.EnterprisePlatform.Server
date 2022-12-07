@@ -25,6 +25,12 @@ internal class BuilderBase
     return false;
   }
 
+  protected static MemberInfo GetMember(Type targetType, string memberName)
+  {
+    (MemberInfo member, _) = GetMemberAndType(targetType, memberName);
+    return member;
+  }
+
   protected static (MemberInfo Member, Type Type) GetMemberAndType(Type targetType, string memberName)
   {
     MemberInfo[] members = targetType.GetMember(
@@ -41,8 +47,8 @@ internal class BuilderBase
     return members[0] switch
     {
       PropertyInfo property => (property, property.PropertyType),
-      FieldInfo field       => (field, field.FieldType),
-      _                     => throw Errors.Unreacheable,
+      FieldInfo field => (field, field.FieldType),
+      _ => throw Errors.Unreacheable,
     };
   }
 

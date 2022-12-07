@@ -73,12 +73,4 @@ internal abstract class EntityModel : IEntityModel
     navigationModel = null;
     return false;
   }
-
-  public static EntityModel Create(Type entityType, IInitializerModel initializer, IReadOnlyList<IColumnModel> columns, IPrimaryKeyModel primaryKey)
-  {
-    Debug.Assert(typeof(IPrimaryKeyModel<>).MakeGenericType(primaryKey.Type).IsAssignableFrom(primaryKey.GetType()), $"Wrongly typed {nameof(IPrimaryKeyModel)} supplied.");
-
-    Type entityModelType = typeof(EntityModel<,>).MakeGenericType(entityType, primaryKey.Type);
-    return (EntityModel)Activator.CreateInstance(entityModelType, new object[] { initializer, columns, primaryKey })!;
-  }
 }

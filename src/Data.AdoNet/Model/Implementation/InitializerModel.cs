@@ -6,39 +6,42 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class InitializerModel : IInitializerModel
 {
-  public InitializerModel(ConstructorInfo constructor, IReadOnlyCollection<IAccessibleColumnModel> constructorProperties, IReadOnlyCollection<IAccessibleColumnModel> initializerProperties)
+  private readonly IReadOnlyCollection<AccessibleColumnModel> _constructorProperties;
+  private readonly IReadOnlyCollection<AccessibleColumnModel> _initializerProperties;
+
+  public InitializerModel(ConstructorInfo constructor, IReadOnlyCollection<AccessibleColumnModel> constructorProperties, IReadOnlyCollection<AccessibleColumnModel> initializerProperties)
   {
     Constructor = constructor;
-    ConstructorProperties = constructorProperties;
-    InitializerProperties = initializerProperties;
+    _constructorProperties = constructorProperties;
+    _initializerProperties = initializerProperties;
   }
 
   public ConstructorInfo Constructor { get; }
 
-  public IReadOnlyCollection<IAccessibleColumnModel> ConstructorProperties { get; }
+  public IReadOnlyCollection<IAccessibleColumnModel> ConstructorProperties => _constructorProperties;
 
-  public IReadOnlyCollection<IAccessibleColumnModel> InitializerProperties { get; }
+  public IReadOnlyCollection<IAccessibleColumnModel> InitializerProperties => _initializerProperties;
 
-  public static InitializerModel Create(Type type, IReadOnlyList<IAccessibleColumnModel> columns)
+  public static InitializerModel Create(Type type, IReadOnlyList<AccessibleColumnModel> columns)
   {
     ConstructorInfo constructor = type
       .GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
       .OrderBy(ctor => ctor.GetParameters().Length)
       .First();
 
-    HashSet<IAccessibleColumnModel> constructorProperties = new();
+    HashSet<AccessibleColumnModel> constructorProperties = new();
     foreach (ParameterInfo parameter in constructor.GetParameters())
     {
       if (parameter.Name is null)
         throw new ModelConfigurationException($"Found nameless constructor parameter in type '{type.Name}'.");
 
-      IAccessibleColumnModel column = columns.SingleOrDefault(col => col.Member.Name.MatchesCamelCaseConvention(parameter.Name))
+      AccessibleColumnModel column = columns.SingleOrDefault(col => col.Member.Name.MatchesCamelCaseConvention(parameter.Name))
         ?? throw new ModelConfigurationException($"Could not resolve a member of type '{type.Name}' corresponding to parameter named '{parameter.Name}' by convention.");
 
       constructorProperties.Add(column);
     }
 
-    List<IAccessibleColumnModel> initializerProperties = columns
+    List<AccessibleColumnModel> initializerProperties = columns
       .Where(col => !constructorProperties.Contains(col))
       .ToList();
 

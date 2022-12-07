@@ -1,14 +1,24 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class AccessibleMemberModelComponent : MemberModelComponent, IAccessibleMemberModelBase
+internal abstract class AccessibleMemberComponent : MemberComponent, IAccessibleMemberModel
 {
-  protected AccessibleMemberModelComponent(Getter<object?> getValue, Setter<object?> setValue)
+  private string? _name;
+
+  protected AccessibleMemberComponent(Getter<object?> getValue, Setter<object?> setValue)
   {
     GetValue = getValue;
     SetValue = setValue;
+  }
+
+  [AllowNull]
+  public string Name
+  {
+    get => _name ?? Member.Name;
+    set => _name = value;
   }
 
   public new abstract MemberInfo Member { get; }
@@ -25,12 +35,12 @@ internal abstract class AccessibleMemberModelComponent : MemberModelComponent, I
 
   protected override bool HasMemberCore => true;
 
-  public static AccessibleMemberModelComponent Create(MemberInfo member)
+  public static AccessibleMemberComponent Create(MemberInfo member)
   {
     return member switch
     {
-      PropertyInfo property => PropertyMemberModelComponent.Create(property),
-      FieldInfo field       => FieldMemberModelComponent.Create(field),
+      PropertyInfo property => PropertyMemberComponent.Create(property),
+      FieldInfo field       => FieldMemberComponent.Create(field),
       _                     => throw Errors.Unreacheable
     };
   }

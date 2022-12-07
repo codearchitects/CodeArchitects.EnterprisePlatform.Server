@@ -2,14 +2,13 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal record OTMAssociation(
+internal abstract record DirectAssociation(
   AssociationKind Kind,
   Type From,
   Type To,
   MemberInfo? Navigation,
   MemberInfo? InverseNavigation,
   IReadOnlyCollection<Name> ForeignKeyNames)
-  : DirectAssociation(Kind, From, To, Navigation, InverseNavigation, ForeignKeyNames)
+  : Association(Kind, From, To, Navigation, InverseNavigation)
 {
-  public override AssociationMultiplicity Multiplicity => AssociationMultiplicity.OneToMany;
 }

@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class PropertyMemberModelComponent : AccessibleMemberModelComponent
+internal class PropertyMemberComponent : AccessibleMemberComponent
 {
-  public PropertyMemberModelComponent(PropertyInfo property, Getter<object?> getValue, Setter<object?> setValue)
+  public PropertyMemberComponent(PropertyInfo property, Getter<object?> getValue, Setter<object?> setValue)
     : base(getValue, setValue)
   {
     Property = property;
@@ -37,14 +37,14 @@ internal class PropertyMemberModelComponent : AccessibleMemberModelComponent
     if (!property.TryGetBackingFieldByConvention(out FieldInfo? backingField))
       throw new ModelConfigurationException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a setter or a backing field resolvable by convention.");
 
-    return FieldMemberModelComponent.BuildSetAccessor(backingField, property.Name);
+    return FieldMemberComponent.BuildSetAccessor(backingField, property.Name);
   }
 
-  public static PropertyMemberModelComponent Create(PropertyInfo property)
+  public static PropertyMemberComponent Create(PropertyInfo property)
   {
     Getter<object?> getValue = BuildGetAccessor(property);
     Setter<object?> setValue = BuildSetAccessor(property);
 
-    return new PropertyMemberModelComponent(property, getValue, setValue);
+    return new PropertyMemberComponent(property, getValue, setValue);
   }
 }

@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class MemberModelComponent : IMemberModelBase
+internal abstract class MemberComponent : IMemberModel
 {
   public Type Type => TypeCore;
 

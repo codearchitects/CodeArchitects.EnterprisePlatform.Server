@@ -48,11 +48,22 @@ internal class DataModel : IDataModel
   {
     DataModel model = new();
 
+    HashSet<Type> entityTypes = entityBuilders
+      .Select(builder => builder.EntityType)
+      .ToHashSet();
+
     foreach (EntityModelBuilder entityBuilder in entityBuilders)
     {
-      IEntityModel entity = entityBuilder.Build(associations.Where(association => association.To == entityBuilder.EntityType));
+      IEnumerable<DirectAssociation> associationsTo = associations
+        .Where(association => association.To == entityBuilder.EntityType)
+        .OfType<DirectAssociation>();
 
+      entityBuilder.Complete(entityTypes, associationsTo);
+
+      IEntityModel entity = entityBuilder.Build();
       model.AddEntity(entity);
     }
+
+    return model;
   }
 }
