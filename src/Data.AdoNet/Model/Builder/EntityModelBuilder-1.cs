@@ -172,7 +172,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
     IReadOnlyCollection<MemberInfo> keyMembers = GetKeyMembers(members);
 
-    List<AccessibleColumnModel> accessibleColumns = new();
+    List<ColumnModel> accessibleColumns = new();
 
     foreach (AccessibleMemberComponent memberComponent in memberComponents)
     {
@@ -182,7 +182,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       }
       else
       {
-        AccessibleColumnModel column = ProcessColumnMemberComponent(memberComponent, keyMembers, foreignKeyMembers);
+        ColumnModel column = ProcessColumnMemberComponent(memberComponent, keyMembers, foreignKeyMembers);
         accessibleColumns.Add(column);
       }
     }
@@ -190,7 +190,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     throw new NotImplementedException();
   }
 
-  private AccessibleColumnModel ProcessColumnMemberComponent(
+  private ColumnModel ProcessColumnMemberComponent(
     AccessibleMemberComponent memberComponent,
     IReadOnlyCollection<MemberInfo> keyMembers,
     IReadOnlyDictionary<MemberInfo, SimpleAssociation> foreignKeyMembers)

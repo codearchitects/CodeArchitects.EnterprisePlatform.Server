@@ -2,12 +2,12 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class AccessibleNavigationModel : NavigationModel, IAccessibleNavigationModel
+internal class AccessibleSimpleNavigationModel : SimpleNavigationModel, IAccessibleSimpleNavigationModel
 {
   private readonly AccessibleMemberComponent _memberComponent;
 
-  public AccessibleNavigationModel(AccessibleMemberComponent memberComponent, int id, EntityModel from, EntityModel to, AssociationKind associationKind)
-    : base(id, from, to, associationKind)
+  public AccessibleSimpleNavigationModel(AccessibleMemberComponent memberComponent, int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+    : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     _memberComponent = memberComponent;
   }

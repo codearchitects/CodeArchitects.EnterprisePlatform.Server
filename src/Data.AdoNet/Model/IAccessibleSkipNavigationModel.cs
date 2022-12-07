@@ -3,6 +3,6 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface ISimpleAccessibleNavigationModel : ISimpleNavigationModel, IAccessibleNavigationModel
+public interface IAccessibleSkipNavigationModel : ISkipNavigationModel, IAccessibleNavigationModel
 {
 }

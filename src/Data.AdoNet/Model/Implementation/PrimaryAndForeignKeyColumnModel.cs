@@ -19,7 +19,7 @@ internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryA
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
-  public NavigationModel Navigation => throw new NotImplementedException();
+  public INavigationModel Navigation => throw new NotImplementedException();
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {
@@ -30,10 +30,4 @@ internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryA
   {
     return visitor.VisitPrimaryAndForeignKey(this, in state);
   }
-
-  #region Explicit implementation
-
-  INavigationModel IForeignKeyColumnModelBase.Navigation => Navigation;
-
-  #endregion
 }

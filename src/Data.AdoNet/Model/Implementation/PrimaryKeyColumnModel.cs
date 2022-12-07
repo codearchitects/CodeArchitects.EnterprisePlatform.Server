@@ -1,18 +1,39 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
-internal class PrimaryKeyColumnModel : AccessibleColumnModel, IPrimaryKeyColumnModel
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+
+internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
 {
+  private readonly AccessibleMemberComponent _memberComponent;
+
   public PrimaryKeyColumnModel(AccessibleMemberComponent memberComponent, short index, short primaryKeyIndex)
-    : base(memberComponent, index)
+    : base(index)
   {
+    _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
   }
+
+  protected override MemberComponent MemberComponent => _memberComponent;
 
   public override bool IsPrimaryKey => true;
 
   public override bool IsForeignKey => false;
 
   public short PrimaryKeyIndex { get; }
+
+  [AllowNull]
+  public override string Name
+  {
+    get => _memberComponent.Name;
+    set => _memberComponent.Name = value;
+  }
+
+  public new MemberInfo Member => _memberComponent.Member;
+
+  public new Getter<object?> GetValue => _memberComponent.GetValue;
+
+  public new Setter<object?> SetValue => _memberComponent.SetValue;
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {

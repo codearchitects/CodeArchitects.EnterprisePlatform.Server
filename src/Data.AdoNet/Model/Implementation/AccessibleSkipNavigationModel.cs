@@ -1,26 +1,18 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class AccessibleColumnModel : ColumnModel, IAccessibleColumnModel
+internal class AccessibleSkipNavigationModel : SkipNavigationModel, IAccessibleSkipNavigationModel
 {
   private readonly AccessibleMemberComponent _memberComponent;
 
-  public AccessibleColumnModel(AccessibleMemberComponent memberComponent, short index)
-    : base(index)
+  public AccessibleSkipNavigationModel(AccessibleMemberComponent memberComponent, int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+    : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     _memberComponent = memberComponent;
   }
 
   protected override MemberComponent MemberComponent => _memberComponent;
-
-  [AllowNull]
-  public override string Name
-  {
-    get => _memberComponent.Name;
-    set => _memberComponent.Name = value;
-  }
 
   public new MemberInfo Member => _memberComponent.Member;
 

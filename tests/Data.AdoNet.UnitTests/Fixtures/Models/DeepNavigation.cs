@@ -103,17 +103,17 @@ internal static class DeepNavigation
     public static readonly IEntityModel<ManyToMany, int> ManyToManyEntity = CreateManyToManyEntity().Mocked<ManyToMany, int>();
     public static readonly IEntityModel<ChildG, int> ChildGEntity = CreateChildGEntity().Mocked<ChildG, int>();
 
-    public static readonly ISimpleAccessibleNavigationModel RootToChildANavigation = CreateRootToChildANavigation();
-    public static readonly ISimpleAccessibleNavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
-    public static readonly ISimpleAccessibleNavigationModel RootToChildCNavigation = CreateRootToChildCNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildAToChildFNavigation = CreateChildAToChildFNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildDToChildENavigation = CreateChildDToChildENavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildAToRootNavigation = CreateChildAToRootNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildDToChildANavigation = CreateChildDToChildANavigation();
-    public static readonly ISkipAccessibleNavigationModel RootToManyToManyNavigation = CreateRootToManyToManyNavigation();
-    public static readonly ISkipAccessibleNavigationModel ManyToManyToRootNavigation = CreateManyToManyToRootNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildGToManyToManyNavigation = CreateChildGToManyToManyNavigation();
+    public static readonly IAccessibleSimpleNavigationModel RootToChildANavigation = CreateRootToChildANavigation();
+    public static readonly IAccessibleSimpleNavigationModel RootToChildBNavigation = CreateRootToChildBNavigation();
+    public static readonly IAccessibleSimpleNavigationModel RootToChildCNavigation = CreateRootToChildCNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildAToChildFNavigation = CreateChildAToChildFNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildDToChildENavigation = CreateChildDToChildENavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildAToRootNavigation = CreateChildAToRootNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildDToChildANavigation = CreateChildDToChildANavigation();
+    public static readonly IAccessibleSkipNavigationModel RootToManyToManyNavigation = CreateRootToManyToManyNavigation();
+    public static readonly IAccessibleSkipNavigationModel ManyToManyToRootNavigation = CreateManyToManyToRootNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildGToManyToManyNavigation = CreateChildGToManyToManyNavigation();
 
     public const int RootToChildAId = 1;
     public const int RootToChildBId = 2;
@@ -317,7 +317,7 @@ internal static class DeepNavigation
           })));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateRootToChildANavigation()
+    private static IAccessibleSimpleNavigationModel CreateRootToChildANavigation()
     {
       PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildA));
 
@@ -335,7 +335,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildA.RootId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateRootToChildBNavigation()
+    private static IAccessibleSimpleNavigationModel CreateRootToChildBNavigation()
     {
       PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildB));
 
@@ -353,7 +353,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildB.RootId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateRootToChildCNavigation()
+    private static IAccessibleSimpleNavigationModel CreateRootToChildCNavigation()
     {
       PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.ChildC));
 
@@ -371,7 +371,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildC.RootId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildAToChildDNavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildAToChildDNavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildD));
 
@@ -389,7 +389,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildD.ChildAId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildAToChildFNavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildAToChildFNavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildF));
 
@@ -407,7 +407,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildF.ChildAId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildDToChildENavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildDToChildENavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildE));
 
@@ -425,7 +425,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildE.ChildDId))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildAToRootNavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildAToRootNavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.Root));
 
@@ -443,7 +443,7 @@ internal static class DeepNavigation
               .SetName(nameof(Root.Id))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildDToChildANavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildDToChildANavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildA));
 
@@ -461,7 +461,7 @@ internal static class DeepNavigation
               .SetName(nameof(ChildA.Id))))));
     }
 
-    private static ISkipAccessibleNavigationModel CreateRootToManyToManyNavigation()
+    private static IAccessibleSkipNavigationModel CreateRootToManyToManyNavigation()
     {
       PropertyInfo propertyInfo = typeof(Root).GetRequiredProperty(nameof(Root.MTMEntities));
 
@@ -487,7 +487,7 @@ internal static class DeepNavigation
               .SetName(nameof(ManyToMany.Id))))));
     }
 
-    private static ISkipAccessibleNavigationModel CreateManyToManyToRootNavigation()
+    private static IAccessibleSkipNavigationModel CreateManyToManyToRootNavigation()
     {
       PropertyInfo propertyInfo = typeof(ManyToMany).GetRequiredProperty(nameof(ManyToMany.Roots));
 
@@ -513,7 +513,7 @@ internal static class DeepNavigation
               .SetName(nameof(Root.Id))))));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildGToManyToManyNavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildGToManyToManyNavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildG).GetRequiredProperty(nameof(ChildG.MTMEntity));
 

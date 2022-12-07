@@ -2,41 +2,35 @@
 
 internal abstract class NavigationModel : MemberModel, INavigationModel
 {
-  protected NavigationModel(int id, EntityModel from, EntityModel to, AssociationKind associationKind)
+  protected NavigationModel(int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
   {
     Id = id;
     From = from;
     To = to;
     AssociationKind = associationKind;
+    CollectionKind = collectionKind;
+    IsOnDependent = isOnDependent;
   }
 
-  public abstract NavigationModel Inverse { get; }
+  public abstract INavigationModel InverseCore { get; }
+
+  public CollectionKind CollectionKind { get; }
 
   public int Id { get; }
 
   public AssociationKind AssociationKind { get; }
 
-  public bool IsOnDependent => throw new NotImplementedException();
+  public bool IsOnDependent { get; }
 
-  public bool IsCollection => throw new NotImplementedException();
+  public bool IsCollection => CollectionKind is not CollectionKind.None;
 
-  public EntityModel From { get; }
+  public INavigationModel Inverse => InverseCore;
 
-  public EntityModel To { get; }
+  public IEntityModel From { get; }
 
-  public IPrimaryKeyModel PrimaryKey => throw new NotImplementedException();
+  public IEntityModel To { get; }
+
+  public IPrimaryKeyModel PrimaryKey => IsOnDependent ? To.PrimaryKey : From.PrimaryKey;
 
   public IForeignKeyModel ForeignKey => throw new NotImplementedException();
-
-  public CollectionKind CollectionKind => throw new NotImplementedException();
-
-  #region Explicit implementation
-
-  IEntityModel INavigationModel.From => throw new NotImplementedException();
-
-  IEntityModel INavigationModel.To => throw new NotImplementedException();
-
-  INavigationModel INavigationModel.Inverse => throw new NotImplementedException();
-
-  #endregion
 }

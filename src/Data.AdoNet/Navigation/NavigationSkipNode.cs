@@ -5,12 +5,12 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationSkipNode : IncluderNode, INavigationSkipNode
 {
-  public NavigationSkipNode(ISkipAccessibleNavigationModel model)
+  public NavigationSkipNode(IAccessibleSkipNavigationModel model)
   {
     Model = model;
   }
 
-  public ISkipAccessibleNavigationModel Model { get; }
+  public IAccessibleSkipNavigationModel Model { get; }
 
   IAccessibleNavigationModel INavigation.Model => Model;
 

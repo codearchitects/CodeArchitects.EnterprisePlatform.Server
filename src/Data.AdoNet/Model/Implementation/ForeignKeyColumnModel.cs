@@ -16,7 +16,7 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
-  public NavigationModel Navigation => throw new NotImplementedException();
+  public INavigationModel Navigation => throw new NotImplementedException();
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {
@@ -27,11 +27,4 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
   {
     return visitor.VisitForeignKey(this, in state);
   }
-
-
-  #region Explicit implementation
-
-  INavigationModel IForeignKeyColumnModelBase.Navigation => throw new NotImplementedException();
-
-  #endregion
 }

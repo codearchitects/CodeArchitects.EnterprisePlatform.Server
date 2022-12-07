@@ -141,10 +141,10 @@ public partial class MaterializationTests
     public static readonly IEntityModel<ChildC, int> ChildCModel = CreateChildCModel();
     public static readonly IEntityModel<ChildD, int> ChildDModel = CreateChildDModel();
 
-    public static readonly ISimpleAccessibleNavigationModel ParentToChildANavigation = CreateParentToChildANavigation();
-    public static readonly ISimpleAccessibleNavigationModel ParentToChildBNavigation = CreateParentToChildBNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ParentToChildCNavigation = CreateParentToChildCNavigation();
-    public static readonly ISimpleAccessibleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ParentToChildANavigation = CreateParentToChildANavigation();
+    public static readonly IAccessibleSimpleNavigationModel ParentToChildBNavigation = CreateParentToChildBNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ParentToChildCNavigation = CreateParentToChildCNavigation();
+    public static readonly IAccessibleSimpleNavigationModel ChildAToChildDNavigation = CreateChildAToChildDNavigation();
 
     private static IEntityModel<Parent, Guid> CreateParentModel()
     {
@@ -348,7 +348,7 @@ public partial class MaterializationTests
       return entity.Mocked<ChildD, int>();
     }
 
-    private static ISimpleAccessibleNavigationModel CreateParentToChildANavigation()
+    private static IAccessibleSimpleNavigationModel CreateParentToChildANavigation()
     {
       PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenA));
 
@@ -365,7 +365,7 @@ public partial class MaterializationTests
           .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateParentToChildBNavigation()
+    private static IAccessibleSimpleNavigationModel CreateParentToChildBNavigation()
     {
       PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenB));
 
@@ -382,7 +382,7 @@ public partial class MaterializationTests
           .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateParentToChildCNavigation()
+    private static IAccessibleSimpleNavigationModel CreateParentToChildCNavigation()
     {
       PropertyInfo propertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.ChildC));
 
@@ -398,7 +398,7 @@ public partial class MaterializationTests
           .Returns(propertyInfo.SetValue)));
     }
 
-    private static ISimpleAccessibleNavigationModel CreateChildAToChildDNavigation()
+    private static IAccessibleSimpleNavigationModel CreateChildAToChildDNavigation()
     {
       PropertyInfo propertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ChildrenD));
 

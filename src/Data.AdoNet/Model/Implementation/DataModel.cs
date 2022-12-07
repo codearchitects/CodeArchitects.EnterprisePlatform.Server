@@ -1,7 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 

@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 public partial class SqlTextBuilderTests
 {
-  private record NavigationSimpleLeaf(ISimpleAccessibleNavigationModel Model) : INavigationSimpleLeaf
+  private record NavigationSimpleLeaf(IAccessibleSimpleNavigationModel Model) : INavigationSimpleLeaf
   {
     public IEntityModel Target => Model.To;
 
@@ -31,7 +31,7 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSkipLeaf(ISkipAccessibleNavigationModel Model) : INavigationSkipLeaf
+  private record NavigationSkipLeaf(IAccessibleSkipNavigationModel Model) : INavigationSkipLeaf
   {
     public IEntityModel Target => Model.To;
 
@@ -57,7 +57,7 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSimpleNode(ISimpleAccessibleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
+  private record NavigationSimpleNode(IAccessibleSimpleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSimpleNode
   {
     public IEntityModel Target => Model.To;
 
@@ -79,11 +79,11 @@ public partial class SqlTextBuilderTests
     }
   }
 
-  private record NavigationSkipNode(ISkipAccessibleNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSkipNode
+  private record NavigationSkipNode(IAccessibleSkipNavigationModel Model, IReadOnlyCollection<INavigation> Children) : INavigationSkipNode
   {
     public IEntityModel Target => Model.To;
 
-    ISkipAccessibleNavigationModel INavigationSkipNode.Model => Model;
+    IAccessibleSkipNavigationModel INavigationSkipNode.Model => Model;
 
     IAccessibleNavigationModel INavigation.Model => Model;
 
