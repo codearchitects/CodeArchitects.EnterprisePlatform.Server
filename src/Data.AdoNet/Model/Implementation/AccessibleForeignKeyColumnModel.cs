@@ -7,10 +7,12 @@ internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel
   private readonly AccessibleMemberComponent _memberComponent;
 
   public AccessibleForeignKeyColumnModel(AccessibleMemberComponent memberComponent, short index, short foreignKeyIndex)
-    : base(memberComponent, index, foreignKeyIndex)
+    : base(index, foreignKeyIndex)
   {
     _memberComponent = memberComponent;
   }
+
+  protected override MemberComponent MemberComponent => _memberComponent;
 
   [AllowNull]
   public override string Name

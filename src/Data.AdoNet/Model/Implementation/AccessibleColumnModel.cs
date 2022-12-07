@@ -8,10 +8,12 @@ internal abstract class AccessibleColumnModel : ColumnModel, IAccessibleColumnMo
   private readonly AccessibleMemberComponent _memberComponent;
 
   public AccessibleColumnModel(AccessibleMemberComponent memberComponent, short index)
-    : base(memberComponent, index)
+    : base(index)
   {
     _memberComponent = memberComponent;
   }
+
+  protected override MemberComponent MemberComponent => _memberComponent;
 
   [AllowNull]
   public override string Name

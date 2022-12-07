@@ -2,8 +2,8 @@
 
 internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
 {
-  public PrimaryAndForeignKeyColumnModel(MemberComponent memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex)
-    : base(memberComponent, index)
+  public PrimaryAndForeignKeyColumnModel(short index, short primaryKeyIndex, short foreignKeyIndex)
+    : base(index)
   {
     PrimaryKeyIndex = primaryKeyIndex;
     ForeignKeyIndex = foreignKeyIndex;
@@ -19,7 +19,7 @@ internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryA
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
-  public INavigationModel Navigation => throw new NotImplementedException();
+  public NavigationModel Navigation => throw new NotImplementedException();
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {
@@ -30,4 +30,10 @@ internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryA
   {
     return visitor.VisitPrimaryAndForeignKey(this, in state);
   }
+
+  #region Explicit implementation
+
+  INavigationModel IForeignKeyColumnModelBase.Navigation => Navigation;
+
+  #endregion
 }

@@ -54,9 +54,9 @@ internal class DataModel : IDataModel
 
     foreach (EntityModelBuilder entityBuilder in entityBuilders)
     {
-      IEnumerable<DirectAssociation> associationsTo = associations
+      IEnumerable<SimpleAssociation> associationsTo = associations
         .Where(association => association.To == entityBuilder.EntityType)
-        .OfType<DirectAssociation>();
+        .OfType<SimpleAssociation>();
 
       entityBuilder.Complete(entityTypes, associationsTo);
 

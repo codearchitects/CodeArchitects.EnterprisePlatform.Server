@@ -163,8 +163,8 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       .Select(AccessibleMemberComponent.Create)
       .ToList();
 
-    IReadOnlyDictionary<MemberInfo, DirectAssociation> foreignKeyMembers = _associationsTo
-      .OfType<DirectAssociation>()
+    IReadOnlyDictionary<MemberInfo, SimpleAssociation> foreignKeyMembers = _associationsTo
+      .OfType<SimpleAssociation>()
       .SelectMany(association => association.ForeignKeyNames
         .Where(name => !name.IsColumnName)
         .Select(name => (name, association)))
@@ -186,14 +186,16 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
         accessibleColumns.Add(column);
       }
     }
+
+    throw new NotImplementedException();
   }
 
   private AccessibleColumnModel ProcessColumnMemberComponent(
     AccessibleMemberComponent memberComponent,
     IReadOnlyCollection<MemberInfo> keyMembers,
-    IReadOnlyDictionary<MemberInfo, DirectAssociation> foreignKeyMembers)
+    IReadOnlyDictionary<MemberInfo, SimpleAssociation> foreignKeyMembers)
   {
-    bool isForeignKey = foreignKeyMembers.TryGetValue(memberComponent.Member, out DirectAssociation? association);
+    bool isForeignKey = foreignKeyMembers.TryGetValue(memberComponent.Member, out SimpleAssociation? association);
     bool isPrimaryKey = keyMembers.Contains(memberComponent.Member);
 
     if (isForeignKey && isPrimaryKey)
@@ -212,6 +214,8 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     {
 
     }
+
+    throw new NotImplementedException();
   }
 
   private IReadOnlyCollection<MemberInfo> GetKeyMembers(IEnumerable<MemberInfo> members)

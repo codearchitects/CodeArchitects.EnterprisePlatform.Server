@@ -7,8 +7,6 @@ public interface INavigationModel : IMemberModel
 {
   int Id { get; }
 
-  int Index { get; }
-
   AssociationKind AssociationKind { get; }
 
   bool IsOnDependent { get; }

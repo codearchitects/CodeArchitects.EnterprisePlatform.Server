@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
-internal abstract record DirectAssociation(
+internal abstract record SimpleAssociation(
   AssociationKind Kind,
   Type From,
   Type To,
