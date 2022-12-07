@@ -5,8 +5,6 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 public interface IEntityModelBuilder<TEntity>
   where TEntity : class
 {
-  IEntityModelBuilder<TEntity> WithKey(params Name[] keyNames);
-
   IEntityModelBuilder<TEntity> WithKey(params string[] keyNames);
 
   IEntityModelBuilder<TEntity> WithKey<TKey>(Expression<Func<TEntity, TKey>> expression);

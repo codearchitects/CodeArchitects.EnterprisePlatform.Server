@@ -3,11 +3,11 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockPrimaryKeyPropertyModel : IPrimaryKeyColumnModel
+internal class MockPrimaryKeyPropertyModel : IStandardPrimaryKeyColumnModel
 {
-  private readonly IPrimaryKeyColumnModel _mock;
+  private readonly IStandardPrimaryKeyColumnModel _mock;
 
-  public MockPrimaryKeyPropertyModel(IPrimaryKeyColumnModel mock)
+  public MockPrimaryKeyPropertyModel(IStandardPrimaryKeyColumnModel mock)
   {
     _mock = mock;
   }

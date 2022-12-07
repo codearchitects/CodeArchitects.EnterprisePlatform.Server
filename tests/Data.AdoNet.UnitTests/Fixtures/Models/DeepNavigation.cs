@@ -129,7 +129,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateRootEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(Root.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -153,7 +153,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildAEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildA.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -178,7 +178,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildBEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildB.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -196,7 +196,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildCEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildC.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -214,7 +214,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildDEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildD.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -238,7 +238,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildEEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildE.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -256,7 +256,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildFEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildF.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -274,7 +274,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateManyToManyEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ManyToMany.Id))
         .SetPrimaryKeyIndex(0));
 
@@ -295,7 +295,7 @@ internal static class DeepNavigation
 
     private static IEntityModel CreateChildGEntity()
     {
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildG.Id))
         .SetPrimaryKeyIndex(0));
 

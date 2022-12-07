@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
@@ -95,7 +96,7 @@ internal class RowReaderProvider : IRowReaderProvider
     {
       Expression<KeyReader> keyReaderExpr = Expression.Lambda<KeyReader>(
         body: Expression.New(
-          constructor: entity.PrimaryKey.TupleConstructor,
+          constructor: GetTupleConstructor(entity.PrimaryKey),
           arguments: entity.PrimaryKey.Columns.Select(column => MakeGetValueCallExpression(column.Type, column.Index))),
         parameters: new[] { readerParam, offsetParam });
 
@@ -144,6 +145,28 @@ internal class RowReaderProvider : IRowReaderProvider
         return method;
 
       throw new NotSupportedException($"Property type '{type.Name}' is not supported.");
+    }
+
+    static ConstructorInfo GetTupleConstructor(IPrimaryKeyModel primaryKey)
+    {
+      Debug.Assert(primaryKey.Type.IsGenericType);
+
+      Type[] componentTypes = primaryKey.Type.GetGenericArguments();
+      Type valueTupleType = componentTypes.Length switch
+      {
+        2 => typeof(Tuple<,>),
+        3 => typeof(Tuple<,,>),
+        4 => typeof(Tuple<,,,>),
+        5 => typeof(Tuple<,,,,>),
+        6 => typeof(Tuple<,,,,,>),
+        7 => typeof(Tuple<,,,,,,>),
+        8 => typeof(Tuple<,,,,,,,>),
+        _ => throw Errors.Unreacheable
+      };
+
+      return valueTupleType.MakeGenericType(componentTypes).GetRequiredConstructor(
+        bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+        types: componentTypes);
     }
   }
 

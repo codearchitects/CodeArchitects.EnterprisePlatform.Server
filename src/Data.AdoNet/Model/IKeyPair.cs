@@ -5,9 +5,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IKeyPair
 {
-  IColumnModel PrimaryKey { get; }
+  IPrimaryKeyColumnModel PrimaryKey { get; }
   
-  IColumnModel ForeignKey { get; }
+  IForeignKeyColumnModel ForeignKey { get; }
 
   IColumnModel FromColumn { get; }
   

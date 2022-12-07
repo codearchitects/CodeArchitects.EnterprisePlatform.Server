@@ -1,13 +1,20 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
-internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+
+internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
 {
-  public PrimaryAndForeignKeyColumnModel(short index, short primaryKeyIndex, short foreignKeyIndex)
+  private readonly AccessibleMemberComponent _memberComponent;
+
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent memberComponent, short index, short primaryKeyIndex)
     : base(index)
   {
+    _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
-    ForeignKeyIndex = foreignKeyIndex;
   }
+
+  protected override MemberComponent MemberComponent => _memberComponent;
 
   public override bool IsPrimaryKey => true;
 
@@ -15,11 +22,24 @@ internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryA
 
   public short PrimaryKeyIndex { get; }
 
-  public short ForeignKeyIndex { get; }
+  public short ForeignKeyIndex => PrimaryKeyColumn.PrimaryKeyIndex;
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
   public INavigationModel Navigation => throw new NotImplementedException();
+
+  [AllowNull]
+  public override string Name
+  {
+    get => _memberComponent.Name;
+    set => _memberComponent.Name = value;
+  }
+
+  public new MemberInfo Member => _memberComponent.Member;
+
+  public new Getter<object?> GetValue => _memberComponent.GetValue;
+
+  public new Setter<object?> SetValue => _memberComponent.SetValue;
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {

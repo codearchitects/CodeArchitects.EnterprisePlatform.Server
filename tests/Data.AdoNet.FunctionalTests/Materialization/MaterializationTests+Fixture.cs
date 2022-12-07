@@ -151,7 +151,7 @@ public partial class MaterializationTests
       PropertyInfo idPropertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.Id));
       PropertyInfo namePropertyInfo = typeof(Parent).GetRequiredProperty(nameof(Parent.Name));
 
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(Guid))
         .Setup(mock => mock
@@ -185,7 +185,7 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildA).GetRequiredProperty(nameof(ChildA.ParentId));
 
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
@@ -228,7 +228,7 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId));
 
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
@@ -271,7 +271,7 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildC).GetRequiredProperty(nameof(ChildC.Name));
       PropertyInfo parentIdPropertyInfo = typeof(ChildC).GetRequiredProperty(nameof(ChildC.ParentId));
 
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock
@@ -311,7 +311,7 @@ public partial class MaterializationTests
       PropertyInfo namePropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.Name));
       PropertyInfo childAIdPropertyInfo = typeof(ChildD).GetRequiredProperty(nameof(ChildD.ChildAId));
 
-      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetIndex(0)
         .SetType(typeof(int))
         .Setup(mock => mock

@@ -117,11 +117,11 @@ internal class CommandBuilder : ICommandBuilder
       return columnModel.GetValue(_node);
     }
 
-    private object? GetNavigatableValue(IForeignKeyColumnModelBase columnModel, in NavigationContext context)
+    private object? GetNavigatableValue(IForeignKeyColumnModel columnModel, in NavigationContext context)
     {
       INavigationModel navigationModel = columnModel.Navigation;
 
-      if (navigationModel.Inverse.Id == context.NavigationModel.Id)
+      if (context != default && navigationModel.Inverse.Id == context.NavigationModel.Id)
       {
         object? value = columnModel.PrimaryKeyColumn.GetValue(context.Parent);
         if (navigationModel.HasMember)

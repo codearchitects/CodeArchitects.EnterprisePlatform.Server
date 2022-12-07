@@ -1,20 +1,15 @@
 ﻿using CodeArchitects.Platform.CodeAnalysis;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
 public interface IPrimaryKeyModel
 {
-  [MemberNotNullWhen(true, nameof(TupleConstructor))]
   bool IsComposite { get; }
   
   Type Type { get; }
   
   IReadOnlyList<IPrimaryKeyColumnModel> Columns { get; }
-
-  ConstructorInfo? TupleConstructor { get; } // TODO: This must be the constructor of Tuple, not ValueTuple
 
   Getter<object?> GetValue { get; }
 

@@ -2,17 +2,16 @@
 
 internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnModel
 {
-  public ForeignKeyColumnModel(short index, short foreignKeyIndex)
+  public ForeignKeyColumnModel(short index)
     : base(index)
   {
-    ForeignKeyIndex = foreignKeyIndex;
   }
 
   public override bool IsPrimaryKey => false;
 
   public override bool IsForeignKey => true;
 
-  public short ForeignKeyIndex { get; }
+  public short ForeignKeyIndex => PrimaryKeyColumn.PrimaryKeyIndex;
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 

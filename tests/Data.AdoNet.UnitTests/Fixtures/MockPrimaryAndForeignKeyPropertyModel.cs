@@ -24,7 +24,7 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyColu
 
   public short ForeignKeyIndex => _mock.ForeignKeyIndex;
 
-  public IPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
+  public IStandardPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
 
   public INavigationModel Navigation => _mock.Navigation;
 

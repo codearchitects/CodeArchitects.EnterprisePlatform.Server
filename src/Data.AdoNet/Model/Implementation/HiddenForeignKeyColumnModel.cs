@@ -4,8 +4,8 @@ internal class HiddenForeignKeyColumnModel : ForeignKeyColumnModel
 {
   private readonly HiddenMemberComponent _memberComponent;
 
-  public HiddenForeignKeyColumnModel(HiddenMemberComponent memberComponent, short index, short foreignKeyIndex)
-    : base(index, foreignKeyIndex)
+  public HiddenForeignKeyColumnModel(HiddenMemberComponent memberComponent, short index)
+    : base(index)
   {
     _memberComponent = memberComponent;
   }
