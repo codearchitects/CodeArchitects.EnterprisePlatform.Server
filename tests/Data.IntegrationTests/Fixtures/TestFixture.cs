@@ -133,7 +133,7 @@ public class TestFixture : IAsyncLifetime
 
         DataContext<TestDbContext> context = new(contextManager, trackingContext, predicateProvider, entityFactory);
 
-        return new Repository<TEntity, TKey>(context);
+        return new EFCoreRepository<TEntity, TKey>(context);
       default:
         throw Errors.Unreacheable;
     }

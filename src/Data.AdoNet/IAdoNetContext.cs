@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
-using System.Data;
+﻿using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 

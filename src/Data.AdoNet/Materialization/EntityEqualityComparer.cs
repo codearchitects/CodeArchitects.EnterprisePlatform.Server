@@ -31,7 +31,7 @@ internal class EntityEqualityComparer<TEntity, TKey> : IEqualityComparer<TEntity
     return EqualityComparer<TKey>.Default.GetHashCode(_keyGetter(obj));
   }
 
-  public static EntityEqualityComparer<TEntity, TKey> GetDefault(IEntityModel<TEntity, TKey> entity)
+  public static EntityEqualityComparer<TEntity, TKey> GetInstance(IEntityModel<TEntity, TKey> entity)
   {
     return s_instance ??= new(entity.PrimaryKey.GetValue);
   }

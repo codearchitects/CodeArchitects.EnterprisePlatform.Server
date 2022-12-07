@@ -32,7 +32,7 @@ internal class IdentityCollectionFactory : IIdentityCollectionFactory
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    EntityEqualityComparer<TEntity, TKey> comparer = EntityEqualityComparer<TEntity, TKey>.GetDefault(entity);
+    EntityEqualityComparer<TEntity, TKey> comparer = EntityEqualityComparer<TEntity, TKey>.GetInstance(entity);
 
     return collectionKind switch
     {

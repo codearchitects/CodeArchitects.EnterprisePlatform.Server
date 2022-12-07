@@ -134,7 +134,7 @@ internal class DataContext<TDbConnection> : IAdoNetContext<TDbConnection>
     await Connection.OpenAsync(cancellationToken);
     try
     {
-      return await _executor.ExecuteSelectCommandAsync(command, key, spec, cancellationToken);
+      return await _executor.ExecuteSelectCommandAsync(command, key, in spec, cancellationToken);
     }
     finally
     {

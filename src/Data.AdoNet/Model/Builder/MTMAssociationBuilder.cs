@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
