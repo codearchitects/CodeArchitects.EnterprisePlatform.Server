@@ -26,7 +26,7 @@ public partial class RowReaderProviderTests
       PropertyInfo idPropertyInfo = typeof(EntityWithConstructor).GetRequiredProperty(nameof(EntityWithConstructor.Id), BindingFlags.Instance | BindingFlags.Public);
       PropertyInfo namePropertyInfo = typeof(EntityWithConstructor).GetRequiredProperty(nameof(EntityWithConstructor.Name), BindingFlags.Instance | BindingFlags.Public);
 
-      IStandardPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
+      IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetType(typeof(int))
         .SetIndex(0)
         .SetHasMember(true)

@@ -4,11 +4,11 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class AccessibleMemberComponent : MemberComponent, IAccessibleMemberModel
+internal abstract class AccessibleMemberComponent<T> : MemberComponent<T>
 {
   private string? _name;
 
-  protected AccessibleMemberComponent(Getter<object?> getValue, Setter<object?> setValue)
+  protected AccessibleMemberComponent(Getter<T> getValue, Setter<T> setValue)
   {
     GetValue = getValue;
     SetValue = setValue;
@@ -23,24 +23,24 @@ internal abstract class AccessibleMemberComponent : MemberComponent, IAccessible
 
   public new abstract MemberInfo Member { get; }
 
-  public new Getter<object?> GetValue { get; }
+  public new Getter<T> GetValue { get; }
 
-  public new Setter<object?> SetValue { get; }
+  public new Setter<T> SetValue { get; }
 
   protected override MemberInfo? MemberCore => Member;
 
-  protected override Getter<object?>? GetValueCore => GetValue;
+  protected override Getter<T>? GetValueCore => GetValue;
 
-  protected override Setter<object?>? SetValueCore => SetValue;
+  protected override Setter<T>? SetValueCore => SetValue;
 
   protected override bool HasMemberCore => true;
 
-  public static AccessibleMemberComponent Create(MemberInfo member)
+  public static AccessibleMemberComponent<T> Create(MemberInfo member)
   {
     return member switch
     {
-      PropertyInfo property => PropertyMemberComponent.Create(property),
-      FieldInfo field       => FieldMemberComponent.Create(field),
+      PropertyInfo property => PropertyMemberComponent<T>.Create(property),
+      FieldInfo field       => FieldMemberComponent<T>.Create(field),
       _                     => throw Errors.Unreacheable
     };
   }

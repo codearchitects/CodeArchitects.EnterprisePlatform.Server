@@ -10,5 +10,5 @@ public interface IPrimaryKeyModel<TKey> : IPrimaryKeyModel
 
   new Setter<TKey> SetValue { get; }
 
-  object GetKeyComponent(TKey key, int index);
+  object? GetKeyComponent(TKey key, int index);
 }

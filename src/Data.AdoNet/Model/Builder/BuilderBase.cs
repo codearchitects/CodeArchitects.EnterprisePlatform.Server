@@ -47,14 +47,20 @@ internal class BuilderBase
     return members[0] switch
     {
       PropertyInfo property => (property, property.PropertyType),
-      FieldInfo field => (field, field.FieldType),
-      _ => throw Errors.Unreacheable,
+      FieldInfo field       => (field, field.FieldType),
+      _                     => throw Errors.Unreacheable,
     };
   }
 
   protected static IEnumerable<Name> GetKeyNames(Expression body)
   {
     return GetKeyNamesCore(body, false);
+  }
+
+  protected static void CheckKeyArity(int arity)
+  {
+    if (arity > 4)
+      throw new NotSupportedException("Primary keys with more than 4 components are not supported.");
   }
 
   private static IEnumerable<Name> GetKeyNamesCore(Expression expression, bool throwOnNewExpression)
@@ -78,8 +84,11 @@ internal class BuilderBase
           if (!TryGetPropertyOrField(argument, out member))
             throw InvalidExpression();
 
+          int arity = 0;
           foreach (Name name in GetKeyNamesCore(argument, true))
           {
+            arity++;
+            CheckKeyArity(arity);
             yield return name;
           }
         }

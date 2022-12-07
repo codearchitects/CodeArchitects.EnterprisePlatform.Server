@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class MemberModel : IMemberModel
 {
-  protected abstract MemberComponent MemberComponent { get; }
+  protected abstract MemberComponent<object?> MemberComponent { get; }
 
   public Type Type => MemberComponent.Type;
 

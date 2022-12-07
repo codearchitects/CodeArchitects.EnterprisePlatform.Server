@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal abstract class EntityModelBuilder : BuilderBase
 {
@@ -13,5 +15,7 @@ internal abstract class EntityModelBuilder : BuilderBase
 
   public abstract void Complete(IReadOnlyCollection<Type> entityTypes, IEnumerable<Association> associations);
 
-  public abstract IEntityModel Build();
+  // public abstract EntityModel EntityModel { get; }
+  // 
+  // public abstract PrimaryKeyModel PrimaryKeyModel { get; }
 }

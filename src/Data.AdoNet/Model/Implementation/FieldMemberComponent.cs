@@ -1,11 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class FieldMemberComponent : AccessibleMemberComponent
+internal class FieldMemberComponent<T> : AccessibleMemberComponent<T>
 {
-  public FieldMemberComponent(FieldInfo field, Getter<object?> getValue, Setter<object?> setValue)
+  public FieldMemberComponent(FieldInfo field, Getter<T> getValue, Setter<T> setValue)
     : base(getValue, setValue)
   {
     Field = field;
@@ -21,7 +22,7 @@ internal class FieldMemberComponent : AccessibleMemberComponent
 
   protected override PropertyInfo? PropertyCore => null;
 
-  public static Getter<object?> BuildGetAccessor(FieldInfo field, string? memberName = null)
+  public static Getter<T> BuildGetAccessor(FieldInfo field, string? memberName = null)
   {
     memberName ??= field.Name;
     DynamicMethod getMethod = new($"get_{memberName}", field.FieldType, Type.EmptyTypes, field.DeclaringType!);
@@ -31,10 +32,10 @@ internal class FieldMemberComponent : AccessibleMemberComponent
     il.Emit(OpCodes.Ldfld, field);
     il.Emit(OpCodes.Ret);
 
-    return (Getter<object?>)getMethod.CreateDelegate(typeof(Getter<object?>));
+    return (Getter<T>)getMethod.CreateDelegate(typeof(Getter<T>));
   }
 
-  public static Setter<object?> BuildSetAccessor(FieldInfo field, string? memberName = null)
+  public static Setter<T> BuildSetAccessor(FieldInfo field, string? memberName = null)
   {
     memberName ??= field.Name;
     DynamicMethod setMethod = new($"set_{memberName}", typeof(void), new[] { field.FieldType }, field.DeclaringType!);
@@ -45,14 +46,16 @@ internal class FieldMemberComponent : AccessibleMemberComponent
     il.Emit(OpCodes.Stfld, field);
     il.Emit(OpCodes.Ret);
 
-    return (Setter<object?>)setMethod.CreateDelegate(typeof(Setter<object?>));
+    return (Setter<T>)setMethod.CreateDelegate(typeof(Setter<T>));
   }
 
-  public static FieldMemberComponent Create(FieldInfo field)
+  public static FieldMemberComponent<T> Create(FieldInfo field)
   {
-    Getter<object?> getValue = BuildGetAccessor(field);
-    Setter<object?> setValue = BuildSetAccessor(field);
+    Debug.Assert(typeof(T).Equals(field.FieldType), "Invalid member component type.");
 
-    return new FieldMemberComponent(field, getValue, setValue);
+    Getter<T> getValue = BuildGetAccessor(field);
+    Setter<T> setValue = BuildSetAccessor(field);
+
+    return new(field, getValue, setValue);
   }
 }

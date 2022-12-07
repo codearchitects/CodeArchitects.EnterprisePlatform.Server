@@ -25,7 +25,7 @@ public partial class IdentityCollectionFactoryTests
           .SetType(typeof(int))))
         .Mocked<Entity, int>();
 
-      INavigationModel navigation = SimpleAccessibleNavigationModelBuilder.Build(_ => _
+      INavigationModel navigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
         .SetCollectionKind(_collectionKind)
         .SetTo(entity));
 

@@ -1,11 +1,12 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class PropertyMemberComponent : AccessibleMemberComponent
+internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
 {
-  public PropertyMemberComponent(PropertyInfo property, Getter<object?> getValue, Setter<object?> setValue)
+  public PropertyMemberComponent(PropertyInfo property, Getter<T> getValue, Setter<T> setValue)
     : base(getValue, setValue)
   {
     Property = property;
@@ -21,30 +22,32 @@ internal class PropertyMemberComponent : AccessibleMemberComponent
 
   protected override PropertyInfo? PropertyCore => Property;
 
-  public static Getter<object?> BuildGetAccessor(PropertyInfo property)
+  public static Getter<T> BuildGetAccessor(PropertyInfo property)
   {
     if (property.GetMethod is null)
       throw new ModelConfigurationException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a getter.");
 
-    return (Getter<object?>)Delegate.CreateDelegate(typeof(Getter<object?>), property.GetMethod);
+    return (Getter<T>)Delegate.CreateDelegate(typeof(Getter<T>), property.GetMethod);
   }
 
-  public static Setter<object?> BuildSetAccessor(PropertyInfo property)
+  public static Setter<T> BuildSetAccessor(PropertyInfo property)
   {
     if (property.SetMethod is not null)
-      return (Setter<object?>)Delegate.CreateDelegate(typeof(Setter<object?>), property.SetMethod);
+      return (Setter<T>)Delegate.CreateDelegate(typeof(Setter<T>), property.SetMethod);
 
     if (!property.TryGetBackingFieldByConvention(out FieldInfo? backingField))
       throw new ModelConfigurationException($"Property '{property.Name}' on type '{property.DeclaringType!.Name}' does not have a setter or a backing field resolvable by convention.");
 
-    return FieldMemberComponent.BuildSetAccessor(backingField, property.Name);
+    return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
   }
 
-  public static PropertyMemberComponent Create(PropertyInfo property)
+  public static PropertyMemberComponent<T> Create(PropertyInfo property)
   {
-    Getter<object?> getValue = BuildGetAccessor(property);
-    Setter<object?> setValue = BuildSetAccessor(property);
+    Debug.Assert(typeof(T).Equals(property.PropertyType), "Invalid member component type.");
 
-    return new PropertyMemberComponent(property, getValue, setValue);
+    Getter<T> getValue = BuildGetAccessor(property);
+    Setter<T> setValue = BuildSetAccessor(property);
+
+    return new(property, getValue, setValue);
   }
 }

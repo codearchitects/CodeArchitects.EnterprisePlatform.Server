@@ -5,16 +5,16 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
 {
-  private readonly AccessibleMemberComponent _memberComponent;
+  private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent memberComponent, short index, short primaryKeyIndex)
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex)
     : base(index)
   {
     _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
   }
 
-  protected override MemberComponent MemberComponent => _memberComponent;
+  protected override MemberComponent<object?> MemberComponent => _memberComponent;
 
   public override bool IsPrimaryKey => true;
 

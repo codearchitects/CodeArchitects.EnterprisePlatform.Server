@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
@@ -18,9 +17,7 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
 
   public Type Type => _mock.Type;
 
-  public IReadOnlyList<IStandardPrimaryKeyColumnModel> Columns => _mock.Columns;
-
-  public ConstructorInfo? Constructor => _mock.Constructor;
+  public IReadOnlyList<IPrimaryKeyColumnModel> Columns => _mock.Columns;
 
   public Getter<TKey> GetValue => instance => (TKey)_mock.GetValue(instance)!;
 

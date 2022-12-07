@@ -59,8 +59,6 @@ internal class DataModel : IDataModel
 
       entityBuilder.Complete(entityTypes, associationsTo);
 
-      IEntityModel entity = entityBuilder.Build();
-      model.AddEntity(entity);
     }
 
     return model;

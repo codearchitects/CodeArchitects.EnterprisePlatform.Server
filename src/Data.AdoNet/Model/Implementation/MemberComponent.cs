@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal abstract class MemberComponent : IMemberModel
+internal abstract class MemberComponent<T>
 {
   public Type Type => TypeCore;
 
@@ -14,9 +14,9 @@ internal abstract class MemberComponent : IMemberModel
 
   public bool HasMember => HasMemberCore;
 
-  public Getter<object?>? GetValue => GetValueCore;
+  public Getter<T>? GetValue => GetValueCore;
 
-  public Setter<object?>? SetValue => SetValueCore;
+  public Setter<T>? SetValue => SetValueCore;
 
   protected abstract Type TypeCore { get; }
 
@@ -28,7 +28,7 @@ internal abstract class MemberComponent : IMemberModel
 
   protected abstract bool HasMemberCore { get; }
 
-  protected abstract Getter<object?>? GetValueCore { get; }
+  protected abstract Getter<T>? GetValueCore { get; }
 
-  protected abstract Setter<object?>? SetValueCore { get; }
+  protected abstract Setter<T>? SetValueCore { get; }
 }

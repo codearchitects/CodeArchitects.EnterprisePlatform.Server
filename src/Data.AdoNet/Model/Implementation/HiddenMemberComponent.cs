@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class HiddenMemberComponent : MemberComponent
+internal class HiddenMemberComponent<T> : MemberComponent<T>
 {
   public HiddenMemberComponent(Type type)
   {
@@ -19,7 +19,7 @@ internal class HiddenMemberComponent : MemberComponent
 
   protected override bool HasMemberCore => false;
 
-  protected override Getter<object?>? GetValueCore => null;
+  protected override Getter<T>? GetValueCore => null;
 
-  protected override Setter<object?>? SetValueCore => null;
+  protected override Setter<T>? SetValueCore => null;
 }

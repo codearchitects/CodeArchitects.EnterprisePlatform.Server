@@ -4,15 +4,15 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel
 {
-  private readonly AccessibleMemberComponent _memberComponent;
+  private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent memberComponent, short index)
+  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index)
     : base(index)
   {
     _memberComponent = memberComponent;
   }
 
-  protected override MemberComponent MemberComponent => _memberComponent;
+  protected override MemberComponent<object?> MemberComponent => _memberComponent;
 
   [AllowNull]
   public override string Name

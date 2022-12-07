@@ -2,15 +2,15 @@
 
 internal class HiddenForeignKeyColumnModel : ForeignKeyColumnModel
 {
-  private readonly HiddenMemberComponent _memberComponent;
+  private readonly HiddenMemberComponent<object?> _memberComponent;
 
-  public HiddenForeignKeyColumnModel(HiddenMemberComponent memberComponent, short index)
+  public HiddenForeignKeyColumnModel(HiddenMemberComponent<object?> memberComponent, short index)
     : base(index)
   {
     _memberComponent = memberComponent;
   }
 
-  protected override MemberComponent MemberComponent => _memberComponent;
+  protected override MemberComponent<object?> MemberComponent => _memberComponent;
 
   public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 }

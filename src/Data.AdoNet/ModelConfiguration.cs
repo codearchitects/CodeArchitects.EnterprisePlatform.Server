@@ -139,7 +139,7 @@ public abstract class ModelConfiguration
     _associations.Add(association);
   }
 
-  protected static ColumnName Column(string columnName)
+  protected internal static ColumnName Column(string columnName)
   {
     return new(columnName);
   }

@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
@@ -69,6 +68,8 @@ internal class OTOAssociationBuilder<TFrom, TTo> : AssociationBuilder, IOTOAssoc
 
   public IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params string[] keyNames)
   {
+    CheckKeyArity(keyNames.Length);
+
     _foreignKeyNames.Clear();
 
     foreach (string keyName in keyNames)
@@ -83,6 +84,8 @@ internal class OTOAssociationBuilder<TFrom, TTo> : AssociationBuilder, IOTOAssoc
 
   public IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params Name[] keyNames)
   {
+    CheckKeyArity(keyNames.Length);
+
     _foreignKeyNames.Clear();
 
     foreach (Name keyName in keyNames)

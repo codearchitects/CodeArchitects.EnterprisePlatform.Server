@@ -5,15 +5,15 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class OrdinaryColumnModel : ColumnModel, IOrdinaryColumnModel
 {
-  private readonly AccessibleMemberComponent _memberComponent;
+  private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public OrdinaryColumnModel(AccessibleMemberComponent memberComponent, short index)
+  public OrdinaryColumnModel(AccessibleMemberComponent<object?> memberComponent, short index)
     : base(index)
   {
     _memberComponent = memberComponent;
   }
 
-  protected override MemberComponent MemberComponent => _memberComponent;
+  protected override MemberComponent<object?> MemberComponent => _memberComponent;
 
   public override bool IsPrimaryKey => false;
 

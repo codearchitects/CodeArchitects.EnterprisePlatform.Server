@@ -56,7 +56,7 @@ internal abstract class EntityModel : IEntityModel
 
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation)
   {
-    foreach (NavigationModel nav in Navigations)
+    foreach (INavigationModel nav in Navigations)
     {
       if (!nav.HasMember)
         continue;
@@ -72,5 +72,11 @@ internal abstract class EntityModel : IEntityModel
 
     navigation = null;
     return false;
+  }
+
+  public static EntityModel Create(Type entityType, IInitializerModel initializer, IPrimaryKeyModel primaryKey)
+  {
+    Type type = typeof(EntityModel<,>).MakeGenericType(entityType, primaryKey.Type);
+    return (EntityModel)Activator.CreateInstance(type, new object[] { initializer, primaryKey })!;
   }
 }

@@ -3,18 +3,18 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
-internal class MockForeignKeyPropertyModel : IStandardForeignKeyColumnModel
+internal class MockForeignKeyPropertyModel : IForeignKeyColumnModel
 {
-  private readonly IStandardForeignKeyColumnModel _mock;
+  private readonly IForeignKeyColumnModel _mock;
 
-  public MockForeignKeyPropertyModel(IStandardForeignKeyColumnModel mock)
+  public MockForeignKeyPropertyModel(IForeignKeyColumnModel mock)
   {
     _mock = mock;
   }
 
   public short ForeignKeyIndex => _mock.ForeignKeyIndex;
 
-  public IStandardPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => _mock.PrimaryKeyColumn;
 
   public INavigationModel Navigation => _mock.Navigation;
 
@@ -57,7 +57,7 @@ internal class MockForeignKeyPropertyModel : IStandardForeignKeyColumnModel
 
 internal static class MockForeignKeyPropertyModelExtensions
 {
-  public static IStandardForeignKeyColumnModel Mocked(this IStandardForeignKeyColumnModel mock)
+  public static IForeignKeyColumnModel Mocked(this IForeignKeyColumnModel mock)
   {
     return new MockForeignKeyPropertyModel(mock);
   }
