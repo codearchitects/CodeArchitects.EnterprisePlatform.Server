@@ -93,6 +93,32 @@ internal class CommandBuilder : ICommandBuilder
 
     public object? VisitForeignKey(IForeignKeyColumnModel columnModel, in NavigationContext context)
     {
+      return GetNavigatableValue(columnModel, in context);
+    }
+
+    public object? VisitOrdinary(IOrdinaryColumnModel columnModel, in NavigationContext context)
+    {
+      return GetAccessibleValue(columnModel);
+    }
+
+    public object? VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel columnModel, in NavigationContext context)
+    {
+      return GetNavigatableValue(columnModel, in context);
+    }
+
+    public object? VisitPrimaryKey(IPrimaryKeyColumnModel columnModel, in NavigationContext context)
+    {
+      return GetAccessibleValue(columnModel);
+    }
+
+
+    private object? GetAccessibleValue(IAccessibleColumnModel columnModel)
+    {
+      return columnModel.GetValue(_node);
+    }
+
+    private object? GetNavigatableValue(IForeignKeyColumnModelBase columnModel, in NavigationContext context)
+    {
       INavigationModel navigationModel = columnModel.Navigation;
 
       if (navigationModel.Inverse.Id == context.NavigationModel.Id)
@@ -125,21 +151,6 @@ internal class CommandBuilder : ICommandBuilder
         return columnModel.GetValue(_node);
 
       return null;
-    }
-
-    public object? VisitOrdinary(IOrdinaryColumnModel columnModel, in NavigationContext context)
-    {
-      return columnModel.GetValue(_node);
-    }
-
-    public object? VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel columnModel, in NavigationContext context)
-    {
-      return VisitForeignKey(columnModel, in context);
-    }
-
-    public object? VisitPrimaryKey(IPrimaryKeyColumnModel columnModel, in NavigationContext context)
-    {
-      return columnModel.GetValue(_node);
     }
   }
 }

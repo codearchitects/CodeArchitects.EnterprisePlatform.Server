@@ -3,6 +3,7 @@
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Experimental]
-public interface IPrimaryKeyColumnModel : IPrimaryKeyColumnModelBase, IAccessibleColumnModel
+public interface IPrimaryKeyColumnModelBase : IColumnModel
 {
+  short PrimaryKeyIndex { get; }
 }

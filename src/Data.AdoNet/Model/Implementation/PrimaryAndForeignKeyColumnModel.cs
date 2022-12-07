@@ -1,21 +1,21 @@
 ﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
+internal abstract class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
 {
-  public PrimaryAndForeignKeyColumnModel(MemberComponent memberComponent, short index)
+  public PrimaryAndForeignKeyColumnModel(MemberComponent memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex)
     : base(memberComponent, index)
   {
+    PrimaryKeyIndex = primaryKeyIndex;
+    ForeignKeyIndex = foreignKeyIndex;
   }
 
-  public override bool IsPrimaryKey => throw new NotImplementedException();
+  public override bool IsPrimaryKey => true;
 
-  public override bool IsForeignKey => throw new NotImplementedException();
+  public override bool IsForeignKey => true;
 
-  public override string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+  public short PrimaryKeyIndex { get; }
 
-  public short PrimaryKeyIndex => throw new NotImplementedException();
-
-  public short ForeignKeyIndex => throw new NotImplementedException();
+  public short ForeignKeyIndex { get; }
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
