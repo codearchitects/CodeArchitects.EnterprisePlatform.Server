@@ -12,7 +12,7 @@ public partial class ModelConfigurationTests
     WithAOneToManyAggregation.TestModelConfiguration sut = new();
 
     // Act
-    DataModel dataModel = sut.CreateDataModel();
+    IDataModel dataModel = sut.CreateDataModel();
 
     // Assert
   }

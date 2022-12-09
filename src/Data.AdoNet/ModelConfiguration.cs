@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public abstract class ModelConfiguration : INavigationIdGenerator
+public abstract class ModelConfiguration
 {
   internal static readonly MethodInfo s_hiddenColumnMethod = typeof(ModelConfiguration).GetRequiredMethod(
     name: nameof(Column),
@@ -39,55 +39,25 @@ public abstract class ModelConfiguration : INavigationIdGenerator
     typeof(long?)
   };
 
-  private readonly Dictionary<string, EntityModelBuilder> _entityBuilders;
-  private readonly HashSet<NavigationModelBuilder> _navigationBuilders;
-  private bool _configured;
-  private int _navigationId;
+  private readonly DataModelBuilder _modelBuilder;
+  private DataModel? _dataModel;
 
   public ModelConfiguration()
   {
-    _entityBuilders = new();
-    _navigationBuilders = new();
+    _modelBuilder = new();
   }
 
   protected abstract void Configure();
 
-  internal DataModel CreateDataModel()
+  internal IDataModel CreateDataModel()
   {
-    if (!_configured)
+    if (_dataModel is null)
     {
       Configure();
-      _configured = true;
+      _dataModel = _modelBuilder.Build();
     }
 
-    List<EntityModel> entities = new();
-
-    DataModel dataModel = new();
-
-    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
-    {
-      EntityModel entity = entityBuilder.Build();
-      entities.Add(entity);
-      dataModel.AddEntity(entity);
-    }
-
-    foreach (NavigationModelBuilder navigationBuilder in _navigationBuilders)
-    {
-      (NavigationModel directNavigation, NavigationModel inverseNavigation) = navigationBuilder.Build(dataModel);
-
-      EntityModelBuilder fromEntityBuilder = _entityBuilders[directNavigation.From.Name];
-      EntityModelBuilder toEntityBuilder = _entityBuilders[directNavigation.To.Name];
-
-      fromEntityBuilder.AddNavigation(directNavigation, Enumerable.Empty<Name>());
-      toEntityBuilder.AddNavigation(inverseNavigation, navigationBuilder.ForeignKeyNames);
-    }
-
-    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
-    {
-      entityBuilder.AddColumns();
-    }
-
-    return dataModel;
+    return _dataModel;
   }
 
   protected void Entity<TEntity>(Action<IEntityModelBuilder<TEntity>>? buildAction = null)
@@ -153,33 +123,18 @@ public abstract class ModelConfiguration : INavigationIdGenerator
   protected void EntityCore<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>>? buildAction = null)
     where TEntity : class
   {
-    if (_entityBuilders.TryGetValue(entityName, out EntityModelBuilder? untypedBuilder))
-    {
-      if (untypedBuilder is not EntityModelBuilder<TEntity> typedBuilder)
-        throw new ModelConfigurationException($"Duplicate entity name '{entityName}' for entities of type '{typeof(TEntity).Name}' and '{untypedBuilder.EntityType.Name}'.");
-
-      buildAction?.Invoke(typedBuilder);
-      return;
-    }
-
-    EntityModelBuilder<TEntity> builder = new(entityName);
-    _entityBuilders.Add(entityName, builder);
-    buildAction?.Invoke(builder);
+    EntityModelBuilder<TEntity> entityBuilder = _modelBuilder.GetEntityBuilder<TEntity>(entityName);
+    buildAction?.Invoke(entityBuilder);
   }
 
   private void Association<TFrom, TTo>(string fromName, string toName, AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
-    AssociationBuilder<TFrom, TTo> builder = new(this, kind, fromName, toName);
+    AssociationBuilder<TFrom, TTo> builder = new(_modelBuilder, kind, fromName, toName);
     buildAction(builder);
 
-    NavigationModelBuilder navigationBuilder = builder.NavigationBuilder;
-
-    if (_navigationBuilders.Contains(navigationBuilder))
-      throw new ModelConfigurationException($"Duplicate association '{fromName}' -> '{toName}'.");
-
-    _navigationBuilders.Add(navigationBuilder);
+    _modelBuilder.AddNavigationBuilder(fromName, toName, builder.NavigationBuilder);
   }
 
   protected internal static ColumnName Column(string columnName)
@@ -190,10 +145,5 @@ public abstract class ModelConfiguration : INavigationIdGenerator
   internal static bool IsSupportedColumnType(Type type)
   {
     return s_supportedColumnTypes.Contains(type);
-  }
-
-  int INavigationIdGenerator.GetNextId()
-  {
-    return ++_navigationId;
   }
 }
