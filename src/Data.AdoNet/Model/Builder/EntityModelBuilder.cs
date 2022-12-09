@@ -13,9 +13,5 @@ internal abstract class EntityModelBuilder : BuilderBase
 
   public string EntityName { get; }
 
-  public abstract void Complete(IReadOnlyCollection<Type> entityTypes, IEnumerable<Association> associations);
-
-  // public abstract EntityModel EntityModel { get; }
-  // 
-  // public abstract PrimaryKeyModel PrimaryKeyModel { get; }
+  public abstract EntityModel Build();
 }

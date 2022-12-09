@@ -68,23 +68,38 @@ public abstract class ModelConfiguration
         throw new ModelConfigurationException($"An association '{association.From.Name}' -> '{association.To.Name}' was defined, but '{association.To.Name}' is not an entity type.");
     }
 
-    return DataModel.Create(_entityBuilders.Values, _associations);
+    List<EntityModel> entities = new();
+
+    DataModel dataModel = new();
+
+    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
+    {
+      EntityModel entity = entityBuilder.Build();
+      entities.Add(entity);
+      dataModel.AddEntity(entity);
+    }
+
+    foreach (Association association in _associations)
+    {
+    }
+
+    return dataModel;
   }
 
-  protected void Entity<TEntity>(Action<IEntityModelBuilder<TEntity>> buildAction)
+  protected void Entity<TEntity>(Action<IEntityModelBuilder<TEntity>>? buildAction = null)
     where TEntity : class
   {
     EntityCore(
       typeof(TEntity).Name,
-      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
+      buildAction);
   }
 
-  protected void Entity<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>> buildAction)
+  protected void Entity<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>>? buildAction = null)
     where TEntity : class
   {
     EntityCore(
       entityName ?? throw new ArgumentNullException(nameof(entityName)),
-      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
+      buildAction);
   }
 
   protected void Aggregation<TFrom, TTo>(Action<IAggregationBuilder<TFrom, TTo>> buildAction)
@@ -92,6 +107,19 @@ public abstract class ModelConfiguration
     where TTo : class
   {
     Association(
+      typeof(TFrom).Name,
+      typeof(TTo).Name,
+      AssociationKind.Aggregation,
+      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
+  }
+
+  protected void Aggregation<TFrom, TTo>(string fromName, string toName, Action<IAggregationBuilder<TFrom, TTo>> buildAction)
+    where TFrom : class
+    where TTo : class
+  {
+    Association(
+      fromName,
+      toName,
       AssociationKind.Aggregation,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
@@ -101,35 +129,45 @@ public abstract class ModelConfiguration
     where TTo : class
   {
     Association(
+      typeof(TFrom).Name,
+      typeof(TTo).Name,
       AssociationKind.Composition,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
 
-  protected void EntityCore<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>> buildAction)
-    where TEntity : class
-  {
-    EntityModelBuilder<TEntity> builder = GetEntityBuilder<TEntity>(entityName);
-    buildAction(builder);
-  }
-
-  private EntityModelBuilder<TEntity> GetEntityBuilder<TEntity>(string entityName)
-    where TEntity : class
-  {
-    if (_entityBuilders.TryGetValue(entityName, out EntityModelBuilder? builder))
-      return builder as EntityModelBuilder<TEntity>
-        ?? throw new ModelConfigurationException($"Duplicate entity name '{entityName}' for entities of type '{typeof(TEntity).Name}' and '{builder.EntityType.Name}'.");
-
-    EntityModelBuilder<TEntity> typedBuilder = new(entityName);
-    _entityBuilders.Add(entityName, typedBuilder);
-
-    return typedBuilder;
-  }
-
-  private void Association<TFrom, TTo>(AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
+  protected void Composition<TFrom, TTo>(string fromName, string toName, Action<ICompositionBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
-    AssociationBuilder<TFrom, TTo> builder = new();
+    Association(
+      fromName,
+      toName,
+      AssociationKind.Composition,
+      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
+  }
+
+  protected void EntityCore<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>>? buildAction = null)
+    where TEntity : class
+  {
+    if (_entityBuilders.TryGetValue(entityName, out EntityModelBuilder? untypedBuilder))
+    {
+      if (untypedBuilder is not EntityModelBuilder<TEntity> typedBuilder)
+        throw new ModelConfigurationException($"Duplicate entity name '{entityName}' for entities of type '{typeof(TEntity).Name}' and '{untypedBuilder.EntityType.Name}'.");
+
+      buildAction?.Invoke(typedBuilder);
+      return;
+    }
+
+    EntityModelBuilder<TEntity> builder = new(entityName);
+    _entityBuilders.Add(entityName, builder);
+    buildAction?.Invoke(builder);
+  }
+
+  private void Association<TFrom, TTo>(string fromName, string toName, AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
+    where TFrom : class
+    where TTo : class
+  {
+    AssociationBuilder<TFrom, TTo> builder = new(fromName, toName);
     buildAction(builder);
     Association association = builder.Build(kind);
 

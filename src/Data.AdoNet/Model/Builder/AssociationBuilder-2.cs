@@ -4,7 +4,15 @@ internal class AssociationBuilder<TFrom, TTo> : AssociationBuilder, IAggregation
   where TFrom : class
   where TTo : class
 {
+  private readonly string _fromName;
+  private readonly string _toName;
   private AssociationBuilder? _builder;
+
+  public AssociationBuilder(string fromName, string toName)
+  {
+    _fromName = fromName;
+    _toName = toName;
+  }
 
   public override Association Build(AssociationKind kind)
   {

@@ -9,5 +9,5 @@ public interface IForeignKeyModel
 
   Type Type { get; }
   
-  IReadOnlyCollection<IForeignKeyColumnModel> Properties { get; }
+  IReadOnlyCollection<IForeignKeyColumnModel> Columns { get; }
 }

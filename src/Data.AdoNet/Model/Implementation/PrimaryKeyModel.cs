@@ -64,7 +64,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
     return (PrimaryKeyModel)result!;
   }
 
-  public static SimplePrimaryKeyModel<TKey> Create1<TKey>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
+  private static SimplePrimaryKeyModel<TKey> Create1<TKey>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
     where TKey : IEquatable<TKey>
   {
     AccessibleMemberComponent<TKey> memberComponent = AccessibleMemberComponent<TKey>.Create(membersAndTypes[0].Member);
@@ -72,7 +72,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
     return new(memberComponent.GetValue, memberComponent.SetValue);
   }
 
-  public static CompositePrimaryKeyModel<TKey1, TKey2> Create2<TKey1, TKey2>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
+  private static CompositePrimaryKeyModel<TKey1, TKey2> Create2<TKey1, TKey2>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
   {
     AccessibleMemberComponent<TKey1> memberComponent1 = AccessibleMemberComponent<TKey1>.Create(membersAndTypes[0].Member);
     AccessibleMemberComponent<TKey2> memberComponent2 = AccessibleMemberComponent<TKey2>.Create(membersAndTypes[1].Member);
@@ -90,7 +90,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
     return new(getValue, setValue);
   }
 
-  public static CompositePrimaryKeyModel<TKey1, TKey2, TKey3> Create3<TKey1, TKey2, TKey3>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
+  private static CompositePrimaryKeyModel<TKey1, TKey2, TKey3> Create3<TKey1, TKey2, TKey3>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
   {
     AccessibleMemberComponent<TKey1> memberComponent1 = AccessibleMemberComponent<TKey1>.Create(membersAndTypes[0].Member);
     AccessibleMemberComponent<TKey2> memberComponent2 = AccessibleMemberComponent<TKey2>.Create(membersAndTypes[1].Member);
@@ -111,7 +111,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
     return new(getValue, setValue);
   }
 
-  public static CompositePrimaryKeyModel<TKey1, TKey2, TKey3, TKey4> Create4<TKey1, TKey2, TKey3, TKey4>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
+  private static CompositePrimaryKeyModel<TKey1, TKey2, TKey3, TKey4> Create4<TKey1, TKey2, TKey3, TKey4>(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)
   {
     AccessibleMemberComponent<TKey1> memberComponent1 = AccessibleMemberComponent<TKey1>.Create(membersAndTypes[0].Member);
     AccessibleMemberComponent<TKey2> memberComponent2 = AccessibleMemberComponent<TKey2>.Create(membersAndTypes[1].Member);
