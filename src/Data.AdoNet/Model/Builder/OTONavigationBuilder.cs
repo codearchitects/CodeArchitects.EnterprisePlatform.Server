@@ -17,7 +17,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 
   public override IReadOnlyCollection<Name> ForeignKeyNames => _foreignKeyNames;
 
-  protected override (NavigationModel Direct, NavigationModel Inverse) Build(IEntityModel fromEntity, IEntityModel toEntity)
+  protected override NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity)
   {
     SimpleNavigationModel direct;
     SimpleNavigationModel inverse;
@@ -45,7 +45,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     direct.Inverse = inverse;
     inverse.Inverse = direct;
 
-    return (direct, inverse);
+    return direct;
   }
 
   public IOTOAssociationBuilder<TFrom, TTo> InverseNavigation(Expression<Func<TTo, TFrom?>> expression)

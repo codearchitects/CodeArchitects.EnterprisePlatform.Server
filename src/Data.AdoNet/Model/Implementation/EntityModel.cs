@@ -51,6 +51,26 @@ internal abstract class EntityModel : IEntityModel
     _navigations.Add(navigation);
   }
 
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleColumnModel? column)
+  {
+    foreach (IColumnModel col in _columns)
+    {
+      if (!col.HasMember)
+        continue;
+
+      Debug.Assert(col is IAccessibleColumnModel, $"A column model with member should be assignable to {nameof(IAccessibleColumnModel)}.");
+
+      if (name.SequenceEqual(col.Member.Name))
+      {
+        column = (IAccessibleColumnModel)col;
+        return true;
+      }
+    }
+
+    column = null;
+    return false;
+  }
+
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation)
   {
     foreach (INavigationModel nav in Navigations)
@@ -60,7 +80,7 @@ internal abstract class EntityModel : IEntityModel
 
       Debug.Assert(nav is IAccessibleNavigationModel, $"A navigation model with member should be assignable to {nameof(IAccessibleNavigationModel)}.");
 
-      if (name.SequenceEqual(nav.Member.Name.AsSpan()))
+      if (name.SequenceEqual(nav.Member.Name))
       {
         navigation = (IAccessibleNavigationModel)nav;
         return true;

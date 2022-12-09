@@ -12,7 +12,7 @@ internal abstract class NavigationModelBuilder : BuilderBase, IEquatable<Navigat
   protected abstract MemberInfo? DirectNavigationMember { get; }
   protected abstract MemberInfo? InverseNavigationMember { get; }
 
-  public abstract (NavigationModel Direct, NavigationModel Inverse) Build(DataModel dataModel);
+  public abstract NavigationModel Build(DataModel dataModel);
 
   public bool Equals([AllowNull] NavigationModelBuilder other)
   {

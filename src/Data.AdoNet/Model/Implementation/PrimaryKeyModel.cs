@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
@@ -46,6 +47,21 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
   public void AddColumn(IPrimaryKeyColumnModel column)
   {
     _columns.Add(column);
+  }
+
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IPrimaryKeyColumnModel? column)
+  {
+    foreach (IPrimaryKeyColumnModel col in _columns)
+    {
+      if (name.SequenceEqual(col.Member.Name))
+      {
+        column = col;
+        return true;
+      }
+    }
+
+    column = null;
+    return false;
   }
 
   public static PrimaryKeyModel Create(IReadOnlyList<(MemberInfo Member, Type Type)> membersAndTypes)

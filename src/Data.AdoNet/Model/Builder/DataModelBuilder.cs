@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
@@ -29,21 +30,38 @@ internal class DataModelBuilder : INavigationIdGenerator
 
     foreach (NavigationModelBuilder navigationBuilder in _navigationBuilders)
     {
-      (NavigationModel directNavigation, NavigationModel inverseNavigation) = navigationBuilder.Build(dataModel);
+      NavigationModel navigation = navigationBuilder.Build(dataModel);
 
-      EntityModelBuilder fromEntityBuilder = _entityBuilders[directNavigation.From.Type];
-      EntityModelBuilder toEntityBuilder = _entityBuilders[directNavigation.To.Type];
+      EntityModelBuilder fromEntityBuilder = _entityBuilders[navigation.From.Type];
+      EntityModelBuilder toEntityBuilder = _entityBuilders[navigation.To.Type];
 
-      fromEntityBuilder.AddNavigation(directNavigation, Enumerable.Empty<Name>());
-      toEntityBuilder.AddNavigation(inverseNavigation, navigationBuilder.ForeignKeyNames);
+      IEnumerable<Name> foreignKeyNames = GetForeignKeyNames(navigation, navigationBuilder, fromEntityBuilder);
+      fromEntityBuilder.AddNavigation(navigation, Array.Empty<Name>());
+      toEntityBuilder.AddNavigation(navigation.Inverse, foreignKeyNames);
     }
 
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
     {
-      entityBuilder.AddColumns();
+      entityBuilder.AddAccessibleColumns();
+    }
+
+    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
+    {
+      entityBuilder.AddHiddenColumns();
     }
 
     return dataModel;
+
+    static IEnumerable<Name> GetForeignKeyNames(NavigationModel navigation, NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder)
+    {
+      if (navigationBuilder.ForeignKeyNames is { Count: > 0 } foreignKeyNames)
+        return foreignKeyNames;
+
+      return fromEntityBuilder.PrimaryKeyMembers
+        .Select(member => new Name(new ColumnName(navigation.HasMember
+          ? $"{navigation.Member.Name}{member.Name}"
+          : $"{navigation.From.Type.Name}{member.Name}")));
+    }
   }
 
   public EntityModelBuilder<TEntity> GetEntityBuilder<TEntity>()

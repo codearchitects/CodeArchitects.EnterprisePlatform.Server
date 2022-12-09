@@ -32,6 +32,11 @@ internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
 
   IPrimaryKeyModel<TKey> IEntityModel<TEntity, TKey>.PrimaryKey => new MockPrimaryKeyModel<TKey>(PrimaryKey);
 
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleColumnModel? column)
+  {
+    throw new NotImplementedException();
+  }
+
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigationModel)
   {
     foreach (INavigationModel navigation in Navigations)

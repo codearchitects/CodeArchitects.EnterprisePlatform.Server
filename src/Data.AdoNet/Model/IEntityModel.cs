@@ -22,5 +22,7 @@ public interface IEntityModel
   
   IReadOnlyCollection<INavigationModel> Navigations { get; }
 
+  bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleColumnModel? column);
+
   bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation);
 }

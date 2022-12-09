@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
 
@@ -28,6 +29,11 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
   Setter<object?> IPrimaryKeyModel.SetValue => _mock.SetValue;
 
   public object GetKeyComponent(TKey key, int index)
+  {
+    throw new NotImplementedException();
+  }
+
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IPrimaryKeyColumnModel? column)
   {
     throw new NotImplementedException();
   }

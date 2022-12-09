@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -34,6 +35,11 @@ internal class MockPrimaryKeyModel<TKey> : IPrimaryKeyModel<TKey>
       return tuple[index]!;
 
     return key;
+  }
+
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IPrimaryKeyColumnModel? column)
+  {
+    throw new NotImplementedException();
   }
 }
 

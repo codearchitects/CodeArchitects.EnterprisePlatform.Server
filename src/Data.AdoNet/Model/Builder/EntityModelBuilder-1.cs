@@ -31,6 +31,15 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
   [MemberNotNullWhen(true, nameof(_entity), nameof(_primaryKey), nameof(_initializer), nameof(_primaryKeyMembers))]
   private bool HasCompleted { get; set; }
 
+  public override IReadOnlyCollection<MemberInfo> PrimaryKeyMembers
+  {
+    get
+    {
+      EnsureCompleted(HasCompleted);
+      return _primaryKeyMembers;
+    }
+  }
+
   public override Type EntityType => typeof(TEntity);
 
   public IEntityModelBuilder<TEntity> Ignore(string memberName)
@@ -141,8 +150,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
   public override void AddNavigation(INavigationModel navigation, IEnumerable<Name> foreignKeyNames)
   {
-    if (!HasCompleted)
-      throw new InvalidOperationException("Builder has not completed yet.");
+    EnsureCompleted(HasCompleted);
 
     foreach (Name foreignKeyName in foreignKeyNames)
     {
@@ -151,10 +159,9 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     _entity.AddNavigation(navigation);
   }
 
-  public override void AddColumns()
+  public override void AddAccessibleColumns()
   {
-    if (!HasCompleted)
-      throw new InvalidOperationException("Builder has not completed yet.");
+    EnsureCompleted(HasCompleted);
 
     IReadOnlyList<AccessibleMemberComponent<object?>> primaryKeyMemberComponents = _primaryKeyMembers
       .Select(AccessibleMemberComponent<object?>.Create)
@@ -163,11 +170,12 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     short index = 0;
     foreach (var memberComponent in primaryKeyMemberComponents)
     {
-      IColumnModel column = _navigations.TryGetValue(memberComponent.Name, out INavigationModel? navigation)
+      IPrimaryKeyColumnModel column = _navigations.TryGetValue(memberComponent.Name, out INavigationModel? navigation)
         ? new PrimaryAndForeignKeyColumnModel(memberComponent, index, index, navigation)
         : new PrimaryKeyColumnModel(memberComponent, index, index);
 
       _entity.AddColumn(column);
+      _primaryKey.AddColumn(column);
       index++;
     }
 
@@ -188,6 +196,18 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
       _entity.AddColumn(column);
       index++;
+    }
+  }
+
+  public override void AddHiddenColumns()
+  {
+    EnsureCompleted(HasCompleted);
+
+    short index = (short)_entity.Columns.Count;
+    foreach (Name columnName in _navigations.Keys.Where(name => name.IsColumnName))
+    {
+      Type memberType = _navigations[columnName].From.PrimaryKey.GetColumn(columnName.Value).Type;
+      HiddenMemberComponent<object?> memberComponent = new(memberType);
     }
   }
 
@@ -215,5 +235,11 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
   {
     if (!typeof(IEquatable<>).MakeGenericType(memberType).IsAssignableFrom(memberType))
       throw new ModelConfigurationException($"Key member '{member.Name}' does not implement the IEquatable interface.");
+  }
+
+  private static void EnsureCompleted([DoesNotReturnIf(false)] bool hasCompleted)
+  {
+    if (!hasCompleted)
+      throw new InvalidOperationException("Builder has not completed yet.");
   }
 }

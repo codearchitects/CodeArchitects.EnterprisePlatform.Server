@@ -26,7 +26,7 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
 
   protected sealed override Type ToType => typeof(TTo);
 
-  public sealed override (NavigationModel Direct, NavigationModel Inverse) Build(DataModel dataModel)
+  public sealed override NavigationModel Build(DataModel dataModel)
   {
     if (!dataModel.TryGetEntity(FromType, out IEntityModel? fromEntity))
       throw new ModelConfigurationException($"An association '{FromType.Name}' -> '{ToType.Name}' was defined, but '{FromType.Name}' is not an entity.");
@@ -37,7 +37,7 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
     return Build(fromEntity, toEntity);
   }
 
-  protected abstract (NavigationModel Direct, NavigationModel Inverse) Build(IEntityModel fromEntity, IEntityModel toEntity);
+  protected abstract NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity);
 
   protected static CollectionKind GetCollectionKind(Type memberType)
   {

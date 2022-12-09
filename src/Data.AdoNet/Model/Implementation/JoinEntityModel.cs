@@ -1,11 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class JoinEntityModel : IEntityModel
 {
+  private readonly List<IColumnModel> _columns;
+
   public JoinEntityModel(string tableName)
   {
+    _columns = new();
     TableName = tableName;
   }
 
@@ -24,6 +28,26 @@ internal class JoinEntityModel : IEntityModel
   public IReadOnlyCollection<IColumnModel> Columns => throw new NotImplementedException();
 
   public IReadOnlyCollection<INavigationModel> Navigations => Array.Empty<INavigationModel>();
+
+  public bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleColumnModel? column)
+  {
+    foreach (IColumnModel col in _columns)
+    {
+      if (!col.HasMember)
+        continue;
+
+      Debug.Assert(col is IAccessibleColumnModel, $"A column model with member should be assignable to {nameof(IAccessibleColumnModel)}.");
+
+      if (name.SequenceEqual(col.Member.Name))
+      {
+        column = (IAccessibleColumnModel)col;
+        return true;
+      }
+    }
+
+    column = null;
+    return false;
+  }
 
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation)
   {
