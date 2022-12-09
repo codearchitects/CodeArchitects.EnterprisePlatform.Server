@@ -6,8 +6,6 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IEntityModel
 {
-  string Name { get; }
-
   string TableName { get; }
   
   Type Type { get; }

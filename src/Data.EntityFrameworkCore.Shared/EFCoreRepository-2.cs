@@ -26,5 +26,5 @@ public class EFCoreRepository<TEntity, TKey> : EFCoreRepositoryBase<TEntity, TKe
 
   protected DbContext DbContext => Context.DbContext;
 
-  protected DbSet<TEntity> Entities => Context.DbContext.Set<TEntity>(EntityName);
+  protected DbSet<TEntity> Entities => Context.DbContext.Set<TEntity>();
 }

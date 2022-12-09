@@ -20,8 +20,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
   private InitializerModel? _initializer;
   private IReadOnlyCollection<MemberInfo>? _primaryKeyMembers;
 
-  public EntityModelBuilder(string entityName)
-    : base(entityName)
+  public EntityModelBuilder()
   {
     _keyNames = new();
     _ignoredMembers = new();

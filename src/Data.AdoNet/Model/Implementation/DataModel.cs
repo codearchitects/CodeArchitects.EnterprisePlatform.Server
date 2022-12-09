@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class DataModel : IDataModel
 {
-  private readonly Dictionary<string, IEntityModel> _entities;
+  private readonly Dictionary<Type, IEntityModel> _entities;
 
   public DataModel()
   {
@@ -16,27 +16,23 @@ internal class DataModel : IDataModel
 
   public void AddEntity(IEntityModel entity)
   {
-    _entities.Add(entity.Name, entity);
+    _entities.Add(entity.Type, entity);
   }
 
-  public bool TryGetEntity(string entityName, [NotNullWhen(true)] out IEntityModel? entity)
+  public bool TryGetEntity(Type entityType, [NotNullWhen(true)] out IEntityModel? entity)
   {
-    return _entities.TryGetValue(entityName, out entity);
+    return _entities.TryGetValue(entityType, out entity);
   }
 
-  public bool TryGetEntity<TEntity, TKey>(string entityName, [NotNullWhen(true)] out IEntityModel<TEntity, TKey>? entity)
+  public bool TryGetEntity<TEntity, TKey>([NotNullWhen(true)] out IEntityModel<TEntity, TKey>? entity)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (!_entities.TryGetValue(entityName, out IEntityModel? untypedEntity))
+    if (!_entities.TryGetValue(typeof(TEntity), out IEntityModel? untypedEntity))
     {
       entity = null;
       return false;
     }
-
-    Type entityType = untypedEntity.Type;
-    if (entityType != typeof(TEntity))
-      throw new TypeArgumentException($"Wrong entity type '{typeof(TEntity).Name}' for entity '{untypedEntity.Type.Name}': expected '{entityType.Name}'.");
 
     Type keyType = untypedEntity.PrimaryKey.Type;
     if (keyType != typeof(TKey))

@@ -7,8 +7,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 internal abstract class NavigationModelBuilder : BuilderBase, IEquatable<NavigationModelBuilder>
 {
   public abstract IReadOnlyCollection<Name> ForeignKeyNames { get; }
-  protected abstract string FromEntityName { get; }
-  protected abstract string ToEntityName { get; }
+  protected abstract Type FromType { get; }
+  protected abstract Type ToType { get; }
   protected abstract MemberInfo? DirectNavigationMember { get; }
   protected abstract MemberInfo? InverseNavigationMember { get; }
 
@@ -20,8 +20,8 @@ internal abstract class NavigationModelBuilder : BuilderBase, IEquatable<Navigat
       return false;
 
     return
-      FromEntityName == other.FromEntityName &&
-      ToEntityName == other.ToEntityName &&
+      FromType == other.FromType &&
+      ToType == other.ToType &&
       DirectNavigationMember == other.DirectNavigationMember &&
       InverseNavigationMember == other.InverseNavigationMember;
   }
@@ -33,6 +33,6 @@ internal abstract class NavigationModelBuilder : BuilderBase, IEquatable<Navigat
 
   public override int GetHashCode()
   {
-    return HashCode.Combine(FromEntityName, ToEntityName);
+    return HashCode.Combine(FromType, ToType);
   }
 }

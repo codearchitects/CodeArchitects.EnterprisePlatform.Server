@@ -5,7 +5,6 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class EntityModel : IEntityModel
 {
-  private string? _name;
   private string? _tableName;
   private readonly List<IColumnModel> _columns;
   private readonly List<INavigationModel> _navigations;
@@ -17,13 +16,6 @@ internal abstract class EntityModel : IEntityModel
     _columns = new();
     _navigations = new();
     _foreignKeys = new();
-  }
-
-  [AllowNull]
-  public string Name
-  {
-    get => _name ?? Type.Name;
-    set => _name = value;
   }
 
   [AllowNull]

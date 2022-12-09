@@ -9,8 +9,8 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 {
   private readonly List<Name> _foreignKeyNames;
 
-  public OTONavigationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind, string fromEntityName, string toEntityName)
-    : base(idGenerator, kind, fromEntityName, toEntityName)
+  public OTONavigationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
+    : base(idGenerator, kind)
   {
     _foreignKeyNames = new();
   }

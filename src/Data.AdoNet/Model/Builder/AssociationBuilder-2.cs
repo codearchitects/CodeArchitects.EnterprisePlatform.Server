@@ -6,37 +6,33 @@ internal class AssociationBuilder<TFrom, TTo> : IAggregationBuilder<TFrom, TTo>,
 {
   private readonly INavigationIdGenerator _idGenerator;
   private readonly AssociationKind _kind;
-  private readonly string _fromEntityName;
-  private readonly string _toEntityName;
-  private NavigationModelBuilder? _navigationBuilder;
+  private NavigationModelBuilder<TFrom, TTo>? _navigationBuilder;
 
-  public AssociationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind, string fromEntityName, string toEntityName)
+  public AssociationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
   {
     _idGenerator = idGenerator;
     _kind = kind;
-    _fromEntityName = fromEntityName;
-    _toEntityName = toEntityName;
   }
 
-  public NavigationModelBuilder NavigationBuilder => _navigationBuilder ?? throw new ModelConfigurationException($"The multiplicity of the relationship '{_fromEntityName}' -> '{_toEntityName}' was not specified.");
+  public NavigationModelBuilder<TFrom, TTo> NavigationBuilder => _navigationBuilder ?? throw new ModelConfigurationException($"The multiplicity of the relationship '{typeof(TFrom).Name}' -> '{typeof(TTo).Name}' was not specified.");
 
   public IOTOAssociationBuilder<TFrom, TTo> OneToOne()
   {
-    OTONavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind, _fromEntityName, _toEntityName);
+    OTONavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind);
     _navigationBuilder = builder;
     return builder;
   }
 
   public IOTMAssociationBuilder<TFrom, TTo> OneToMany()
   {
-    OTMNavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind, _fromEntityName, _toEntityName);
+    OTMNavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind);
     _navigationBuilder = builder;
     return builder;
   }
 
   public IMTMAssociationBuilder<TFrom, TTo> ManyToMany()
   {
-    MTMNavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind, _fromEntityName, _toEntityName);
+    MTMNavigationBuilder<TFrom, TTo> builder = new(_idGenerator, _kind);
     _navigationBuilder = builder;
     return builder;
   }

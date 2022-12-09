@@ -12,8 +12,8 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
   private string? _tableName;
   private IReadOnlyCollection<string>? _foreignKeyNames;
 
-  public MTMNavigationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind, string fromEntityName, string toEntityName)
-    : base(idGenerator, kind, fromEntityName, toEntityName)
+  public MTMNavigationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
+    : base(idGenerator, kind)
   {
   }
 
@@ -21,7 +21,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 
   protected override (NavigationModel Direct, NavigationModel Inverse) Build(IEntityModel fromEntity, IEntityModel toEntity)
   {
-    JoinEntityModel joinEntity = new(_tableName ?? $"{_fromEntityName}{_toEntityName}");
+    JoinEntityModel joinEntity = new(_tableName ?? $"{typeof(TFrom).Name}{typeof(TTo).Name}");
     SkipNavigationModel direct;
     SkipNavigationModel inverse;
 

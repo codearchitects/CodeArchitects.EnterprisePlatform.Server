@@ -4,7 +4,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal class DataModelBuilder : INavigationIdGenerator
 {
-  private readonly Dictionary<string, EntityModelBuilder> _entityBuilders;
+  private readonly Dictionary<Type, EntityModelBuilder> _entityBuilders;
   private readonly HashSet<NavigationModelBuilder> _navigationBuilders;
   private int _navigationId;
 
@@ -31,8 +31,8 @@ internal class DataModelBuilder : INavigationIdGenerator
     {
       (NavigationModel directNavigation, NavigationModel inverseNavigation) = navigationBuilder.Build(dataModel);
 
-      EntityModelBuilder fromEntityBuilder = _entityBuilders[directNavigation.From.Name];
-      EntityModelBuilder toEntityBuilder = _entityBuilders[directNavigation.To.Name];
+      EntityModelBuilder fromEntityBuilder = _entityBuilders[directNavigation.From.Type];
+      EntityModelBuilder toEntityBuilder = _entityBuilders[directNavigation.To.Type];
 
       fromEntityBuilder.AddNavigation(directNavigation, Enumerable.Empty<Name>());
       toEntityBuilder.AddNavigation(inverseNavigation, navigationBuilder.ForeignKeyNames);
@@ -46,23 +46,24 @@ internal class DataModelBuilder : INavigationIdGenerator
     return dataModel;
   }
 
-  public EntityModelBuilder<TEntity> GetEntityBuilder<TEntity>(string entityName)
+  public EntityModelBuilder<TEntity> GetEntityBuilder<TEntity>()
     where TEntity : class
   {
-    if (_entityBuilders.TryGetValue(entityName, out EntityModelBuilder? untypedBuilder))
-      return untypedBuilder as EntityModelBuilder<TEntity>
-        ?? throw new ModelConfigurationException($"Duplicate entity name '{entityName}' for entities of type '{typeof(TEntity).Name}' and '{untypedBuilder.EntityType.Name}'.");
+    if (_entityBuilders.TryGetValue(typeof(TEntity), out EntityModelBuilder? untypedBuilder))
+      return (EntityModelBuilder<TEntity>)untypedBuilder;
 
-    EntityModelBuilder<TEntity> builder = new(entityName);
-    _entityBuilders.Add(entityName, builder);
+    EntityModelBuilder<TEntity> builder = new();
+    _entityBuilders.Add(typeof(TEntity), builder);
 
     return builder;
   }
 
-  public void AddNavigationBuilder(string fromEntityName, string toEntityName, NavigationModelBuilder navigationBuilder)
+  public void AddNavigationBuilder<TFrom, TTo>(NavigationModelBuilder<TFrom, TTo> navigationBuilder)
+    where TFrom : class
+    where TTo : class
   {
     if (_navigationBuilders.Contains(navigationBuilder))
-      throw new ModelConfigurationException($"Duplicate association '{fromEntityName}' -> '{toEntityName}'.");
+      throw new ModelConfigurationException($"Duplicate association '{typeof(TFrom).Name}' -> '{typeof(TTo).Name}'.");
 
     _navigationBuilders.Add(navigationBuilder);
   }

@@ -11,8 +11,6 @@ internal class JoinEntityModel : IEntityModel
 
   public string TableName { get; }
 
-  public string Name => TableName;
-
   public Type Type => typeof(Dictionary<string, object>);
 
   public IInitializerModel Initializer => throw new NotSupportedException("Join entities do not have an initializer.");

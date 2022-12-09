@@ -63,17 +63,8 @@ public abstract class ModelConfiguration
   protected void Entity<TEntity>(Action<IEntityModelBuilder<TEntity>>? buildAction = null)
     where TEntity : class
   {
-    EntityCore(
-      typeof(TEntity).Name,
-      buildAction);
-  }
-
-  protected void Entity<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>>? buildAction = null)
-    where TEntity : class
-  {
-    EntityCore(
-      entityName ?? throw new ArgumentNullException(nameof(entityName)),
-      buildAction);
+    EntityModelBuilder<TEntity> entityBuilder = _modelBuilder.GetEntityBuilder<TEntity>();
+    buildAction?.Invoke(entityBuilder);
   }
 
   protected void Aggregation<TFrom, TTo>(Action<IAggregationBuilder<TFrom, TTo>> buildAction)
@@ -81,19 +72,6 @@ public abstract class ModelConfiguration
     where TTo : class
   {
     Association(
-      typeof(TFrom).Name,
-      typeof(TTo).Name,
-      AssociationKind.Aggregation,
-      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
-  }
-
-  protected void Aggregation<TFrom, TTo>(string fromName, string toName, Action<IAggregationBuilder<TFrom, TTo>> buildAction)
-    where TFrom : class
-    where TTo : class
-  {
-    Association(
-      fromName,
-      toName,
       AssociationKind.Aggregation,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
@@ -103,38 +81,19 @@ public abstract class ModelConfiguration
     where TTo : class
   {
     Association(
-      typeof(TFrom).Name,
-      typeof(TTo).Name,
       AssociationKind.Composition,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
 
-  protected void Composition<TFrom, TTo>(string fromName, string toName, Action<ICompositionBuilder<TFrom, TTo>> buildAction)
+
+  private void Association<TFrom, TTo>(AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
-    Association(
-      fromName,
-      toName,
-      AssociationKind.Composition,
-      buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
-  }
-
-  protected void EntityCore<TEntity>(string entityName, Action<IEntityModelBuilder<TEntity>>? buildAction = null)
-    where TEntity : class
-  {
-    EntityModelBuilder<TEntity> entityBuilder = _modelBuilder.GetEntityBuilder<TEntity>(entityName);
-    buildAction?.Invoke(entityBuilder);
-  }
-
-  private void Association<TFrom, TTo>(string fromName, string toName, AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
-    where TFrom : class
-    where TTo : class
-  {
-    AssociationBuilder<TFrom, TTo> builder = new(_modelBuilder, kind, fromName, toName);
+    AssociationBuilder<TFrom, TTo> builder = new(_modelBuilder, kind);
     buildAction(builder);
 
-    _modelBuilder.AddNavigationBuilder(fromName, toName, builder.NavigationBuilder);
+    _modelBuilder.AddNavigationBuilder<TFrom, TTo>(builder.NavigationBuilder);
   }
 
   protected internal static ColumnName Column(string columnName)
