@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel
+internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel, IAccessibleColumnModel
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
@@ -20,4 +21,10 @@ internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel
     get => _memberComponent.Name;
     set => _memberComponent.Name = value;
   }
+
+  public new MemberInfo Member => _memberComponent.Member;
+
+  public new Getter<object?> GetValue => _memberComponent.GetValue;
+
+  public new Setter<object?> SetValue => _memberComponent.SetValue;
 }

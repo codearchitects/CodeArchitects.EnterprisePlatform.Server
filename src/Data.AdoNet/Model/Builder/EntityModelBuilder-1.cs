@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using CodeArchitects.Platform.Common.Reflection;
+using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
@@ -163,6 +164,8 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
   {
     EnsureCompleted(HasCompleted);
 
+    ParameterInfo[] constructorParameters = _initializer.Constructor.GetParameters();
+
     IReadOnlyList<AccessibleMemberComponent<object?>> primaryKeyMemberComponents = _primaryKeyMembers
       .Select(AccessibleMemberComponent<object?>.Create)
       .ToList();
@@ -173,6 +176,8 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       IPrimaryKeyColumnModel column = _navigations.TryGetValue(memberComponent.Name, out INavigationModel? navigation)
         ? new PrimaryAndForeignKeyColumnModel(memberComponent, index, index, navigation)
         : new PrimaryKeyColumnModel(memberComponent, index, index);
+
+      AddColumnToInitializer(_initializer, constructorParameters, column);
 
       _entity.AddColumn(column);
       _primaryKey.AddColumn(column);
@@ -190,12 +195,29 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
     foreach (var memberComponent in otherMemberComponents)
     {
-      IColumnModel column = _navigations.TryGetValue(memberComponent.Name, out INavigationModel? navigation)
+      IAccessibleColumnModel column = _navigations.TryGetValue(memberComponent.Name, out INavigationModel? navigation)
         ? new AccessibleForeignKeyColumnModel(memberComponent, index, navigation)
         : new OrdinaryColumnModel(memberComponent, index);
 
+      AddColumnToInitializer(_initializer, constructorParameters, column);
+
       _entity.AddColumn(column);
       index++;
+    }
+
+    if (_initializer.ConstructorProperties.Count != constructorParameters.Length)
+      throw new ModelConfigurationException("Could not resolve some constructor parameters. Constructor parameters should have the same name of the properties they are assigned to, using the camelCase convention.");
+
+    static void AddColumnToInitializer(InitializerModel initializer, IEnumerable<ParameterInfo> constructorParameters, IAccessibleColumnModel column)
+    {
+      if (constructorParameters.Any(parameter => column.Member.Name.MatchesCamelCaseConvention(parameter.Name!)))
+      {
+        initializer.AddConstructorProperty(column);
+      }
+      else
+      {
+        initializer.AddInitializerProperty(column);
+      }
     }
   }
 
@@ -206,8 +228,12 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     short index = (short)_entity.Columns.Count;
     foreach (Name columnName in _navigations.Keys.Where(name => name.IsColumnName))
     {
-      Type memberType = _navigations[columnName].From.PrimaryKey.GetColumn(columnName.Value).Type;
+      INavigationModel navigation = _navigations[columnName];
+      Type memberType = navigation.From.PrimaryKey.GetColumn(columnName.Value).Type;
       HiddenMemberComponent<object?> memberComponent = new(memberType);
+
+      _entity.AddColumn(new HiddenForeignKeyColumnModel(memberComponent, index, navigation, columnName.Value));
+      index++;
     }
   }
 
