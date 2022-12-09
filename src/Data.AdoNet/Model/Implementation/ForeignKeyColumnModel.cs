@@ -2,9 +2,10 @@
 
 internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnModel
 {
-  public ForeignKeyColumnModel(short index)
+  public ForeignKeyColumnModel(short index, INavigationModel navigation)
     : base(index)
   {
+    Navigation = navigation;
   }
 
   public override bool IsPrimaryKey => false;
@@ -15,7 +16,7 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
-  public INavigationModel Navigation => throw new NotImplementedException();
+  public INavigationModel Navigation { get; }
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {

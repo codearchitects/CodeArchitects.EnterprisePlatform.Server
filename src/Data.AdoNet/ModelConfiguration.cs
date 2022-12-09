@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public abstract class ModelConfiguration
+public abstract class ModelConfiguration : INavigationIdGenerator
 {
   internal static readonly MethodInfo s_hiddenColumnMethod = typeof(ModelConfiguration).GetRequiredMethod(
     name: nameof(Column),
@@ -40,13 +40,14 @@ public abstract class ModelConfiguration
   };
 
   private readonly Dictionary<string, EntityModelBuilder> _entityBuilders;
-  private readonly HashSet<Association> _associations;
+  private readonly HashSet<NavigationModelBuilder> _navigationBuilders;
   private bool _configured;
+  private int _navigationId;
 
   public ModelConfiguration()
   {
     _entityBuilders = new();
-    _associations = new(AssociationEqualityComparer.Instance);
+    _navigationBuilders = new();
   }
 
   protected abstract void Configure();
@@ -57,15 +58,6 @@ public abstract class ModelConfiguration
     {
       Configure();
       _configured = true;
-    }
-
-    foreach (Association association in _associations)
-    {
-      if (!_entityBuilders.Values.Any(builder => builder.EntityType == association.From))
-        throw new ModelConfigurationException($"An association '{association.From.Name}' -> '{association.To.Name}' was defined, but '{association.From.Name}' is not an entity type.");
-    
-      if (!_entityBuilders.Values.Any(builder => builder.EntityType == association.To))
-        throw new ModelConfigurationException($"An association '{association.From.Name}' -> '{association.To.Name}' was defined, but '{association.To.Name}' is not an entity type.");
     }
 
     List<EntityModel> entities = new();
@@ -79,8 +71,20 @@ public abstract class ModelConfiguration
       dataModel.AddEntity(entity);
     }
 
-    foreach (Association association in _associations)
+    foreach (NavigationModelBuilder navigationBuilder in _navigationBuilders)
     {
+      (NavigationModel directNavigation, NavigationModel inverseNavigation) = navigationBuilder.Build(dataModel);
+
+      EntityModelBuilder fromEntityBuilder = _entityBuilders[directNavigation.From.Name];
+      EntityModelBuilder toEntityBuilder = _entityBuilders[directNavigation.To.Name];
+
+      fromEntityBuilder.AddNavigation(directNavigation, Enumerable.Empty<Name>());
+      toEntityBuilder.AddNavigation(inverseNavigation, navigationBuilder.ForeignKeyNames);
+    }
+
+    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
+    {
+      entityBuilder.AddColumns();
     }
 
     return dataModel;
@@ -167,14 +171,15 @@ public abstract class ModelConfiguration
     where TFrom : class
     where TTo : class
   {
-    AssociationBuilder<TFrom, TTo> builder = new(fromName, toName);
+    AssociationBuilder<TFrom, TTo> builder = new(this, kind, fromName, toName);
     buildAction(builder);
-    Association association = builder.Build(kind);
 
-    if (_associations.Contains(association))
-      throw new ModelConfigurationException($"Duplicate association '{typeof(TFrom).Name}' -> '{typeof(TTo).Name}'.");
+    NavigationModelBuilder navigationBuilder = builder.NavigationBuilder;
 
-    _associations.Add(association);
+    if (_navigationBuilders.Contains(navigationBuilder))
+      throw new ModelConfigurationException($"Duplicate association '{fromName}' -> '{toName}'.");
+
+    _navigationBuilders.Add(navigationBuilder);
   }
 
   protected internal static ColumnName Column(string columnName)
@@ -185,5 +190,10 @@ public abstract class ModelConfiguration
   internal static bool IsSupportedColumnType(Type type)
   {
     return s_supportedColumnTypes.Contains(type);
+  }
+
+  int INavigationIdGenerator.GetNextId()
+  {
+    return ++_navigationId;
   }
 }

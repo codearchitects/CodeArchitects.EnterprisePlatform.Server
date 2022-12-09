@@ -49,9 +49,14 @@ internal abstract class EntityModel : IEntityModel
 
   protected abstract IPrimaryKeyModel PrimaryKeyCore { get; }
 
-  public void AddColumn(ColumnModel column)
+  public void AddColumn(IColumnModel column)
   {
     _columns.Add(column);
+  }
+
+  public void AddNavigation(INavigationModel navigation)
+  {
+    _navigations.Add(navigation);
   }
 
   public bool TryGetNavigation(ReadOnlySpan<char> name, [NotNullWhen(true)] out IAccessibleNavigationModel? navigation)

@@ -5,6 +5,8 @@ public interface ICompositionBuilder<TFrom, TTo>
   where TTo : class
 {
   IOTOAssociationBuilder<TFrom, TTo> OneToOne();
+  
   IOTMAssociationBuilder<TFrom, TTo> OneToMany();
+  
   IMTMAssociationBuilder<TFrom, TTo> ManyToMany();
 }

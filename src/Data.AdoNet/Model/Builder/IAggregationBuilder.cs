@@ -5,5 +5,6 @@ public interface IAggregationBuilder<TFrom, TTo>
   where TTo : class
 {
   IOTOAssociationBuilder<TFrom, TTo> OneToOne();
+
   IOTMAssociationBuilder<TFrom, TTo> OneToMany();
 }

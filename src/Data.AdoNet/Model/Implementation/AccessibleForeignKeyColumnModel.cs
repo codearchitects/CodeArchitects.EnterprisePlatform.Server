@@ -6,8 +6,8 @@ internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index)
-    : base(index)
+  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, INavigationModel navigation)
+    : base(index, navigation)
   {
     _memberComponent = memberComponent;
   }

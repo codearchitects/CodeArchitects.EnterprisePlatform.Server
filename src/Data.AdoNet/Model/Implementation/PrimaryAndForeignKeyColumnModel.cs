@@ -7,11 +7,12 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex)
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, INavigationModel navigation)
     : base(index)
   {
     _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
+    Navigation = navigation;
   }
 
   protected override MemberComponent<object?> MemberComponent => _memberComponent;
@@ -26,7 +27,7 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
 
-  public INavigationModel Navigation => throw new NotImplementedException();
+  public INavigationModel Navigation { get; }
 
   [AllowNull]
   public override string Name

@@ -7,5 +7,6 @@ public enum CollectionKind
 {
   None,
   List,
-  HashSet
+  HashSet,
+  Unknown
 }

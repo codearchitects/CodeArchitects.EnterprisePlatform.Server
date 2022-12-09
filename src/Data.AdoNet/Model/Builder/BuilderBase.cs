@@ -7,21 +7,33 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal class BuilderBase
 {
-  protected static bool TryGetPropertyOrField(Expression body, [NotNullWhen(true)] out MemberInfo? member)
+  protected static bool TryGetMemberAndTypeFromExpression(Expression body, [NotNullWhen(true)] out MemberInfo? member, [NotNullWhen(true)] out Type? type)
   {
     if (body is not MemberExpression memberExpression)
     {
       member = null;
+      type = null;
       return false;
     }
 
-    if (memberExpression.Expression is ParameterExpression && memberExpression.Member is PropertyInfo or FieldInfo)
+    if (memberExpression.Expression is ParameterExpression)
     {
-      member = memberExpression.Member;
-      return true;
+      if (memberExpression.Member is PropertyInfo property)
+      {
+        member = property;
+        type = property.PropertyType;
+        return true;
+      }
+      else if (memberExpression.Member is FieldInfo field)
+      {
+        member = field;
+        type = field.FieldType;
+        return true;
+      }
     }
 
     member = null;
+    type = null;
     return false;
   }
 
@@ -69,7 +81,7 @@ internal class BuilderBase
     switch (expression)
     {
       case MemberExpression memberExpression:
-        if (!TryGetPropertyOrField(memberExpression, out member))
+        if (!TryGetMemberAndTypeFromExpression(memberExpression, out member, out _))
           throw InvalidExpression();
 
         yield return member.Name;
@@ -81,7 +93,7 @@ internal class BuilderBase
 
         foreach (Expression argument in newExpression.Arguments)
         {
-          if (!TryGetPropertyOrField(argument, out member))
+          if (!TryGetMemberAndTypeFromExpression(argument, out member, out _))
             throw InvalidExpression();
 
           int arity = 0;

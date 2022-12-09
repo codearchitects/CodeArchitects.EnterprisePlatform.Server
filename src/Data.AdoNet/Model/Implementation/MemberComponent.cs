@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
@@ -12,6 +13,7 @@ internal abstract class MemberComponent<T>
 
   public PropertyInfo? Property => PropertyCore;
 
+  [MemberNotNull(nameof(Member), nameof(GetValue), nameof(SetValue))]
   public bool HasMember => HasMemberCore;
 
   public Getter<T>? GetValue => GetValueCore;
@@ -26,6 +28,7 @@ internal abstract class MemberComponent<T>
 
   protected abstract PropertyInfo? PropertyCore { get; }
 
+  [MemberNotNull(nameof(Member), nameof(GetValue), nameof(SetValue))]
   protected abstract bool HasMemberCore { get; }
 
   protected abstract Getter<T>? GetValueCore { get; }

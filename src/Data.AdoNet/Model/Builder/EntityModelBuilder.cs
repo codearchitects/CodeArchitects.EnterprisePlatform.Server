@@ -14,4 +14,8 @@ internal abstract class EntityModelBuilder : BuilderBase
   public string EntityName { get; }
 
   public abstract EntityModel Build();
+
+  public abstract void AddNavigation(INavigationModel navigation, IEnumerable<Name> foreignKeyNames);
+
+  public abstract void AddColumns();
 }

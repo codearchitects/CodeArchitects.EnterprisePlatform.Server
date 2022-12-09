@@ -46,7 +46,7 @@ internal class RowReader : IRowReader
       if (navigationEntity is null)
         continue;
 
-      if (navigation.Model.IsCollection)
+      if (navigationModel.IsCollection)
       {
         IIdentityCollection collection;
         if (navigationModel.GetValue(entity) is { } property)
