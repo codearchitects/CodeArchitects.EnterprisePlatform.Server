@@ -2,9 +2,10 @@
 
 internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnModel
 {
-  public ForeignKeyColumnModel(short index, INavigationModel navigation)
+  public ForeignKeyColumnModel(short index, short foreignKeyIndex, INavigationModel navigation)
     : base(index)
   {
+    ForeignKeyIndex = foreignKeyIndex;
     Navigation = navigation;
   }
 
@@ -12,9 +13,9 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public override bool IsForeignKey => true;
 
-  public short ForeignKeyIndex => PrimaryKeyColumn.PrimaryKeyIndex;
+  public short ForeignKeyIndex { get; }
 
-  public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => Navigation.PrimaryKey.Columns[ForeignKeyIndex];
 
   public INavigationModel Navigation { get; }
 

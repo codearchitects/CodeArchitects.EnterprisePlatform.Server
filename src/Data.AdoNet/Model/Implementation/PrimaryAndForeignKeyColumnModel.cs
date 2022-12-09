@@ -7,11 +7,12 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, INavigationModel navigation)
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex, INavigationModel navigation)
     : base(index)
   {
     _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
+    ForeignKeyIndex = foreignKeyIndex;
     Navigation = navigation;
   }
 
@@ -23,9 +24,9 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public short PrimaryKeyIndex { get; }
 
-  public short ForeignKeyIndex => PrimaryKeyColumn.PrimaryKeyIndex;
+  public short ForeignKeyIndex { get; }
 
-  public IPrimaryKeyColumnModel PrimaryKeyColumn => throw new NotImplementedException();
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => Navigation.PrimaryKey.Columns[ForeignKeyIndex];
 
   public INavigationModel Navigation { get; }
 

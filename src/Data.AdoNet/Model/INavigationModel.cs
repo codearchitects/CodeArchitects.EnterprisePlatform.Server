@@ -19,8 +19,6 @@ public interface INavigationModel : IMemberModel
 
   IPrimaryKeyModel PrimaryKey { get; }
 
-  IForeignKeyModel ForeignKey { get; }
-
   INavigationModel Inverse { get; }
 
   CollectionKind CollectionKind { get; }

@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public abstract class ModelConfiguration
+public abstract class ModelConfiguration // TODO: The whole model building section needs a refactoring
 {
   internal static readonly MethodInfo s_hiddenColumnMethod = typeof(ModelConfiguration).GetRequiredMethod(
     name: nameof(Column),

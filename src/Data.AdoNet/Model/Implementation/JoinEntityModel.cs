@@ -23,8 +23,6 @@ internal class JoinEntityModel : IEntityModel
 
   public IPrimaryKeyModel PrimaryKey => throw new NotImplementedException();
 
-  public IReadOnlyCollection<IForeignKeyModel> ForeignKeys => throw new NotImplementedException();
-
   public IReadOnlyCollection<IColumnModel> Columns => throw new NotImplementedException();
 
   public IReadOnlyCollection<INavigationModel> Navigations => Array.Empty<INavigationModel>();

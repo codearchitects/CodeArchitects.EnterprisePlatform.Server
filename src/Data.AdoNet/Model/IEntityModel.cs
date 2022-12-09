@@ -16,8 +16,6 @@ public interface IEntityModel
 
   IPrimaryKeyModel PrimaryKey { get; }
 
-  IReadOnlyCollection<IForeignKeyModel> ForeignKeys { get; }
-
   IReadOnlyCollection<IColumnModel> Columns { get; }
   
   IReadOnlyCollection<INavigationModel> Navigations { get; }

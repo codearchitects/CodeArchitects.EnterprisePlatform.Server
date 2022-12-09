@@ -31,6 +31,4 @@ internal abstract class NavigationModel : MemberModel, INavigationModel
   public IEntityModel To { get; }
 
   public IPrimaryKeyModel PrimaryKey => IsOnDependent ? To.PrimaryKey : From.PrimaryKey;
-
-  public IForeignKeyModel ForeignKey => throw new NotImplementedException();
 }
