@@ -73,7 +73,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.Append(", ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");
     _stringBuilder.Append(navigation.Model.JoinEntity.TableName);
@@ -84,7 +84,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append("] AS t");
     _stringBuilder.Append(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeys, AppendJoinCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
 
@@ -124,7 +124,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
     _stringBuilder.Append(", ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendKey);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");
     _stringBuilder.Append(navigation.Model.JoinEntity.TableName);
@@ -152,7 +152,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append(") AS t");
     _stringBuilder.Append(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeys, AppendJoinCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
 

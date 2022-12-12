@@ -107,6 +107,11 @@ internal class CommandBuilder : ICommandBuilder
       return GetNavigatableValue(columnModel, in context);
     }
 
+    public object? VisitJoin(IJoinColumnModel columnModel, in NavigationContext state)
+    {
+      return GetAccessibleValue(columnModel);
+    }
+
     public object? VisitOrdinary(IOrdinaryColumnModel columnModel, in NavigationContext context)
     {
       return GetAccessibleValue(columnModel);

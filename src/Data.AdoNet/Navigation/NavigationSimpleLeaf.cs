@@ -32,42 +32,9 @@ internal class NavigationSimpleLeaf : INavigationSimpleLeaf
 
   public bool Equals(INavigation? other)
   {
-    return other is not null && new EqualityVisitor(this).Visit(other);
-  }
-
-  private readonly struct EqualityVisitor : INavigationVisitor<bool>
-  {
-    private readonly INavigationSimpleLeaf _navigation;
-
-    public EqualityVisitor(INavigationSimpleLeaf navigation)
-    {
-      _navigation = navigation;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool Visit(INavigation navigation)
-    {
-      return navigation.Accept<EqualityVisitor, bool>(in this);
-    }
-
-    public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
-    {
-      return navigation.Model.Id == _navigation.Model.Id;
-    }
-
-    public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
-    {
+    if (other is not INavigationSimpleLeaf leaf)
       return false;
-    }
 
-    public bool VisitSkipLeaf(INavigationSkipLeaf navigation)
-    {
-      return false;
-    }
-
-    public bool VisitSkipNode(INavigationSkipNode navigation)
-    {
-      return false;
-    }
+    return Model.Id == leaf.Model.Id;
   }
 }

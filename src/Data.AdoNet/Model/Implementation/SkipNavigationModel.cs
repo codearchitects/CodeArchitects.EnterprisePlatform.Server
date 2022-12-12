@@ -3,15 +3,15 @@
 internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationModel
 {
   private SkipNavigationModel? _inverse;
-  private readonly List<IKeyPair> _fromKeys;
-  private readonly List<IKeyPair> _toKeys;
+  private readonly List<IKeyPair> _fromKeyPairs;
+  private readonly List<IKeyPair> _toKeyPairs;
 
-  protected SkipNavigationModel(int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, IEntityModel joinEntity)
+  protected SkipNavigationModel(int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, JoinEntityModel joinEntity)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     JoinEntity = joinEntity;
-    _fromKeys = new();
-    _toKeys = new();
+    _fromKeyPairs = new();
+    _toKeyPairs = new();
   }
 
   protected override NavigationModel InverseCore => Inverse;
@@ -22,23 +22,55 @@ internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationMo
     set => _inverse = value;
   }
 
-  public IEntityModel JoinEntity { get; }
+  public JoinEntityModel JoinEntity { get; }
 
-  public IReadOnlyList<IKeyPair> FromKeys => _fromKeys;
+  public IReadOnlyList<IKeyPair> FromKeyPairs => _fromKeyPairs;
 
-  public IReadOnlyList<IKeyPair> ToKeys => _toKeys;
+  public IReadOnlyList<IKeyPair> ToKeyPairs => _toKeyPairs;
 
   ISkipNavigationModel ISkipNavigationModel.Inverse => Inverse;
 
+  IEntityModel ISkipNavigationModel.JoinEntity => JoinEntity;
+
+  public void AddFromForeignKey(IForeignKeyColumnModel foreignKeyColumn)
+  {
+    AddFromForeignKey(foreignKeyColumn, true);
+  }
+
+  public void AddFromForeignKey(IForeignKeyColumnModel foreignKeyColumn, bool addOnInverse)
+  {
+    _fromKeyPairs.Add(new KeyPair(foreignKeyColumn, IsOnDependent));
+
+    if (!addOnInverse)
+      return;
+
+    Inverse.AddFromForeignKey(foreignKeyColumn, false);
+  }
+
+  public void AddToForeignKey(IForeignKeyColumnModel foreignKeyColumn)
+  {
+    AddToForeignKey(foreignKeyColumn, true);
+  }
+
+  public void AddToForeignKey(IForeignKeyColumnModel foreignKeyColumn, bool addOnInverse)
+  {
+    _toKeyPairs.Add(new KeyPair(foreignKeyColumn, IsOnDependent));
+
+    if (!addOnInverse)
+      return;
+
+    Inverse.AddToForeignKey(foreignKeyColumn, false);
+  }
+
   public object CreateJoin(object from, object to)
   {
-    Dictionary<string, object?> join = new(FromKeys.Count + ToKeys.Count);
+    Dictionary<string, object?> join = new(FromKeyPairs.Count + ToKeyPairs.Count);
     
-    foreach (IKeyPair keyPair in FromKeys)
+    foreach (IKeyPair keyPair in FromKeyPairs)
     {
       join.Add(keyPair.ForeignKeyColumn.Name, keyPair.PrimaryKeyColumn.GetValue(from));
     }
-    foreach (IKeyPair keyPair in ToKeys)
+    foreach (IKeyPair keyPair in ToKeyPairs)
     {
       join.Add(keyPair.ForeignKeyColumn.Name, keyPair.PrimaryKeyColumn.GetValue(to));
     }

@@ -11,11 +11,15 @@ internal abstract class EntityModelBuilder : BuilderBase
 
   public abstract EntityModel Build();
 
-  public abstract void AddNavigation(NavigationModel navigation, IEnumerable<Name> foreignKeyNames);
+  public abstract void AddSimpleNavigation(SimpleNavigationModel navigation, IEnumerable<Name> foreignKeyNames);
+
+  public abstract void AddSkipNavigation(SkipNavigationModel navigation, IEnumerable<Name> columnNames);
 
   public abstract void AddPrimaryKeyColumns();
 
   public abstract void AddAccessibleColumns();
 
   public abstract void AddHiddenColumns();
+
+  public abstract void AddJoinTableColumns();
 }

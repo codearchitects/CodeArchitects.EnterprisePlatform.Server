@@ -28,44 +28,11 @@ internal class NavigationSkipNode : IncluderNode, INavigationSkipNode
 
   public bool Equals(INavigation? other)
   {
-    return  other is not null && new EqualityVisitor(this).Visit(other);
-  }
-
-  private readonly struct EqualityVisitor : INavigationVisitor<bool>
-  {
-    private readonly INavigationSkipNode _navigation;
-
-    public EqualityVisitor(INavigationSkipNode navigation)
-    {
-      _navigation = navigation;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool Visit(INavigation navigation)
-    {
-      return navigation.Accept<EqualityVisitor, bool>(in this);
-    }
-
-    public readonly bool VisitSimpleLeaf(INavigationSimpleLeaf navigation)
-    {
+    if (other is not INavigationNode node)
       return false;
-    }
 
-    public readonly bool VisitSimpleNode(INavigationSimpleNode navigation)
-    {
-      return false;
-    }
-
-    public bool VisitSkipLeaf(INavigationSkipLeaf navigation)
-    {
-      return false;
-    }
-
-    public bool VisitSkipNode(INavigationSkipNode navigation)
-    {
-      return
-        navigation.Model.Id == _navigation.Model.Id &&
-        NavigationCollection.Equal(navigation.Children, _navigation.Children);
-    }
+    return
+      Model.Id == node.Model.Id &&
+      NavigationCollection.Equal(Children, node.Children);
   }
 }

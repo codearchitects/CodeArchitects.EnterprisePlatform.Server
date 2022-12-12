@@ -60,7 +60,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
   {
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendCondition);
 
     return VoidResult.Instance;
 
@@ -78,7 +78,7 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
   public VoidResult VisitSkipNode(INavigationSkipNode navigation)
   {
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeys, AppendCondition);
+    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendCondition);
 
     return VoidResult.Instance;
 

@@ -3,12 +3,10 @@
 internal class ThenIncluder<TEntity> : Includer<TEntity>
   where TEntity : class
 {
-  private readonly IncluderNode _node;
-
   public ThenIncluder(IncluderNode node)
   {
-    _node = node;
+    Node = node;
   }
 
-  protected override IncluderNode Node => _node;
+  protected override IncluderNode Node { get; }
 }

@@ -10,14 +10,15 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
   private CollectionKind _directCollectionKind = CollectionKind.Unknown;
   private CollectionKind _inverseCollectionKind = CollectionKind.Unknown;
   private string? _tableName;
-  private IReadOnlyCollection<string>? _foreignKeyNames;
+  private readonly List<Name> _columnNames;
 
   public MTMNavigationBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
     : base(idGenerator, kind)
   {
+    _columnNames = new();
   }
 
-  public override IReadOnlyCollection<Name> ForeignKeyNames => Array.Empty<Name>();
+  public override IReadOnlyCollection<Name> ForeignKeyNames => _columnNames;
 
   protected override NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity)
   {
@@ -87,9 +88,10 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IMTMAssociationBuilder<TFrom, TTo> UsingForeignKeys(params string[] keyNames)
+  public IMTMAssociationBuilder<TFrom, TTo> UsingJoinColumnNames(params string[] columnNames)
   {
-    _foreignKeyNames = keyNames;
+    _columnNames.Clear();
+    _columnNames.AddRange(columnNames.Select(name => new Name(new ColumnName(name))));
 
     return this;
   }

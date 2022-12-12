@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
@@ -17,6 +18,7 @@ internal class DataModelBuilder : INavigationIdGenerator
   public DataModel Build()
   {
     List<EntityModel> entities = new();
+    List<NavigationModel> navigations = new();
 
     DataModel dataModel = new();
 
@@ -34,9 +36,22 @@ internal class DataModelBuilder : INavigationIdGenerator
       EntityModelBuilder fromEntityBuilder = _entityBuilders[navigation.From.Type];
       EntityModelBuilder toEntityBuilder = _entityBuilders[navigation.To.Type];
 
-      IEnumerable<Name> foreignKeyNames = GetForeignKeyNames(navigation, navigationBuilder, fromEntityBuilder);
-      fromEntityBuilder.AddNavigation(navigation, Array.Empty<Name>());
-      toEntityBuilder.AddNavigation(navigation.Inverse, foreignKeyNames);
+      switch (navigation)
+      {
+        case SimpleNavigationModel simpleNavigation:
+          IEnumerable<Name> foreignKeyNames = GetForeignKeyNames(simpleNavigation, navigationBuilder, fromEntityBuilder);
+          fromEntityBuilder.AddSimpleNavigation(simpleNavigation, Array.Empty<Name>());
+          toEntityBuilder.AddSimpleNavigation(simpleNavigation.Inverse, foreignKeyNames);
+          break;
+        case SkipNavigationModel skipNavigation:
+          IEnumerable<Name> columnNames = GetColumnNames(navigationBuilder, fromEntityBuilder, toEntityBuilder);
+          fromEntityBuilder.AddSkipNavigation(skipNavigation, columnNames);
+          break;
+        default:
+          throw Errors.Unreacheable;
+      };
+
+      navigations.Add(navigation);
     }
 
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
@@ -56,11 +71,8 @@ internal class DataModelBuilder : INavigationIdGenerator
 
     return dataModel;
 
-    static IEnumerable<Name> GetForeignKeyNames(NavigationModel navigation, NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder)
+    static IEnumerable<Name> GetForeignKeyNames(SimpleNavigationModel navigation, NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder)
     {
-      if (navigation is SkipNavigationModel)
-        return Array.Empty<Name>();
-
       if (navigationBuilder.ForeignKeyNames is { Count: > 0 } foreignKeyNames)
         return foreignKeyNames;
 
@@ -68,6 +80,20 @@ internal class DataModelBuilder : INavigationIdGenerator
         .Select(member => new Name(new ColumnName(navigation.HasMember
           ? $"{navigation.Member.Name}{member.Name}"
           : $"{navigation.From.Type.Name}{member.Name}")));
+    }
+
+    static IEnumerable<Name> GetColumnNames(NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder, EntityModelBuilder toEntityBuilder)
+    {
+      if (navigationBuilder.ForeignKeyNames is { Count: > 0 } foreignKeyNames)
+        return foreignKeyNames;
+
+      IEnumerable<Name> fromColumnNames = fromEntityBuilder.PrimaryKeyMembers
+        .Select(member => new Name(new ColumnName($"{fromEntityBuilder.EntityType.Name}{member.Name}")));
+      
+      IEnumerable<Name> toColumnNames = toEntityBuilder.PrimaryKeyMembers
+        .Select(member => new Name(new ColumnName($"{toEntityBuilder.EntityType.Name}{member.Name}")));
+
+      return fromColumnNames.Concat(toColumnNames);
     }
   }
 

@@ -14,5 +14,5 @@ public interface IMTMAssociationBuilder<TFrom, TTo>
   
   IMTMAssociationBuilder<TFrom, TTo> UsingJoinTable(string tableName);
   
-  IMTMAssociationBuilder<TFrom, TTo> UsingForeignKeys(params string[] keyNames);
+  IMTMAssociationBuilder<TFrom, TTo> UsingJoinColumnNames(params string[] keyNames);
 }

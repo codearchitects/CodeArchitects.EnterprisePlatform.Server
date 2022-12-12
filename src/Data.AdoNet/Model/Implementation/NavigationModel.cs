@@ -2,7 +2,7 @@
 
 internal abstract class NavigationModel : MemberModel, INavigationModel
 {
-  protected NavigationModel(int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+  protected NavigationModel(int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
   {
     Id = id;
     From = from;
@@ -26,9 +26,13 @@ internal abstract class NavigationModel : MemberModel, INavigationModel
 
   public NavigationModel Inverse => InverseCore;
 
-  public IEntityModel From { get; }
+  public EntityModel From { get; }
 
-  public IEntityModel To { get; }
+  public EntityModel To { get; }
 
   INavigationModel INavigationModel.Inverse => Inverse;
+
+  IEntityModel INavigationModel.From => From;
+
+  IEntityModel INavigationModel.To => To;
 }

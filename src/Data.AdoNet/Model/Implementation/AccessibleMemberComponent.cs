@@ -15,7 +15,7 @@ internal abstract class AccessibleMemberComponent<T> : MemberComponent<T>
   }
 
   [AllowNull]
-  public string Name
+  public virtual string Name
   {
     get => _name ?? Member.Name;
     set => _name = value;
