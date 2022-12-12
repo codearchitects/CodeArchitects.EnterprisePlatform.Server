@@ -4,6 +4,14 @@ namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
 internal static class DataRecordExtensions
 {
+  public static string? GetNullableString(this IDataRecord record, int ordinal)
+  {
+    if (record.IsDBNull(ordinal))
+      return null;
+
+    return record.GetString(ordinal);
+  }
+
   public static bool? GetNullableBoolean(this IDataRecord record, int ordinal)
   {
     if (record.IsDBNull(ordinal))

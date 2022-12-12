@@ -65,7 +65,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 
   public IOTOAssociationBuilder<TFrom, TTo> Navigation(Expression<Func<TFrom, TTo?>> expression)
   {
-    if (!TryGetMemberAndTypeFromExpression(expression.Body, out _inverseNavigationMember, out _))
+    if (!TryGetMemberAndTypeFromExpression(expression.Body, out _directNavigationMember, out _))
       throw new ModelConfigurationException("The expression must be 'x => x.Member'.");
 
     return this;

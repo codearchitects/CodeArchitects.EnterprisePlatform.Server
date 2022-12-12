@@ -34,7 +34,6 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
-    _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");
@@ -133,7 +132,6 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine("INNER JOIN (");
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
-    _stringBuilder.Append(", ");
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM [");

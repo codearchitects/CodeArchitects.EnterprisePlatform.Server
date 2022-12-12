@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-internal sealed class DataContext<TDbContext> : IEFCoreContext<TDbContext>
+internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
   where TDbContext : DbContext
 {
   private readonly IStateManager<TDbContext> _stateManager;
@@ -19,7 +19,7 @@ internal sealed class DataContext<TDbContext> : IEFCoreContext<TDbContext>
   private readonly IPredicateProvider _predicateProvider;
   private readonly IDefaultEntityFactory _defaultEntityFactory;
 
-  public DataContext(IStateManager<TDbContext> stateManager, ITrackingContext trackingContext, IPredicateProvider predicateProvider, IDefaultEntityFactory defaultEntityFactory)
+  public EFCoreContext(IStateManager<TDbContext> stateManager, ITrackingContext trackingContext, IPredicateProvider predicateProvider, IDefaultEntityFactory defaultEntityFactory)
   {
     _stateManager = stateManager;
     _trackingContext = trackingContext;

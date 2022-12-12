@@ -90,7 +90,6 @@ internal readonly struct SelectStringBuilder
   {
     Append("SELECT ");
     AppendJoin(", ", entity.Columns, AppendTargetColumn);
-    Append(", ");
     AppendChildrenColumns(navigations);
     AppendLine();
     AppendLine("FROM (");
@@ -181,6 +180,10 @@ internal readonly struct SelectStringBuilder
 
   public void AppendChildrenColumns(IReadOnlyCollection<INavigation> children)
   {
+    if (children.Count == 0)
+      return;
+
+    Append(", ");
     AppendJoin(", ", children, static (stringBuilder, child) => stringBuilder.AppendColumns(child));
   }
 

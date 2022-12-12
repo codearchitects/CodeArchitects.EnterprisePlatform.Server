@@ -6,14 +6,14 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class DataContext<TDbConnection> : IAdoNetContext<TDbConnection>
+internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
   where TDbConnection : DbConnection
 {
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor _executor;
   private readonly IDataModel _model;
 
-  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
+  public AdoNetContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;

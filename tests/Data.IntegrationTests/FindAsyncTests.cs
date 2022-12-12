@@ -167,6 +167,7 @@ public class FindAsyncTests : TestBase
     fromDb.Items.Should().BeNull();
     fromDb.User.Should().NotBeNull();
     fromDb.User!.Id.Should().Be(_user.Id);
+    fromDb.User.Claims.Should().BeNull();
     fromDb.User.Address.Should().NotBeNull();
     fromDb.User.Address!.Id.Should().Be(_user.Address!.Id);
   }
@@ -182,7 +183,7 @@ public class FindAsyncTests : TestBase
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
       .Include(e => e.User, _ => _
-        .Include(e => e.Address)));
+        .Include(e => e.Claims)));
 
     // Assert
     fromDb.Should().NotBeNull();
@@ -190,8 +191,10 @@ public class FindAsyncTests : TestBase
     fromDb.Items.Should().BeNull();
     fromDb.User.Should().NotBeNull();
     fromDb.User!.Id.Should().Be(_user.Id);
-    fromDb.User.Address.Should().NotBeNull();
-    fromDb.User.Address!.Id.Should().Be(_user.Address!.Id);
+    fromDb.User.Address.Should().BeNull();
+    fromDb.User.Claims.Should().HaveCount(2)
+      .And.ContainSingle(claim => claim.Id == _user.Claims![0].Id)
+      .And.ContainSingle(claim => claim.Id == _user.Claims![1].Id);
   }
 
   [Theory, RepositoryDependenciesData]

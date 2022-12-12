@@ -18,7 +18,7 @@ public static class DataServiceCollectionExtensions
     services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<DbContext>().Model));
     services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
     services.AddScoped<IStateManager<TDbContext>, StateManager<TDbContext>>();
-    services.AddScoped<IEFCoreContext<TDbContext>, DataContext<TDbContext>>();
+    services.AddScoped<IEFCoreContext<TDbContext>, EFCoreContext<TDbContext>>();
     services.AddScoped<IEFCoreContext>(sp => sp.GetRequiredService<IEFCoreContext<TDbContext>>());
 
     return services;

@@ -1,4 +1,9 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet;
+using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Executor;
+using CodeArchitects.Platform.Data.AdoNet.Materialization;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.EntityFrameworkCore;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
@@ -121,9 +126,28 @@ public class TestFixture : IAsyncLifetime
     switch (implementation)
     {
       case RepositoryImplementation.AdoNet:
-        throw new NotSupportedException();
+        CommandBuilder commandBuilder = new(new SqlTextBuilder(SqlTextCache.Create()));
+        Materializer materializer = new(IdentityCollectionFactory.Create(), RowReaderProvider.Create());
+        Executor executor = new(commandBuilder, materializer, trackingContext);
+        TestModelConfiguration modelConfiguration = new();
+        IDataModel dataModel = modelConfiguration.CreateDataModel();
+
+        IAdoNetContext adoNetContext = provider switch
+        {
+          DatabaseProvider.SqlServer => new AdoNetContext<SqlConnection>(
+            new AdoNet.StateManager<SqlConnection>(_sqlServerConnectionLazy.Value),
+            executor,
+            dataModel),
+          DatabaseProvider.Postgres => new AdoNetContext<NpgsqlConnection>(
+            new AdoNet.StateManager<NpgsqlConnection>(_postgresConnectionLazy.Value),
+            executor,
+            dataModel),
+          _ => throw Errors.Unreacheable
+        };
+
+        return new AdoNetRepository<TEntity, TKey>(adoNetContext);
       case RepositoryImplementation.EntityFrameworkCore:
-        StateManager<TestDbContext> contextManager = new(_dbContext);
+        EntityFrameworkCore.StateManager<TestDbContext> contextManager = new(_dbContext);
 
         PredicateTemplateFactory templateFactory = new(_dbContext.Model);
         PredicateProvider predicateProvider = new(templateFactory, PredicateTemplateCache.Create());
@@ -131,9 +155,9 @@ public class TestFixture : IAsyncLifetime
         DefaultEntityFactoryFactory entityFactoryFactory = new(_dbContext.Model);
         DefaultEntityFactory entityFactory = new(entityFactoryFactory, DefaultEntityFactoryCache.Create());
 
-        DataContext<TestDbContext> context = new(contextManager, trackingContext, predicateProvider, entityFactory);
+        EFCoreContext<TestDbContext> efCoreContext = new(contextManager, trackingContext, predicateProvider, entityFactory);
 
-        return new EFCoreRepository<TEntity, TKey>(context);
+        return new EFCoreRepository<TEntity, TKey>(efCoreContext);
       default:
         throw Errors.Unreacheable;
     }

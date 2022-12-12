@@ -28,7 +28,7 @@ internal class RowReaderProvider : IRowReaderProvider
       [typeof(short)]     = GetGetValueMethod("Int16"),
       [typeof(int)]       = GetGetValueMethod("Int32"),
       [typeof(long)]      = GetGetValueMethod("Int64"),
-      [typeof(string)]    = GetGetValueMethod("String"),
+      [typeof(string)]    = GetGetNullableValueMethod("String"),
       [typeof(bool?)]     = GetGetNullableValueMethod("Boolean"),
       [typeof(byte?)]     = GetGetNullableValueMethod("Byte"),
       [typeof(char?)]     = GetGetNullableValueMethod("Char"),
@@ -125,7 +125,7 @@ internal class RowReaderProvider : IRowReaderProvider
         left: offsetParam,
         right: Expression.Constant(index));
 
-      return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
+      return !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)
         ? Expression.Call(
             method: readMethod,
             arg0: readerParam,

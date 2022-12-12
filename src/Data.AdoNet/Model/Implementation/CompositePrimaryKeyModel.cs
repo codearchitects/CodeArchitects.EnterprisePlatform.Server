@@ -16,7 +16,7 @@ internal class CompositePrimaryKeyModel<TKey1, TKey2> : PrimaryKeyModel<(TKey1, 
 
   public override object? GetKeyComponent((TKey1, TKey2) key, int index)
   {
-    return key switch
+    return index switch
     {
       0 => key.Item1,
       1 => key.Item2,
@@ -41,7 +41,7 @@ internal class CompositePrimaryKeyModel<TKey1, TKey2, TKey3> : PrimaryKeyModel<(
 
   public override object? GetKeyComponent((TKey1, TKey2, TKey3) key, int index)
   {
-    return key switch
+    return index switch
     {
       0 => key.Item1,
       1 => key.Item2,
@@ -67,7 +67,7 @@ internal class CompositePrimaryKeyModel<TKey1, TKey2, TKey3, TKey4> : PrimaryKey
 
   public override object? GetKeyComponent((TKey1, TKey2, TKey3, TKey4) key, int index)
   {
-    return key switch
+    return index switch
     {
       0 => key.Item1,
       1 => key.Item2,

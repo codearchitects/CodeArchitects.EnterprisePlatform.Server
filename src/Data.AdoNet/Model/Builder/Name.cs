@@ -17,9 +17,9 @@ public readonly struct Name
     _columnName = columnName;
   }
 
-  public bool IsColumnName => _columnName.Equals(default);
+  public bool IsColumnName => _memberName == string.Empty;
 
-  public string Value => IsColumnName ? _memberName : _columnName.Name;
+  public string Value => IsColumnName ? _columnName.Name : _memberName;
 
   public static implicit operator Name(string memberName) => new(memberName);
 

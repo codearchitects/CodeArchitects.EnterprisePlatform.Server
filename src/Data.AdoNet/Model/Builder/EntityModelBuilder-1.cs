@@ -141,6 +141,9 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     short index = (short)_entity.Columns.Count;
     foreach (var memberComponent in accessibleMemberComponents)
     {
+      if (!ModelConfiguration.IsSupportedColumnType(memberComponent.Type))
+        continue;
+
       IAccessibleColumnModel column;
       if (_navigations.TryGetValue(memberComponent.Name, out NavigationWithFKIndex navigationWithIndex))
       {
@@ -188,10 +191,10 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     short index = (short)_entity.Columns.Count;
     foreach (Name columnName in _navigations.Keys.Where(name => name.IsColumnName))
     {
-      NavigationWithFKIndex navigationWithIndex= _navigations[columnName];
+      NavigationWithFKIndex navigationWithIndex = _navigations[columnName];
       var navigation = (SimpleNavigationModel)navigationWithIndex.Navigation;
       short foreignKeyIndex = navigationWithIndex.Index;
-      Type memberType = navigation.From.PrimaryKey.GetColumn(columnName.Value).Type;
+      Type memberType = navigation.To.PrimaryKey.Columns[foreignKeyIndex].Type;
 
       HiddenMemberComponent<object?> memberComponent = new(memberType);
       HiddenForeignKeyColumnModel fkColumn = new(memberComponent, index, foreignKeyIndex, navigation, columnName.Value);
