@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 

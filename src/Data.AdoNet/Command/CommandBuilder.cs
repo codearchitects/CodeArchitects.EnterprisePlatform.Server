@@ -57,6 +57,17 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
+  public void BuildDeleteCommand(IDbCommand command, object node, IEntityModel model)
+  {
+    command.Parameters.Clear();
+    command.CommandText = _sqlBuilder.BuildDeleteText(model);
+
+    for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
+    {
+      CreateParameter(command, $"p{i}", model.PrimaryKey.Columns[i].GetValue(node));
+    }
+  }
+
   public void BuildDeleteCommand<TEntity, TKey>(IDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class
     where TKey : IEquatable<TKey>

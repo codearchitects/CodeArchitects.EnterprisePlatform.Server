@@ -60,7 +60,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     return _entity;
   }
 
-  public override void AddNavigation(INavigationModel navigation, IEnumerable<Name> foreignKeyNames)
+  public override void AddNavigation(NavigationModel navigation, IEnumerable<Name> foreignKeyNames)
   {
     EnsureCompleted(HasCompleted);
 
@@ -72,7 +72,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     _entity.AddNavigation(navigation);
   }
 
-  public override void AddAccessibleColumns()
+  public override void AddPrimaryKeyColumns()
   {
     EnsureCompleted(HasCompleted);
 
@@ -88,12 +88,17 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       IPrimaryKeyColumnModel column;
       if (_navigations.TryGetValue(memberComponent.Name, out NavigationWithFKIndex navigationWithIndex))
       {
-        PrimaryAndForeignKeyColumnModel pkAndFkColumn = new(memberComponent, index, index, navigationWithIndex.Index, navigationWithIndex.Navigation);
+        var navigation = (SimpleNavigationModel)navigationWithIndex.Navigation;
+        short foreignKeyIndex = navigationWithIndex.Index;
+
+        PrimaryAndForeignKeyColumnModel pkAndFkColumn = new(memberComponent, index, index, foreignKeyIndex, navigation);
         if (_columnNames.TryGetValue(memberComponent.Member, out string? name))
         {
           pkAndFkColumn.Name = name;
         }
         column = pkAndFkColumn;
+
+        navigation.AddForeignKey(pkAndFkColumn);
       }
       else
       {
@@ -116,8 +121,15 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       _primaryKey.AddColumn(column);
       index++;
     }
+  }
 
-    IReadOnlyList<AccessibleMemberComponent<object?>> otherMemberComponents = EntityType.GetMembers(BindingFlags.Instance | BindingFlags.Public)
+  public override void AddAccessibleColumns()
+  {
+    EnsureCompleted(HasCompleted);
+
+    ParameterInfo[] constructorParameters = _initializer.Constructor.GetParameters();
+
+    IReadOnlyList<AccessibleMemberComponent<object?>> accessibleMemberComponents = EntityType.GetMembers(BindingFlags.Instance | BindingFlags.Public)
       .Where(member =>
         member.MemberType is MemberTypes.Property or MemberTypes.Field &&
         !_primaryKeyMembers.Contains(member) &&
@@ -126,17 +138,23 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       .Select(AccessibleMemberComponent<object?>.Create)
       .ToList();
 
-    foreach (var memberComponent in otherMemberComponents)
+    short index = (short)_entity.Columns.Count;
+    foreach (var memberComponent in accessibleMemberComponents)
     {
       IAccessibleColumnModel column;
       if (_navigations.TryGetValue(memberComponent.Name, out NavigationWithFKIndex navigationWithIndex))
       {
-        AccessibleForeignKeyColumnModel fkColumn = new(memberComponent, index, navigationWithIndex.Index, navigationWithIndex.Navigation);
+        var navigation = (SimpleNavigationModel)navigationWithIndex.Navigation;
+        short foreignKeyIndex = navigationWithIndex.Index;
+
+        AccessibleForeignKeyColumnModel fkColumn = new(memberComponent, index, foreignKeyIndex, navigation);
         if (_columnNames.TryGetValue(memberComponent.Member, out string? name))
         {
           fkColumn.Name = name;
         }
         column = fkColumn;
+
+        navigation.AddForeignKey(fkColumn);
       }
       else
       {
@@ -161,18 +179,6 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
     if (_initializer.ConstructorProperties.Count != constructorParameters.Length)
       throw new ModelConfigurationException("Could not resolve some constructor parameters. Constructor parameters should have the same name of the properties they are assigned to, using the camelCase convention.");
-
-    static void AddColumnToInitializer(InitializerModel initializer, IEnumerable<ParameterInfo> constructorParameters, IAccessibleColumnModel column)
-    {
-      if (constructorParameters.Any(parameter => column.Member.Name.MatchesCamelCaseConvention(parameter.Name!)))
-      {
-        initializer.AddConstructorProperty(column);
-      }
-      else
-      {
-        initializer.AddInitializerProperty(column);
-      }
-    }
   }
 
   public override void AddHiddenColumns()
@@ -182,11 +188,16 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     short index = (short)_entity.Columns.Count;
     foreach (Name columnName in _navigations.Keys.Where(name => name.IsColumnName))
     {
-      (INavigationModel navigation, short foreignKeyIndex) = _navigations[columnName];
+      NavigationWithFKIndex navigationWithIndex= _navigations[columnName];
+      var navigation = (SimpleNavigationModel)navigationWithIndex.Navigation;
+      short foreignKeyIndex = navigationWithIndex.Index;
       Type memberType = navigation.From.PrimaryKey.GetColumn(columnName.Value).Type;
-      HiddenMemberComponent<object?> memberComponent = new(memberType);
 
-      _entity.AddColumn(new HiddenForeignKeyColumnModel(memberComponent, index, foreignKeyIndex, navigation, columnName.Value));
+      HiddenMemberComponent<object?> memberComponent = new(memberType);
+      HiddenForeignKeyColumnModel fkColumn = new(memberComponent, index, foreignKeyIndex, navigation, columnName.Value);
+
+      _entity.AddColumn(fkColumn);
+      navigation.AddForeignKey(fkColumn);
       index++;
     }
   }
@@ -300,6 +311,18 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     }
   }
 
+  private static void AddColumnToInitializer(InitializerModel initializer, IEnumerable<ParameterInfo> constructorParameters, IAccessibleColumnModel column)
+  {
+    if (constructorParameters.Any(parameter => column.Member.Name.MatchesCamelCaseConvention(parameter.Name!)))
+    {
+      initializer.AddConstructorProperty(column);
+    }
+    else
+    {
+      initializer.AddInitializerProperty(column);
+    }
+  }
+
   private static void CheckIEquatable(MemberInfo member, Type memberType)
   {
     if (!typeof(IEquatable<>).MakeGenericType(memberType).IsAssignableFrom(memberType))
@@ -312,5 +335,5 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       throw new InvalidOperationException("Builder has not completed yet.");
   }
 
-  private readonly record struct NavigationWithFKIndex(INavigationModel Navigation, short Index);
+  private readonly record struct NavigationWithFKIndex(NavigationModel Navigation, short Index);
 }

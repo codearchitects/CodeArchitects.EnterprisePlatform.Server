@@ -41,6 +41,11 @@ internal class DataModelBuilder : INavigationIdGenerator
 
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
     {
+      entityBuilder.AddPrimaryKeyColumns();
+    }
+
+    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
+    {
       entityBuilder.AddAccessibleColumns();
     }
 

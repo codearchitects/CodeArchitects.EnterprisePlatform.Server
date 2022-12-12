@@ -2,11 +2,13 @@
 
 internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnModel
 {
-  public ForeignKeyColumnModel(short index, short foreignKeyIndex, INavigationModel navigation)
+  private readonly ISimpleNavigationModel _navigation;
+
+  public ForeignKeyColumnModel(short index, short foreignKeyIndex, ISimpleNavigationModel navigation)
     : base(index)
   {
     ForeignKeyIndex = foreignKeyIndex;
-    Navigation = navigation;
+    _navigation = navigation;
   }
 
   public override bool IsPrimaryKey => false;
@@ -15,9 +17,9 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public short ForeignKeyIndex { get; }
 
-  public IPrimaryKeyColumnModel PrimaryKeyColumn => Navigation.PrimaryKey.Columns[ForeignKeyIndex];
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => _navigation.PrimaryKey.Columns[ForeignKeyIndex];
 
-  public INavigationModel Navigation { get; }
+  public INavigationModel Navigation => _navigation;
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {

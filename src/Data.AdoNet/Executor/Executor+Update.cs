@@ -24,7 +24,8 @@ internal partial class Executor
             await self.ExecuteInsertCommandAsync(command, node, model, in context, cancellationToken);
             break;
           case TrackingState.Removed:
-            throw new NotSupportedException();
+            await self.ExecuteDeleteCommandAsync(command, node, model, cancellationToken);
+            break;
           case TrackingState.Modified:
             await self.ExecuteUpdateCommandAsync(command, node, model, in context, cancellationToken);
             break;
@@ -34,14 +35,19 @@ internal partial class Executor
 
       if (navigationModel is ISkipNavigationModel skipNavigationModel)
       {
+        IEntityModel joinEntityModel = skipNavigationModel.JoinEntity;
+        object joinEntity;
+
         switch (self._trackingContext.GetTrackingState(node))
         {
           case TrackingState.Added:
-            object joinEntity = skipNavigationModel.CreateJoin(parent, node);
-            await self.ExecuteInsertCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
+            joinEntity = skipNavigationModel.CreateJoin(parent, node);
+            await self.ExecuteInsertCommandAsync(command, joinEntity, joinEntityModel, default, cancellationToken);
             break;
           case TrackingState.Removed:
-            throw new NotSupportedException();
+            joinEntity = skipNavigationModel.CreateJoin(parent, node);
+            await self.ExecuteDeleteCommandAsync(command, joinEntity, joinEntityModel, cancellationToken);
+            break;
           case TrackingState.Modified:
             throw new InvalidTrackingStateException(model.Type.Name, TrackingState.Modified);
         }

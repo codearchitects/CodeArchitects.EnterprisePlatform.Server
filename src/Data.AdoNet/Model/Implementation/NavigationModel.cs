@@ -12,7 +12,7 @@ internal abstract class NavigationModel : MemberModel, INavigationModel
     IsOnDependent = isOnDependent;
   }
 
-  public abstract INavigationModel InverseCore { get; }
+  protected abstract NavigationModel InverseCore { get; }
 
   public CollectionKind CollectionKind { get; }
 
@@ -24,11 +24,11 @@ internal abstract class NavigationModel : MemberModel, INavigationModel
 
   public bool IsCollection => CollectionKind is not CollectionKind.None;
 
-  public INavigationModel Inverse => InverseCore;
+  public NavigationModel Inverse => InverseCore;
 
   public IEntityModel From { get; }
 
   public IEntityModel To { get; }
 
-  public IPrimaryKeyModel PrimaryKey => IsOnDependent ? To.PrimaryKey : From.PrimaryKey;
+  INavigationModel INavigationModel.Inverse => Inverse;
 }

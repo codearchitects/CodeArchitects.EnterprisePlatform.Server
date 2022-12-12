@@ -6,14 +6,15 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeignKeyColumnModel
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
+  private readonly ISimpleNavigationModel _navigation;
 
-  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex, INavigationModel navigation)
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex, ISimpleNavigationModel navigation)
     : base(index)
   {
     _memberComponent = memberComponent;
     PrimaryKeyIndex = primaryKeyIndex;
     ForeignKeyIndex = foreignKeyIndex;
-    Navigation = navigation;
+    _navigation = navigation;
   }
 
   protected override MemberComponent<object?> MemberComponent => _memberComponent;
@@ -26,9 +27,9 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public short ForeignKeyIndex { get; }
 
-  public IPrimaryKeyColumnModel PrimaryKeyColumn => Navigation.PrimaryKey.Columns[ForeignKeyIndex];
+  public IPrimaryKeyColumnModel PrimaryKeyColumn => _navigation.PrimaryKey.Columns[ForeignKeyIndex];
 
-  public INavigationModel Navigation { get; }
+  public INavigationModel Navigation => _navigation;
 
   [AllowNull]
   public override string Name

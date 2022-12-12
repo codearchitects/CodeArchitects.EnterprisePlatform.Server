@@ -7,7 +7,7 @@ internal class AccessibleForeignKeyColumnModel : ForeignKeyColumnModel, IAccessi
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short foreignKeyIndex, INavigationModel navigation)
+  public AccessibleForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short foreignKeyIndex, ISimpleNavigationModel navigation)
     : base(index, foreignKeyIndex, navigation)
   {
     _memberComponent = memberComponent;

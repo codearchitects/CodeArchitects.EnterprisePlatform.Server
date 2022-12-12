@@ -16,4 +16,13 @@ internal partial class Executor
     if (affectedRows == 0)
       throw new DBConcurrencyException(); // TODO: Message
   }
+
+  private async Task ExecuteDeleteCommandAsync(DbCommand command, object node, IEntityModel model, CancellationToken cancellationToken)
+  {
+    _commandBuilder.BuildDeleteCommand(command, node, model);
+
+    int affectedRows = await command.ExecuteNonQueryAsync(cancellationToken);
+    if (affectedRows == 0)
+      throw new DBConcurrencyException(); // TODO: Message
+  }
 }

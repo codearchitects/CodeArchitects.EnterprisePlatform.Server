@@ -3,14 +3,18 @@
 internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationModel
 {
   private SkipNavigationModel? _inverse;
+  private readonly List<IKeyPair> _fromKeys;
+  private readonly List<IKeyPair> _toKeys;
 
   protected SkipNavigationModel(int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, IEntityModel joinEntity)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     JoinEntity = joinEntity;
+    _fromKeys = new();
+    _toKeys = new();
   }
 
-  public override INavigationModel InverseCore => Inverse;
+  protected override NavigationModel InverseCore => Inverse;
 
   public new SkipNavigationModel Inverse
   {
@@ -20,14 +24,25 @@ internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationMo
 
   public IEntityModel JoinEntity { get; }
 
-  public IReadOnlyList<IKeyPair> FromKeys => throw new NotImplementedException();
+  public IReadOnlyList<IKeyPair> FromKeys => _fromKeys;
 
-  public IReadOnlyList<IKeyPair> ToKeys => throw new NotImplementedException();
+  public IReadOnlyList<IKeyPair> ToKeys => _toKeys;
 
   ISkipNavigationModel ISkipNavigationModel.Inverse => Inverse;
 
   public object CreateJoin(object from, object to)
   {
-    throw new NotImplementedException();
+    Dictionary<string, object?> join = new(FromKeys.Count + ToKeys.Count);
+    
+    foreach (IKeyPair keyPair in FromKeys)
+    {
+      join.Add(keyPair.ForeignKeyColumn.Name, keyPair.PrimaryKeyColumn.GetValue(from));
+    }
+    foreach (IKeyPair keyPair in ToKeys)
+    {
+      join.Add(keyPair.ForeignKeyColumn.Name, keyPair.PrimaryKeyColumn.GetValue(to));
+    }
+
+    return join;
   }
 }
