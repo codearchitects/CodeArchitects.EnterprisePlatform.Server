@@ -95,14 +95,17 @@ public class TestDbContext : DbContext
     modelBuilder.Entity<User>(entity =>
     {
       entity
-        .HasOne(user => user.Address)
-        .WithOne()
-        .HasForeignKey<Address>()
-        .AsAggregation();
-
-      entity
         .HasMany(user => user.Claims)
         .WithOne()
+        .AsAggregation();
+    });
+
+    modelBuilder.Entity<Address>(entity =>
+    {
+      entity
+        .HasOne(address => address.User)
+        .WithOne(user => user.Address)
+        .HasForeignKey<Address>("UserId")
         .AsAggregation();
     });
 

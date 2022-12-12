@@ -1,12 +1,14 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP3_1_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.NotNullAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that an output is not <see langword="null"/> even if the corresponding type allows it.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class NotNullAttribute : Attribute
 {
   /// <summary>

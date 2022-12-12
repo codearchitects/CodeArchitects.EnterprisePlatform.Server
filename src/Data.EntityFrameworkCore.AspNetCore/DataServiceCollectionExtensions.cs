@@ -25,8 +25,8 @@ public static class DataServiceCollectionExtensions
 
     services.AddScoped<IStateManager<TDbContext>, StateManager<TDbContext>>();
 
-    services.AddScoped<IDataContext<TDbContext>, DataContext<TDbContext>>();
-    services.AddScoped<IDataContext>(sp => sp.GetRequiredService<IDataContext<TDbContext>>());
+    services.AddScoped<IEFCoreContext<TDbContext>, EFCoreContext<TDbContext>>();
+    services.AddScoped<IEFCoreContext>(sp => sp.GetRequiredService<IEFCoreContext<TDbContext>>());
 
     return services;
   }

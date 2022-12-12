@@ -9,6 +9,7 @@ namespace CodeArchitects.Platform.Data;
 public class FindAsyncTests : TestBase
 {
   private readonly User _user;
+  private readonly Category _category;
   private readonly IEnumerable<object> _seed;
 
   public FindAsyncTests(TestFixture fixture, ITestOutputHelper output)
@@ -24,7 +25,14 @@ public class FindAsyncTests : TestBase
     _user.Carts[1].Items![0].ShippingAddress = ShippingAddress.One();
     _user.Claims = UserClaim.Many(2);
 
-    _seed = new[] { _user };
+    _category = Category.One();
+    _category.Typologies = new()
+    {
+      Typology.One(),
+      Typology.One()
+    };
+
+    _seed = new object[] { _user, _category };
   }
 
   [Theory, RepositoryDependenciesData]
@@ -100,7 +108,7 @@ public class FindAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeCollection(RepositoryDependencies dependencies)
+  public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeOneToMany(RepositoryDependencies dependencies)
   {
     // Arrange
     Cart cart = _user.Carts![0];
@@ -122,6 +130,25 @@ public class FindAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
+  public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeManyToMany(RepositoryDependencies dependencies)
+  {
+    // Arrange
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, _seed);
+
+    // Act
+    Category? fromDb = await sut.FindAsync(_category.Id, _ => _
+      .Include(e => e.Typologies));
+
+    // Assert
+    fromDb.Should().NotBeNull();
+    fromDb!.Id.Should().Be(_category.Id);
+    fromDb.Typologies.Should().NotBeNull()
+      .And.HaveCount(2)
+      .And.Contain(typology => typology.Id == _category.Typologies![0].Id)
+      .And.Contain(typology => typology.Id == _category.Typologies![1].Id);
+  }
+
+  [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeReferenceThenReference(RepositoryDependencies dependencies)
   {
     // Arrange
@@ -140,6 +167,7 @@ public class FindAsyncTests : TestBase
     fromDb.Items.Should().BeNull();
     fromDb.User.Should().NotBeNull();
     fromDb.User!.Id.Should().Be(_user.Id);
+    fromDb.User.Claims.Should().BeNull();
     fromDb.User.Address.Should().NotBeNull();
     fromDb.User.Address!.Id.Should().Be(_user.Address!.Id);
   }
@@ -155,7 +183,7 @@ public class FindAsyncTests : TestBase
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
       .Include(e => e.User, _ => _
-        .Include(e => e.Address)));
+        .Include(e => e.Claims)));
 
     // Assert
     fromDb.Should().NotBeNull();
@@ -163,8 +191,10 @@ public class FindAsyncTests : TestBase
     fromDb.Items.Should().BeNull();
     fromDb.User.Should().NotBeNull();
     fromDb.User!.Id.Should().Be(_user.Id);
-    fromDb.User.Address.Should().NotBeNull();
-    fromDb.User.Address!.Id.Should().Be(_user.Address!.Id);
+    fromDb.User.Address.Should().BeNull();
+    fromDb.User.Claims.Should().HaveCount(2)
+      .And.ContainSingle(claim => claim.Id == _user.Claims![0].Id)
+      .And.ContainSingle(claim => claim.Id == _user.Claims![1].Id);
   }
 
   [Theory, RepositoryDependenciesData]

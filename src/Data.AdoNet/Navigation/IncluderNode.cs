@@ -1,0 +1,131 @@
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
+
+internal abstract class IncluderNode
+{
+  private readonly Dictionary<int, INavigation> _children;
+
+  public IncluderNode()
+  {
+    _children = new();
+  }
+
+  public abstract IEntityModel Target { get; }
+
+  public IReadOnlyCollection<INavigation> Children => _children.Values;
+
+  public void AddLeaf(ReadOnlySpan<char> path)
+  {
+    int index = 0;
+    int length = path.Length;
+
+    if (length == 0)
+      throw new IncludeException("A part of the include path was empty.");
+
+    while (index < length && path[index] is not '.')
+    {
+      index++;
+    }
+
+    IAccessibleNavigationModel model;
+    if (index == length)
+    {
+      model = GetNavigationModel(path);
+      TryAddLeaf(model);
+
+      return;
+    }
+
+    model = GetNavigationModel(path[..index]);
+    IncluderNode node = GetOrUpdateNode(model);
+
+    node.AddLeaf(path[(index + 1)..]);
+  }
+
+  public void AddLeaf(MemberExpression memberExpression)
+  {
+    IncluderNode node = memberExpression.Expression is MemberExpression childMemberExpression
+      ? AddNode(childMemberExpression)
+      : this;
+
+    IAccessibleNavigationModel model = node.GetNavigationModel(memberExpression.Member);
+
+    node.TryAddLeaf(model);
+  }
+
+  public IncluderNode AddNode(MemberExpression memberExpression)
+  {
+    IncluderNode node = memberExpression.Expression is MemberExpression childMemberExpression
+      ? AddNode(childMemberExpression)
+      : this;
+
+    IAccessibleNavigationModel model = node.GetNavigationModel(memberExpression.Member);
+
+    return node.GetOrUpdateNode(model);
+  }
+
+  private IncluderNode GetOrUpdateNode(IAccessibleNavigationModel model)
+  {
+    if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not IncluderNode node)
+    {
+      switch (model)
+      {
+        case IAccessibleSimpleNavigationModel navigationModel:
+          NavigationSimpleNode navigationNode = new(navigationModel);
+          _children[model.Id] = navigationNode;
+          return navigationNode;
+
+        case IAccessibleSkipNavigationModel skipNavigationModel:
+          NavigationSkipNode navigationSkipNode = new(skipNavigationModel);
+          _children[model.Id] = navigationSkipNode;
+          return navigationSkipNode;
+
+        default:
+          throw Errors.Unreacheable;
+      }
+    }
+
+    return node;
+  }
+
+  private void TryAddLeaf(IAccessibleNavigationModel model)
+  {
+    if (!_children.ContainsKey(model.Id))
+    {
+      INavigation leaf = model switch
+      {
+        IAccessibleSimpleNavigationModel navigationModel   => new NavigationSimpleLeaf(navigationModel),
+        IAccessibleSkipNavigationModel skipNavigationModel => new NavigationSkipLeaf(skipNavigationModel),
+        _                                                  => throw Errors.Unreacheable
+      };
+      _children.Add(model.Id, leaf);
+    }
+  }
+
+  private IAccessibleNavigationModel GetNavigationModel(MemberInfo member)
+  {
+    string navigationName = member switch
+    {
+      PropertyInfo property => property.Name,
+      FieldInfo field       => field.Name,
+      _                     => throw new IncludeException("A member of the include expression was not a property or a field.")
+    };
+
+    if (!Target.TryGetNavigation(navigationName, out IAccessibleNavigationModel? model))
+      throw new IncludeException($"Navigation '{navigationName}' was not found on entity '{Target.Type.Name}'.");
+
+    return model;
+  }
+
+  private IAccessibleNavigationModel GetNavigationModel(ReadOnlySpan<char> navigationName)
+  {
+    if (!Target.TryGetNavigation(navigationName, out IAccessibleNavigationModel? model))
+      throw new IncludeException($"Navigation '{navigationName.ToString()}' was not found on entity '{Target.Type.Name}'.");
+
+    return model;
+  }
+}

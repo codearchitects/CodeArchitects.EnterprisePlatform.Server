@@ -1,12 +1,14 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NET5_0_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.MemberNotNullAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that the method or property will ensure that the listed field and property members have not-<see langword="null"/> values.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class MemberNotNullAttribute : Attribute
 {
   /// <summary>

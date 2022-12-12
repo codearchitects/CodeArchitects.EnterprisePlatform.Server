@@ -1,0 +1,36 @@
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+
+internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigationModel
+{
+  private SimpleNavigationModel? _inverse;
+  private readonly List<IKeyPair> _keyPairs;
+
+  public SimpleNavigationModel(int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+    : base(id, from, to, associationKind, collectionKind, isOnDependent)
+  {
+    _keyPairs = new();
+  }
+
+  public IPrimaryKeyModel PrimaryKey => IsOnDependent ? To.PrimaryKey : From.PrimaryKey;
+
+  public IReadOnlyList<IKeyPair> KeyPairs => _keyPairs;
+
+  public new SimpleNavigationModel Inverse
+  {
+    get => _inverse ?? throw new InvalidOperationException("Inverse navigation was not set.");
+    set => _inverse = value;
+  }
+
+  protected override NavigationModel InverseCore => Inverse;
+
+  ISimpleNavigationModel ISimpleNavigationModel.Inverse => Inverse;
+
+  public void AddForeignKey(IForeignKeyColumnModel foreignKeyColumn)
+  {
+    _keyPairs.Add(new KeyPair(foreignKeyColumn, IsOnDependent));
+    if (IsOnDependent)
+    {
+      Inverse.AddForeignKey(foreignKeyColumn);
+    }
+  }
+}

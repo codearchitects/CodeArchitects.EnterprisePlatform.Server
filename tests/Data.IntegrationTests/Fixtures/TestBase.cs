@@ -15,7 +15,7 @@ public class TestBase : IAsyncLifetime
 
   Task IAsyncLifetime.InitializeAsync()
   {
-    return _fixture.SetUpAsync(_output);
+    return _fixture.SetupAsync(_output);
   }
 
   async Task IAsyncLifetime.DisposeAsync()

@@ -11,7 +11,8 @@ public class User
   public Address? Address { get; set; } // OTO aggregation, on principal
 
   private static readonly Faker<User> s_faker = new Faker<User>()
-    .RuleFor(user => user.Id, Guid.NewGuid);
+    .RuleFor(user => user.Id, Guid.NewGuid)
+    .RuleFor(user => user.Name, faker => faker.Name.FullName());
 
   public static User One() => s_faker.Generate();
 }

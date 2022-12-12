@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EFCoreSample.Infrastructure.Repositories;
 
-public class ProductRepository : Repository<Product, Guid>, IProductRepository
+public class ProductRepository : EFCoreRepository<Product, Guid>, IProductRepository
 {
-  public ProductRepository(IDataContext context)
+  public ProductRepository(IEFCoreContext context)
     : base(context)
   {
   }

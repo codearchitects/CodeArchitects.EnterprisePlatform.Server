@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Application\CodeArchitects.Platform.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
     <ProjectReference Include="..\..\..\src\Data.AutoMapper\CodeArchitects.Platform.Data.AutoMapper.csproj" />
     <ProjectReference Include="..\..\..\src\Data.EntityFrameworkCore.AspNetCore\CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" />

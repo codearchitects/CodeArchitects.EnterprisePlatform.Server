@@ -4,9 +4,9 @@ using EFCoreSample.Domain.Repositories;
 
 namespace EFCoreSample.Infrastructure.Repositories;
 
-public class CartRepository : Repository<Cart, Guid>, ICartRepository
+public class CartRepository : EFCoreRepository<Cart, Guid>, ICartRepository
 {
-  public CartRepository(IDataContext context)
+  public CartRepository(IEFCoreContext context)
     : base(context)
   {
   }

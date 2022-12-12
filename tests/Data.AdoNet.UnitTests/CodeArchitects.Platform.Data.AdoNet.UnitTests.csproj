@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
 
     <IsPackable>false</IsPackable>
 
@@ -11,7 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="FluentMock" Version="0.1.11-alpha" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -26,7 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj">
+      <SetTargetFramework>TargetFramework=net6.0</SetTargetFramework>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
+    <ProjectReference Include="..\..\src\Emit\CodeArchitects.Platform.Emit.csproj" />
   </ItemGroup>
 
 </Project>

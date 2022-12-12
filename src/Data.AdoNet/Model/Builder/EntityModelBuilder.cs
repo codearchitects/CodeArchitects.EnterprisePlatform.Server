@@ -1,0 +1,21 @@
+﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+using System.Reflection;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+
+internal abstract class EntityModelBuilder : BuilderBase
+{
+  public abstract IReadOnlyCollection<MemberInfo> PrimaryKeyMembers { get; }
+
+  public abstract Type EntityType { get; }
+
+  public abstract EntityModel Build();
+
+  public abstract void AddNavigation(NavigationModel navigation, IEnumerable<Name> foreignKeyNames);
+
+  public abstract void AddPrimaryKeyColumns();
+
+  public abstract void AddAccessibleColumns();
+
+  public abstract void AddHiddenColumns();
+}

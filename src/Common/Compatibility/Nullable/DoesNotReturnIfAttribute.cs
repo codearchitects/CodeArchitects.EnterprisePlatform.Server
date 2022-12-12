@@ -1,12 +1,14 @@
-﻿namespace System.Diagnostics.CodeAnalysis;
+﻿#if NETCOREAPP3_1_OR_GREATER
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute))]
+#else
 
-#if !NETCOREAPP3_0_OR_GREATER
+namespace System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Specifies that the method will not return if the associated <see cref="bool"/> parameter is passed the specified value.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage, DebuggerNonUserCode]
 internal sealed class DoesNotReturnIfAttribute : Attribute
 {
   /// <summary>
