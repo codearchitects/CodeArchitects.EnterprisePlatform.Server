@@ -20,7 +20,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 
   public override IReadOnlyCollection<Name> ForeignKeyNames => _columnNames;
 
-  protected override NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity)
+  protected override NavigationModel Build(EntityModel fromEntity, EntityModel toEntity)
   {
     JoinEntityModel joinEntity = new(_tableName ?? $"{typeof(TFrom).Name}{typeof(TTo).Name}");
     SkipNavigationModel direct;

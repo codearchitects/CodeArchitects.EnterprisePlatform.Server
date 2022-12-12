@@ -6,7 +6,7 @@ internal class AccessibleSimpleNavigationModel : SimpleNavigationModel, IAccessi
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public AccessibleSimpleNavigationModel(AccessibleMemberComponent<object?> memberComponent, int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+  public AccessibleSimpleNavigationModel(AccessibleMemberComponent<object?> memberComponent, int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     _memberComponent = memberComponent;

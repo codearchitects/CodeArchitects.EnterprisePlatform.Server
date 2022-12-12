@@ -6,7 +6,7 @@ internal class AccessibleSkipNavigationModel : SkipNavigationModel, IAccessibleS
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public AccessibleSkipNavigationModel(AccessibleMemberComponent<object?> memberComponent, int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, IEntityModel joinEntity)
+  public AccessibleSkipNavigationModel(AccessibleMemberComponent<object?> memberComponent, int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, JoinEntityModel joinEntity)
     : base(id, from, to, associationKind, collectionKind, isOnDependent, joinEntity)
   {
     _memberComponent = memberComponent;

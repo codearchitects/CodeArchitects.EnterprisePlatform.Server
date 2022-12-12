@@ -17,7 +17,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
 
   public override IReadOnlyCollection<Name> ForeignKeyNames => _foreignKeyNames;
 
-  protected override NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity)
+  protected override NavigationModel Build(EntityModel fromEntity, EntityModel toEntity)
   {
     SimpleNavigationModel direct;
     SimpleNavigationModel inverse;

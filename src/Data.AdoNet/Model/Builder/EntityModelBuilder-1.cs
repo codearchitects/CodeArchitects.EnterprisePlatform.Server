@@ -223,10 +223,9 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     {
       (SkipNavigationModel navigation, IEnumerable<Name> columnNames) = navigationWithNames;
       bool isTo = navigation.To == _entity;
-      if (isTo)
-      {
-        columnNames = columnNames.Skip(navigation.From.PrimaryKey.Columns.Count);
-      }
+      columnNames = isTo
+        ? columnNames.Skip(navigation.From.PrimaryKey.Columns.Count)
+        : columnNames.Take(navigation.From.PrimaryKey.Columns.Count);
 
       short index = 0;
       foreach (Name columnName in columnNames)

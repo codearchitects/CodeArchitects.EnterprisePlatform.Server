@@ -69,6 +69,11 @@ internal class DataModelBuilder : INavigationIdGenerator
       entityBuilder.AddHiddenColumns();
     }
 
+    foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
+    {
+      entityBuilder.AddJoinTableColumns();
+    }
+
     return dataModel;
 
     static IEnumerable<Name> GetForeignKeyNames(SimpleNavigationModel navigation, NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder)

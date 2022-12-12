@@ -15,7 +15,7 @@ internal class JoinColumnMemberComponent : AccessibleMemberComponent<object?>
   public JoinColumnMemberComponent(string name, Type type, Getter<object?> getValue, Setter<object?> setValue)
     : base(getValue, setValue)
   {
-    Name = name;
+    base.Name = name;
     TypeCore = type;
   }
 

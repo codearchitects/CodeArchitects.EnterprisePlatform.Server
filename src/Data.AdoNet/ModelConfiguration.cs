@@ -71,9 +71,6 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
     where TFrom : class
     where TTo : class
   {
-    if (typeof(TFrom) == typeof(TTo))
-      throw new NotSupportedException("Self references are not supported yet.");
-
     Association(
       AssociationKind.Aggregation,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
@@ -83,9 +80,6 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
     where TFrom : class
     where TTo : class
   {
-    if (typeof(TFrom) == typeof(TTo))
-      throw new NotSupportedException("Self references are not supported yet.");
-
     Association(
       AssociationKind.Composition,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
