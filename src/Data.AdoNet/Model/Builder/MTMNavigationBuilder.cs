@@ -56,7 +56,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     if (!TryGetMemberAndTypeFromExpression(expression.Body, out _inverseNavigationMember, out Type? memberType))
       throw new ModelConfigurationException("The expression must be 'x => x.Member'.");
 
-    _inverseCollectionKind = GetCollectionKind(memberType);
+    _inverseCollectionKind = GetCollectionKind(memberType, typeof(TFrom));
 
     return this;
   }
@@ -64,7 +64,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
   public IMTMAssociationBuilder<TFrom, TTo> InverseNavigation(string navigationName)
   {
     (_inverseNavigationMember, Type memberType) = GetMemberAndType(typeof(TTo), navigationName);
-    _inverseCollectionKind = GetCollectionKind(memberType);
+    _inverseCollectionKind = GetCollectionKind(memberType, typeof(TFrom));
 
     return this;
   }
@@ -74,7 +74,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     if (!TryGetMemberAndTypeFromExpression(expression.Body, out _directNavigationMember, out Type? memberType))
       throw new ModelConfigurationException("The expression must be 'x => x.Member'.");
 
-    _directCollectionKind = GetCollectionKind(memberType);
+    _directCollectionKind = GetCollectionKind(memberType, typeof(TTo));
 
     return this;
   }
@@ -82,7 +82,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
   public IMTMAssociationBuilder<TFrom, TTo> Navigation(string navigationName)
   {
     (_directNavigationMember, Type memberType) = GetMemberAndType(typeof(TFrom), navigationName);
-    _directCollectionKind = GetCollectionKind(memberType);
+    _directCollectionKind = GetCollectionKind(memberType, typeof(TTo));
 
     return this;
   }

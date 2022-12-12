@@ -58,6 +58,9 @@ internal class DataModelBuilder : INavigationIdGenerator
 
     static IEnumerable<Name> GetForeignKeyNames(NavigationModel navigation, NavigationModelBuilder navigationBuilder, EntityModelBuilder fromEntityBuilder)
     {
+      if (navigation is SkipNavigationModel)
+        return Array.Empty<Name>();
+
       if (navigationBuilder.ForeignKeyNames is { Count: > 0 } foreignKeyNames)
         return foreignKeyNames;
 

@@ -39,14 +39,14 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
 
   protected abstract NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity);
 
-  protected static CollectionKind GetCollectionKind(Type memberType)
+  protected static CollectionKind GetCollectionKind(Type memberType, Type entityType)
   {
     if (memberType.IsArray)
-      throw new ModelConfigurationException("Plain arrays are not supported. Use other kind of collections instead (e.g., ICollection<>, IList<>, etc.).");
+      throw new ModelConfigurationException("Plain arrays are not supported. Use other kind of collections instead (e.g., ICollection<T>, IList<T>, etc.).");
 
     return
-      memberType.IsAssignableFrom(typeof(HashSet<>).MakeGenericType(typeof(TTo))) ? CollectionKind.HashSet :
-      memberType.IsAssignableFrom(typeof(List<>).MakeGenericType(typeof(TTo))) ? CollectionKind.List :
-      throw new ModelConfigurationException($"Collection type '{memberType}' is not supported. Use other kind of collections instead (e.g., ICollection<>, IList<>, etc.).");
+      memberType.IsAssignableFrom(typeof(HashSet<>).MakeGenericType(entityType)) ? CollectionKind.HashSet :
+      memberType.IsAssignableFrom(typeof(List<>).MakeGenericType(entityType)) ? CollectionKind.List :
+      throw new ModelConfigurationException($"Collection type '{memberType}' is not supported. Use other kind of collections instead (e.g., ICollection<T>, IList<T>, etc.).");
   }
 }

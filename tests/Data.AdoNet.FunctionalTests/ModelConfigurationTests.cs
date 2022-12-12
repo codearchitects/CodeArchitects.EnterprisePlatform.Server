@@ -15,4 +15,16 @@ public partial class ModelConfigurationTests
 
     // Assert
   }
+
+  [Fact]
+  public void ShouldCreateADataModelWithAManyToManyComposition()
+  {
+    // Arrange
+    WithAManyToManyComposition.TestModelConfiguration sut = new();
+
+    // Act
+    IDataModel dataModel = sut.CreateDataModel();
+
+    // Assert
+  }
 }

@@ -69,7 +69,7 @@ internal class OTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     if (!TryGetMemberAndTypeFromExpression(expression.Body, out _directNavigationMember, out Type? memberType))
       throw new ModelConfigurationException("The expression must be 'x => x.Member'.");
 
-    _collectionKind = GetCollectionKind(memberType);
+    _collectionKind = GetCollectionKind(memberType, typeof(TTo));
 
     return this;
   }
@@ -77,7 +77,7 @@ internal class OTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
   public IOTMAssociationBuilder<TFrom, TTo> Navigation(string navigationName)
   {
     (_directNavigationMember, Type memberType) = GetMemberAndType(typeof(TFrom), navigationName);
-    _collectionKind = GetCollectionKind(memberType);
+    _collectionKind = GetCollectionKind(memberType, typeof(TTo));
 
     return this;
   }
