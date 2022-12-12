@@ -17,6 +17,13 @@ internal partial class Executor
       throw new DBConcurrencyException(); // TODO: Message
   }
 
+  public Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    return ExecuteDeleteCommandAsync(command, entity, model, cancellationToken);
+  }
+
   private async Task ExecuteDeleteCommandAsync(DbCommand command, object node, IEntityModel model, CancellationToken cancellationToken)
   {
     _commandBuilder.BuildDeleteCommand(command, node, model);

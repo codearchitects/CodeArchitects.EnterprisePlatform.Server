@@ -63,21 +63,42 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw new NotImplementedException();
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      using DbCommand command = connection.CreateCommand();
+      command.Transaction = transaction;
+      await _executor.ExecuteUpdateCommandAsync(command, entity, model, cancellationToken);
+    }, cancellationToken);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw new NotImplementedException();
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      using DbCommand command = connection.CreateCommand();
+      command.Transaction = transaction;
+      await _executor.ExecuteDeleteCommandAsync(command, entity, model, cancellationToken);
+    }, cancellationToken);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw new NotImplementedException();
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      using DbCommand command = connection.CreateCommand();
+      command.Transaction = transaction;
+      await _executor.ExecuteDeleteCommandAsync(command, key, model, cancellationToken);
+    }, cancellationToken);
   }
 
   public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, CancellationToken cancellationToken = default)
