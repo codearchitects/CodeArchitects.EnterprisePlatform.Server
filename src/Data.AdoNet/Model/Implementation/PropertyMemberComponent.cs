@@ -35,10 +35,11 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Callvirt, property.GetMethod);
     if (typeof(T) == typeof(object) && property.PropertyType.IsValueType)
     {
-      il.Emit(OpCodes.Box);
+      il.Emit(OpCodes.Box, property.PropertyType);
     }
     il.Emit(OpCodes.Ret);
 
@@ -61,10 +62,11 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Ldarg_1);
     if (typeof(T) == typeof(object) && property.PropertyType.IsValueType)
     {
-      il.Emit(OpCodes.Unbox, property.PropertyType);
+      il.Emit(OpCodes.Unbox_Any, property.PropertyType);
     }
     il.Emit(OpCodes.Callvirt, property.SetMethod);
     il.Emit(OpCodes.Ret);

@@ -45,7 +45,9 @@ internal class DataModelBuilder : INavigationIdGenerator
           break;
         case SkipNavigationModel skipNavigation:
           IEnumerable<Name> columnNames = GetColumnNames(navigationBuilder, fromEntityBuilder, toEntityBuilder);
-          fromEntityBuilder.AddSkipNavigation(skipNavigation, columnNames);
+          int fromPrimaryKeyArity = fromEntityBuilder.PrimaryKeyMembers.Count;
+          fromEntityBuilder.AddSkipNavigation(skipNavigation, columnNames.Take(fromPrimaryKeyArity));
+          toEntityBuilder.AddSkipNavigation(skipNavigation.Inverse, columnNames.Skip(fromPrimaryKeyArity));
           break;
         default:
           throw Errors.Unreacheable;

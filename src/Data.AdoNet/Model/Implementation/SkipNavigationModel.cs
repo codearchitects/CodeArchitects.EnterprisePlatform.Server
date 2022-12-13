@@ -1,4 +1,7 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationModel
 {
@@ -32,34 +35,40 @@ internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationMo
 
   IEntityModel ISkipNavigationModel.JoinEntity => JoinEntity;
 
-  public void AddFromForeignKey(IForeignKeyColumnModel foreignKeyColumn)
+  public void AddFromJoinColumn(IPrimaryKeyColumnModel primaryKeyColumn, string name)
   {
-    AddFromForeignKey(foreignKeyColumn, true);
+    AddFromJoinColumn(primaryKeyColumn, name, true);
   }
 
-  public void AddFromForeignKey(IForeignKeyColumnModel foreignKeyColumn, bool addOnInverse)
+  private void AddFromJoinColumn(IPrimaryKeyColumnModel primaryKeyColumn, string name, bool addOnInverse)
   {
-    _fromKeyPairs.Add(new KeyPair(foreignKeyColumn, IsOnDependent));
+    JoinColumnModel joinColumn = JoinColumnModel.Create(name, primaryKeyColumn.Type, (short)JoinEntity.Columns.Count);
+    JoinKeyPair keyPair = new(primaryKeyColumn, joinColumn, true);
+    _fromKeyPairs.Add(keyPair);
 
-    if (!addOnInverse)
-      return;
-
-    Inverse.AddFromForeignKey(foreignKeyColumn, false);
+    if (addOnInverse)
+    {
+      JoinEntity.AddColumn(joinColumn);
+      Inverse.AddToJoinColumn(primaryKeyColumn, name, false);
+    }
   }
 
-  public void AddToForeignKey(IForeignKeyColumnModel foreignKeyColumn)
+  public void AddToJoinColumn(IPrimaryKeyColumnModel primaryKeyColumn, string name)
   {
-    AddToForeignKey(foreignKeyColumn, true);
+    AddToJoinColumn(primaryKeyColumn, name, true);
   }
 
-  public void AddToForeignKey(IForeignKeyColumnModel foreignKeyColumn, bool addOnInverse)
+  private void AddToJoinColumn(IPrimaryKeyColumnModel primaryKeyColumn, string name, bool addOnInverse)
   {
-    _toKeyPairs.Add(new KeyPair(foreignKeyColumn, IsOnDependent));
+    JoinColumnModel joinColumn = JoinColumnModel.Create(name, primaryKeyColumn.Type, (short)JoinEntity.Columns.Count);
+    JoinKeyPair keyPair = new(primaryKeyColumn, joinColumn, false);
+    _toKeyPairs.Add(keyPair);
 
-    if (!addOnInverse)
-      return;
-
-    Inverse.AddToForeignKey(foreignKeyColumn, false);
+    if (addOnInverse)
+    {
+      JoinEntity.AddColumn(joinColumn);
+      Inverse.AddFromJoinColumn(primaryKeyColumn, name, false);
+    }
   }
 
   public object CreateJoin(object from, object to)

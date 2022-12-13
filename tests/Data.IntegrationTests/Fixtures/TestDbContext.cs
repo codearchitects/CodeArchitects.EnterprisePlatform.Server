@@ -89,7 +89,19 @@ public class TestDbContext : DbContext
     {
       entity
         .HasMany(category => category.Typologies)
-        .WithMany(typology => typology.Categories);
+        .WithMany(typology => typology.Categories)
+        .UsingEntity<Dictionary<string, object>>(
+          "CategoryTypology",
+          join => join
+            .HasOne<Typology>()
+            .WithMany()
+            .HasForeignKey("TypologyId")
+            .OnDelete(DeleteBehavior.Cascade),
+          join => join
+            .HasOne<Category>()
+            .WithMany()
+            .HasForeignKey("CategoryId")
+            .OnDelete(DeleteBehavior.Cascade));
     });
 
     modelBuilder.Entity<User>(entity =>

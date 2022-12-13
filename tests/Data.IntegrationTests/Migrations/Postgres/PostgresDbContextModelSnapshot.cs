@@ -43,15 +43,15 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
 
             modelBuilder.Entity("CategoryTypology", b =>
                 {
-                    b.Property<Guid>("CategoriesId")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("TypologiesId")
+                    b.Property<Guid>("TypologyId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CategoriesId", "TypologiesId");
+                    b.HasKey("CategoryId", "TypologyId");
 
-                    b.HasIndex("TypologiesId");
+                    b.HasIndex("TypologyId");
 
                     b.ToTable("CategoryTypology");
                 });
@@ -294,13 +294,13 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 {
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Category", null)
                         .WithMany()
-                        .HasForeignKey("CategoriesId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Typology", null)
                         .WithMany()
-                        .HasForeignKey("TypologiesId")
+                        .HasForeignKey("TypologyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

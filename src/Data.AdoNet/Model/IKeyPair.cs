@@ -7,7 +7,7 @@ public interface IKeyPair
 {
   IPrimaryKeyColumnModel PrimaryKeyColumn { get; }
   
-  IForeignKeyColumnModel ForeignKeyColumn { get; }
+  IColumnModel ForeignKeyColumn { get; }
 
   IColumnModel FromColumn { get; }
   

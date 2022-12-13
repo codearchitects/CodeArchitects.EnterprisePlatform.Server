@@ -222,24 +222,19 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     foreach (SkipNavigationWithColumnNames navigationWithNames in _skipNavigations)
     {
       (SkipNavigationModel navigation, IEnumerable<Name> columnNames) = navigationWithNames;
-      bool isTo = navigation.To == _entity;
-      columnNames = isTo
-        ? columnNames.Skip(navigation.From.PrimaryKey.Columns.Count)
-        : columnNames.Take(navigation.From.PrimaryKey.Columns.Count);
+      bool isFrom = navigation.From == _entity;
 
       short index = 0;
       foreach (Name columnName in columnNames)
       {
         IPrimaryKeyColumnModel primaryKeyColumn = _entity.PrimaryKey.Columns[index];
-        JoinColumnModel column = JoinColumnModel.Create(columnName.Value, primaryKeyColumn.Type, index);
-        navigation.JoinEntity.AddColumn(column);
-
-        if (isTo)
+        if (isFrom)
         {
+          navigation.AddFromJoinColumn(primaryKeyColumn, columnName.Value);
         }
         else
         {
-
+          navigation.AddToJoinColumn(primaryKeyColumn, columnName.Value);
         }
 
         index++;

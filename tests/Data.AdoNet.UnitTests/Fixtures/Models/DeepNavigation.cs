@@ -473,13 +473,13 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
-        .SetFromKeys(_ => _
+        .SetFromKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName(nameof(Root.Id)))
             .SetToColumn(_ => _
               .SetName("RootId"))))
-        .SetToKeys(_ => _
+        .SetToKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName("ManyToManyId"))
@@ -499,13 +499,13 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
-        .SetFromKeys(_ => _
+        .SetFromKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName(nameof(ManyToMany.Id)))
             .SetToColumn(_ => _
               .SetName("ManyToManyId"))))
-        .SetToKeys(_ => _
+        .SetToKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName("RootId"))

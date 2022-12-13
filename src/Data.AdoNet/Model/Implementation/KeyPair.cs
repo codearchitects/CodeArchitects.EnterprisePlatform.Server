@@ -13,7 +13,7 @@ internal class KeyPair : IKeyPair
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => _foreignKeyColumn.PrimaryKeyColumn;
 
-  public IForeignKeyColumnModel ForeignKeyColumn => _foreignKeyColumn;
+  public IColumnModel ForeignKeyColumn => _foreignKeyColumn;
 
   public IColumnModel FromColumn => _isOnDependent ? ForeignKeyColumn : PrimaryKeyColumn;
 

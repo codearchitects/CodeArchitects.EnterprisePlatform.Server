@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CodeArchitects.Platform.Data.Migrations.Postgres
+namespace CodeArchitects.Platform.Data.Migrations.SqlServer
 {
     /// <inheritdoc />
-    public partial class Postgres : Migration
+    public partial class SqlServer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,8 +15,8 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Category",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,9 +27,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Person",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    PartnerId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PartnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -45,8 +45,8 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "ShippingAddress",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -57,9 +57,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "SoftDeleteEntity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,9 +70,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "TenantEntity",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,8 +83,8 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Typology",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,8 +95,8 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "User",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,21 +107,21 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "CategoryTypology",
                 columns: table => new
                 {
-                    CategoriesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TypologiesId = table.Column<Guid>(type: "uuid", nullable: false)
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TypologyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryTypology", x => new { x.CategoriesId, x.TypologiesId });
+                    table.PrimaryKey("PK_CategoryTypology", x => new { x.CategoryId, x.TypologyId });
                     table.ForeignKey(
-                        name: "FK_CategoryTypology_Category_CategoriesId",
-                        column: x => x.CategoriesId,
+                        name: "FK_CategoryTypology_Category_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CategoryTypology_Typology_TypologiesId",
-                        column: x => x.TypologiesId,
+                        name: "FK_CategoryTypology_Typology_TypologyId",
+                        column: x => x.TypologyId,
                         principalTable: "Typology",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -131,10 +131,10 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Product",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uuid", nullable: true),
-                    TypologyId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TypologyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -155,9 +155,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Address",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -173,9 +173,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "Cart",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -191,9 +191,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "UserClaim",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -209,10 +209,10 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "CartItem",
                 columns: table => new
                 {
-                    Index = table.Column<int>(type: "integer", nullable: false),
-                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    ShippingAddressId = table.Column<Guid>(type: "uuid", nullable: true)
+                    Index = table.Column<int>(type: "int", nullable: false),
+                    CartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShippingAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -234,9 +234,9 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "CartItemProduct",
                 columns: table => new
                 {
-                    ProductsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CartItemIndex = table.Column<int>(type: "integer", nullable: false),
-                    CartItemCartId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CartItemIndex = table.Column<int>(type: "int", nullable: false),
+                    CartItemCartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,7 +259,8 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 name: "IX_Address_UserId",
                 table: "Address",
                 column: "UserId",
-                unique: true);
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cart_UserId",
@@ -282,15 +283,16 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 columns: new[] { "CartItemIndex", "CartItemCartId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryTypology_TypologiesId",
+                name: "IX_CategoryTypology_TypologyId",
                 table: "CategoryTypology",
-                column: "TypologiesId");
+                column: "TypologyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_PartnerId",
                 table: "Person",
                 column: "PartnerId",
-                unique: true);
+                unique: true,
+                filter: "[PartnerId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_CategoryId",
