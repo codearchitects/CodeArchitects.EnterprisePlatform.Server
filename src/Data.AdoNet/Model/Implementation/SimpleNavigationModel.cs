@@ -1,9 +1,12 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿using System.Diagnostics;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigationModel
 {
   private SimpleNavigationModel? _inverse;
   private readonly List<IKeyPair> _keyPairs;
+  private IEntityModel? _navigationEntity;
 
   public SimpleNavigationModel(int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
@@ -26,6 +29,25 @@ internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigati
   ISimpleNavigationModel ISimpleNavigationModel.Inverse => Inverse;
 
   IPrimaryKeyModel ISimpleNavigationModel.PrimaryKey => PrimaryKey;
+
+  public IEntityModel? NavigationEntity
+  {
+    get
+    {
+      if (IsOnDependent)
+        return null;
+
+      return _navigationEntity ?? throw new InvalidOperationException("Navigation entity was not set.");
+    }
+  }
+
+  public void SetNavigationEntity()
+  {
+    Debug.Assert(_navigationEntity is null, "Navigation entity was set multiple times.");
+    Debug.Assert(!IsOnDependent, "Attempted to set the navigation entity on a navigation on a dependent entity.");
+
+    _navigationEntity = NavigationEntityModel.Create(this);
+  }
 
   public void AddForeignKey(IForeignKeyColumnModel foreignKeyColumn)
   {

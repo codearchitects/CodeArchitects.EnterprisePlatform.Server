@@ -25,11 +25,12 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
 
   protected override async Task SaveCoreAsync(CancellationToken cancellationToken)
   {
+    await Connection.OpenAsync(cancellationToken);
+
     DbTransaction? transaction = _startTransaction || _executions.Count > 1
       ? await Connection.BeginTransactionAsync(IsolationLevel.Unspecified, cancellationToken)
       : null;
 
-    await Connection.OpenAsync(cancellationToken);
     try
     {
       foreach (var execution in _executions)

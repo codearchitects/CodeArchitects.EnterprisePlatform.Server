@@ -14,16 +14,25 @@ internal partial class Executor
       (Executor self, DbCommand command) = state;
       (object parent, INavigationModel navigationModel) = context;
 
-      if (!navigationModel.IsOnDependent && navigationModel.AssociationKind is AssociationKind.Aggregation)
+      if (navigationModel is ISimpleNavigationModel simpleNavigationModel && !simpleNavigationModel.IsOnDependent)
       {
-        await self.ExecuteInsertCommandAsync(command, node, model, in context, cancellationToken);
-        return true;
+        if (navigationModel.AssociationKind is AssociationKind.Aggregation)
+        {
+          await self.ExecuteInsertCommandAsync(command, node, model, in context, cancellationToken);
+          return true;
+        }
+        else
+        {
+          await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
+          return false;
+        }
       }
 
       if (navigationModel is ISkipNavigationModel skipNavigationModel)
       {
         object joinEntity = skipNavigationModel.CreateJoin(parent, node);
         await self.ExecuteInsertCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
+        return false;
       }
 
       return false;

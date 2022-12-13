@@ -18,7 +18,7 @@ internal class DataModelBuilder : INavigationIdGenerator
   public DataModel Build()
   {
     List<EntityModel> entities = new();
-    List<NavigationModel> navigations = new();
+    List<SimpleNavigationModel> simpleNavigationsOnPrincipal = new();
 
     DataModel dataModel = new();
 
@@ -42,6 +42,7 @@ internal class DataModelBuilder : INavigationIdGenerator
           IEnumerable<Name> foreignKeyNames = GetForeignKeyNames(simpleNavigation, navigationBuilder, fromEntityBuilder);
           fromEntityBuilder.AddSimpleNavigation(simpleNavigation, Array.Empty<Name>());
           toEntityBuilder.AddSimpleNavigation(simpleNavigation.Inverse, foreignKeyNames);
+          simpleNavigationsOnPrincipal.Add(simpleNavigation);
           break;
         case SkipNavigationModel skipNavigation:
           IEnumerable<Name> columnNames = GetColumnNames(navigationBuilder, fromEntityBuilder, toEntityBuilder);
@@ -52,8 +53,6 @@ internal class DataModelBuilder : INavigationIdGenerator
         default:
           throw Errors.Unreacheable;
       };
-
-      navigations.Add(navigation);
     }
 
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
@@ -74,6 +73,11 @@ internal class DataModelBuilder : INavigationIdGenerator
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
     {
       entityBuilder.AddJoinTableColumns();
+    }
+
+    foreach (SimpleNavigationModel simpleNavigation in simpleNavigationsOnPrincipal)
+    {
+      simpleNavigation.SetNavigationEntity();
     }
 
     return dataModel;
