@@ -6,14 +6,14 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
+internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
   where TDbConnection : DbConnection
 {
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor _executor;
   private readonly IDataModel _model;
 
-  public AdoNetContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
+  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
@@ -22,7 +22,7 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
 
   public TDbConnection Connection => _stateManager.Connection;
 
-  IDbConnection IAdoNetContext.Connection => _stateManager.Connection;
+  IDbConnection IDataContext.Connection => _stateManager.Connection;
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class

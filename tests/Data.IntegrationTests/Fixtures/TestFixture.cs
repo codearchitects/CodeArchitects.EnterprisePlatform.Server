@@ -132,13 +132,13 @@ public class TestFixture : IAsyncLifetime
         TestModelConfiguration modelConfiguration = new();
         IDataModel dataModel = modelConfiguration.CreateDataModel();
 
-        IAdoNetContext adoNetContext = provider switch
+        AdoNet.IDataContext adoNetContext = provider switch
         {
-          DatabaseProvider.SqlServer => new AdoNetContext<SqlConnection>(
+          DatabaseProvider.SqlServer => new AdoNet.DataContext<SqlConnection>(
             new AdoNet.StateManager<SqlConnection>(_sqlServerConnectionLazy.Value),
             executor,
             dataModel),
-          DatabaseProvider.Postgres => new AdoNetContext<NpgsqlConnection>(
+          DatabaseProvider.Postgres => new AdoNet.DataContext<NpgsqlConnection>(
             new AdoNet.StateManager<NpgsqlConnection>(_postgresConnectionLazy.Value),
             executor,
             dataModel),
@@ -155,7 +155,7 @@ public class TestFixture : IAsyncLifetime
         DefaultEntityFactoryFactory entityFactoryFactory = new(_dbContext.Model);
         DefaultEntityFactory entityFactory = new(entityFactoryFactory, DefaultEntityFactoryCache.Create());
 
-        EFCoreContext<TestDbContext> efCoreContext = new(contextManager, trackingContext, predicateProvider, entityFactory);
+        EntityFrameworkCore.DataContext<TestDbContext> efCoreContext = new(contextManager, trackingContext, predicateProvider, entityFactory);
 
         return new EFCoreRepository<TEntity, TKey>(efCoreContext);
       default:

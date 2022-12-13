@@ -6,23 +6,23 @@ public abstract class EFCoreRepositoryBase<TEntity, TKey> : Repository<TEntity, 
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  protected override IDataContext Context => ContextCore;
+  protected override Data.IDataContext Context => ContextCore;
 
-  private protected abstract IEFCoreContext ContextCore { get; }
+  private protected abstract IDataContext ContextCore { get; }
 }
 
 public class EFCoreRepository<TEntity, TKey> : EFCoreRepositoryBase<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public EFCoreRepository(IEFCoreContext context)
+  public EFCoreRepository(IDataContext context)
   {
     Context = context;
   }
 
-  protected new IEFCoreContext Context { get; }
+  protected new IDataContext Context { get; }
 
-  private protected override IEFCoreContext ContextCore => Context;
+  private protected override IDataContext ContextCore => Context;
 
   protected DbContext DbContext => Context.DbContext;
 

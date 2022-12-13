@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-public interface IAdoNetContext : IDataContext
+public interface IDataContext : Data.IDataContext
 {
   IDbConnection Connection { get; }
 

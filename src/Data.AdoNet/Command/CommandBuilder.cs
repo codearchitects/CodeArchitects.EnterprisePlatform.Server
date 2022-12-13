@@ -24,7 +24,8 @@ internal class CommandBuilder : ICommandBuilder
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
-      CreateParameter(command, $"p{i}", model.PrimaryKey.GetKeyComponent(key, i));
+      object? value = model.PrimaryKey.GetKeyComponent(key, i);
+      CreateParameter(command, $"p{i}", value);
     }
   }
 
@@ -64,7 +65,8 @@ internal class CommandBuilder : ICommandBuilder
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
-      CreateParameter(command, $"p{i}", model.PrimaryKey.Columns[i].GetValue(node));
+      object? value = model.PrimaryKey.Columns[i].GetValue(node);
+      CreateParameter(command, $"p{i}", value);
     }
   }
 
@@ -76,7 +78,8 @@ internal class CommandBuilder : ICommandBuilder
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
-      CreateParameter(command, $"p{i}", model.PrimaryKey.GetKeyComponent(key, i));
+      object? value = model.PrimaryKey.GetKeyComponent(key, i);
+      CreateParameter(command, $"p{i}", value);
     }
   }
 
