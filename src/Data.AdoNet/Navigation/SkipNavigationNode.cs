@@ -1,11 +1,10 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationSkipNode : IncluderNode, INavigationSkipNode
+internal class SkipNavigationNode : IncluderNode, ISkipNavigationNode
 {
-  public NavigationSkipNode(IAccessibleSkipNavigationModel model)
+  public SkipNavigationNode(IAccessibleSkipNavigationModel model)
   {
     Model = model;
   }

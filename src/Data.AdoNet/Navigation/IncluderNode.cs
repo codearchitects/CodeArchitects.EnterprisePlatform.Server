@@ -74,15 +74,15 @@ internal abstract class IncluderNode
     {
       switch (model)
       {
-        case IAccessibleSimpleNavigationModel navigationModel:
-          NavigationSimpleNode navigationNode = new(navigationModel);
-          _children[model.Id] = navigationNode;
-          return navigationNode;
+        case IAccessibleSimpleNavigationModel simpleNavigationModel:
+          SimpleNavigationNode simpleNavigationNode = new(simpleNavigationModel);
+          _children[model.Id] = simpleNavigationNode;
+          return simpleNavigationNode;
 
         case IAccessibleSkipNavigationModel skipNavigationModel:
-          NavigationSkipNode navigationSkipNode = new(skipNavigationModel);
-          _children[model.Id] = navigationSkipNode;
-          return navigationSkipNode;
+          SkipNavigationNode skipNavigationNode = new(skipNavigationModel);
+          _children[model.Id] = skipNavigationNode;
+          return skipNavigationNode;
 
         default:
           throw Errors.Unreacheable;
@@ -98,10 +98,11 @@ internal abstract class IncluderNode
     {
       INavigation leaf = model switch
       {
-        IAccessibleSimpleNavigationModel navigationModel   => new NavigationSimpleLeaf(navigationModel),
-        IAccessibleSkipNavigationModel skipNavigationModel => new NavigationSkipLeaf(skipNavigationModel),
+        IAccessibleSimpleNavigationModel navigationModel   => new SimpleNavigationLeaf(navigationModel),
+        IAccessibleSkipNavigationModel skipNavigationModel => new SkipNavigationLeaf(skipNavigationModel),
         _                                                  => throw Errors.Unreacheable
       };
+
       _children.Add(model.Id, leaf);
     }
   }

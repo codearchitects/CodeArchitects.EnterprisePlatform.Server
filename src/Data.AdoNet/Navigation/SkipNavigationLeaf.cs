@@ -1,16 +1,15 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationSimpleLeaf : INavigationSimpleLeaf
+internal class SkipNavigationLeaf : ISkipNavigationLeaf
 {
-  public NavigationSimpleLeaf(IAccessibleSimpleNavigationModel model)
+  public SkipNavigationLeaf(IAccessibleSkipNavigationModel model)
   {
     Model = model;
   }
 
-  public IAccessibleSimpleNavigationModel Model { get; }
+  public IAccessibleSkipNavigationModel Model { get; }
 
   IAccessibleNavigationModel INavigation.Model => Model;
 
@@ -21,18 +20,18 @@ internal class NavigationSimpleLeaf : INavigationSimpleLeaf
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitSimpleLeaf(this);
+    return visitor.VisitSkipLeaf(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitSimpleLeaf(this, in state);
+    return visitor.VisitSkipLeaf(this, in state);
   }
 
   public bool Equals(INavigation? other)
   {
-    if (other is not INavigationSimpleLeaf leaf)
+    if (other is not ISkipNavigationLeaf leaf)
       return false;
 
     return Model.Id == leaf.Model.Id;

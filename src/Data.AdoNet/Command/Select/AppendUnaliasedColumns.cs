@@ -19,28 +19,28 @@ internal readonly struct AppendUnaliasedColumns : INavigationVisitor<VoidResult,
     navigation.Accept<AppendUnaliasedColumns, VoidResult, int>(in this, in index);
   }
 
-  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation, in int index)
+  public VoidResult VisitSimpleLeaf(ISimpleNavigationLeaf navigation, in int index)
   {
     _stringBuilder.AppendLeafUnaliasedColumns(index, navigation);
 
     return VoidResult.Instance;
   }
 
-  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation, in int index)
+  public VoidResult VisitSimpleNode(ISimpleNavigationNode navigation, in int index)
   {
     _stringBuilder.AppendNodeColumns(index, navigation);
 
     return VoidResult.Instance;
   }
 
-  public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation, in int index)
+  public VoidResult VisitSkipLeaf(ISkipNavigationLeaf navigation, in int index)
   {
     _stringBuilder.AppendLeafUnaliasedColumns(index, navigation);
 
     return VoidResult.Instance;
   }
 
-  public VoidResult VisitSkipNode(INavigationSkipNode navigation, in int index)
+  public VoidResult VisitSkipNode(ISkipNavigationNode navigation, in int index)
   {
     _stringBuilder.AppendNodeColumns(index, navigation);
 

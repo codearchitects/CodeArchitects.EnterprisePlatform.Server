@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal interface INavigationSkipLeaf : INavigationLeaf
+internal interface ISkipNavigationNode : INavigationNode
 {
   new IAccessibleSkipNavigationModel Model { get; }
 }

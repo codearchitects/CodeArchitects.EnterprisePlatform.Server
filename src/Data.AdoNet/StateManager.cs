@@ -6,6 +6,7 @@ namespace CodeArchitects.Platform.Data.AdoNet;
 internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConnection>
   where TDbConnection : DbConnection
 {
+  private bool _startTransaction;
   private readonly List<Execution<TDbConnection, DbTransaction>> _executions;
   
   public StateManager(TDbConnection connection)
@@ -16,14 +17,15 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
 
   public TDbConnection Connection { get; }
 
-  public void AddExecution(Execution<TDbConnection, DbTransaction> execution)
+  public void AddExecution(Execution<TDbConnection, DbTransaction> execution, bool startTransaction)
   {
+    _startTransaction |= startTransaction;
     _executions.Add(execution);
   }
 
   protected override async Task SaveCoreAsync(CancellationToken cancellationToken)
   {
-    DbTransaction? transaction = _executions.Count > 1
+    DbTransaction? transaction = _startTransaction || _executions.Count > 1
       ? await Connection.BeginTransactionAsync(IsolationLevel.Unspecified, cancellationToken)
       : null;
 
@@ -46,6 +48,7 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
     }
     finally
     {
+      _startTransaction = false;
       transaction?.Dispose();
       _executions.Clear();
       Connection.Close();

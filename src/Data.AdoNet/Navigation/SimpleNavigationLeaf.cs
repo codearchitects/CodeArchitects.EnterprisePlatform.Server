@@ -1,11 +1,10 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationSimpleNode : IncluderNode, INavigationSimpleNode
+internal class SimpleNavigationLeaf : ISimpleNavigationLeaf
 {
-  public NavigationSimpleNode(IAccessibleSimpleNavigationModel model)
+  public SimpleNavigationLeaf(IAccessibleSimpleNavigationModel model)
   {
     Model = model;
   }
@@ -14,25 +13,27 @@ internal class NavigationSimpleNode : IncluderNode, INavigationSimpleNode
 
   IAccessibleNavigationModel INavigation.Model => Model;
 
-  public override IEntityModel Target => Model.To;
+  public IEntityModel Target => Model.To;
+
+  public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitSimpleNode(this);
+    return visitor.VisitSimpleLeaf(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitSimpleNode(this, in state);
+    return visitor.VisitSimpleLeaf(this, in state);
   }
 
   public bool Equals(INavigation? other)
   {
-    if (other is not INavigationSimpleNode node)
+    if (other is not ISimpleNavigationLeaf leaf)
       return false;
 
-    return Model.Id == node.Model.Id && NavigationCollection.Equal(Children, node.Children);
+    return Model.Id == leaf.Model.Id;
   }
 }

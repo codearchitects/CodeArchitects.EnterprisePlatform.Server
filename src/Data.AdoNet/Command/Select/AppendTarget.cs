@@ -20,7 +20,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     navigation.Accept<AppendTarget, VoidResult>(in this);
   }
 
-  public VoidResult VisitSimpleLeaf(INavigationSimpleLeaf navigation)
+  public VoidResult VisitSimpleLeaf(ISimpleNavigationLeaf navigation)
   {
     _stringBuilder.Append("[");
     _stringBuilder.Append(navigation.Target.TableName);
@@ -29,7 +29,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     return VoidResult.Instance;
   }
 
-  public VoidResult VisitSimpleNode(INavigationSimpleNode navigation)
+  public VoidResult VisitSimpleNode(ISimpleNavigationNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
@@ -55,7 +55,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSimpleNode navigation, IColumnModel column)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, ISimpleNavigationNode navigation, IColumnModel column)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(column.Name);
@@ -67,7 +67,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     }
   }
 
-  public VoidResult VisitSkipLeaf(INavigationSkipLeaf navigation)
+  public VoidResult VisitSkipLeaf(ISkipNavigationLeaf navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
@@ -90,7 +90,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IColumnModel column)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IColumnModel column)
     {
       stringBuilder.Append('t');
       stringBuilder.Append(navigation.Model.Id);
@@ -99,14 +99,14 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append(']');
     }
 
-    static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
+    static void AppendKey(SelectStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
 
-    static void AppendJoinCondition(SelectStringBuilder stringBuilder, INavigationSkipLeaf navigation, IKeyPair pair)
+    static void AppendJoinCondition(SelectStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromColumn.Name);
@@ -118,7 +118,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
     }
   }
 
-  public VoidResult VisitSkipNode(INavigationSkipNode navigation)
+  public VoidResult VisitSkipNode(ISkipNavigationNode navigation)
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
@@ -158,7 +158,7 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IColumnModel column)
+    static void AppendTargetColumn(SelectStringBuilder stringBuilder, ISkipNavigationNode navigation, IColumnModel column)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(column.Name);
@@ -169,14 +169,14 @@ internal readonly struct AppendTarget : INavigationVisitor<VoidResult>
       stringBuilder.Append(']');
     }
 
-    static void AppendKey(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
+    static void AppendKey(SelectStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.ToColumn.Name);
       stringBuilder.Append(']');
     }
 
-    static void AppendJoinCondition(SelectStringBuilder stringBuilder, INavigationSkipNode navigation, IKeyPair pair)
+    static void AppendJoinCondition(SelectStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
     {
       stringBuilder.Append("t.[");
       stringBuilder.Append(pair.FromColumn.Name);

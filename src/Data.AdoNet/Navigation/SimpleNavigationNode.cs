@@ -1,40 +1,37 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationSkipLeaf : INavigationSkipLeaf
+internal class SimpleNavigationNode : IncluderNode, ISimpleNavigationNode
 {
-  public NavigationSkipLeaf(IAccessibleSkipNavigationModel model)
+  public SimpleNavigationNode(IAccessibleSimpleNavigationModel model)
   {
     Model = model;
   }
 
-  public IAccessibleSkipNavigationModel Model { get; }
+  public IAccessibleSimpleNavigationModel Model { get; }
 
   IAccessibleNavigationModel INavigation.Model => Model;
 
-  public IEntityModel Target => Model.To;
-
-  public IReadOnlyCollection<INavigation> Children => Array.Empty<INavigation>();
+  public override IEntityModel Target => Model.To;
 
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>
   {
-    return visitor.VisitSkipLeaf(this);
+    return visitor.VisitSimpleNode(this);
   }
 
   public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
     where TVisitor : INavigationVisitor<TResult, TState>
   {
-    return visitor.VisitSkipLeaf(this, in state);
+    return visitor.VisitSimpleNode(this, in state);
   }
 
   public bool Equals(INavigation? other)
   {
-    if (other is not INavigationSkipLeaf leaf)
+    if (other is not ISimpleNavigationNode node)
       return false;
 
-    return Model.Id == leaf.Model.Id;
+    return Model.Id == node.Model.Id && NavigationCollection.Equal(Children, node.Children);
   }
 }
