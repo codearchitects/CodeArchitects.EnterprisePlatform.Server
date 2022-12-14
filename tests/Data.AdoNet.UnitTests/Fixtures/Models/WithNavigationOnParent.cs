@@ -51,7 +51,6 @@ internal static class WithNavigationOnParent
     INavigationModel childANavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetType(typeof(ChildA))
-      .SetIsCollection(false)
       .SetHasMember(true)
       .SetProperty(typeof(Parent).GetRequiredProperty(nameof(Parent.ChildA)))
       .SetTo(_ => _
@@ -60,12 +59,14 @@ internal static class WithNavigationOnParent
           .SetType(typeof(Guid))))
       .Setup(mock => mock
         .Setup(x => x.IsOnDependent)
-        .Returns(true)));
+        .Returns(true))
+      .Setup(mock => mock
+        .Setup(x => x.IsCollection)
+        .Returns(false)));
 
     INavigationModel childrenBNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetType(typeof(ICollection<ChildB>))
-      .SetIsCollection(true)
       .SetHasMember(true)
       .SetProperty(typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenB)))
       .SetTo(_ => _
@@ -74,6 +75,9 @@ internal static class WithNavigationOnParent
           .SetType(typeof(int))))
       .Setup(mock => mock
         .Setup(x => x.IsOnDependent)
+        .Returns(true))
+      .Setup(mock => mock
+        .Setup(x => x.IsCollection)
         .Returns(true)));
 
     return EntityModelBuilder.Build(_ => _
@@ -108,7 +112,6 @@ internal static class WithNavigationOnParent
     INavigationModel parentNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetType(typeof(Parent))
-      .SetIsCollection(false)
       .SetHasMember(false)
       .SetProperty(null!)
       .SetTo(_ => _
@@ -117,6 +120,9 @@ internal static class WithNavigationOnParent
           .SetType(typeof(Guid))))
       .Setup(mock => mock
         .Setup(x => x.IsOnDependent)
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.IsCollection)
         .Returns(false)));
 
     IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
@@ -157,7 +163,6 @@ internal static class WithNavigationOnParent
     INavigationModel parentNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetType(typeof(Parent))
-      .SetIsCollection(true)
       .SetHasMember(false)
       .SetProperty(null)
       .SetTo(_ => _
@@ -166,7 +171,10 @@ internal static class WithNavigationOnParent
           .SetType(typeof(Guid))))
       .Setup(mock => mock
         .Setup(x => x.IsOnDependent)
-        .Returns(false)));
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.IsCollection)
+        .Returns(true)));
 
     IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
       .SetIndex(2)
