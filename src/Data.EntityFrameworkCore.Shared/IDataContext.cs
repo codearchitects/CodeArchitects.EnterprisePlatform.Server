@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-public interface IEFCoreContext : IDataContext
+public interface IDataContext : Data.IDataContext
 {
   DbContext DbContext { get; }
 }

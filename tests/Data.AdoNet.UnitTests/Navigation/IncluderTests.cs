@@ -16,7 +16,7 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -30,7 +30,7 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -46,8 +46,8 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -63,8 +63,8 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -78,8 +78,8 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -95,7 +95,7 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -111,7 +111,7 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -125,9 +125,9 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -141,9 +141,9 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -158,9 +158,9 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -176,9 +176,9 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -194,9 +194,9 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -212,10 +212,10 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -231,10 +231,10 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -248,10 +248,10 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -269,10 +269,10 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(1)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -290,14 +290,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(3)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -315,14 +315,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(3)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -336,14 +336,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(3)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -363,14 +363,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(3)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(1)
-          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == RootToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildDId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(1)
+          .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -388,14 +388,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -413,14 +413,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -434,14 +434,14 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf);
   }
 
   [Fact]
@@ -461,13 +461,13 @@ public class IncluderTests
 
     // Assert
     includer.Spec.Navigations.Should().HaveCount(2)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is INavigationSimpleLeaf)
-      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is INavigationSimpleNode)
-      .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is INavigationSimpleLeaf)
-        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is INavigationSimpleNode)
-        .Which.As<INavigationSimpleNode>().Children.Should().HaveCount(2)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is INavigationSimpleLeaf)
-          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is INavigationSimpleLeaf);
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildEId && nav is ISimpleNavigationLeaf)
+      .And.ContainSingle(nav => nav.Model.Id == ChildDToChildAId && nav is ISimpleNavigationNode)
+      .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToChildFId && nav is ISimpleNavigationLeaf)
+        .And.ContainSingle(nav => nav.Model.Id == ChildAToRootId && nav is ISimpleNavigationNode)
+        .Which.As<ISimpleNavigationNode>().Children.Should().HaveCount(2)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildBId && nav is ISimpleNavigationLeaf)
+          .And.ContainSingle(nav => nav.Model.Id == RootToChildCId && nav is ISimpleNavigationLeaf);
   }
 }

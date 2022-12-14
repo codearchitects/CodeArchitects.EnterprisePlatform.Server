@@ -11,7 +11,7 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(RootEntity, new INavigation[]
     {
-      new NavigationSimpleLeaf(RootToChildANavigation)
+      new SimpleNavigationLeaf(RootToChildANavigation)
     });
 
     string expectedSql = """
@@ -39,8 +39,8 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(RootEntity, new INavigation[]
     {
-      new NavigationSimpleLeaf(RootToChildANavigation),
-      new NavigationSimpleLeaf(RootToChildBNavigation)
+      new SimpleNavigationLeaf(RootToChildANavigation),
+      new SimpleNavigationLeaf(RootToChildBNavigation)
     });
 
     string expectedSql = """
@@ -69,7 +69,7 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(RootEntity, new INavigation[]
     {
-      new NavigationSkipLeaf(RootToManyToManyNavigation)
+      new SkipNavigationLeaf(RootToManyToManyNavigation)
     });
 
     string expectedSql = """
@@ -101,16 +101,16 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(RootEntity, new INavigation[]
     {
-      new NavigationSimpleLeaf(RootToChildBNavigation),
-        new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
+      new SimpleNavigationLeaf(RootToChildBNavigation),
+        new SimpleNavigationNode(RootToChildANavigation, new INavigation[]
         {
-          new NavigationSimpleNode(ChildAToChildDNavigation, new INavigation[]
+          new SimpleNavigationNode(ChildAToChildDNavigation, new INavigation[]
           {
-            new NavigationSimpleLeaf(ChildDToChildENavigation)
+            new SimpleNavigationLeaf(ChildDToChildENavigation)
           }),
-          new NavigationSimpleLeaf(ChildAToChildFNavigation)
+          new SimpleNavigationLeaf(ChildAToChildFNavigation)
         }),
-        new NavigationSimpleLeaf(RootToChildCNavigation)
+        new SimpleNavigationLeaf(RootToChildCNavigation)
     });
 
     string expectedSql = """
@@ -149,7 +149,7 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(ChildAEntity, new INavigation[]
     {
-      new NavigationSimpleLeaf(ChildAToRootNavigation)
+      new SimpleNavigationLeaf(ChildAToRootNavigation)
     });
 
     string expectedSql = """
@@ -177,9 +177,9 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(ChildAEntity, new INavigation[]
     {
-      new NavigationSimpleNode(ChildAToRootNavigation, new INavigation[]
+      new SimpleNavigationNode(ChildAToRootNavigation, new INavigation[]
       {
-        new NavigationSimpleLeaf(RootToChildBNavigation),
+        new SimpleNavigationLeaf(RootToChildBNavigation),
       })
     });
 
@@ -212,9 +212,9 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(ChildGEntity, new INavigation[]
     {
-      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {
-        new NavigationSkipLeaf(ManyToManyToRootNavigation)
+        new SkipNavigationLeaf(ManyToManyToRootNavigation)
       })
     });
 
@@ -251,11 +251,11 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(ChildGEntity, new INavigation[]
     {
-      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {
-        new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
+        new SkipNavigationNode(ManyToManyToRootNavigation, new INavigation[]
         {
-          new NavigationSimpleLeaf(RootToChildANavigation)
+          new SimpleNavigationLeaf(RootToChildANavigation)
         })
       })
     });
@@ -297,13 +297,13 @@ public partial class SqlTextBuilderTests
     // Arrange
     NavigationSpec spec = new(ChildGEntity, new INavigation[]
     {
-      new NavigationSimpleNode(ChildGToManyToManyNavigation, new INavigation[]
+      new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {
-        new NavigationSkipNode(ManyToManyToRootNavigation, new INavigation[]
+        new SkipNavigationNode(ManyToManyToRootNavigation, new INavigation[]
         {
-          new NavigationSimpleNode(RootToChildANavigation, new INavigation[]
+          new SimpleNavigationNode(RootToChildANavigation, new INavigation[]
           {
-            new NavigationSimpleLeaf(ChildAToChildDNavigation)
+            new SimpleNavigationLeaf(ChildAToChildDNavigation)
           })
         })
       })

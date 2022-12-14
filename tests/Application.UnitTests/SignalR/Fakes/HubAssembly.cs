@@ -14,7 +14,7 @@ public static class HubAssembly
   {
     get
     {
-      Mock<Assembly> assemblyMock = new Mock<Assembly>(behavior: MockBehavior.Strict);
+      Mock<Assembly> assemblyMock = new(behavior: MockBehavior.Strict);
       assemblyMock
         .Setup(x => x.GetTypes())
         .Returns(new Type[] { HubInterface1Type, HubInterface2Type, HubClass1Type, HubClass2Type });

@@ -1,6 +1,4 @@
-﻿using static CodeArchitects.Platform.Data.AdoNet.Materialization.MaterializationTests;
-
-namespace CodeArchitects.Platform.Data.AdoNet;
+﻿namespace CodeArchitects.Platform.Data.AdoNet;
 
 public partial class ModelConfigurationTests
 {

@@ -452,6 +452,7 @@ public class UpdateAsyncTests : TestBase
       .And.ContainSingle(item => item.Index == item2.Index && item.Name == item2.Name);
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldUpdateEntity_WhenEntityBelongsToCurrentTenant(RepositoryDependencies dependencies)
   {
@@ -475,6 +476,7 @@ public class UpdateAsyncTests : TestBase
     fromDb!.Name.Should().Be(entity.Name);
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldThrow_WhenEntityBelongsToAnotherTenant(RepositoryDependencies dependencies)
   {
@@ -494,6 +496,7 @@ public class UpdateAsyncTests : TestBase
     await act.Should().ThrowAsync<DbUpdateConcurrencyException>();
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldUpdateEntity_WhenEntityIsNotSoftDeleted(RepositoryDependencies dependencies)
   {
@@ -514,6 +517,7 @@ public class UpdateAsyncTests : TestBase
     fromDb!.Name.Should().Be(entity.Name);
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldThrow_WhenEntityIsSoftDeleted(RepositoryDependencies dependencies)
   {

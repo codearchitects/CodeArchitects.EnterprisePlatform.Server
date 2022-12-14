@@ -29,8 +29,8 @@ internal class TopicRouter
 
   public Task ExecuteAsync(HttpContext context)
   {
-    using StreamReader streamReader = new StreamReader(context.Request.Body);
-    using JsonTextReader jsonReader = new JsonTextReader(streamReader);
+    using StreamReader streamReader = new(context.Request.Body);
+    using JsonTextReader jsonReader = new(streamReader);
     ILogger logger = context.RequestServices.CreateMessagingLogger();
 
     switch (context.Request.ContentType)

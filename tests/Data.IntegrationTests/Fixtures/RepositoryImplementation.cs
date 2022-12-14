@@ -3,5 +3,5 @@
 public enum RepositoryImplementation
 {
   AdoNet,
-  EntityFrameworkCore
+  EFCore
 }

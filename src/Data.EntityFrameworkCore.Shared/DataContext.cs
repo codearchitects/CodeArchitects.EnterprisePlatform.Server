@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Associations;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Navigation;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Navigation;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
-internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
+internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
   where TDbContext : DbContext
 {
   private readonly IStateManager<TDbContext> _stateManager;
@@ -19,7 +19,7 @@ internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
   private readonly IPredicateProvider _predicateProvider;
   private readonly IDefaultEntityFactory _defaultEntityFactory;
 
-  public EFCoreContext(IStateManager<TDbContext> stateManager, ITrackingContext trackingContext, IPredicateProvider predicateProvider, IDefaultEntityFactory defaultEntityFactory)
+  public DataContext(IStateManager<TDbContext> stateManager, ITrackingContext trackingContext, IPredicateProvider predicateProvider, IDefaultEntityFactory defaultEntityFactory)
   {
     _stateManager = stateManager;
     _trackingContext = trackingContext;
@@ -29,7 +29,7 @@ internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
 
   public TDbContext DbContext => _stateManager.DbContext;
 
-  DbContext IEFCoreContext.DbContext => _stateManager.DbContext;
+  DbContext IDataContext.DbContext => _stateManager.DbContext;
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
@@ -75,10 +75,10 @@ internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
           if (navigation.IsOnDependent)
             return false;
 
-          bool isAggregation = navigation.IsAggregation();
-          if (isAggregation)
+          if (navigation.IsAggregation())
           {
             node.Entry.State = EntityState.Added;
+            return true;
           }
           else
           {
@@ -86,8 +86,8 @@ internal sealed class EFCoreContext<TDbContext> : IEFCoreContext<TDbContext>
             {
               node.Entry.Property(property.Name).IsModified = true;
             }
+            return false;
           }
-          return isAggregation;
 
         default:
           Debug.Fail("This point should be unreacheable.");

@@ -7,12 +7,12 @@ public class EFCoreRepository<TDbContext, TEntity, TKey> : EFCoreRepository<TEnt
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public EFCoreRepository(IEFCoreContext<TDbContext> context)
+  public EFCoreRepository(IDataContext<TDbContext> context)
     : base(context)
   {
   }
 
-  protected new IEFCoreContext<TDbContext> Context => (IEFCoreContext<TDbContext>)base.Context;
+  protected new IDataContext<TDbContext> Context => (IDataContext<TDbContext>)base.Context;
 
   protected new TDbContext DbContext => Context.DbContext;
 }

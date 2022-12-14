@@ -9,7 +9,7 @@ public class HubEndpointAttributeTests
     const string endpoint = nameof(endpoint);
 
     // Act
-    HubEndpointAttribute attribute = new HubEndpointAttribute(endpoint);
+    HubEndpointAttribute attribute = new(endpoint);
 
     // Assert
     attribute.Endpoint.Should().Be(endpoint);

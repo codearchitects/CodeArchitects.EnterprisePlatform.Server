@@ -25,7 +25,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
 
             modelBuilder.Entity("CartItemProduct", b =>
                 {
-                    b.Property<Guid>("ProductsId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("CartItemIndex")
@@ -34,7 +34,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                     b.Property<Guid>("CartItemCartId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("ProductsId", "CartItemIndex", "CartItemCartId");
+                    b.HasKey("ProductId", "CartItemIndex", "CartItemCartId");
 
                     b.HasIndex("CartItemIndex", "CartItemCartId");
 
@@ -43,15 +43,15 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
 
             modelBuilder.Entity("CategoryTypology", b =>
                 {
-                    b.Property<Guid>("CategoriesId")
+                    b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("TypologiesId")
+                    b.Property<Guid>("TypologyId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CategoriesId", "TypologiesId");
+                    b.HasKey("CategoryId", "TypologyId");
 
-                    b.HasIndex("TypologiesId");
+                    b.HasIndex("TypologyId");
 
                     b.ToTable("CategoryTypology");
                 });
@@ -279,7 +279,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 {
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -294,13 +294,13 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 {
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Category", null)
                         .WithMany()
-                        .HasForeignKey("CategoriesId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Typology", null)
                         .WithMany()
-                        .HasForeignKey("TypologiesId")
+                        .HasForeignKey("TypologyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

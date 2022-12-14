@@ -107,21 +107,21 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                 name: "CategoryTypology",
                 columns: table => new
                 {
-                    CategoriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TypologiesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TypologyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CategoryTypology", x => new { x.CategoriesId, x.TypologiesId });
+                    table.PrimaryKey("PK_CategoryTypology", x => new { x.CategoryId, x.TypologyId });
                     table.ForeignKey(
-                        name: "FK_CategoryTypology_Category_CategoriesId",
-                        column: x => x.CategoriesId,
+                        name: "FK_CategoryTypology_Category_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "Category",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CategoryTypology_Typology_TypologiesId",
-                        column: x => x.TypologiesId,
+                        name: "FK_CategoryTypology_Typology_TypologyId",
+                        column: x => x.TypologyId,
                         principalTable: "Typology",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -234,13 +234,13 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                 name: "CartItemProduct",
                 columns: table => new
                 {
-                    ProductsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CartItemIndex = table.Column<int>(type: "int", nullable: false),
                     CartItemCartId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItemProduct", x => new { x.ProductsId, x.CartItemIndex, x.CartItemCartId });
+                    table.PrimaryKey("PK_CartItemProduct", x => new { x.ProductId, x.CartItemIndex, x.CartItemCartId });
                     table.ForeignKey(
                         name: "FK_CartItemProduct_CartItem_CartItemIndex_CartItemCartId",
                         columns: x => new { x.CartItemIndex, x.CartItemCartId },
@@ -248,8 +248,8 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                         principalColumns: new[] { "Index", "CartId" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartItemProduct_Product_ProductsId",
-                        column: x => x.ProductsId,
+                        name: "FK_CartItemProduct_Product_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -283,9 +283,9 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                 columns: new[] { "CartItemIndex", "CartItemCartId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CategoryTypology_TypologiesId",
+                name: "IX_CategoryTypology_TypologyId",
                 table: "CategoryTypology",
-                column: "TypologiesId");
+                column: "TypologyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Person_PartnerId",

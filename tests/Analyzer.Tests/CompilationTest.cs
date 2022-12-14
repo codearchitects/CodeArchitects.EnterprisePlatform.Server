@@ -15,7 +15,7 @@ public abstract class CompilationTest
 
   protected async Task<CompilationData> GetCompilationDataAsync(string code)
   {
-    AdhocWorkspace workspace = new AdhocWorkspace();
+    AdhocWorkspace workspace = new();
     Solution solution = workspace.CurrentSolution;
     ProjectId projectId = ProjectId.CreateNewId();
     DocumentId documentId = DocumentId.CreateNewId(projectId);

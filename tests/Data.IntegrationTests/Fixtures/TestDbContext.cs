@@ -69,7 +69,17 @@ public class TestDbContext : DbContext
 
       entity
         .HasMany(item => item.Products)
-        .WithMany();
+        .WithMany()
+        .UsingEntity<Dictionary<string, object>>(
+          "CartItemProduct",
+          join => join
+            .HasOne<Product>()
+            .WithMany()
+            .HasForeignKey("ProductId"),
+          join => join
+            .HasOne<CartItem>()
+            .WithMany()
+            .HasForeignKey("CartItemIndex", "CartItemCartId"));
     });
 
     modelBuilder.Entity<Product>(entity =>
@@ -89,7 +99,19 @@ public class TestDbContext : DbContext
     {
       entity
         .HasMany(category => category.Typologies)
-        .WithMany(typology => typology.Categories);
+        .WithMany(typology => typology.Categories)
+        .UsingEntity<Dictionary<string, object>>(
+          "CategoryTypology",
+          join => join
+            .HasOne<Typology>()
+            .WithMany()
+            .HasForeignKey("TypologyId")
+            .OnDelete(DeleteBehavior.Cascade),
+          join => join
+            .HasOne<Category>()
+            .WithMany()
+            .HasForeignKey("CategoryId")
+            .OnDelete(DeleteBehavior.Cascade));
     });
 
     modelBuilder.Entity<User>(entity =>

@@ -21,7 +21,7 @@ public static class ApplicationSignalRServerBuilderExtensions
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
-    HubConfiguration configuration = new HubConfiguration(assemblies);
+    HubConfiguration configuration = new(assemblies);
     builder.Services.AddSingleton(configuration);
     foreach (KeyValuePair<Type, Type> entry in configuration.HubMap)
     {

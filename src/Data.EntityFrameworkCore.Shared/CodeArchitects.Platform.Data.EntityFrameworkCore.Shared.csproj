@@ -10,7 +10,6 @@
     <RootNamespace>$(MSBuildProjectName.Replace(".Shared", ""))</RootNamespace>
   </PropertyGroup>
 
-
 	<PropertyGroup>
 		<EFCoreVersion Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'">5.0.17</EFCoreVersion>
 		<EFCoreVersion Condition="'$(TargetFramework)' == 'net6.0'">7.0.0</EFCoreVersion>

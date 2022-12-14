@@ -131,7 +131,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(Root.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(Root))
@@ -155,7 +155,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildA.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildA))
@@ -180,7 +180,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildB.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildB))
@@ -198,7 +198,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildC.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildC))
@@ -216,7 +216,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildD.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildD))
@@ -240,7 +240,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildE.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildE))
@@ -258,7 +258,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildF.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildF))
@@ -276,7 +276,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ManyToMany.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ManyToMany))
@@ -297,7 +297,7 @@ internal static class DeepNavigation
     {
       IPrimaryKeyColumnModel idProperty = PrimaryKeyColumnModelBuilder.Build(_ => _
         .SetName(nameof(ChildG.Id))
-        .SetPrimaryKeyIndex(0));
+        .SetIndex(0));
 
       return EntityModelBuilder.Build(_ => _
         .SetTableName(nameof(ChildG))
@@ -473,13 +473,13 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
-        .SetFromKeys(_ => _
+        .SetFromKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName(nameof(Root.Id)))
             .SetToColumn(_ => _
               .SetName("RootId"))))
-        .SetToKeys(_ => _
+        .SetToKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName("ManyToManyId"))
@@ -499,13 +499,13 @@ internal static class DeepNavigation
           .Returns(propertyInfo))
         .SetJoinEntity(_ => _
           .SetTableName("RootManyToMany"))
-        .SetFromKeys(_ => _
+        .SetFromKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName(nameof(ManyToMany.Id)))
             .SetToColumn(_ => _
               .SetName("ManyToManyId"))))
-        .SetToKeys(_ => _
+        .SetToKeyPairs(_ => _
           .Add(_ => _
             .SetFromColumn(_ => _
               .SetName("RootId"))

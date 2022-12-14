@@ -32,7 +32,7 @@ internal class MessageBusOutputBinding : IOutputBinding<IMessageBusOutputMetadat
 
     string topic = context.Metadata.Topic ?? MessageBus.DefaultTopic;
 
-    CloudEvent<TResult> @event = new CloudEvent<TResult>(result)
+    CloudEvent<TResult> @event = new(result)
     {
       Type = _info.GetMessageName(typeof(TResult))
     };

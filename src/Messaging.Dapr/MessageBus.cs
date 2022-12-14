@@ -44,7 +44,7 @@ internal class MessageBus : IMessageBus
 
   private Task SendCoreAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default)
   {
-    CloudEvent<TMessage> @event = new CloudEvent<TMessage>(message)
+    CloudEvent<TMessage> @event = new(message)
     {
       Type = _info.GetMessageName(typeof(TMessage))
     };

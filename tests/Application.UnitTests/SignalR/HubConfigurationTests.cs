@@ -11,7 +11,7 @@ public class HubConfigurationTests
     // Arrange
 
     // Act
-    HubConfiguration sut = new HubConfiguration(new Assembly[] { HubAssembly.Instance });
+    HubConfiguration sut = new(new Assembly[] { HubAssembly.Instance });
 
     // Assert
     sut.HubMap.Should().HaveCount(2);

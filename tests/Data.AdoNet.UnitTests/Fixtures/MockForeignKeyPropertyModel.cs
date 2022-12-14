@@ -42,6 +42,8 @@ internal class MockForeignKeyPropertyModel : IForeignKeyColumnModel
 
   public Setter<object?>? SetValue => _mock.SetValue;
 
+  public object? DefaultValue => _mock.DefaultValue;
+
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : IColumnModelVisitor<TResult>
   {

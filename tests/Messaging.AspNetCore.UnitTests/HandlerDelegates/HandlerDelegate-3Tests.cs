@@ -21,7 +21,8 @@ public class HandlerDelegate3Tests
   public async Task HandleAsync_ShouldCallHandlerWithMessageAndOutputActionsWithResult()
   {
     // Arrange
-    Message2 message = new Message2 { Data = "myData" };
+    Message2 message = new()
+    { Data = "myData" };
     JObject messageJson = JObject.FromObject(message);
     object result = new();
 
