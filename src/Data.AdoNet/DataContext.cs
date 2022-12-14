@@ -1,19 +1,19 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
-using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
+internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
   where TDbConnection : DbConnection
 {
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor _executor;
   private readonly IDataModel _model;
 
-  public AdoNetContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
+  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
@@ -22,7 +22,7 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
 
   public TDbConnection Connection => _stateManager.Connection;
 
-  IDbConnection IAdoNetContext.Connection => _stateManager.Connection;
+  IDbConnection IDataContext.Connection => _stateManager.Connection;
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
@@ -51,12 +51,14 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
   {
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
       using DbCommand command = connection.CreateCommand();
       command.Transaction = transaction;
       await _executor.ExecuteInsertCommandAsync(command, entity, model, cancellationToken);
-    }, cancellationToken);
+    }, startTransaction, cancellationToken);
   }
 
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -65,12 +67,14 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
   {
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
       using DbCommand command = connection.CreateCommand();
       command.Transaction = transaction;
       await _executor.ExecuteUpdateCommandAsync(command, entity, model, cancellationToken);
-    }, cancellationToken);
+    }, startTransaction, cancellationToken);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -84,7 +88,7 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
       using DbCommand command = connection.CreateCommand();
       command.Transaction = transaction;
       await _executor.ExecuteDeleteCommandAsync(command, entity, model, cancellationToken);
-    }, cancellationToken);
+    }, false, cancellationToken);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
@@ -98,17 +102,17 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
       using DbCommand command = connection.CreateCommand();
       command.Transaction = transaction;
       await _executor.ExecuteDeleteCommandAsync(command, key, model, cancellationToken);
-    }, cancellationToken);
+    }, false, cancellationToken);
   }
 
-  public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, CancellationToken cancellationToken = default)
+  public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
   {
-    return _stateManager.ExecuteAsync(execution, cancellationToken);
+    return _stateManager.ExecuteAsync(execution, startTransaction, cancellationToken);
   }
 
-  public Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, CancellationToken cancellationToken = default)
+  public Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
   {
-    return _stateManager.ExecuteAsync(execution, cancellationToken);
+    return _stateManager.ExecuteAsync(execution, startTransaction, cancellationToken);
   }
 
   public void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
@@ -135,6 +139,7 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
   {
     DbCommand command = Connection.CreateCommand();
     await Connection.OpenAsync(cancellationToken);
+
     try
     {
       return await _executor.ExecuteSelectCommandAsync(command, key, in spec, cancellationToken);
@@ -162,5 +167,16 @@ internal class AdoNetContext<TDbConnection> : IAdoNetContext<TDbConnection>
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;
+  }
+
+  private static bool ShouldStartTransaction(IEntityModel model, object entity)
+  {
+    foreach (INavigationModel navigation in model.Navigations)
+    {
+      if (navigation.HasMember && navigation.GetValue(entity) is not null)
+        return true;
+    }
+
+    return false;
   }
 }

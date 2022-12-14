@@ -15,6 +15,8 @@ internal interface ICommandBuilder
 
   void BuildUpdateCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context);
 
+  void BuildUpsertCommand(IDbCommand command, object node, IEntityModel model);
+
   void BuildDeleteCommand(IDbCommand command, object node, IEntityModel model);
 
   void BuildDeleteCommand<TEntity, TKey>(IDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)

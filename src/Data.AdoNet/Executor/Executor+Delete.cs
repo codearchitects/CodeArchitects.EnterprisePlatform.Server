@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Data.Common;
 using System.Data;
+using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 

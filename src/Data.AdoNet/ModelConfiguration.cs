@@ -85,7 +85,6 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
 
-
   private void Association<TFrom, TTo>(AssociationKind kind, Action<AssociationBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class

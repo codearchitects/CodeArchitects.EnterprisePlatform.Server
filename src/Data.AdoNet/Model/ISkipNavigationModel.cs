@@ -7,9 +7,9 @@ public interface ISkipNavigationModel : INavigationModel
 {
   IEntityModel JoinEntity { get; }
   
-  IReadOnlyList<IKeyPair> FromKeys { get; }
+  IReadOnlyList<IKeyPair> FromKeyPairs { get; }
 
-  IReadOnlyList<IKeyPair> ToKeys { get; }
+  IReadOnlyList<IKeyPair> ToKeyPairs { get; }
 
   new ISkipNavigationModel Inverse { get; }
 

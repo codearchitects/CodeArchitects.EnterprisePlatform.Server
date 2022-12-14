@@ -39,8 +39,8 @@ internal partial class Executor : IExecutor
           if (element is null)
             continue;
 
-          bool continueTracking = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
-          if (!continueTracking)
+          bool continueVisiting = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
+          if (!continueVisiting)
             continue;
 
           VisitGraph(element, navigationModel.To, state, callback);
@@ -48,8 +48,8 @@ internal partial class Executor : IExecutor
       }
       else
       {
-        bool continueTracking = callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state);
-        if (!continueTracking)
+        bool continueVisiting = callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state);
+        if (!continueVisiting)
           continue;
 
         VisitGraph(child, navigationModel.To, state, callback);
@@ -61,35 +61,41 @@ internal partial class Executor : IExecutor
   {
     foreach (INavigationModel navigationModel in model.Navigations)
     {
-      if (!navigationModel.HasMember)
+      if (navigationModel is not IAccessibleNavigationModel accessibleNavigationModel)
         continue;
 
-      object? child = navigationModel.GetValue(node);
+      object? child = accessibleNavigationModel.GetValue(node);
       if (child is null)
         continue;
 
-      if (navigationModel.IsCollection)
+      if (accessibleNavigationModel.IsCollection)
       {
-        IEnumerable collection = (IEnumerable)child;
-        foreach (object? element in collection)
+        _ = accessibleNavigationModel.CollectionAccessor.TryGetNonEnumeratedCount(node, out int count);
+        List<object?> list = new(count);
+        foreach (object? element in (IEnumerable)child)
+        {
+          list.Add(element);
+        }
+
+        foreach (object? element in list)
         {
           if (element is null)
             continue;
 
-          bool continueTracking = await callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
-          if (!continueTracking)
+          bool continueVisiting = await callback(element, accessibleNavigationModel.To, new NavigationContext(node, accessibleNavigationModel), state, cancellationToken);
+          if (!continueVisiting)
             continue;
 
-          await VisitGraphAsync(element, navigationModel.To, state, callback, cancellationToken);
+          await VisitGraphAsync(element, accessibleNavigationModel.To, state, callback, cancellationToken);
         }
       }
       else
       {
-        bool continueTracking = await callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
-        if (!continueTracking)
+        bool continueVisiting = await callback(child, accessibleNavigationModel.To, new NavigationContext(node, accessibleNavigationModel), state, cancellationToken);
+        if (!continueVisiting)
           continue;
 
-        await VisitGraphAsync(child, navigationModel.To, state, callback, cancellationToken);
+        await VisitGraphAsync(child, accessibleNavigationModel.To, state, callback, cancellationToken);
       }
     }
   }

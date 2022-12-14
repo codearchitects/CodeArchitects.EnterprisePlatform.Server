@@ -4,7 +4,7 @@ internal class HiddenSimpleNavigationModel : SimpleNavigationModel
 {
   private readonly HiddenMemberComponent<object?> _memberComponent;
 
-  public HiddenSimpleNavigationModel(HiddenMemberComponent<object?> memberComponent, int id, IEntityModel from, IEntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
+  public HiddenSimpleNavigationModel(HiddenMemberComponent<object?> memberComponent, int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
   {
     _memberComponent = memberComponent;

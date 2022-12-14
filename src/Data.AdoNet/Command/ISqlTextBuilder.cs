@@ -8,5 +8,6 @@ internal interface ISqlTextBuilder
   string BuildSelectText(NavigationSpec spec);
   string BuildInsertText(IEntityModel entity);
   string BuildUpdateText(IEntityModel entity);
+  string BuildUpsertText(IEntityModel entity);
   string BuildDeleteText(IEntityModel entity);
 }

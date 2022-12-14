@@ -4,7 +4,7 @@ internal class EntityModel<TEntity, TKey> : EntityModel, IEntityModel<TEntity, T
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public EntityModel(IInitializerModel initializer, IPrimaryKeyModel<TKey> primaryKey)
+  public EntityModel(InitializerModel initializer, PrimaryKeyModel<TKey> primaryKey)
     : base(initializer)
   {
     PrimaryKey = primaryKey;
@@ -12,7 +12,9 @@ internal class EntityModel<TEntity, TKey> : EntityModel, IEntityModel<TEntity, T
 
   public override Type Type => typeof(TEntity);
 
-  public new IPrimaryKeyModel<TKey> PrimaryKey { get; }
+  public new PrimaryKeyModel<TKey> PrimaryKey { get; }
 
-  protected override IPrimaryKeyModel PrimaryKeyCore => PrimaryKey;
+  protected override PrimaryKeyModel PrimaryKeyCore => PrimaryKey;
+
+  IPrimaryKeyModel<TKey> IEntityModel<TEntity, TKey>.PrimaryKey => PrimaryKey;
 }

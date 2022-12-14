@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Data.Tracking;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
@@ -16,44 +17,96 @@ internal partial class Executor
       (Executor self, DbCommand command) = state;
       (object parent, INavigationModel navigationModel) = context;
 
-      if (!navigationModel.IsOnDependent && navigationModel.AssociationKind is AssociationKind.Aggregation)
+      TrackingState trackingState = self._trackingContext.GetTrackingState(node);
+
+      switch (navigationModel)
       {
-        switch (self._trackingContext.GetTrackingState(node))
-        {
-          case TrackingState.Added:
-            await self.ExecuteInsertCommandAsync(command, node, model, in context, cancellationToken);
-            break;
-          case TrackingState.Removed:
-            await self.ExecuteDeleteCommandAsync(command, node, model, cancellationToken);
-            break;
-          case TrackingState.Modified:
-            await self.ExecuteUpdateCommandAsync(command, node, model, in context, cancellationToken);
-            break;
-        }
-        return true;
+        case IAccessibleSimpleNavigationModel simpleNavigationModel:
+          if (simpleNavigationModel.IsOnDependent)
+          {
+            if (simpleNavigationModel.AssociationKind is AssociationKind.Aggregation)
+              return false;
+
+            switch (trackingState)
+            {
+              case TrackingState.Added:
+                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.Inverse.NavigationEntity!, in context, cancellationToken);
+                break;
+              case TrackingState.Detached:
+                break;
+              default:
+                throw new InvalidTrackingStateException(model.Type.Name, trackingState);
+            }
+
+            return false;
+          }
+
+          if (simpleNavigationModel.AssociationKind is AssociationKind.Composition)
+          {
+            switch (trackingState)
+            {
+              case TrackingState.Added:
+                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
+                break;
+              case TrackingState.Removed:
+                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, context.WithRemovedParent(), cancellationToken);
+                if (simpleNavigationModel.IsCollection)
+                {
+                  simpleNavigationModel.CollectionAccessor.Remove(parent, node);
+                }
+                else
+                {
+                  simpleNavigationModel.SetValue!(parent, null);
+                }
+                break;
+              case TrackingState.Detached or TrackingState.Unchanged:
+                break;
+              default:
+                throw new InvalidTrackingStateException(model.Type.Name, trackingState);
+            }
+
+            return false;
+          }
+
+          switch (trackingState)
+          {
+            case TrackingState.Added:
+              await self.ExecuteInsertCommandAsync(command, node, model, in context, cancellationToken);
+              break;
+            case TrackingState.Removed:
+              await self.ExecuteDeleteCommandAsync(command, node, model, cancellationToken);
+              break;
+            case TrackingState.Modified:
+              await self.ExecuteUpdateCommandAsync(command, node, model, in context, cancellationToken);
+              break;
+          }
+
+          return true;
+
+        case IAccessibleSkipNavigationModel skipNavigationModel:
+          object joinEntity;
+
+          switch (trackingState)
+          {
+            case TrackingState.Added:
+              joinEntity = skipNavigationModel.CreateJoin(parent, node);
+              await self.ExecuteInsertCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
+              break;
+            case TrackingState.Removed:
+              joinEntity = skipNavigationModel.CreateJoin(parent, node);
+              await self.ExecuteDeleteCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, cancellationToken);
+              skipNavigationModel.CollectionAccessor.Remove(parent, node);
+              break;
+            case TrackingState.Modified:
+              throw new InvalidTrackingStateException(model.Type.Name, TrackingState.Modified);
+          }
+
+          return false;
+
+        default:
+          Debug.Fail("This point should be unreacheable.");
+          return false;
       }
-
-      if (navigationModel is ISkipNavigationModel skipNavigationModel)
-      {
-        IEntityModel joinEntityModel = skipNavigationModel.JoinEntity;
-        object joinEntity;
-
-        switch (self._trackingContext.GetTrackingState(node))
-        {
-          case TrackingState.Added:
-            joinEntity = skipNavigationModel.CreateJoin(parent, node);
-            await self.ExecuteInsertCommandAsync(command, joinEntity, joinEntityModel, default, cancellationToken);
-            break;
-          case TrackingState.Removed:
-            joinEntity = skipNavigationModel.CreateJoin(parent, node);
-            await self.ExecuteDeleteCommandAsync(command, joinEntity, joinEntityModel, cancellationToken);
-            break;
-          case TrackingState.Modified:
-            throw new InvalidTrackingStateException(model.Type.Name, TrackingState.Modified);
-        }
-      }
-
-      return false;
     };
 
     await ExecuteUpdateCommandAsync(command, entity, model, default, cancellationToken);

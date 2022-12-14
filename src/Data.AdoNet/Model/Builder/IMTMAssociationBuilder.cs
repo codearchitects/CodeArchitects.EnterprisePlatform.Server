@@ -12,7 +12,7 @@ public interface IMTMAssociationBuilder<TFrom, TTo>
   
   IMTMAssociationBuilder<TFrom, TTo> InverseNavigation(string navigationName);
   
-  IMTMAssociationBuilder<TFrom, TTo> UsingJoinTable(string tableName);
+  IMTMAssociationBuilder<TFrom, TTo> UsingJunctionTable(string tableName);
   
-  IMTMAssociationBuilder<TFrom, TTo> UsingForeignKeys(params string[] keyNames);
+  IMTMAssociationBuilder<TFrom, TTo> UsingJunctionColumnNames(params string[] keyNames);
 }

@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -31,14 +30,15 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
     if (property.GetMethod is null)
       throw new ModelConfigurationException($"Property '{property.Name}' on type '{entityType.Name}' does not have a getter.");
 
-    DynamicMethod method = new DynamicMethod($"getvalue_{property.Name}", typeof(T), new[] { typeof(object) }, entityType);
+    DynamicMethod method = new($"getvalue_{property.Name}", typeof(T), new[] { typeof(object) }, entityType);
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Callvirt, property.GetMethod);
     if (typeof(T) == typeof(object) && property.PropertyType.IsValueType)
     {
-      il.Emit(OpCodes.Box);
+      il.Emit(OpCodes.Box, property.PropertyType);
     }
     il.Emit(OpCodes.Ret);
 
@@ -57,14 +57,15 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
       return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
     }
 
-    DynamicMethod method = new DynamicMethod($"getvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
+    DynamicMethod method = new($"getvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Ldarg_1);
     if (typeof(T) == typeof(object) && property.PropertyType.IsValueType)
     {
-      il.Emit(OpCodes.Unbox, property.PropertyType);
+      il.Emit(OpCodes.Unbox_Any, property.PropertyType);
     }
     il.Emit(OpCodes.Callvirt, property.SetMethod);
     il.Emit(OpCodes.Ret);

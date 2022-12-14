@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal interface INavigationSimpleNode : INavigationNode
+internal interface ISimpleNavigationLeaf : INavigationLeaf
 {
   new IAccessibleSimpleNavigationModel Model { get; }
 }

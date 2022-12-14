@@ -1,30 +1,28 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
+internal class JoinColumnModel : ColumnModel, IPrimaryKeyColumnModel
 {
-  private readonly AccessibleMemberComponent<object?> _memberComponent;
+  private readonly JoinColumnMemberComponent _memberComponent;
 
-  public PrimaryKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index)
+  public JoinColumnModel(JoinColumnMemberComponent memberComponent, short index)
     : base(index)
   {
     _memberComponent = memberComponent;
   }
 
-  protected override MemberComponent<object?> MemberComponent => _memberComponent;
-
   public override bool IsPrimaryKey => true;
 
-  public override bool IsForeignKey => false;
+  public override bool IsForeignKey => true;
 
-  [AllowNull]
   public override string Name
   {
     get => _memberComponent.Name;
-    set => _memberComponent.Name = value;
+    set => throw new InvalidOperationException("Cannot set the name of a join column.");
   }
+
+  protected override MemberComponent<object?> MemberComponent => _memberComponent;
 
   public new MemberInfo Member => _memberComponent.Member;
 
@@ -40,5 +38,12 @@ internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
   public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
   {
     return visitor.VisitPrimaryKey(this, in state);
+  }
+
+  public static JoinColumnModel Create(string name, Type type, short index)
+  {
+    JoinColumnMemberComponent memberComponent = JoinColumnMemberComponent.Create(name, type);
+
+    return new(memberComponent, index);
   }
 }

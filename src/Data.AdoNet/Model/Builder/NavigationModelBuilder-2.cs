@@ -28,16 +28,16 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
 
   public sealed override NavigationModel Build(DataModel dataModel)
   {
-    if (!dataModel.TryGetEntity(FromType, out IEntityModel? fromEntity))
+    if (!dataModel.TryGetEntity(FromType, out EntityModel? fromEntity))
       throw new ModelConfigurationException($"An association '{FromType.Name}' -> '{ToType.Name}' was defined, but '{FromType.Name}' is not an entity.");
 
-    if (!dataModel.TryGetEntity(ToType, out IEntityModel? toEntity))
+    if (!dataModel.TryGetEntity(ToType, out EntityModel? toEntity))
       throw new ModelConfigurationException($"An association '{ToType.Name}' -> '{ToType.Name}' was defined, but '{ToType.Name}' is not an entity.");
 
     return Build(fromEntity, toEntity);
   }
 
-  protected abstract NavigationModel Build(IEntityModel fromEntity, IEntityModel toEntity);
+  protected abstract NavigationModel Build(EntityModel fromEntity, EntityModel toEntity);
 
   protected static CollectionKind GetCollectionKind(Type memberType, Type entityType)
   {

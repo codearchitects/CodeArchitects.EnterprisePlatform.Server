@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 public interface IEntityModel
 {
   string TableName { get; }
-  
+
   Type Type { get; }
 
   IInitializerModel Initializer { get; }

@@ -21,4 +21,6 @@ public interface IMemberModel
   Getter<object?>? GetValue { get; }
 
   Setter<object?>? SetValue { get; }
+
+  object? DefaultValue { get; }
 }

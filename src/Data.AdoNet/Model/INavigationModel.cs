@@ -9,7 +9,7 @@ public interface INavigationModel : IMemberModel
 
   AssociationKind AssociationKind { get; }
 
-  bool IsOnDependent { get; }
+  bool IsOnDependent { get; } // TODO: Rename 'IsOnPrincipal' and change value accordingly
 
   bool IsCollection { get; }
   
@@ -20,4 +20,6 @@ public interface INavigationModel : IMemberModel
   INavigationModel Inverse { get; }
 
   CollectionKind CollectionKind { get; }
+
+  ICollectionAccessor? CollectionAccessor { get; }
 }

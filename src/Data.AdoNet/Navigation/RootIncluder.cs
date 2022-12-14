@@ -22,7 +22,7 @@ internal class RootIncluder<TEntity, TKey> : Includer<TEntity>, IIncluder<TEntit
   {
     try
     {
-      _root.AddLeaf(navigation.AsSpan());
+      _root.AddLeaf(navigation);
 
       return this;
     }

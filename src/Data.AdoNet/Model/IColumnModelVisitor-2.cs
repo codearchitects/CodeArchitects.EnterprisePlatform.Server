@@ -10,6 +10,6 @@ public interface IColumnModelVisitor<out TResult, TState>
   TResult VisitOrdinary(IOrdinaryColumnModel column, in TState state);
   
   TResult VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel column, in TState state);
-  
+
   TResult VisitPrimaryKey(IPrimaryKeyColumnModel column, in TState state);
 }
