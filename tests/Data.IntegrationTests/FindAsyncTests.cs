@@ -246,6 +246,7 @@ public class FindAsyncTests : TestBase
     fromDb.Claims.Should().BeNull();
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntity_WhenExistsAndBelogsToCurrentTenant(RepositoryDependencies dependencies)
   {
@@ -264,6 +265,7 @@ public class FindAsyncTests : TestBase
     fromDb!.Id.Should().Be(entity.Id);
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnNull_WhenExistsButBelongsToAnotherTenant(RepositoryDependencies dependencies)
   {
@@ -283,6 +285,7 @@ public class FindAsyncTests : TestBase
     fromDb.Should().BeNull();
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntity_WhenExistsAndIsNotSoftDeleted(RepositoryDependencies dependencies)
   {
@@ -299,6 +302,7 @@ public class FindAsyncTests : TestBase
     fromDb!.Id.Should().Be(entity.Id);
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnNull_WhenExistsButIsSoftDeleted(RepositoryDependencies dependencies)
   {

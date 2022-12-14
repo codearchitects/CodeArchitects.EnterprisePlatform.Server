@@ -28,6 +28,7 @@ public class RemoveAsyncTests : TestBase
     _fixture.DbContext.Set<Product>().FirstOrDefault(p => p.Id == product.Id).Should().BeNull();
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task RemoveAsync_ShouldRemoveEntity_WhenEntityBelongsToCurrentTenant(RepositoryDependencies dependencies)
   {
@@ -45,6 +46,7 @@ public class RemoveAsyncTests : TestBase
     _fixture.DbContext.Set<TenantEntity>().FirstOrDefault(e => e.Id == entity.Id).Should().BeNull();
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task RemoveAsync_ShouldThrow_WhenEntityBelongsToAnotherTenant(RepositoryDependencies dependencies)
   {
@@ -64,6 +66,7 @@ public class RemoveAsyncTests : TestBase
     await act.Should().ThrowAsync<DbUpdateConcurrencyException>();
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task RemoveAsync_ShouldSetSoftDeleteFlagToTrue_WhenEntityIsNotAlreadySoftDeleted(RepositoryDependencies dependencies)
   {
@@ -82,6 +85,7 @@ public class RemoveAsyncTests : TestBase
     _fixture.DbContext.Entry(fromDb!).Property(SoftDeleteEntity.SoftDeletePropertyName).OriginalValue.Should().Be(true);
   }
 
+  [SoftDeleteTest]
   [Theory, RepositoryDependenciesData]
   public async Task RemoveAsync_ShouldThrow_WhenEntityIsAlreadySoftDeleted(RepositoryDependencies dependencies)
   {

@@ -126,6 +126,7 @@ public class InsertAsyncTests : TestBase
     fromDb!.Address.Should().NotBeNull();
   }
 
+  [MultitenancyTest]
   [Theory, RepositoryDependenciesData]
   public async Task InsertAsync_ShouldInsertEntityWithCurrentTenantId(RepositoryDependencies dependencies)
   {

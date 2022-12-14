@@ -21,4 +21,6 @@ internal abstract class MemberModel : IMemberModel
   public Getter<object?>? GetValue => MemberComponent.GetValue;
 
   public Setter<object?>? SetValue => MemberComponent.SetValue;
+
+  public object? DefaultValue => MemberComponent.DefaultValue;
 }

@@ -49,7 +49,7 @@ internal partial class Executor
                 await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
                 break;
               case TrackingState.Removed:
-                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
+                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, context.WithRemovedParent(), cancellationToken);
                 if (simpleNavigationModel.IsCollection)
                 {
                   // TODO: Remove from collection

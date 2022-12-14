@@ -5,6 +5,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class MemberComponent<T>
 {
+  private object? _defaultValue;
+
   public Type Type => TypeCore;
 
   public MemberInfo? Member => MemberCore;
@@ -20,6 +22,8 @@ internal abstract class MemberComponent<T>
 
   public Setter<T>? SetValue => SetValueCore;
 
+  public object? DefaultValue => _defaultValue ??= CreateDefaultValue();
+
   protected abstract Type TypeCore { get; }
 
   protected abstract MemberInfo? MemberCore { get; }
@@ -33,4 +37,11 @@ internal abstract class MemberComponent<T>
   protected abstract Getter<T>? GetValueCore { get; }
 
   protected abstract Setter<T>? SetValueCore { get; }
+
+  private object? CreateDefaultValue()
+  {
+    return Type.IsValueType
+      ? Activator.CreateInstance(Type)
+      : null;
+  }
 }

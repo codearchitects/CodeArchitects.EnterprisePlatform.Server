@@ -152,10 +152,26 @@ internal class CommandBuilder : ICommandBuilder
 
       if (context != default && navigationModel.Inverse.Id == context.NavigationModel.Id)
       {
-        object? value = columnModel.PrimaryKeyColumn.GetValue(context.Parent);
+        object parent = context.Parent;
+
+        if (RemovedParent.IsRemoved(parent))
+        {
+          if (navigationModel.HasMember)
+          {
+            navigationModel.SetValue(_node, null);
+          }
+          if (columnModel.HasMember)
+          {
+            columnModel.SetValue(_node, columnModel.DefaultValue);
+          }
+
+          return null;
+        }
+
+        object? value = columnModel.PrimaryKeyColumn.GetValue(parent);
         if (navigationModel.HasMember)
         {
-          navigationModel.SetValue(_node, context.Parent);
+          navigationModel.SetValue(_node, parent);
         }
         if (columnModel.HasMember)
         {

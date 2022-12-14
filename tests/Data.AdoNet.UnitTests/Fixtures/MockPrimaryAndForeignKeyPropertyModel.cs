@@ -42,6 +42,8 @@ internal class MockPrimaryAndForeignKeyPropertyModel : IPrimaryAndForeignKeyColu
 
   public bool HasMember => _mock.HasMember;
 
+  public object? DefaultValue => _mock.DefaultValue;
+
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : IColumnModelVisitor<TResult>
   {
