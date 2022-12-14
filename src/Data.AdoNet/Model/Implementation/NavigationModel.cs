@@ -30,6 +30,8 @@ internal abstract class NavigationModel : MemberModel, INavigationModel
 
   public EntityModel To { get; }
 
+  public ICollectionAccessor? CollectionAccessor => MemberComponent.CollectionAccessor;
+
   INavigationModel INavigationModel.Inverse => Inverse;
 
   IEntityModel INavigationModel.From => From;

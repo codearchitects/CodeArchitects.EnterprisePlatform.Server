@@ -13,7 +13,7 @@ public class RepositoryDependenciesDataAttribute : DataAttribute
       yield return new object[] { new RepositoryDependencies(RepositoryImplementation.AdoNet, DatabaseProvider.SqlServer, new TrackingContext()) };
       // yield return new object[] { new RepositoryDependencies(RepositoryImplementation.AdoNet, DatabaseProvider.Postgres, new TrackingContext()) };
     }
-    yield return new object[] { new RepositoryDependencies(RepositoryImplementation.EntityFrameworkCore, DatabaseProvider.SqlServer, new TrackingContext()) };
-    yield return new object[] { new RepositoryDependencies(RepositoryImplementation.EntityFrameworkCore, DatabaseProvider.Postgres, new TrackingContext()) };
+    yield return new object[] { new RepositoryDependencies(RepositoryImplementation.EFCore, DatabaseProvider.SqlServer, new TrackingContext()) };
+    yield return new object[] { new RepositoryDependencies(RepositoryImplementation.EFCore, DatabaseProvider.Postgres, new TrackingContext()) };
   }
 }

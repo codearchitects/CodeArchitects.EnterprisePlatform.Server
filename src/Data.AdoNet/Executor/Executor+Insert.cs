@@ -17,7 +17,7 @@ internal partial class Executor
 
       switch (navigationModel)
       {
-        case ISimpleNavigationModel simpleNavigationModel:
+        case IAccessibleSimpleNavigationModel simpleNavigationModel:
           if (simpleNavigationModel.IsOnDependent)
             return false;
 
@@ -32,7 +32,7 @@ internal partial class Executor
             return false;
           }
 
-        case ISkipNavigationModel skipNavigationModel:
+        case IAccessibleSkipNavigationModel skipNavigationModel:
           object joinEntity = skipNavigationModel.CreateJoin(parent, node);
           await self.ExecuteInsertCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
           return false;

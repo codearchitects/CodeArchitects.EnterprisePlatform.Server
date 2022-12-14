@@ -146,7 +146,7 @@ public class TestFixture : IAsyncLifetime
         };
 
         return new AdoNetRepository<TEntity, TKey>(adoNetContext);
-      case RepositoryImplementation.EntityFrameworkCore:
+      case RepositoryImplementation.EFCore:
         EntityFrameworkCore.StateManager<TestDbContext> contextManager = new(_dbContext);
 
         PredicateTemplateFactory templateFactory = new(_dbContext.Model);

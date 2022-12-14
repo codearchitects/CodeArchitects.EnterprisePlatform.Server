@@ -9,6 +9,7 @@ internal class AccessibleSkipNavigationModel : SkipNavigationModel, IAccessibleS
   public AccessibleSkipNavigationModel(AccessibleMemberComponent<object?> memberComponent, int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent, JoinEntityModel joinEntity)
     : base(id, from, to, associationKind, collectionKind, isOnDependent, joinEntity)
   {
+    CollectionAccessor = memberComponent.CollectionAccessor ?? throw new ArgumentException("Expected a collection member component.", nameof(_memberComponent));
     _memberComponent = memberComponent;
   }
 
@@ -19,4 +20,6 @@ internal class AccessibleSkipNavigationModel : SkipNavigationModel, IAccessibleS
   public new Getter<object?> GetValue => _memberComponent.GetValue;
 
   public new Setter<object?> SetValue => _memberComponent.SetValue;
+
+  public new ICollectionAccessor CollectionAccessor { get; }
 }

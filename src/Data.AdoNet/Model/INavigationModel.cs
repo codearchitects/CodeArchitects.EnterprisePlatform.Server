@@ -20,4 +20,6 @@ public interface INavigationModel : IMemberModel
   INavigationModel Inverse { get; }
 
   CollectionKind CollectionKind { get; }
+
+  ICollectionAccessor? CollectionAccessor { get; }
 }

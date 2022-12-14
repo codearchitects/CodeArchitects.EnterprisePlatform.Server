@@ -6,6 +6,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class AccessibleMemberComponent<T> : MemberComponent<T>
 {
+  private CollectionAccessor? _collectionAccessor;
   private string? _name;
 
   protected AccessibleMemberComponent(Getter<T> getValue, Setter<T> setValue)
@@ -34,6 +35,8 @@ internal abstract class AccessibleMemberComponent<T> : MemberComponent<T>
   protected override Setter<T>? SetValueCore => SetValue;
 
   protected override bool HasMemberCore => true;
+
+  public override ICollectionAccessor? CollectionAccessor => _collectionAccessor ??= Implementation.CollectionAccessor.Create(this);
 
   public static AccessibleMemberComponent<T> Create(MemberInfo member)
   {

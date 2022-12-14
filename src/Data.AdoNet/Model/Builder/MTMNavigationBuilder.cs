@@ -88,7 +88,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IMTMAssociationBuilder<TFrom, TTo> UsingJoinColumnNames(params string[] columnNames)
+  public IMTMAssociationBuilder<TFrom, TTo> UsingJunctionColumnNames(params string[] columnNames)
   {
     _columnNames.Clear();
     _columnNames.AddRange(columnNames.Select(name => new Name(new ColumnName(name))));
@@ -96,7 +96,7 @@ internal class MTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IMTMAssociationBuilder<TFrom, TTo> UsingJoinTable(string tableName)
+  public IMTMAssociationBuilder<TFrom, TTo> UsingJunctionTable(string tableName)
   {
     _tableName = tableName;
 

@@ -48,8 +48,8 @@ internal class TestModelConfiguration : ModelConfiguration
     Composition<CartItem, Product>(composition => composition
       .ManyToMany()
       .Navigation(item => item.Products)
-      .UsingJoinTable("CartItemProduct")
-      .UsingJoinColumnNames("CartItemIndex", "CartItemCartId", "ProductId"));
+      .UsingJunctionTable("CartItemProduct")
+      .UsingJunctionColumnNames("CartItemIndex", "CartItemCartId", "ProductId"));
 
     Composition<Category, Product>(composition => composition
       .OneToMany()
@@ -65,8 +65,8 @@ internal class TestModelConfiguration : ModelConfiguration
       .ManyToMany()
       .Navigation(category => category.Typologies)
       .InverseNavigation(typology => typology.Categories)
-      .UsingJoinTable("CategoryTypology")
-      .UsingJoinColumnNames("CategoryId", "TypologyId"));
+      .UsingJunctionTable("CategoryTypology")
+      .UsingJunctionColumnNames("CategoryId", "TypologyId"));
 
     Aggregation<User, Address>(aggregation => aggregation
       .OneToOne()

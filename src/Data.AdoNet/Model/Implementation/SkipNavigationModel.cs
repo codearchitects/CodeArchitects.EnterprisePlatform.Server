@@ -1,7 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
-using CodeArchitects.Platform.Data.AdoNet.Navigation;
-
-namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationModel
 {

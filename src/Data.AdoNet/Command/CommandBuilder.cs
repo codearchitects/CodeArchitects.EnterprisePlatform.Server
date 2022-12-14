@@ -152,9 +152,7 @@ internal class CommandBuilder : ICommandBuilder
 
       if (context != default && navigationModel.Inverse.Id == context.NavigationModel.Id)
       {
-        object parent = context.Parent;
-
-        if (RemovedParent.IsRemoved(parent))
+        if (context.HasRemovedParent)
         {
           if (navigationModel.HasMember)
           {
@@ -168,6 +166,7 @@ internal class CommandBuilder : ICommandBuilder
           return null;
         }
 
+        object parent = context.Parent;
         object? value = columnModel.PrimaryKeyColumn.GetValue(parent);
         if (navigationModel.HasMember)
         {

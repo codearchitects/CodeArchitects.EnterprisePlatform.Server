@@ -24,6 +24,8 @@ internal abstract class MemberComponent<T>
 
   public object? DefaultValue => _defaultValue ??= CreateDefaultValue();
 
+  public abstract ICollectionAccessor? CollectionAccessor { get; }
+
   protected abstract Type TypeCore { get; }
 
   protected abstract MemberInfo? MemberCore { get; }

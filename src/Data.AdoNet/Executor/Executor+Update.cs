@@ -21,7 +21,7 @@ internal partial class Executor
 
       switch (navigationModel)
       {
-        case ISimpleNavigationModel simpleNavigationModel:
+        case IAccessibleSimpleNavigationModel simpleNavigationModel:
           if (simpleNavigationModel.IsOnDependent)
           {
             if (simpleNavigationModel.AssociationKind is AssociationKind.Aggregation)
@@ -52,7 +52,7 @@ internal partial class Executor
                 await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, context.WithRemovedParent(), cancellationToken);
                 if (simpleNavigationModel.IsCollection)
                 {
-                  // TODO: Remove from collection
+                  simpleNavigationModel.CollectionAccessor.Remove(parent, node);
                 }
                 else
                 {
@@ -83,7 +83,7 @@ internal partial class Executor
 
           return true;
 
-        case ISkipNavigationModel skipNavigationModel:
+        case IAccessibleSkipNavigationModel skipNavigationModel:
           object joinEntity;
 
           switch (trackingState)
@@ -95,7 +95,7 @@ internal partial class Executor
             case TrackingState.Removed:
               joinEntity = skipNavigationModel.CreateJoin(parent, node);
               await self.ExecuteDeleteCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, cancellationToken);
-              // TODO: Remove from collection
+              skipNavigationModel.CollectionAccessor.Remove(parent, node);
               break;
             case TrackingState.Modified:
               throw new InvalidTrackingStateException(model.Type.Name, TrackingState.Modified);

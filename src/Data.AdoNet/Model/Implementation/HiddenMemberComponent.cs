@@ -9,6 +9,8 @@ internal class HiddenMemberComponent<T> : MemberComponent<T>
     TypeCore = type;
   }
 
+  public override ICollectionAccessor? CollectionAccessor => null;
+
   protected override Type TypeCore { get; }
 
   protected override MemberInfo? MemberCore => null;
