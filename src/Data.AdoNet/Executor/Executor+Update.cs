@@ -49,7 +49,7 @@ internal partial class Executor
                 await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
                 break;
               case TrackingState.Removed:
-                await self.ExecuteUpdateCommandAsync(command, null, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
+                await self.ExecuteUpdateCommandAsync(command, node, simpleNavigationModel.NavigationEntity, in context, cancellationToken);
                 if (simpleNavigationModel.IsCollection)
                 {
                   // TODO: Remove from collection
@@ -84,18 +84,17 @@ internal partial class Executor
           return true;
 
         case ISkipNavigationModel skipNavigationModel:
-          IEntityModel joinEntityModel = skipNavigationModel.JoinEntity;
           object joinEntity;
 
-          switch (self._trackingContext.GetTrackingState(node))
+          switch (trackingState)
           {
             case TrackingState.Added:
               joinEntity = skipNavigationModel.CreateJoin(parent, node);
-              await self.ExecuteInsertCommandAsync(command, joinEntity, joinEntityModel, default, cancellationToken);
+              await self.ExecuteInsertCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
               break;
             case TrackingState.Removed:
               joinEntity = skipNavigationModel.CreateJoin(parent, node);
-              await self.ExecuteDeleteCommandAsync(command, joinEntity, joinEntityModel, cancellationToken);
+              await self.ExecuteDeleteCommandAsync(command, joinEntity, skipNavigationModel.JoinEntity, cancellationToken);
               // TODO: Remove from collection
               break;
             case TrackingState.Modified:
@@ -114,7 +113,7 @@ internal partial class Executor
     await VisitGraphAsync(entity, model, new VisitGraphState(this, command), callback, cancellationToken);
   }
 
-  private Task ExecuteUpdateCommandAsync(DbCommand command, object? node, IEntityModel model, in NavigationContext context, CancellationToken cancellationToken)
+  private Task ExecuteUpdateCommandAsync(DbCommand command, object node, IEntityModel model, in NavigationContext context, CancellationToken cancellationToken)
   {
     _commandBuilder.BuildUpdateCommand(command, node, model, in context);
 

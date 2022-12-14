@@ -39,8 +39,8 @@ internal partial class Executor : IExecutor
           if (element is null)
             continue;
 
-          bool continueTracking = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
-          if (!continueTracking)
+          bool continueVisiting = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
+          if (!continueVisiting)
             continue;
 
           VisitGraph(element, navigationModel.To, state, callback);
@@ -48,8 +48,8 @@ internal partial class Executor : IExecutor
       }
       else
       {
-        bool continueTracking = callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state);
-        if (!continueTracking)
+        bool continueVisiting = callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state);
+        if (!continueVisiting)
           continue;
 
         VisitGraph(child, navigationModel.To, state, callback);
@@ -76,8 +76,8 @@ internal partial class Executor : IExecutor
           if (element is null)
             continue;
 
-          bool continueTracking = await callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
-          if (!continueTracking)
+          bool continueVisiting = await callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
+          if (!continueVisiting)
             continue;
 
           await VisitGraphAsync(element, navigationModel.To, state, callback, cancellationToken);
@@ -85,8 +85,8 @@ internal partial class Executor : IExecutor
       }
       else
       {
-        bool continueTracking = await callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
-        if (!continueTracking)
+        bool continueVisiting = await callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state, cancellationToken);
+        if (!continueVisiting)
           continue;
 
         await VisitGraphAsync(child, navigationModel.To, state, callback, cancellationToken);

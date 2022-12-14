@@ -25,7 +25,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
 
             modelBuilder.Entity("CartItemProduct", b =>
                 {
-                    b.Property<Guid>("ProductsId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("CartItemIndex")
@@ -34,7 +34,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                     b.Property<Guid>("CartItemCartId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("ProductsId", "CartItemIndex", "CartItemCartId");
+                    b.HasKey("ProductId", "CartItemIndex", "CartItemCartId");
 
                     b.HasIndex("CartItemIndex", "CartItemCartId");
 
@@ -279,7 +279,7 @@ namespace CodeArchitects.Platform.Data.Migrations.Postgres
                 {
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

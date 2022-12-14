@@ -49,7 +49,7 @@ internal class TestModelConfiguration : ModelConfiguration
       .ManyToMany()
       .Navigation(item => item.Products)
       .UsingJoinTable("CartItemProduct")
-      .UsingJoinColumnNames("CartItemCartId", "CartItemIndex", "ProductId"));
+      .UsingJoinColumnNames("CartItemIndex", "CartItemCartId", "ProductId"));
 
     Composition<Category, Product>(composition => composition
       .OneToMany()

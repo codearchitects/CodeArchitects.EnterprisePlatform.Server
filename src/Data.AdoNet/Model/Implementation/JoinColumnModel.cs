@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
-internal class JoinColumnModel : ColumnModel, IJoinColumnModel
+internal class JoinColumnModel : ColumnModel, IPrimaryKeyColumnModel
 {
   private readonly JoinColumnMemberComponent _memberComponent;
 
@@ -32,12 +32,12 @@ internal class JoinColumnModel : ColumnModel, IJoinColumnModel
 
   public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
   {
-    return visitor.VisitJoin(this);
+    return visitor.VisitPrimaryKey(this);
   }
 
   public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
   {
-    return visitor.VisitJoin(this, in state);
+    return visitor.VisitPrimaryKey(this, in state);
   }
 
   public static JoinColumnModel Create(string name, Type type, short index)

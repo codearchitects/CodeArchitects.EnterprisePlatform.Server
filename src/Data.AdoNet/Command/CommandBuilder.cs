@@ -45,19 +45,10 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildUpdateCommand(IDbCommand command, object? node, IEntityModel model, in NavigationContext context)
+  public void BuildUpdateCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context)
   {
     command.Parameters.Clear();
     command.CommandText = _sqlBuilder.BuildUpdateText(model);
-
-    if (node is null)
-    {
-      foreach (IColumnModel column in model.Columns)
-      {
-        CreateParameter(command, $"p{column.Index}", DBNull.Value);
-      }
-      return;
-    }
 
     ParameterValueVisitor visitor = new(node);
     foreach (IColumnModel column in model.Columns)
@@ -132,11 +123,6 @@ internal class CommandBuilder : ICommandBuilder
     public object? VisitForeignKey(IForeignKeyColumnModel columnModel, in NavigationContext context)
     {
       return GetNavigatableValue(columnModel, in context);
-    }
-
-    public object? VisitJoin(IJoinColumnModel columnModel, in NavigationContext state)
-    {
-      return GetAccessibleValue(columnModel);
     }
 
     public object? VisitOrdinary(IOrdinaryColumnModel columnModel, in NavigationContext context)

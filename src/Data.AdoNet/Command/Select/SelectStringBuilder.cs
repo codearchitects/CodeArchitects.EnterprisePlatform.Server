@@ -123,7 +123,7 @@ internal readonly struct SelectStringBuilder
       stringBuilder.Append('[');
       stringBuilder.Append(column.Name);
       stringBuilder.Append("] = @p");
-      stringBuilder.Append(column.PrimaryKeyIndex);
+      stringBuilder.Append(column.Index);
     }
   }
 

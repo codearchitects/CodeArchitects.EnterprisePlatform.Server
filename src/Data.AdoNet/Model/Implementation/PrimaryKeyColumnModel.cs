@@ -7,11 +7,10 @@ internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
 {
   private readonly AccessibleMemberComponent<object?> _memberComponent;
 
-  public PrimaryKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex)
+  public PrimaryKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index)
     : base(index)
   {
     _memberComponent = memberComponent;
-    PrimaryKeyIndex = primaryKeyIndex;
   }
 
   protected override MemberComponent<object?> MemberComponent => _memberComponent;
@@ -19,8 +18,6 @@ internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
   public override bool IsPrimaryKey => true;
 
   public override bool IsForeignKey => false;
-
-  public short PrimaryKeyIndex { get; }
 
   [AllowNull]
   public override string Name

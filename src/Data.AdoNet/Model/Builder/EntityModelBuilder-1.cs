@@ -99,7 +99,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       {
         (SimpleNavigationModel navigation, short foreignKeyIndex) = navigationWithIndex;
 
-        PrimaryAndForeignKeyColumnModel pkAndFkColumn = new(memberComponent, index, index, foreignKeyIndex, navigation);
+        PrimaryAndForeignKeyColumnModel pkAndFkColumn = new(memberComponent, index, foreignKeyIndex, navigation);
         if (_columnNames.TryGetValue(memberComponent.Member, out string? name))
         {
           pkAndFkColumn.Name = name;
@@ -111,7 +111,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
       }
       else
       {
-        PrimaryKeyColumnModel pkColumn = new(memberComponent, index, index);
+        PrimaryKeyColumnModel pkColumn = new(memberComponent, index);
         if (_columnNames.TryGetValue(memberComponent.Member, out string? name))
         {
           pkColumn.Name = name;

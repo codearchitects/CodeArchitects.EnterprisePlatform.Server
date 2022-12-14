@@ -12,6 +12,4 @@ public interface IColumnModelVisitor<out TResult>
   TResult VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel column);
 
   TResult VisitPrimaryKey(IPrimaryKeyColumnModel column);
-
-  TResult VisitJoin(IJoinColumnModel column);
 }

@@ -69,7 +69,17 @@ public class TestDbContext : DbContext
 
       entity
         .HasMany(item => item.Products)
-        .WithMany();
+        .WithMany()
+        .UsingEntity<Dictionary<string, object>>(
+          "CartItemProduct",
+          join => join
+            .HasOne<Product>()
+            .WithMany()
+            .HasForeignKey("ProductId"),
+          join => join
+            .HasOne<CartItem>()
+            .WithMany()
+            .HasForeignKey("CartItemIndex", "CartItemCartId"));
     });
 
     modelBuilder.Entity<Product>(entity =>

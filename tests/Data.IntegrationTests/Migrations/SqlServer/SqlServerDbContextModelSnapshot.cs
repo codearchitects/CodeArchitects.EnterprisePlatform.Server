@@ -25,7 +25,7 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
 
             modelBuilder.Entity("CartItemProduct", b =>
                 {
-                    b.Property<Guid>("ProductsId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CartItemIndex")
@@ -34,7 +34,7 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                     b.Property<Guid>("CartItemCartId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ProductsId", "CartItemIndex", "CartItemCartId");
+                    b.HasKey("ProductId", "CartItemIndex", "CartItemCartId");
 
                     b.HasIndex("CartItemIndex", "CartItemCartId");
 
@@ -281,7 +281,7 @@ namespace CodeArchitects.Platform.Data.Migrations.SqlServer
                 {
                     b.HasOne("CodeArchitects.Platform.Data.Fixtures.Model.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductsId")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

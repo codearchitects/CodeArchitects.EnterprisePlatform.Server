@@ -8,11 +8,10 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
   private readonly AccessibleMemberComponent<object?> _memberComponent;
   private readonly ISimpleNavigationModel _navigation;
 
-  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short primaryKeyIndex, short foreignKeyIndex, ISimpleNavigationModel navigation)
+  public PrimaryAndForeignKeyColumnModel(AccessibleMemberComponent<object?> memberComponent, short index, short foreignKeyIndex, ISimpleNavigationModel navigation)
     : base(index)
   {
     _memberComponent = memberComponent;
-    PrimaryKeyIndex = primaryKeyIndex;
     ForeignKeyIndex = foreignKeyIndex;
     _navigation = navigation;
   }
@@ -22,8 +21,6 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
   public override bool IsPrimaryKey => true;
 
   public override bool IsForeignKey => true;
-
-  public short PrimaryKeyIndex { get; }
 
   public short ForeignKeyIndex { get; }
 

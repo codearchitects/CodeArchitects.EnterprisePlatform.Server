@@ -6,7 +6,7 @@ internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigati
 {
   private SimpleNavigationModel? _inverse;
   private readonly List<IKeyPair> _keyPairs;
-  private IEntityModel? _navigationEntity;
+  private NavigationEntityModel? _navigationEntity;
 
   public SimpleNavigationModel(int id, EntityModel from, EntityModel to, AssociationKind associationKind, CollectionKind collectionKind, bool isOnDependent)
     : base(id, from, to, associationKind, collectionKind, isOnDependent)
@@ -30,7 +30,7 @@ internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigati
 
   IPrimaryKeyModel ISimpleNavigationModel.PrimaryKey => PrimaryKey;
 
-  public IEntityModel? NavigationEntity
+  public NavigationEntityModel? NavigationEntity
   {
     get
     {
@@ -39,15 +39,16 @@ internal abstract class SimpleNavigationModel : NavigationModel, ISimpleNavigati
 
       return _navigationEntity ?? throw new InvalidOperationException("Navigation entity was not set.");
     }
+    set
+    {
+      Debug.Assert(_navigationEntity is null, "Navigation entity was set multiple times.");
+      Debug.Assert(!IsOnDependent, "Attempted to set the navigation entity on a navigation on a dependent entity.");
+
+      _navigationEntity = value;
+    }
   }
 
-  public void SetNavigationEntity()
-  {
-    Debug.Assert(_navigationEntity is null, "Navigation entity was set multiple times.");
-    Debug.Assert(!IsOnDependent, "Attempted to set the navigation entity on a navigation on a dependent entity.");
-
-    _navigationEntity = NavigationEntityModel.Create(this);
-  }
+  IEntityModel? ISimpleNavigationModel.NavigationEntity => NavigationEntity;
 
   public void AddForeignKey(IForeignKeyColumnModel foreignKeyColumn)
   {

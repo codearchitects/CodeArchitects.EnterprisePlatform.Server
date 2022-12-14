@@ -87,7 +87,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
       stringBuilder.Append('[');
       stringBuilder.Append(column.Name);
       stringBuilder.Append("] = @p");
-      stringBuilder.Append(column.PrimaryKeyIndex);
+      stringBuilder.Append(column.Index);
     }
   }
 
@@ -103,7 +103,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple databa
         .Append('[')
         .Append(column.Name)
         .Append("] = @p")
-        .Append(column.PrimaryKeyIndex))
+        .Append(column.Index))
       .ToString();
 
     // TODO: Cache

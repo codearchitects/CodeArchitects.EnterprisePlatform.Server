@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.FluentMock;
-using System.Collections;
-using System.Data.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
@@ -53,26 +51,30 @@ internal static class WithNavigationOnParent
     INavigationModel childANavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetType(typeof(ChildA))
-      .SetIsOnDependent(true)
       .SetIsCollection(false)
       .SetHasMember(true)
       .SetProperty(typeof(Parent).GetRequiredProperty(nameof(Parent.ChildA)))
       .SetTo(_ => _
         .SetType(typeof(ChildA))
         .SetPrimaryKey(_ => _
-          .SetType(typeof(Guid)))));
+          .SetType(typeof(Guid))))
+      .Setup(mock => mock
+        .Setup(x => x.IsOnDependent)
+        .Returns(true)));
 
     INavigationModel childrenBNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetType(typeof(ICollection<ChildB>))
-      .SetIsOnDependent(true)
       .SetIsCollection(true)
       .SetHasMember(true)
       .SetProperty(typeof(Parent).GetRequiredProperty(nameof(Parent.ChildrenB)))
       .SetTo(_ => _
         .SetType(typeof(ChildB))
         .SetPrimaryKey(_ => _
-          .SetType(typeof(int)))));
+          .SetType(typeof(int))))
+      .Setup(mock => mock
+        .Setup(x => x.IsOnDependent)
+        .Returns(true)));
 
     return EntityModelBuilder.Build(_ => _
       .SetType(typeof(Parent))
@@ -106,14 +108,16 @@ internal static class WithNavigationOnParent
     INavigationModel parentNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(1)
       .SetType(typeof(Parent))
-      .SetIsOnDependent(false)
       .SetIsCollection(false)
       .SetHasMember(false)
       .SetProperty(null!)
       .SetTo(_ => _
         .SetType(typeof(Parent))
         .SetPrimaryKey(_ => _
-          .SetType(typeof(Guid)))));
+          .SetType(typeof(Guid))))
+      .Setup(mock => mock
+        .Setup(x => x.IsOnDependent)
+        .Returns(false)));
 
     IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
       .SetIndex(2)
@@ -153,21 +157,22 @@ internal static class WithNavigationOnParent
     INavigationModel parentNavigation = AccessibleSimpleNavigationModelBuilder.Build(_ => _
       .SetId(2)
       .SetType(typeof(Parent))
-      .SetIsOnDependent(false)
       .SetIsCollection(true)
       .SetHasMember(false)
       .SetProperty(null)
       .SetTo(_ => _
         .SetType(typeof(Parent))
         .SetPrimaryKey(_ => _
-          .SetType(typeof(Guid)))));
+          .SetType(typeof(Guid))))
+      .Setup(mock => mock
+        .Setup(x => x.IsOnDependent)
+        .Returns(false)));
 
     IOrdinaryColumnModel parentIdProperty = OrdinaryColumnModelBuilder.Build(_ => _
       .SetIndex(2)
       .SetType(typeof(Guid))
       .SetHasMember(true)
-      .SetProperty(typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId)))
-      /*.SetNavigation(parentNavigation)*/);
+      .SetProperty(typeof(ChildB).GetRequiredProperty(nameof(ChildB.ParentId))));
 
     return EntityModelBuilder.Build(_ => _
       .SetType(typeof(ChildB))

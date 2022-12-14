@@ -5,5 +5,4 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IPrimaryKeyColumnModel : IAccessibleColumnModel
 {
-  short PrimaryKeyIndex { get; }
 }

@@ -13,7 +13,7 @@ internal interface ICommandBuilder
 
   void BuildInsertCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context);
 
-  void BuildUpdateCommand(IDbCommand command, object? node, IEntityModel model, in NavigationContext context);
+  void BuildUpdateCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context);
 
   void BuildUpsertCommand(IDbCommand command, object node, IEntityModel model);
 
