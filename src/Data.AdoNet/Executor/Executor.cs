@@ -71,7 +71,7 @@ internal partial class Executor : IExecutor
       if (accessibleNavigationModel.IsCollection)
       {
         _ = accessibleNavigationModel.CollectionAccessor.TryGetNonEnumeratedCount(node, out int count);
-        List<object?> list = new List<object?>(count);
+        List<object?> list = new(count);
         foreach (object? element in (IEnumerable)child)
         {
           list.Add(element);

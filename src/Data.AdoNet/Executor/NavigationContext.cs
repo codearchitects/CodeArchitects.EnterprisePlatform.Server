@@ -12,6 +12,6 @@ public readonly record struct NavigationContext(object Parent, INavigationModel 
   {
     private RemovedParent() { }
 
-    public static readonly RemovedParent Instance = new RemovedParent();
+    public static readonly RemovedParent Instance = new();
   }
 }

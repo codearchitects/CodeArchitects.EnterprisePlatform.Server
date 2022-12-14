@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Common.Reflection;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace System.Reflection;

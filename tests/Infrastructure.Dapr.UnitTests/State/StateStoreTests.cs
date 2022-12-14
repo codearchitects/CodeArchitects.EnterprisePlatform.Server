@@ -41,7 +41,7 @@ public class StateStoreTests
   {
     // Arrange
     const string key = nameof(key);
-    StateStub state = new StateStub();
+    StateStub state = new();
     _daprClientMock
       .Setup(x => x.SaveStateAsync(
         s_storeName,                    // storeName

@@ -171,8 +171,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   {
     builder.Services.AddSingleton<ITopicRouterFactory>(delegate (IServiceProvider services)
     {
-      OutputActionFactory outputActionFactory = new OutputActionFactory();
-      HandlerDelegateFactory delegateFactory = new HandlerDelegateFactory(services, outputActionFactory);
+      OutputActionFactory outputActionFactory = new();
+      HandlerDelegateFactory delegateFactory = new(services, outputActionFactory);
       return new TopicRouterFactory(delegateFactory, messageMap);
     });
   }

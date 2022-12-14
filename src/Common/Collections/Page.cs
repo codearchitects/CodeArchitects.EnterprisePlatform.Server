@@ -27,5 +27,5 @@ public class Page<T>
 public static class ReadOnlyCollectionExtensions
 {
   public static Page<T> AsPage<T>(this IReadOnlyCollection<T> collection, bool hasNext)
-    => new Page<T>(collection, hasNext);
+    => new(collection, hasNext);
 }

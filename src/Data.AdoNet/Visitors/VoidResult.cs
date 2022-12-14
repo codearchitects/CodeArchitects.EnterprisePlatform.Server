@@ -2,7 +2,7 @@
 
 public class VoidResult
 {
-  public static readonly VoidResult Instance = new VoidResult();
+  public static readonly VoidResult Instance = new();
 
   private VoidResult() { }
 }

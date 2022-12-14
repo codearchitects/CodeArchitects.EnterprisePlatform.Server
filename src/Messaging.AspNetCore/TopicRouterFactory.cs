@@ -28,7 +28,7 @@ internal class TopicRouterFactory : ITopicRouterFactory
 
   public TopicRouter CreateRouter(IEnumerable<IHandlerDescriptor> descriptors)
   {
-    Dictionary<string, HandlerDelegate> delegates = new Dictionary<string, HandlerDelegate>();
+    Dictionary<string, HandlerDelegate> delegates = new();
     foreach (IHandlerDescriptor descriptor in descriptors)
     {
       string messageName = _messageMap[descriptor.MessageType];

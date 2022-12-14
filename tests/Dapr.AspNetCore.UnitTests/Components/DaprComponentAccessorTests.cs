@@ -23,8 +23,8 @@ public class DaprComponentAccessorTests
   public void AddComponents_ShouldAddAllComponentsInFolder_WhenFolderAndFilesExist()
   {
     // Arrange
-    ComponentSchema component1 = new ComponentSchema();
-    ComponentSchema component2 = new ComponentSchema();
+    ComponentSchema component1 = new();
+    ComponentSchema component2 = new();
 
     Mock<IFileInfo> fileMock = new(MockBehavior.Strict);
     Mock<IDirectoryContents> directoryContentsMock = new(MockBehavior.Strict);

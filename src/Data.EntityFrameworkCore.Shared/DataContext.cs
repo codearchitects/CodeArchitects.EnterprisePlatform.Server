@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Associations;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Navigation;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Navigation;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.EntityFrameworkCore;

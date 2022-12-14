@@ -18,7 +18,7 @@ public abstract class CodeFixProviderTest : CompilationTest
     CodeFixProvider codeFixProvider = (CodeFixProvider)Activator.CreateInstance(CodeFixProviderType)!;
 
     CodeAction? registeredCodeAction = null;
-    CodeFixContext context = new CodeFixContext(document, diagnostic, (codeAction, diagnostics) =>
+    CodeFixContext context = new(document, diagnostic, (codeAction, diagnostics) =>
     {
       if (registeredCodeAction != null)
         throw new Exception("Code action was registered more than once");

@@ -21,7 +21,7 @@ internal class ComponentReader : IComponentReader
   public ComponentSchema FromFile(IFileInfo file)
   {
     using Stream stream = file.CreateReadStream();
-    using StreamReader reader = new StreamReader(stream);
+    using StreamReader reader = new(stream);
 
     ComponentSchema component = _deserializer.Deserialize<ComponentSchema>(reader);
     Validate(component);
@@ -31,7 +31,7 @@ internal class ComponentReader : IComponentReader
 
   private static void Validate(ComponentSchema component)
   {
-    ValidationContext context = new ValidationContext(component);
+    ValidationContext context = new(component);
     Validator.ValidateObject(component, context);
   }
 }

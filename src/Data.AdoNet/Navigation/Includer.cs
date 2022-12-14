@@ -87,5 +87,5 @@ internal abstract class Includer<TEntity> : IExpressionIncluder<TEntity>
   }
 
   protected static ArgumentException WrapIncludeException(IncludeException ex, string parameterName)
-    => new ArgumentException("Invalid include expression. See inner exception for details.", parameterName, ex);
+    => new("Invalid include expression. See inner exception for details.", parameterName, ex);
 }

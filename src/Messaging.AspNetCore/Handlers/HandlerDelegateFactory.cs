@@ -10,7 +10,7 @@ namespace CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 /// </summary>
 internal class HandlerDelegateFactory : IHandlerDelegateFactory
 {
-  private static readonly HashSet<Type> s_supportedOneOfTypes = new HashSet<Type>
+  private static readonly HashSet<Type> s_supportedOneOfTypes = new()
   {
     typeof(OneOf<,>),
     typeof(OneOf<,,>),

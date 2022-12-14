@@ -12,7 +12,7 @@ public class ApplicationServiceCollectionExtensionsTests
   public void AddIdentityProfile_ShouldAddIdentityProfileAndHttpContextAccessor()
   {
     // Arrange
-    ServiceCollection services = new ServiceCollection();
+    ServiceCollection services = new();
 
     // Act
     services.AddIdentityProfile();
@@ -30,7 +30,7 @@ public class ApplicationServiceCollectionExtensionsTests
   public void AddIdentityProfileCustom_ShouldAddIdentityProfileAndHttpContextAccessor()
   {
     // Arrange
-    ServiceCollection services = new ServiceCollection();
+    ServiceCollection services = new();
 
     // Act
     services.AddIdentityProfile<IMyIdentityProfile, MyClaimsIdentityProfile>();

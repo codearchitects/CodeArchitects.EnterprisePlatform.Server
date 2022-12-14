@@ -53,7 +53,7 @@ public static class QueryHelpers
     where T : class
   {
     QueryDelegate @delegate = s_queryDelegates.GetOrAdd(typeof(T), CreateDelegate);
-    StringBuilder sb = new StringBuilder(url);
+    StringBuilder sb = new(url);
     sb.Append('?');
 
     @delegate(sb, queryObject);
@@ -75,7 +75,7 @@ public static class QueryHelpers
     where T2 : class
   {
     QueryDelegate @delegate;
-    StringBuilder sb = new StringBuilder(url);
+    StringBuilder sb = new(url);
     sb.Append('?');
 
     @delegate = s_queryDelegates.GetOrAdd(typeof(T1), CreateDelegate);
@@ -105,7 +105,7 @@ public static class QueryHelpers
     where T3 : class
   {
     QueryDelegate @delegate;
-    StringBuilder sb = new StringBuilder(url);
+    StringBuilder sb = new(url);
     sb.Append('?');
 
     @delegate = s_queryDelegates.GetOrAdd(typeof(T1), CreateDelegate);
@@ -130,7 +130,7 @@ public static class QueryHelpers
   /// <returns>The combined result.</returns>
   public static string AddQueryToUrl(string url, params object?[] queryObjects)
   {
-    StringBuilder sb = new StringBuilder(url);
+    StringBuilder sb = new(url);
     sb.Append('?');
 
     for (int i = 0; i < queryObjects.Length; i++)
@@ -156,7 +156,7 @@ public static class QueryHelpers
     ParameterExpression url = Expression.Parameter(typeof(StringBuilder), nameof(url));
     ParameterExpression queryObject = Expression.Parameter(typeof(object), nameof(queryObject));
 
-    List<Expression> statements = new List<Expression>();
+    List<Expression> statements = new();
     AddToStatements(type, url, Expression.Convert(queryObject, type), null, statements);
 
     LambdaExpression expression = Expression.Lambda(

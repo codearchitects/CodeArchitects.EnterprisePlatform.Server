@@ -11,7 +11,7 @@ public class ApplicationSignalRServerBuilderExtensionsTests
 
   public ApplicationSignalRServerBuilderExtensionsTests()
   {
-    Mock<ISignalRServerBuilder> builderMock = new Mock<ISignalRServerBuilder>(behavior: MockBehavior.Strict);
+    Mock<ISignalRServerBuilder> builderMock = new(behavior: MockBehavior.Strict);
     _serviceCollectionMock = new Mock<IServiceCollection>(behavior: MockBehavior.Strict);
 
     builderMock
@@ -25,7 +25,7 @@ public class ApplicationSignalRServerBuilderExtensionsTests
   public void AddHubs_ShouldAddHubConfigurationAsSingletonAndHubsAsTransient()
   {
     // Arrange
-    List<ServiceDescriptor> descriptors = new List<ServiceDescriptor>();
+    List<ServiceDescriptor> descriptors = new();
     _serviceCollectionMock
       .Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
       .Callback<ServiceDescriptor>(x => descriptors.Add(x));

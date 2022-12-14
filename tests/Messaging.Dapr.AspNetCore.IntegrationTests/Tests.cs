@@ -12,7 +12,7 @@ public class Tests : IClassFixture<TestFixture>
     // Arrange
     Guid messageId = Guid.NewGuid();
     int millisecondsTimeout = 20000;
-    using HttpClient http = new HttpClient();
+    using HttpClient http = new();
 
     // Act
     Task<HttpResponseMessage> waitTask = http.GetAsync($"http://localhost:50001/wait/{messageId}?millisecondsTimeout={millisecondsTimeout}");
@@ -33,7 +33,7 @@ public class Tests : IClassFixture<TestFixture>
     // Arrange
     Guid messageId = Guid.NewGuid();
     int millisecondsTimeout = 20000;
-    using HttpClient http = new HttpClient();
+    using HttpClient http = new();
 
     // Act
     Task<HttpResponseMessage> waitTask = http.GetAsync($"http://localhost:50001/wait/{messageId}?millisecondsTimeout={millisecondsTimeout}");

@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
-using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
 using System.Data.Common;
 

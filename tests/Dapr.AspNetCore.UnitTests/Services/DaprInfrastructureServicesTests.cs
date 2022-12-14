@@ -19,7 +19,7 @@ public class DaprInfrastructureServicesTests
   public void AddService_ShouldAddServiceToDictionary()
   {
     // Arrange
-    MyService service = new MyService();
+    MyService service = new();
 
     // Act
     _sut.AddService<IMyService>(service);
@@ -32,7 +32,7 @@ public class DaprInfrastructureServicesTests
   public void GetService_ShouldReturnService_WhenServiceWasAdded()
   {
     // Arrange
-    MyService expected = new MyService();
+    MyService expected = new();
     _services.Add(typeof(IMyService), expected);
 
     // Act

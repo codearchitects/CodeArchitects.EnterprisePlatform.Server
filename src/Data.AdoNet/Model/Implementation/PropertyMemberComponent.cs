@@ -30,7 +30,7 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
     if (property.GetMethod is null)
       throw new ModelConfigurationException($"Property '{property.Name}' on type '{entityType.Name}' does not have a getter.");
 
-    DynamicMethod method = new DynamicMethod($"getvalue_{property.Name}", typeof(T), new[] { typeof(object) }, entityType);
+    DynamicMethod method = new($"getvalue_{property.Name}", typeof(T), new[] { typeof(object) }, entityType);
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
@@ -57,7 +57,7 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
       return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
     }
 
-    DynamicMethod method = new DynamicMethod($"getvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
+    DynamicMethod method = new($"getvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);

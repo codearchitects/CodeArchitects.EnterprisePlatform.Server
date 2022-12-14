@@ -24,7 +24,7 @@ public class MessageBusTests
   {
     // Arrange
     string messageName = "msg1";
-    Message1 message = new Message1();
+    Message1 message = new();
 
     _infoMock
       .Setup(x => x.GetMessageName(typeof(Message1)))
@@ -55,7 +55,7 @@ public class MessageBusTests
     // Arrange
     string topic = "topic";
     string messageName = "msg1";
-    Message1 message = new Message1();
+    Message1 message = new();
 
     _infoMock
       .Setup(x => x.GetMessageName(typeof(Message1)))
@@ -84,7 +84,7 @@ public class MessageBusTests
   public async Task SendAsyncWithTopic_ShouldThrowArgumentNullException_WhenTopicIsNull()
   {
     // Arrange
-    Message1 message = new Message1();
+    Message1 message = new();
 
     // Act
     Func<Task> act = async () => await _sut.SendAsync(null!, message, CancellationToken.None);

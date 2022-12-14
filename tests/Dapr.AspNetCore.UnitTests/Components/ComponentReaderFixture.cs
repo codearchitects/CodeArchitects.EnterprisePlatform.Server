@@ -120,7 +120,7 @@ spec:
       return ComponentTexts.Zip(Components).Select(item =>
       {
         Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(item.First));
-        Mock<IFileInfo> fileMock = new Mock<IFileInfo>(MockBehavior.Strict);
+        Mock<IFileInfo> fileMock = new(MockBehavior.Strict);
         fileMock
           .Setup(x => x.CreateReadStream())
           .Returns(stream);

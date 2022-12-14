@@ -9,7 +9,7 @@ public class ReflectionExtensionsTests
     const string param1 = nameof(param1);
     const string param2 = nameof(param2);
     const string expectedResult = param1 + param2;
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.InvokePublicMethod("PublicMethod", param1, param2);
@@ -24,7 +24,7 @@ public class ReflectionExtensionsTests
     // Arrange
     const string param1 = nameof(param1);
     const string param2 = nameof(param2);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.InvokePublicMethod("NonExistingMethod", param1, param2);
@@ -40,7 +40,7 @@ public class ReflectionExtensionsTests
     const string param1 = nameof(param1);
     const string param2 = nameof(param2);
     const string expectedResult = param1 + param2;
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.InvokeNonPublicMethod("NonPublicMethod", param1, param2);
@@ -55,7 +55,7 @@ public class ReflectionExtensionsTests
     // Arrange
     const string param1 = nameof(param1);
     const string param2 = nameof(param2);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.InvokeNonPublicMethod("NonExistingMethod", param1, param2);
@@ -68,7 +68,7 @@ public class ReflectionExtensionsTests
   public void GetPublicProperty_ShouldGetProperty_WhenPropertyExists()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.GetPublicProperty("PublicProperty");
@@ -81,7 +81,7 @@ public class ReflectionExtensionsTests
   public void GetPublicProperty_ShouldThrowMissingMemberException_WhenPropertyDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.GetPublicProperty("NonExistingProperty");
@@ -95,7 +95,7 @@ public class ReflectionExtensionsTests
   {
     // Arrange
     const string newPublicPropertyValue = nameof(newPublicPropertyValue);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     stub.SetPublicProperty("PublicProperty", newPublicPropertyValue);
@@ -108,7 +108,7 @@ public class ReflectionExtensionsTests
   public void SetPublicProperty_ShouldThrowMissingMemberException_WhenPropertyDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Action act = () => stub.SetPublicProperty("NonExistingProperty", "");
@@ -121,7 +121,7 @@ public class ReflectionExtensionsTests
   public void GetNonPublicProperty_ShouldGetProperty_WhenPropertyExists()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.GetNonPublicProperty("NonPublicProperty");
@@ -134,7 +134,7 @@ public class ReflectionExtensionsTests
   public void GetNonPublicProperty_ShouldThrowMissingMemberException_WhenPropertyDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.GetNonPublicProperty("NonExistingProperty");
@@ -148,7 +148,7 @@ public class ReflectionExtensionsTests
   {
     // Arrange
     const string newNonPublicPropertyValue = nameof(newNonPublicPropertyValue);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     stub.SetNonPublicProperty("NonPublicProperty", newNonPublicPropertyValue);
@@ -161,7 +161,7 @@ public class ReflectionExtensionsTests
   public void SetNonPublicProperty_ShouldThrowMissingMemberException_WhenPropertyDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Action act = () => stub.SetNonPublicProperty("NonExistingProperty", "");
@@ -174,7 +174,7 @@ public class ReflectionExtensionsTests
   public void GetPublicField_ShouldGetField_WhenFieldExists()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.GetPublicField("PublicField");
@@ -187,7 +187,7 @@ public class ReflectionExtensionsTests
   public void GetPublicField_ShouldThrowMissingMemberException_WhenFieldDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.GetPublicField("NonExistingField");
@@ -201,7 +201,7 @@ public class ReflectionExtensionsTests
   {
     // Arrange
     const string newPublicFieldValue = nameof(newPublicFieldValue);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     stub.SetPublicField("PublicField", newPublicFieldValue);
@@ -214,7 +214,7 @@ public class ReflectionExtensionsTests
   public void SetPublicField_ShouldThrowMissingMemberException_WhenFieldDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Action act = () => stub.SetPublicField("NonExistingField", "");
@@ -227,7 +227,7 @@ public class ReflectionExtensionsTests
   public void GetNonPublicField_ShouldGetField_WhenFieldExists()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     object? result = stub.GetNonPublicField("NonPublicField");
@@ -240,7 +240,7 @@ public class ReflectionExtensionsTests
   public void GetNonPublicField_ShouldThrowMissingMemberException_WhenFieldDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Func<object?> act = () => stub.GetNonPublicField("NonExistingField");
@@ -254,7 +254,7 @@ public class ReflectionExtensionsTests
   {
     // Arrange
     const string newNonPublicFieldValue = nameof(newNonPublicFieldValue);
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     stub.SetNonPublicField("NonPublicField", newNonPublicFieldValue);
@@ -267,7 +267,7 @@ public class ReflectionExtensionsTests
   public void SetNonPublicField_ShouldThrowMissingFIeldException_WhenFieldDoesNotExist()
   {
     // Arrange
-    Stub stub = new Stub();
+    Stub stub = new();
 
     // Act
     Action act = () => stub.SetNonPublicField("NonExistingField", "");

@@ -21,7 +21,7 @@ public static class TopicRouterFixture
     public override IEnumerable<object?[]> GetData(MethodInfo testMethod)
     {
       Stream stream = new MemoryStream();
-      StreamWriter writer = new StreamWriter(stream);
+      StreamWriter writer = new(stream);
       writer.AutoFlush = true;
       writer.Write(_body);
       stream.Position = 0;

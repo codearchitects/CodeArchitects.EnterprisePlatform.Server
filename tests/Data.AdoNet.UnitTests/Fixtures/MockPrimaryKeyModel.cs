@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Fixtures;
