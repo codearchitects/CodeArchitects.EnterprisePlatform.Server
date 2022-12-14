@@ -18,6 +18,10 @@ internal interface IExecutor
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
+  Task ExecuteUpsertCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
+
   Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;

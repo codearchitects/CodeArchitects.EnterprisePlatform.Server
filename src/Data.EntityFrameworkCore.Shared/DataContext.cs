@@ -75,10 +75,10 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           if (navigation.IsOnDependent)
             return false;
 
-          bool isAggregation = navigation.IsAggregation();
-          if (isAggregation)
+          if (navigation.IsAggregation())
           {
             node.Entry.State = EntityState.Added;
+            return true;
           }
           else
           {
@@ -86,8 +86,8 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
             {
               node.Entry.Property(property.Name).IsModified = true;
             }
+            return false;
           }
-          return isAggregation;
 
         default:
           Debug.Fail("This point should be unreacheable.");
