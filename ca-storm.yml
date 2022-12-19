@@ -20,17 +20,32 @@ components:
   - name: CodeArchitects.Platform.Data
     path: src\Data
     type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet
+    path: src\Data.AdoNet
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.DependencyInjection
+    path: src\Data.AdoNet.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.Oracle
+    path: src\Data.AdoNet.Oracle
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.PostgreSQL
+    path: src\Data.AdoNet.PostgreSQL
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.SQLServer
+    path: src\Data.AdoNet.SQLServer
+    type: dotnet-package
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore
     path: src\Data.EntityFrameworkCore
     type: dotnet-package
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore5
     path: src\Data.EntityFrameworkCore5
     type: dotnet-package
-  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore
-    path: src\Data.EntityFrameworkCore.AspNetCore
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection
+    path: src\Data.EntityFrameworkCore.DependencyInjection
     type: dotnet-package
-  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.AspNetCore
-    path: src\Data.EntityFrameworkCore5.AspNetCore
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection
+    path: src\Data.EntityFrameworkCore5.DependencyInjection
     type: dotnet-package
   - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
@@ -66,6 +81,9 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
     path: tests\Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.AdoNet.UnitTests
+    path: tests\Data.AdoNet.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests
     path: tests\Data.EntityFrameworkCore.UnitTests
