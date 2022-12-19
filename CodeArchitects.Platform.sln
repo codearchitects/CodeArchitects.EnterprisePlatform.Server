@@ -85,9 +85,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AutoMapper", "src\Data.AutoMapper\CodeArchitects.Platform.Data.AutoMapper.csproj", "{616A153A-22EF-4202-AB61-F9AD8C8CFE10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore", "src\Data.EntityFrameworkCore.AspNetCore\CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore.csproj", "{02AC03BC-AC6E-4DE1-9F80-62B732CB2EA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection", "src\Data.EntityFrameworkCore.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection.csproj", "{02AC03BC-AC6E-4DE1-9F80-62B732CB2EA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore5.AspNetCore", "src\Data.EntityFrameworkCore5.AspNetCore\CodeArchitects.Platform.Data.EntityFrameworkCore5.AspNetCore.csproj", "{6B35D094-95B3-4D74-B22E-C30FAA79A9DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection", "src\Data.EntityFrameworkCore5.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection.csproj", "{6B35D094-95B3-4D74-B22E-C30FAA79A9DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Emit", "src\Emit\CodeArchitects.Platform.Emit.csproj", "{10F08603-166A-4E0D-8300-3A084E8B665E}"
 EndProject
@@ -103,7 +103,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.Oracle", "src\Data.AdoNet.Oracle\CodeArchitects.Platform.Data.AdoNet.Oracle.csproj", "{55B938B6-D096-4FA6-BD81-740E4F88D8B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests", "tests\Data.EntityFrameworkCore.FunctionalTests\CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests.csproj", "{EDF5C2E0-4AA0-407C-9886-44F9F74E9601}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests", "tests\Data.EntityFrameworkCore.FunctionalTests\CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests.csproj", "{EDF5C2E0-4AA0-407C-9886-44F9F74E9601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

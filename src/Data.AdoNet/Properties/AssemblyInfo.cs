@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.DependencyInjection")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.Oracle")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.PostgreSQL")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.SQLServer")]
