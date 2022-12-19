@@ -8,7 +8,7 @@ namespace EFCoreSample.Infrastructure.Repositories;
 
 public class ProductRepository : EFCoreRepository<Product, Guid>, IProductRepository
 {
-  public ProductRepository(IEFCoreContext context)
+  public ProductRepository(IDataContext context)
     : base(context)
   {
   }

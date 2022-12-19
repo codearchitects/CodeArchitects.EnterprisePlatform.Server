@@ -14,9 +14,9 @@ internal class IdentityCollectionFactory : IIdentityCollectionFactory
 
   public delegate IIdentityCollection Factory(CollectionKind collectionKind);
 
-  private readonly ConcurrentDictionary<IEntityModel, Factory> _factories;
+  private readonly IDictionary<IEntityModel, Factory> _factories;
 
-  public IdentityCollectionFactory(ConcurrentDictionary<IEntityModel, Factory> factories)
+  public IdentityCollectionFactory(IDictionary<IEntityModel, Factory> factories)
   {
     _factories = factories;
   }
@@ -25,7 +25,13 @@ internal class IdentityCollectionFactory : IIdentityCollectionFactory
   {
     Debug.Assert(navigation.CollectionKind is not CollectionKind.None);
 
-    return _factories.GetOrAdd(navigation.To, CreateFactory).Invoke(navigation.CollectionKind);
+    if (!_factories.TryGetValue(navigation.To, out Factory? factory))
+    {
+      factory = CreateFactory(navigation.To);
+      _factories.Add(navigation.To, factory);
+    }
+
+    return factory.Invoke(navigation.CollectionKind);
   }
 
   private static IIdentityCollection CreateIdentityCollection<TEntity, TKey>(IEntityModel<TEntity, TKey> entity, CollectionKind collectionKind)

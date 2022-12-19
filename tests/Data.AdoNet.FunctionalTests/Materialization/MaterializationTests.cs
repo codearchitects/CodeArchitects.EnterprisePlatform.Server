@@ -10,7 +10,7 @@ public partial class MaterializationTests
 
   public MaterializationTests()
   {
-    _sut = new(IdentityCollectionFactory.Create(), RowReaderProvider.Create());
+    _sut = new(new IdentityCollectionFactory(new Dictionary<IEntityModel, IdentityCollectionFactory.Factory>()), new RowReaderProvider(new Dictionary<IEntityModel, RowReader>()));
   }
 
   [Fact]

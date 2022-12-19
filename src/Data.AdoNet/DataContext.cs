@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
+using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
@@ -6,23 +7,32 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
+internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnection>
   where TDbConnection : DbConnection
+  where TDbCommand : DbCommand
 {
   private readonly IStateManager<TDbConnection> _stateManager;
-  private readonly IExecutor _executor;
+  private readonly IExecutor<TDbCommand> _executor;
+  private readonly ICommandInterceptor<TDbCommand> _interceptor;
   private readonly IDataModel _model;
 
-  public DataContext(IStateManager<TDbConnection> stateManager, IExecutor executor, IDataModel model)
+  public DataContext(
+    IStateManager<TDbConnection> stateManager,
+    IExecutor<TDbCommand> executor,
+    ICommandInterceptor<TDbCommand> interceptor,
+    IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
+    _interceptor = interceptor;
     _model = model;
   }
 
   public TDbConnection Connection => _stateManager.Connection;
 
   IDbConnection IDataContext.Connection => _stateManager.Connection;
+
+  protected abstract TDbCommand CreateCommand(TDbConnection connection);
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
@@ -55,9 +65,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      using DbCommand command = connection.CreateCommand();
+      TDbCommand command = CreateCommand(OperationType.Insert, Connection);
+
       command.Transaction = transaction;
-      await _executor.ExecuteInsertCommandAsync(command, entity, model, cancellationToken);
+      await _executor.ExecuteInsertAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
   }
 
@@ -71,9 +82,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      using DbCommand command = connection.CreateCommand();
+      TDbCommand command = CreateCommand(OperationType.Update, Connection);
+
       command.Transaction = transaction;
-      await _executor.ExecuteUpdateCommandAsync(command, entity, model, cancellationToken);
+      await _executor.ExecuteUpdateAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
   }
 
@@ -85,9 +97,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      using DbCommand command = connection.CreateCommand();
+      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+
       command.Transaction = transaction;
-      await _executor.ExecuteDeleteCommandAsync(command, entity, model, cancellationToken);
+      await _executor.ExecuteRemoveAsync(command, entity, model, cancellationToken);
     }, false, cancellationToken);
   }
 
@@ -99,9 +112,10 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      using DbCommand command = connection.CreateCommand();
+      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+
       command.Transaction = transaction;
-      await _executor.ExecuteDeleteCommandAsync(command, key, model, cancellationToken);
+      await _executor.ExecuteRemoveAsync(command, key, model, cancellationToken);
     }, false, cancellationToken);
   }
 
@@ -137,18 +151,27 @@ internal class DataContext<TDbConnection> : IDataContext<TDbConnection>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    DbCommand command = Connection.CreateCommand();
+    TDbCommand command = CreateCommand(OperationType.Find, Connection);
+
     await Connection.OpenAsync(cancellationToken);
 
     try
     {
-      return await _executor.ExecuteSelectCommandAsync(command, key, in spec, cancellationToken);
+      return await _executor.ExecuteFindAsync(command, key, in spec, cancellationToken);
     }
     finally
     {
       command.Dispose();
       Connection.Close();
     }
+  }
+
+  private TDbCommand CreateCommand(OperationType operation, TDbConnection connection)
+  {
+    TDbCommand command = CreateCommand(connection);
+    _interceptor.OnCommandCreated(operation, command);
+
+    return command;
   }
 
   private IEntityModel<TEntity, TKey> EnsureEntity<TEntity, TKey>()

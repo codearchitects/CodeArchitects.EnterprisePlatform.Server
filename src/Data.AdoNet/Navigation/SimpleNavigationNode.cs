@@ -21,12 +21,6 @@ internal class SimpleNavigationNode : IncluderNode, ISimpleNavigationNode
     return visitor.VisitSimpleNode(this);
   }
 
-  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : INavigationVisitor<TResult, TState>
-  {
-    return visitor.VisitSimpleNode(this, in state);
-  }
-
   public bool Equals(INavigation? other)
   {
     if (other is not ISimpleNavigationNode node)

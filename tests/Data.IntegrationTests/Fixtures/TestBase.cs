@@ -15,11 +15,13 @@ public class TestBase : IAsyncLifetime
 
   Task IAsyncLifetime.InitializeAsync()
   {
-    return _fixture.SetupAsync(_output);
+    _fixture.Setup(_output);
+    return Task.CompletedTask;
   }
 
-  async Task IAsyncLifetime.DisposeAsync()
+  Task IAsyncLifetime.DisposeAsync()
   {
-    await _fixture.ResetAsync();
+    _fixture.Reset();
+    return Task.CompletedTask;
   }
 }

@@ -142,27 +142,27 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityOnly_WhenNavigationIsOneToManyComposition(RepositoryDependencies dependencies)
   {
     // Arrange
-    User user = User.One();
+    Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
-    user.Carts = new() { cart0, cart1 };
+    customer.Carts = new() { cart0, cart1 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<User, Guid>(dependencies, new object[] { cart0, cart1, user });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
 
-    user.Name = "New user name";
+    customer.Name = "New customer name";
     cart0.Name = "New cart name";
 
     // Act
-    await sut.UpdateAsync(user);
+    await sut.UpdateAsync(customer);
 
     // Assert
-    User? fromDb = _fixture.DbContext.Set<User>()
+    Customer? fromDb = _fixture.DbContext.Set<Customer>()
       .Include(x => x.Carts)
-      .FirstOrDefault(x => x.Id == user.Id);
+      .FirstOrDefault(x => x.Id == customer.Id);
 
     fromDb.Should().NotBeNull();
-    fromDb!.Name.Should().Be(user.Name);
+    fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(2)
       .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName)
       .And.ContainSingle(cart => cart.Id == cart1.Id && cart.Name == cart1.Name);
@@ -174,31 +174,31 @@ public class UpdateAsyncTests : TestBase
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
 
-    User user = User.One();
+    Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
-    user.Carts = new() { cart0 };
+    customer.Carts = new() { cart0 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<User, Guid>(dependencies, new object[] { cart0, cart1, user });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
 
-    user.Name = "New user name";
+    customer.Name = "New customer name";
     cart0.Name = "New cart name";
-    user.Carts.Add(cart1);
-    trackingContext.SetTrackingState(user, TrackingState.Modified);
+    customer.Carts.Add(cart1);
+    trackingContext.SetTrackingState(customer, TrackingState.Modified);
     trackingContext.SetTrackingState(cart0, TrackingState.Unchanged);
     trackingContext.SetTrackingState(cart1, TrackingState.Added);
 
     // Act
-    await sut.UpdateAsync(user);
+    await sut.UpdateAsync(customer);
 
     // Assert
-    User? fromDb = _fixture.DbContext.Set<User>()
+    Customer? fromDb = _fixture.DbContext.Set<Customer>()
       .Include(x => x.Carts)
-      .FirstOrDefault(x => x.Id == user.Id);
+      .FirstOrDefault(x => x.Id == customer.Id);
 
     fromDb.Should().NotBeNull();
-    fromDb!.Name.Should().Be(user.Name);
+    fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(2)
       .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName)
       .And.ContainSingle(cart => cart.Id == cart1.Id && cart.Name == cart1.Name);
@@ -210,30 +210,30 @@ public class UpdateAsyncTests : TestBase
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
 
-    User user = User.One();
+    Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
-    user.Carts = new() { cart0, cart1 };
+    customer.Carts = new() { cart0, cart1 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<User, Guid>(dependencies, new object[] { cart0, cart1, user });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
 
-    user.Name = "New user name";
+    customer.Name = "New customer name";
     cart0.Name = "New cart name";
-    trackingContext.SetTrackingState(user, TrackingState.Modified);
+    trackingContext.SetTrackingState(customer, TrackingState.Modified);
     trackingContext.SetTrackingState(cart0, TrackingState.Unchanged);
     trackingContext.SetTrackingState(cart1, TrackingState.Removed);
 
     // Act
-    await sut.UpdateAsync(user);
+    await sut.UpdateAsync(customer);
 
     // Assert
-    User? fromDb = _fixture.DbContext.Set<User>()
+    Customer? fromDb = _fixture.DbContext.Set<Customer>()
       .Include(x => x.Carts)
-      .FirstOrDefault(x => x.Id == user.Id);
+      .FirstOrDefault(x => x.Id == customer.Id);
 
     fromDb.Should().NotBeNull();
-    fromDb!.Name.Should().Be(user.Name);
+    fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(1)
       .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName);
   }
@@ -284,19 +284,19 @@ public class UpdateAsyncTests : TestBase
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
 
-    User user = User.One();
+    Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
-    user.Carts = new() { cart0, cart1 };
+    customer.Carts = new() { cart0, cart1 };
 
-    var sut = _fixture.CreateRepository<User, Guid>(dependencies, new object[] { cart0, cart1, user });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
 
-    trackingContext.SetTrackingState(user, TrackingState.Modified);
+    trackingContext.SetTrackingState(customer, TrackingState.Modified);
     trackingContext.SetTrackingState(cart0, TrackingState.Modified);
     trackingContext.SetTrackingState(cart1, TrackingState.Modified);
 
     // Act
-    Func<Task> act = () => sut.UpdateAsync(user);
+    Func<Task> act = () => sut.UpdateAsync(customer);
 
     // Assert
     await act.Should().ThrowAsync<InvalidTrackingStateException>();
@@ -341,7 +341,7 @@ public class UpdateAsyncTests : TestBase
 
     var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
 
-    first.Name = "New user name";
+    first.Name = "New customer name";
     second.Name = "New second name";
     first.Partner = second;
     trackingContext.SetTrackingState(first, TrackingState.Modified);
@@ -374,7 +374,7 @@ public class UpdateAsyncTests : TestBase
 
     var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
 
-    first.Name = "New user name";
+    first.Name = "New customer name";
     second.Name = "New second name";
     trackingContext.SetTrackingState(first, TrackingState.Modified);
     trackingContext.SetTrackingState(second, TrackingState.Removed);
@@ -450,88 +450,5 @@ public class UpdateAsyncTests : TestBase
     fromDb.Items.Should().HaveCount(2)
       .And.ContainSingle(item => item.Index == item1.Index && item.Name == item1.Name)
       .And.ContainSingle(item => item.Index == item2.Index && item.Name == item2.Name);
-  }
-
-  [MultitenancyTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntity_WhenEntityBelongsToCurrentTenant(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    TenantEntity entity = TenantEntity.One();
-
-    var sut = _fixture.CreateRepository<TenantEntity, Guid>(dependencies, new[] { entity });
-
-    entity.Name = "New entity name";
-
-    // Act
-    await sut.UpdateAsync(entity);
-
-    // Assert
-    TenantEntity? fromDb = _fixture.DbContext.Set<TenantEntity>()
-      .FirstOrDefault(e => e.Id == entity.Id);
-
-    fromDb.Should().NotBeNull();
-    fromDb!.Name.Should().Be(entity.Name);
-  }
-
-  [MultitenancyTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldThrow_WhenEntityBelongsToAnotherTenant(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    TenantEntity entity = TenantEntity.One();
-
-    var sut = _fixture.CreateRepository<TenantEntity, Guid>(dependencies, new[] { entity });
-
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    // Act
-    Func<Task> act = () => sut.UpdateAsync(entity);
-
-    // Assert
-    await act.Should().ThrowAsync<DbUpdateConcurrencyException>();
-  }
-
-  [SoftDeleteTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntity_WhenEntityIsNotSoftDeleted(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    SoftDeleteEntity entity = SoftDeleteEntity.One();
-
-    var sut = _fixture.CreateRepository<SoftDeleteEntity, Guid>(dependencies, new[] { entity });
-
-    entity.Name = "New entity name";
-
-    // Act
-    await sut.UpdateAsync(entity);
-
-    // Assert
-    _fixture.SoftDeleteContext.ShouldFilter = false;
-    SoftDeleteEntity? fromDb = _fixture.DbContext.Set<SoftDeleteEntity>().FirstOrDefault(e => e.Id == entity.Id);
-    fromDb.Should().NotBeNull();
-    fromDb!.Name.Should().Be(entity.Name);
-  }
-
-  [SoftDeleteTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldThrow_WhenEntityIsSoftDeleted(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    SoftDeleteEntity entity = SoftDeleteEntity.One();
-
-    var sut = _fixture.CreateRepository<SoftDeleteEntity, Guid>(dependencies, new[] { entity });
-
-    _fixture.SoftDelete(entity);
-
-    // Act
-    Func<Task> act = () => sut.UpdateAsync(entity);
-
-    // Assert
-    await act.Should().ThrowAsync<DbUpdateConcurrencyException>();
   }
 }

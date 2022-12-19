@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Associations;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.SoftDelete;
 using CodeArchitects.Platform.Data.Fixtures.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,13 +44,13 @@ public class TestDbContext : DbContext
     {
       entity
         .HasMany(cart => cart.Items)
-        .WithOne(item => item.Cart)
+        .WithOne(item => item.Cart!)
         .HasForeignKey(item => item.CartId)
         .AsAggregation();
 
       entity
-        .HasOne(cart => cart.User)
-        .WithMany(user => user.Carts)
+        .HasOne(cart => cart.Customer!)
+        .WithMany(customer => customer.Carts!)
         .AsComposition();
     });
 
@@ -62,14 +60,14 @@ public class TestDbContext : DbContext
         .HasKey(item => new { item.Index, item.CartId });
 
       entity
-        .HasOne(item => item.ShippingAddress)
+        .HasOne(item => item.ShippingAddress!)
         .WithMany()
         .IsRequired(false)
         .AsComposition();
 
       entity
         .HasMany(item => item.Products)
-        .WithMany()
+        .WithMany(product => product.CartItems)
         .UsingEntity<Dictionary<string, object>>(
           "CartItemProduct",
           join => join
@@ -85,12 +83,12 @@ public class TestDbContext : DbContext
     modelBuilder.Entity<Product>(entity =>
     {
       entity
-        .HasOne(product => product.Category)
+        .HasOne(product => product.Category!)
         .WithMany()
         .AsComposition();
 
       entity
-        .HasOne(product => product.Typology)
+        .HasOne(product => product.Typology!)
         .WithMany()
         .AsComposition();
     });
@@ -114,10 +112,10 @@ public class TestDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade));
     });
 
-    modelBuilder.Entity<User>(entity =>
+    modelBuilder.Entity<Customer>(entity =>
     {
       entity
-        .HasMany(user => user.Claims)
+        .HasMany(customer => customer.Claims)
         .WithOne()
         .AsAggregation();
     });
@@ -125,29 +123,21 @@ public class TestDbContext : DbContext
     modelBuilder.Entity<Address>(entity =>
     {
       entity
-        .HasOne(address => address.User)
-        .WithOne(user => user.Address)
-        .HasForeignKey<Address>("UserId")
+        .HasOne(address => address.Customer!)
+        .WithOne(customer => customer.Address!)
+        .HasForeignKey<Address>("CustomerId")
         .AsAggregation();
     });
 
     modelBuilder.Entity<Person>(entity =>
     {
       entity
-        .HasOne(person => person.Partner)
+        .HasOne(person => person.Partner!)
         .WithOne()
         .AsComposition();
     });
 
-    modelBuilder.Entity<TenantEntity>(entity =>
-    {
-      entity.IsMultiTenant(TenantEntity.TenantIdPropertyName);
-    });
-
-    modelBuilder.Entity<SoftDeleteEntity>(entity =>
-    {
-      entity.IsSoftDelete(SoftDeleteEntity.SoftDeletePropertyName);
-    });
+    modelBuilder.Entity<SerialEntity>();
   }
 }
 
@@ -157,8 +147,7 @@ public class SqlServerDbContext : TestDbContext // For SqlServer migrations
   {
     optionsBuilder
       .UseSqlServer("-")
-      .UseData(data => data
-        .UseMultitenancy(new MultitenancyDescriptor(new())));
+      .UseData();
   }
 }
 
@@ -168,7 +157,6 @@ public class PostgresDbContext : TestDbContext // For Postgres migrations
   {
     optionsBuilder
       .UseNpgsql("-")
-      .UseData(data => data
-        .UseMultitenancy(new MultitenancyDescriptor(new())));
+      .UseData();
   }
 }

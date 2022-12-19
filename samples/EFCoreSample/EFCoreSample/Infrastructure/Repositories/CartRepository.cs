@@ -6,7 +6,7 @@ namespace EFCoreSample.Infrastructure.Repositories;
 
 public class CartRepository : EFCoreRepository<Cart, Guid>, ICartRepository
 {
-  public CartRepository(IEFCoreContext context)
+  public CartRepository(IDataContext context)
     : base(context)
   {
   }

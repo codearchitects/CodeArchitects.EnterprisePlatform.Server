@@ -23,12 +23,6 @@ internal class SkipNavigationLeaf : ISkipNavigationLeaf
     return visitor.VisitSkipLeaf(this);
   }
 
-  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : INavigationVisitor<TResult, TState>
-  {
-    return visitor.VisitSkipLeaf(this, in state);
-  }
-
   public bool Equals(INavigation? other)
   {
     if (other is not ISkipNavigationLeaf leaf)

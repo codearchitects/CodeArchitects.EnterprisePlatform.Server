@@ -55,19 +55,25 @@ internal class RowReaderProvider : IRowReaderProvider
       types: new[] { typeof(IDataRecord), typeof(int) });
   }
 
-  private readonly ConcurrentDictionary<IEntityModel, RowReader> _readers;
+  private readonly IDictionary<IEntityModel, RowReader> _readers;
 
-  public RowReaderProvider(ConcurrentDictionary<IEntityModel, RowReader> readers)
+  public RowReaderProvider(IDictionary<IEntityModel, RowReader> readers)
   {
     _readers = readers;
   }
 
   public IRowReader GetRowReader(IEntityModel entity)
   {
-    return _readers.GetOrAdd(entity, CreateRowReader);
+    if (!_readers.TryGetValue(entity, out RowReader? rowReader))
+    {
+      rowReader = CreateRowReader(entity);
+      _readers.Add(entity, rowReader);
+    }
+
+    return rowReader;
   }
 
-  private static RowReader CreateRowReader(IEntityModel entity)
+  private RowReader CreateRowReader(IEntityModel entity)
   {
     ParameterExpression readerParam = Expression.Parameter(typeof(IDataReader), "reader");
     ParameterExpression offsetParam = Expression.Parameter(typeof(int), "offset");
@@ -136,17 +142,6 @@ internal class RowReaderProvider : IRowReaderProvider
             arguments: indexExpr);
     }
 
-    static MethodInfo GetReadMethod(Type type)
-    {
-      if (type.IsEnum)
-        return GetReadMethod(type.GetEnumUnderlyingType());
-
-      if (s_getValueMethods.TryGetValue(type, out MethodInfo? method))
-        return method;
-
-      throw new NotSupportedException($"Property type '{type.Name}' is not supported.");
-    }
-
     static ConstructorInfo GetTupleConstructor(IPrimaryKeyModel primaryKey)
     {
       Debug.Assert(primaryKey.Type.IsGenericType);
@@ -164,6 +159,17 @@ internal class RowReaderProvider : IRowReaderProvider
         bindingAttr: BindingFlags.Instance | BindingFlags.Public,
         types: componentTypes);
     }
+  }
+
+  protected virtual MethodInfo GetReadMethod(Type type)
+  {
+    if (type.IsEnum)
+      return GetReadMethod(type.GetEnumUnderlyingType());
+
+    if (s_getValueMethods.TryGetValue(type, out MethodInfo? method))
+      return method;
+
+    throw new InvalidOperationException($"Property type '{type.Name}' is not supported.");
   }
 
   public static RowReaderProvider Create()

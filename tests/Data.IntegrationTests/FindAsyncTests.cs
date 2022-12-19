@@ -8,22 +8,22 @@ namespace CodeArchitects.Platform.Data;
 [Collection(TestCollection.Name)]
 public class FindAsyncTests : TestBase
 {
-  private readonly User _user;
+  private readonly Customer _customer;
   private readonly Category _category;
   private readonly IEnumerable<object> _seed;
 
   public FindAsyncTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
   {
-    _user = User.One();
-    _user.Address = Address.One();
-    _user.Carts = Cart.Many(2);
-    _user.Carts[0].Items = CartItem.Many(2, _user.Carts[0].Id);
-    _user.Carts[1].Items = CartItem.Many(1, _user.Carts[1].Id);
-    _user.Carts[0].Items![0].ShippingAddress = ShippingAddress.One();
-    _user.Carts[0].Items![1].ShippingAddress = ShippingAddress.One();
-    _user.Carts[1].Items![0].ShippingAddress = ShippingAddress.One();
-    _user.Claims = UserClaim.Many(2);
+    _customer = Customer.One();
+    _customer.Address = Address.One();
+    _customer.Carts = Cart.Many(2);
+    _customer.Carts[0].Items = CartItem.Many(2, _customer.Carts[0].Id);
+    _customer.Carts[1].Items = CartItem.Many(1, _customer.Carts[1].Id);
+    _customer.Carts[0].Items![0].ShippingAddress = ShippingAddress.One();
+    _customer.Carts[0].Items![1].ShippingAddress = ShippingAddress.One();
+    _customer.Carts[1].Items![0].ShippingAddress = ShippingAddress.One();
+    _customer.Claims = CustomerClaim.Many(2);
 
     _category = Category.One();
     _category.Typologies = new()
@@ -32,7 +32,7 @@ public class FindAsyncTests : TestBase
       Typology.One()
     };
 
-    _seed = new object[] { _user, _category };
+    _seed = new object[] { _customer, _category };
   }
 
   [Theory, RepositoryDependenciesData]
@@ -52,7 +52,7 @@ public class FindAsyncTests : TestBase
   public async Task FindAsync_ShouldReturnEntity_WhenEntityExists(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
@@ -63,14 +63,14 @@ public class FindAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().BeNull();
-    fromDb.User.Should().BeNull();
+    fromDb.Customer.Should().BeNull();
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntity_WhenEntityHasCompositeKey(RepositoryDependencies dependencies)
   {
     // Arrange
-    CartItem item = _user.Carts![1].Items![0];
+    CartItem item = _customer.Carts![1].Items![0];
 
     var sut = _fixture.CreateRepository<CartItem, (int, Guid)>(dependencies, _seed);
 
@@ -89,29 +89,29 @@ public class FindAsyncTests : TestBase
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeReference(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
-      .Include(e => e.User));
+      .Include(e => e.Customer));
   
     // Assert
     fromDb.Should().NotBeNull();
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().BeNull();
-    fromDb.User.Should().NotBeNull();
-    fromDb.User!.Id.Should().Be(_user.Id);
-    fromDb.User.Address.Should().BeNull();
-    fromDb.User.Claims.Should().BeNull();
+    fromDb.Customer.Should().NotBeNull();
+    fromDb.Customer!.Id.Should().Be(_customer.Id);
+    fromDb.Customer.Address.Should().BeNull();
+    fromDb.Customer.Claims.Should().BeNull();
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeOneToMany(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
@@ -126,7 +126,7 @@ public class FindAsyncTests : TestBase
       .And.HaveCount(2)
       .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.ShippingAddress == null)
       .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.ShippingAddress == null);
-    fromDb.User.Should().BeNull();
+    fromDb.Customer.Should().BeNull();
   }
 
   [Theory, RepositoryDependenciesData]
@@ -152,56 +152,56 @@ public class FindAsyncTests : TestBase
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeReferenceThenReference(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
-      .Include(e => e.User, _ => _
+      .Include(e => e.Customer, _ => _
         .Include(e => e.Address)));
 
     // Assert
     fromDb.Should().NotBeNull();
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().BeNull();
-    fromDb.User.Should().NotBeNull();
-    fromDb.User!.Id.Should().Be(_user.Id);
-    fromDb.User.Claims.Should().BeNull();
-    fromDb.User.Address.Should().NotBeNull();
-    fromDb.User.Address!.Id.Should().Be(_user.Address!.Id);
+    fromDb.Customer.Should().NotBeNull();
+    fromDb.Customer!.Id.Should().Be(_customer.Id);
+    fromDb.Customer.Claims.Should().BeNull();
+    fromDb.Customer.Address.Should().NotBeNull();
+    fromDb.Customer.Address!.Id.Should().Be(_customer.Address!.Id);
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeReferenceThenCollection(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
-      .Include(e => e.User, _ => _
+      .Include(e => e.Customer, _ => _
         .Include(e => e.Claims)));
 
     // Assert
     fromDb.Should().NotBeNull();
     fromDb!.Id.Should().Be(cart.Id);
     fromDb.Items.Should().BeNull();
-    fromDb.User.Should().NotBeNull();
-    fromDb.User!.Id.Should().Be(_user.Id);
-    fromDb.User.Address.Should().BeNull();
-    fromDb.User.Claims.Should().HaveCount(2)
-      .And.ContainSingle(claim => claim.Id == _user.Claims![0].Id)
-      .And.ContainSingle(claim => claim.Id == _user.Claims![1].Id);
+    fromDb.Customer.Should().NotBeNull();
+    fromDb.Customer!.Id.Should().Be(_customer.Id);
+    fromDb.Customer.Address.Should().BeNull();
+    fromDb.Customer.Claims.Should().HaveCount(2)
+      .And.ContainSingle(claim => claim.Id == _customer.Claims![0].Id)
+      .And.ContainSingle(claim => claim.Id == _customer.Claims![1].Id);
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeCollectionThenReference(RepositoryDependencies dependencies)
   {
     // Arrange
-    Cart cart = _user.Carts![0];
+    Cart cart = _customer.Carts![0];
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
 
@@ -217,106 +217,32 @@ public class FindAsyncTests : TestBase
       .And.HaveCount(2)
       .And.Contain(item => item.Index == cart.Items![0].Index && item.CartId == cart.Id && item.ShippingAddress!.Id == cart.Items[0].ShippingAddress!.Id)
       .And.Contain(item => item.Index == cart.Items![1].Index && item.CartId == cart.Id && item.ShippingAddress!.Id == cart.Items[1].ShippingAddress!.Id);
-    fromDb.User.Should().BeNull();
+    fromDb.Customer.Should().BeNull();
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeCollectionThenCollection(RepositoryDependencies dependencies)
   {
     // Arrange
-    var sut = _fixture.CreateRepository<User, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, _seed);
 
     // Act
-    User? fromDb = await sut.FindAsync(_user.Id, _ => _
+    Customer? fromDb = await sut.FindAsync(_customer.Id, _ => _
       .Include(e => e.Carts, _ => _
         .Include(e => e.Items)));
 
     // Assert
     fromDb.Should().NotBeNull();
-    fromDb!.Id.Should().Be(_user.Id);
+    fromDb!.Id.Should().Be(_customer.Id);
     fromDb.Carts.Should().NotBeNull().And.HaveCount(2);
-    fromDb.Carts.Should().Contain(cart => cart.Id == _user.Carts![0].Id)
+    fromDb.Carts.Should().Contain(cart => cart.Id == _customer.Carts![0].Id)
       .Which.Items.Should().HaveCount(2)
-        .And.Contain(item => item.Index == _user.Carts![0].Items![0].Index && item.CartId == _user.Carts![0].Id && item.ShippingAddress == null)
-        .And.Contain(item => item.Index == _user.Carts![0].Items![1].Index && item.CartId == _user.Carts![0].Id && item.ShippingAddress == null);
-    fromDb.Carts.Should().Contain(cart => cart.Id == _user.Carts![1].Id)
+        .And.Contain(item => item.Index == _customer.Carts![0].Items![0].Index && item.CartId == _customer.Carts![0].Id && item.ShippingAddress == null)
+        .And.Contain(item => item.Index == _customer.Carts![0].Items![1].Index && item.CartId == _customer.Carts![0].Id && item.ShippingAddress == null);
+    fromDb.Carts.Should().Contain(cart => cart.Id == _customer.Carts![1].Id)
       .Which.Items.Should().HaveCount(1)
-        .And.Contain(item => item.Index == _user.Carts![1].Items![0].Index && item.CartId == _user.Carts![1].Id && item.ShippingAddress == null);
+        .And.Contain(item => item.Index == _customer.Carts![1].Items![0].Index && item.CartId == _customer.Carts![1].Id && item.ShippingAddress == null);
     fromDb.Address.Should().BeNull();
     fromDb.Claims.Should().BeNull();
-  }
-
-  [MultitenancyTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task FindAsync_ShouldReturnEntity_WhenExistsAndBelogsToCurrentTenant(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    TenantEntity entity = TenantEntity.One();
-
-    var sut = _fixture.CreateRepository<TenantEntity, Guid>(dependencies, new[] { entity });
-
-    // Act
-    TenantEntity? fromDb = await sut.FindAsync(entity.Id);
-
-    // Assert
-    fromDb.Should().NotBeNull();
-    fromDb!.Id.Should().Be(entity.Id);
-  }
-
-  [MultitenancyTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task FindAsync_ShouldReturnNull_WhenExistsButBelongsToAnotherTenant(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    TenantEntity entity = TenantEntity.One();
-
-    var sut = _fixture.CreateRepository<TenantEntity, Guid>(dependencies, new[] { entity });
-
-    _fixture.MultitenancyContext.TenantId = Guid.NewGuid();
-
-    // Act
-    TenantEntity? fromDb = await sut.FindAsync(entity.Id);
-
-    // Assert
-    fromDb.Should().BeNull();
-  }
-
-  [SoftDeleteTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task FindAsync_ShouldReturnEntity_WhenExistsAndIsNotSoftDeleted(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    SoftDeleteEntity entity = SoftDeleteEntity.One();
-
-    var sut = _fixture.CreateRepository<SoftDeleteEntity, Guid>(dependencies, new[] { entity });
-
-    // Act
-    SoftDeleteEntity? fromDb = await sut.FindAsync(entity.Id);
-
-    // Assert
-    fromDb.Should().NotBeNull();
-    fromDb!.Id.Should().Be(entity.Id);
-  }
-
-  [SoftDeleteTest]
-  [Theory, RepositoryDependenciesData]
-  public async Task FindAsync_ShouldReturnNull_WhenExistsButIsSoftDeleted(RepositoryDependencies dependencies)
-  {
-    // Arrange
-    SoftDeleteEntity entity = SoftDeleteEntity.One();
-
-    var sut = _fixture.CreateRepository<SoftDeleteEntity, Guid>(dependencies, new[] { entity });
-
-    _fixture.SoftDelete(entity);
-
-    // Act
-    SoftDeleteEntity? fromDb = await sut.FindAsync(entity.Id);
-
-    // Assert
-    fromDb.Should().BeNull();
   }
 }

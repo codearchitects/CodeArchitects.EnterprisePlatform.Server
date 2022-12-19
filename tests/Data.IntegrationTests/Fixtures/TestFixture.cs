@@ -1,25 +1,13 @@
-﻿using CodeArchitects.Platform.Common.Utils;
-using CodeArchitects.Platform.Data.AdoNet;
-using CodeArchitects.Platform.Data.AdoNet.Command;
-using CodeArchitects.Platform.Data.AdoNet.Executor;
-using CodeArchitects.Platform.Data.AdoNet.Materialization;
-using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.EntityFrameworkCore;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.SoftDelete;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
-using CodeArchitects.Platform.Data.Fixtures.Model;
+﻿using CodeArchitects.Platform.Data.Fixtures.Model;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using Respawn;
+using Oracle.ManagedDataAccess.Client;
+using System.Runtime.InteropServices;
 using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.Fixtures;
@@ -28,21 +16,14 @@ public class TestFixture : IAsyncLifetime
 {
   private readonly MsSqlTestcontainer _msSqlContainer;
   private readonly PostgreSqlTestcontainer _postgresContainer;
-
-  private readonly TestLocalData _localData;
-
-  private readonly Lazy<DbContextOptions> _sqlServerOptionsLazy;
-  private readonly Lazy<DbContextOptions> _postgresOptionsLazy;
-  private readonly Lazy<TestDbContext> _sqlServerDbContextLazy;
-  private readonly Lazy<TestDbContext> _postgresDbContextLazy;
+  private readonly OracleTestcontainer _oracleContainer;
 
   private readonly Lazy<SqlConnection> _sqlServerConnectionLazy;
   private readonly Lazy<NpgsqlConnection> _postgresConnectionLazy;
+  private readonly Lazy<OracleConnection> _oracleConnectionLazy;
 
-  private Respawner _sqlServerRespawner = default!;
-  private Respawner _postgresRespawner = default!;
-
-  private TestDbContext? _dbContext;
+  private readonly TestLocalData _localData;
+  private readonly RepositoryFactory _repositoryFactory;
 
   public TestFixture()
   {
@@ -63,140 +44,59 @@ public class TestFixture : IAsyncLifetime
       })
       .Build();
 
-    _localData = new();
-
-    _sqlServerOptionsLazy = new(() => new DbContextOptionsBuilder()
-      .UseSqlServer(SqlServerConnectionString)
-      .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(_localData))
-      .UseData(data => data
-        .UseMultitenancy(new MultitenancyDescriptor(MultitenancyContext))
-        .UseSoftDelete(new SoftDeleteDescriptor(SoftDeleteContext)))
-      .Options);
-
-    _postgresOptionsLazy = new(() => new DbContextOptionsBuilder()
-      .UseNpgsql(PostgresConnectionString)
-      .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(_localData))
-      .UseData(data => data
-        .UseMultitenancy(new MultitenancyDescriptor(MultitenancyContext))
-        .UseSoftDelete(new SoftDeleteDescriptor(SoftDeleteContext)))
-      .Options);
-
-    _sqlServerDbContextLazy = new(() => new TestDbContext(_sqlServerOptionsLazy.Value));
-
-    _postgresDbContextLazy = new(() => new TestDbContext(_postgresOptionsLazy.Value));
+    _oracleContainer = new TestcontainersBuilder<OracleTestcontainer>()
+      .WithDatabase(new OracleTestcontainerConfiguration
+      {
+        Password = "Password1"
+      })
+      .Build();
 
     _sqlServerConnectionLazy = new(() => new SqlConnection(SqlServerConnectionString));
-
     _postgresConnectionLazy = new(() => new NpgsqlConnection(PostgresConnectionString));
+    _oracleConnectionLazy = new(() => new OracleConnection(OracleConnectionString));
+
+    _localData = new(this);
+    _repositoryFactory = new(this);
   }
 
-  public TestDbContext DbContext => _dbContext ?? throw new InvalidOperationException($"Cannot access {nameof(DbContext)} before calling {nameof(CreateRepository)}.");
+  public TestDbContext DbContext => _localData.DbContext;
 
-  public MultitenancyContext MultitenancyContext => _localData.MultitenancyContext;
+  public string SqlServerConnectionString => _msSqlContainer.ConnectionString + "TrustServerCertificate=True;";
 
-  public SoftDeleteContext SoftDeleteContext => _localData.SoftDeleteContext;
+  public string PostgresConnectionString => _postgresContainer.ConnectionString;
 
-  private string SqlServerConnectionString => _msSqlContainer.ConnectionString + "TrustServerCertificate=True;";
+  public string OracleConnectionString => _oracleContainer.ConnectionString;
 
-  private string PostgresConnectionString => _postgresContainer.ConnectionString;
+  public SqlConnection SqlServerConnection => _sqlServerConnectionLazy.Value;
 
-  public IRepository<TEntity, TKey> CreateRepository<TEntity, TKey>(
+  public NpgsqlConnection PostgresConnection => _postgresConnectionLazy.Value;
+
+  public OracleConnection OracleConnection => _oracleConnectionLazy.Value;
+
+  public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>(
     RepositoryDependencies dependencies,
     IEnumerable<object>? seed = null)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    var (implementation, provider, trackingContext) = dependencies;
+    _localData.InitializeContext(dependencies.Provider, seed);
 
-    _dbContext = provider switch
-    {
-      DatabaseProvider.SqlServer => _sqlServerDbContextLazy.Value,
-      DatabaseProvider.Postgres  => _postgresDbContextLazy.Value,
-      _                          => throw Errors.Unreacheable
-    };
-
-    if (seed is not null)
-    {
-      _dbContext.AddRange(seed);
-      _dbContext.SaveChanges();
-    }
-
-    switch (implementation)
-    {
-      case RepositoryImplementation.AdoNet:
-        CommandBuilder commandBuilder = new(new SqlTextBuilder(SqlTextCache.Create()));
-        Materializer materializer = new(IdentityCollectionFactory.Create(), RowReaderProvider.Create());
-        Executor executor = new(commandBuilder, materializer, trackingContext);
-        TestModelConfiguration modelConfiguration = new();
-        IDataModel dataModel = modelConfiguration.CreateDataModel();
-
-        AdoNet.IDataContext adoNetContext = provider switch
-        {
-          DatabaseProvider.SqlServer => new AdoNet.DataContext<SqlConnection>(
-            new AdoNet.StateManager<SqlConnection>(_sqlServerConnectionLazy.Value),
-            executor,
-            dataModel),
-          DatabaseProvider.Postgres => new AdoNet.DataContext<NpgsqlConnection>(
-            new AdoNet.StateManager<NpgsqlConnection>(_postgresConnectionLazy.Value),
-            executor,
-            dataModel),
-          _ => throw Errors.Unreacheable
-        };
-
-        return new AdoNetRepository<TEntity, TKey>(adoNetContext);
-      case RepositoryImplementation.EFCore:
-        EntityFrameworkCore.StateManager<TestDbContext> contextManager = new(_dbContext);
-
-        PredicateTemplateFactory templateFactory = new(_dbContext.Model);
-        PredicateProvider predicateProvider = new(templateFactory, PredicateTemplateCache.Create());
-
-        DefaultEntityFactoryFactory entityFactoryFactory = new(_dbContext.Model);
-        DefaultEntityFactory entityFactory = new(entityFactoryFactory, DefaultEntityFactoryCache.Create());
-
-        EntityFrameworkCore.DataContext<TestDbContext> efCoreContext = new(contextManager, trackingContext, predicateProvider, entityFactory);
-
-        return new EFCoreRepository<TEntity, TKey>(efCoreContext);
-      default:
-        throw Errors.Unreacheable;
-    }
+    return _repositoryFactory.CreateRepository<TEntity, TKey>(dependencies);
   }
 
-  public Task SetupAsync(ITestOutputHelper output)
+  public void Setup(ITestOutputHelper output)
   {
-    _localData.Initialize(output);
-
-    return Task.CompletedTask;
+    _localData.Setup(output);
   }
 
-  public async Task ResetAsync()
+  public void Reset()
   {
-    await _sqlServerConnectionLazy.Value.OpenAsync();
-    await _sqlServerRespawner.ResetAsync(_sqlServerConnectionLazy.Value);
-    await _sqlServerConnectionLazy.Value.CloseAsync();
-
-    await _postgresConnectionLazy.Value.OpenAsync();
-    await _postgresRespawner.ResetAsync(_postgresConnectionLazy.Value);
-    await _postgresConnectionLazy.Value.CloseAsync();
-
-    DbContext.ChangeTracker.Clear();
-    _dbContext = null;
     _localData.Reset();
-  }
-
-  public void SoftDelete(SoftDeleteEntity entity)
-  {
-    bool shouldFilter = SoftDeleteContext.ShouldFilter;
-    SoftDeleteContext.ShouldFilter = false;
-    DbContext.Attach(entity).Property(SoftDeleteEntity.SoftDeletePropertyName).CurrentValue = true;
-    DbContext.SaveChanges();
-    SoftDeleteContext.ShouldFilter = shouldFilter;
   }
 
   async Task IAsyncLifetime.InitializeAsync()
   {
-    if (OperatingSystem.IsLinux())
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     {
       DockerClient dockerClient = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
 
@@ -209,46 +109,26 @@ public class TestFixture : IAsyncLifetime
 
     await _msSqlContainer.StartAsync();
     await _postgresContainer.StartAsync();
+    await _oracleContainer.StartAsync();
 
-    await InitializeDatabaseAsync(_sqlServerDbContextLazy.Value);
-    await InitializeDatabaseAsync(_postgresDbContextLazy.Value);
-
-    await _sqlServerConnectionLazy.Value.OpenAsync();
-    _sqlServerRespawner = await Respawner.CreateAsync(_sqlServerConnectionLazy.Value, new()
-    {
-      DbAdapter = DbAdapter.SqlServer
-    });
-    await _sqlServerConnectionLazy.Value.CloseAsync();
-
-    await _postgresConnectionLazy.Value.OpenAsync();
-    _postgresRespawner = await Respawner.CreateAsync(_postgresConnectionLazy.Value, new()
-    {
-      DbAdapter = DbAdapter.Postgres
-    });
-    await _postgresConnectionLazy.Value.CloseAsync();
+    _localData.EnsureCreated();
   }
 
   async Task IAsyncLifetime.DisposeAsync()
   {
-    await CleanUpContainerAsync(_msSqlContainer);
-    await CleanUpContainerAsync(_postgresContainer);
-
-    _sqlServerDbContextLazy.Value.Dispose();
-    _postgresDbContextLazy.Value.Dispose();
-
     _sqlServerConnectionLazy.Value.Dispose();
     _postgresConnectionLazy.Value.Dispose();
-  }
+    _oracleConnectionLazy.Value.Dispose();
 
-  private static async Task InitializeDatabaseAsync(TestDbContext context)
-  {
-    await context.Database.EnsureCreatedAsync();
-  }
+    await CleanUpContainerAsync(_msSqlContainer);
+    await CleanUpContainerAsync(_postgresContainer);
+    await CleanUpContainerAsync(_oracleContainer);
 
-  private static async Task CleanUpContainerAsync(TestcontainersContainer container)
-  {
-    await container.StopAsync();
-    await container.CleanUpAsync();
-    await container.DisposeAsync();
+    static async Task CleanUpContainerAsync(TestcontainersContainer container)
+    {
+      await container.StopAsync();
+      await container.CleanUpAsync();
+      await container.DisposeAsync();
+    }
   }
 }

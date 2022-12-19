@@ -7,9 +7,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command.Select;
 
 internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 {
-  private readonly SelectStringBuilder _stringBuilder;
+  private readonly SqlStringBuilder _stringBuilder;
 
-  public AppendJoinConditions(SelectStringBuilder stringBuilder)
+  public AppendJoinConditions(SqlStringBuilder stringBuilder)
   {
     _stringBuilder = stringBuilder;
   }
@@ -26,15 +26,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, ISimpleNavigationLeaf navigation, IKeyPair pair)
+    static void AppendCondition(in SqlStringBuilder stringBuilder, ISimpleNavigationLeaf navigation, IKeyPair pair)
     {
-      stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromColumn.Name);
-      stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Model.Id);
-      stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToColumn.Name);
-      stringBuilder.Append(']');
+      stringBuilder.AppendColumn(pair.FromColumn);
+      stringBuilder.Append(" = ");
+      stringBuilder.AppendColumn(pair.ToColumn, navigation.Model.Id);
     }
   }
 
@@ -44,17 +40,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, ISimpleNavigationNode navigation, IKeyPair pair)
+    static void AppendCondition(in SqlStringBuilder stringBuilder, ISimpleNavigationNode navigation, IKeyPair pair)
     {
-      stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromColumn.Name);
-      stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Model.Id);
-      stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToColumn.Name);
-      stringBuilder.Append('_');
-      stringBuilder.Append(navigation.Model.Id);
-      stringBuilder.Append(']');
+      stringBuilder.AppendColumn(pair.FromColumn);
+      stringBuilder.Append(" = ");
+      stringBuilder.AppendColumn(pair.ToColumn, navigation.Model.Id, navigation.Model.Id);
     }
   }
 
@@ -64,15 +54,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
+    static void AppendCondition(in SqlStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
     {
-      stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromColumn.Name);
-      stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Model.Id);
-      stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToColumn.Name);
-      stringBuilder.Append(']');
+      stringBuilder.AppendColumn(pair.FromColumn);
+      stringBuilder.Append(" = ");
+      stringBuilder.AppendColumn(pair.ToColumn, navigation.Model.Id);
     }
   }
 
@@ -82,15 +68,11 @@ internal readonly struct AppendJoinConditions : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendCondition(SelectStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
+    static void AppendCondition(in SqlStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
     {
-      stringBuilder.Append("t.[");
-      stringBuilder.Append(pair.FromColumn.Name);
-      stringBuilder.Append("] = t");
-      stringBuilder.Append(navigation.Model.Id);
-      stringBuilder.Append(".[");
-      stringBuilder.Append(pair.ToColumn.Name);
-      stringBuilder.Append(']');
+      stringBuilder.AppendColumn(pair.FromColumn);
+      stringBuilder.Append(" = ");
+      stringBuilder.AppendColumn(pair.ToColumn, navigation.Model.Id);
     }
   }
 }

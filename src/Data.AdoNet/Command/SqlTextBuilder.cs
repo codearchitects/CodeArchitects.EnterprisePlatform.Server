@@ -1,182 +1,206 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Command.Select;
-using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Text;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
-internal class SqlTextBuilder : ISqlTextBuilder // TODO: Support multiple database providers
+internal class SqlTextBuilder : ISqlTextBuilder
 {
   private readonly ISqlTextCache _cache;
+  private readonly ISyntaxProvider _syntaxProvider;
 
-  public SqlTextBuilder(ISqlTextCache cache)
+  public SqlTextBuilder(ISqlTextCache cache, ISyntaxProvider syntaxProvider)
   {
     _cache = cache;
+    _syntaxProvider = syntaxProvider;
   }
 
-  public string BuildSelectText(NavigationSpec spec)
+  public string BuildFindText(NavigationSpec spec)
   {
-    if (_cache.TryGetSelectText(spec, out string? text))
+    if (_cache.TryGetFindText(spec, out string? text))
       return text;
 
-    SelectStringBuilder stringBuilder = new();
-
-    stringBuilder.AppendSelectFrom(spec.Entity, spec.Navigations);
-
-    foreach (INavigation child in spec.Navigations)
-    {
-      stringBuilder.AppendLeftJoin(child);
-    }
-
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildFindText(in stringBuilder, in spec);
     text = stringBuilder.ToString();
-    _cache.AddSelectText(spec, text);
+
+    _cache.AddFindText(in spec, text);
 
     return text;
   }
 
-  public string BuildInsertText(IEntityModel entity)
+  public string BuildInsertText(IEntityModel entityModel)
   {
-    // TODO: Try get from cache
+    if (_cache.TryGetInsertText(entityModel, out string? text))
+      return text;
 
-    string text = BuildInsertText(new StringBuilder(), entity);
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildInsertText(in stringBuilder, entityModel);
+    text = stringBuilder.ToString();
 
-    // TODO: Cache
+    _cache.AddInsertText(entityModel, text);
 
     return text;
   }
 
-  public string BuildUpdateText(IEntityModel entity)
+  public string BuildUpdateText(IEntityModel entityModel)
   {
-    // TODO: Try get from cache
+    if (_cache.TryGetUpdateText(entityModel, out string? text))
+      return text;
 
-    string text = BuildUpdateText(new StringBuilder(), entity);
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildUpdateText(in stringBuilder, entityModel);
+    text = stringBuilder.ToString();
 
-    // TODO: Cache
+    _cache.AddUpdateText(entityModel, text);
 
     return text;
   }
 
-  public string BuildUpsertText(IEntityModel entity)
+  public string BuildUpsertText(IEntityModel entityModel)
   {
-    // TODO: Try get from cache
+    if (_cache.TryGetUpsertText(entityModel, out string? text))
+      return text;
 
-    StringBuilder stringBuilder = new();
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildUpsertText(in stringBuilder, entityModel);
+    text = stringBuilder.ToString();
 
-    stringBuilder
-      .Append("IF EXISTS (SELECT * FROM [")
-      .Append(entity.TableName)
-      .Append("] WHERE ")
-      .AppendJoin(" AND ", entity.PrimaryKey.Columns, static (stringBuilder, column) => AppendWhereCondition(stringBuilder, column))
-      .AppendLine(")");
-
-    BuildUpdateText(stringBuilder, entity);
-
-    stringBuilder.AppendLine();
-    stringBuilder.AppendLine("ELSE");
-
-    BuildInsertText(stringBuilder, entity);
-
-    string text = stringBuilder.ToString();
-
-    // TODO: Cache
+    _cache.AddUpsertText(entityModel, text);
 
     return text;
+  }
 
-    static void AppendWhereCondition(StringBuilder stringBuilder, IPrimaryKeyColumnModel column)
+  public string BuildRemoveText(IEntityModel entityModel)
+  {
+    if (_cache.TryGetRemoveText(entityModel, out string? text))
+      return text;
+
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildRemoveText(in stringBuilder, entityModel);
+    text = stringBuilder.ToString();
+
+    _cache.AddRemoveText(entityModel, text);
+
+    return text;
+  }
+
+  private void BuildFindText(in SqlStringBuilder stringBuilder, in NavigationSpec spec)
+  {
+    if (spec.Navigations is { Count: > 0 } navigations)
     {
-      stringBuilder.Append('[');
-      stringBuilder.Append(column.Name);
-      stringBuilder.Append("] = @p");
-      stringBuilder.Append(column.Index);
+      BuildFindTextWithJoins(in stringBuilder, spec.Entity, navigations);
     }
-  }
-
-  public string BuildDeleteText(IEntityModel entity)
-  {
-    // TODO: Try get from cache
-
-    string text = new StringBuilder()
-      .Append("DELETE FROM [")
-      .Append(entity.TableName)
-      .Append("] WHERE ")
-      .AppendJoin(" AND ", entity.PrimaryKey.Columns, static (stringBuilder, column) => stringBuilder
-        .Append('[')
-        .Append(column.Name)
-        .Append("] = @p")
-        .Append(column.Index))
-      .ToString();
-
-    // TODO: Cache
-
-    return text;
-  }
-
-  private string BuildInsertText(StringBuilder stringBuilder, IEntityModel entity)
-  {
-    IEnumerable<IColumnModel> columns = entity.Columns.Where(column => !column.IsAutoGenerated);
-
-    stringBuilder
-      .Append("INSERT INTO [")
-      .Append(entity.TableName)
-      .Append("] (")
-      .AppendJoin(", ", columns, static (stringBuilder, column) => stringBuilder
-        .Append('[')
-        .Append(column.Name)
-        .Append(']'))
-      .Append(") VALUES (")
-      .AppendJoin(", ", columns, static (stringBuilder, column) => stringBuilder
-        .Append("@p")
-        .Append(column.Index))
-      .Append(')');
-
-    if (entity.AutoGeneratedColumn is not null)
+    else
     {
-      stringBuilder.Append(" SELECT @@IDENTITY");
+      BuildFindTextNoJoins(in stringBuilder, spec.Entity);
     }
 
-    return stringBuilder.ToString();
-  }
-
-  private string BuildUpdateText(StringBuilder stringBuilder, IEntityModel entity)
-  {
-    IEnumerable<IColumnModel> properties = entity.Columns.Where(column => column.IsForeignKey || !column.IsPrimaryKey);
-
-    stringBuilder
-      .Append("UPDATE [")
-      .Append(entity.TableName)
-      .Append("] SET ")
-      .AppendJoin(", ", properties, static (stringBuilder, column) => AppendColumnUpdate(stringBuilder, column))
-      .Append(" WHERE ")
-      .AppendJoin(" AND ", entity.PrimaryKey.Columns, static (stringBuilder, column) => stringBuilder
-        .Append('[')
-        .Append(column.Name)
-        .Append("] = @p")
-        .Append(column.Index));
-
-    return stringBuilder.ToString();
-
-    static void AppendColumnUpdate(StringBuilder stringBuilder, IColumnModel column)
+    static void BuildFindTextNoJoins(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
     {
-      stringBuilder
-        .Append('[')
-        .Append(column.Name)
-        .Append("] = ");
+      stringBuilder.Append("SELECT ");
+      stringBuilder.AppendJoin(", ", entityModel.Columns, AppendColumn);
+      stringBuilder.AppendLine();
+      stringBuilder.Append("FROM ");
+      stringBuilder.AppendEscaped(entityModel.TableName);
+      stringBuilder.AppendLine();
+      stringBuilder.Append("WHERE ");
+      stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
 
-      if (column is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.Aggregation, HasMember: false } })
+      static void AppendColumn(in SqlStringBuilder stringBuilder, IColumnModel columnModel)
       {
-        stringBuilder
-          .Append("COALESCE(@p")
-          .Append(column.Index)
-          .Append(", [")
-          .Append(column.Name)
-          .Append("])");
+        stringBuilder.AppendEscaped(columnModel.Name);
+      }
+    }
+
+    static void BuildFindTextWithJoins(in SqlStringBuilder stringBuilder, IEntityModel entityModel, IReadOnlyCollection<INavigation> navigations)
+    {
+      stringBuilder.Append("SELECT ");
+      stringBuilder.AppendColumns(entityModel.Columns);
+      stringBuilder.AppendChildrenColumns(navigations);
+      stringBuilder.AppendLine();
+      stringBuilder.AppendLine("FROM (");
+      BuildFindTextNoJoins(in stringBuilder, entityModel);
+      stringBuilder.AppendLine();
+      stringBuilder.Append($") AS {SqlStringBuilder.TableAlias}");
+
+      foreach (INavigation child in navigations)
+      {
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLeftJoin(child);
+      }
+    }
+  }
+
+  private void BuildInsertText(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
+  {
+    IEnumerable<IColumnModel> columns = entityModel.Columns.Where(column => !column.IsAutoGenerated);
+
+    stringBuilder.Append("INSERT INTO ");
+    stringBuilder.AppendEscaped(entityModel.TableName);
+    stringBuilder.Append(" (");
+    stringBuilder.AppendJoin(", ", columns, AppendColumns);
+    stringBuilder.Append(')');
+    stringBuilder.AppendOutputBefore(entityModel);
+    stringBuilder.Append(" VALUES (");
+    stringBuilder.AppendParameters(columns);
+    stringBuilder.Append(')');
+    stringBuilder.AppendOutputAfter(entityModel);
+
+    static void AppendColumns(in SqlStringBuilder stringBuilder, IColumnModel columnModel)
+    {
+      stringBuilder.AppendEscaped(columnModel.Name);
+    }
+  }
+
+  private void BuildUpdateText(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
+  {
+    IEnumerable<IColumnModel> columns = entityModel.Columns.Where(column => column.IsForeignKey || !column.IsPrimaryKey);
+
+    stringBuilder.Append("UPDATE ");
+    stringBuilder.AppendEscaped(entityModel.TableName);
+    stringBuilder.Append(" SET ");
+    stringBuilder.AppendJoin(", ", columns, AppendColumnUpdate);
+    stringBuilder.Append(" WHERE ");
+    stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
+
+    static void AppendColumnUpdate(in SqlStringBuilder stringBuilder, IColumnModel columnModel)
+    {
+      stringBuilder.AppendEscaped(columnModel.Name);
+      stringBuilder.Append(" = ");
+
+      if (columnModel is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.Aggregation, HasMember: false } })
+      {
+        stringBuilder.Append("COALESCE(");
+        stringBuilder.AppendParameter(columnModel);
+        stringBuilder.Append(", ");
+        stringBuilder.AppendEscaped(columnModel.Name);
+        stringBuilder.Append(")");
       }
       else
       {
-        stringBuilder
-          .Append("@p")
-          .Append(column.Index);
+        stringBuilder.AppendParameter(columnModel);
       }
     }
+  }
+
+  private void BuildUpsertText(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
+  {
+    stringBuilder.Append("IF EXISTS (SELECT * FROM ");
+    stringBuilder.AppendEscaped(entityModel.TableName);
+    stringBuilder.Append(" WHERE ");
+    stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
+    stringBuilder.AppendLine(")");
+    BuildUpdateText(in stringBuilder, entityModel);
+    stringBuilder.AppendLine();
+    stringBuilder.AppendLine("ELSE");
+    BuildInsertText(stringBuilder, entityModel);
+  }
+
+  private void BuildRemoveText(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
+  {
+    stringBuilder.Append("DELETE FROM ");
+    stringBuilder.AppendEscaped(entityModel.TableName);
+    stringBuilder.Append(" WHERE ");
+    stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
   }
 }

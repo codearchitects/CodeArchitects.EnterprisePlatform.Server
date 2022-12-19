@@ -12,7 +12,4 @@ internal interface INavigation : IEquatable<INavigation>
 
   TResult Accept<TVisitor, TResult>(in TVisitor visitor)
     where TVisitor : INavigationVisitor<TResult>;
-
-  TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : INavigationVisitor<TResult, TState>;
 }

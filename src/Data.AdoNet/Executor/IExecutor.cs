@@ -1,32 +1,33 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Data.Common;
+using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
-internal interface IExecutor
+internal interface IExecutor<TDbCommand>
+  where TDbCommand : IDbCommand
 {
-  Task<TEntity?> ExecuteSelectCommandAsync<TEntity, TKey>(DbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+  Task<TEntity?> ExecuteFindAsync<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
   
-  Task ExecuteInsertCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteInsertAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteUpdateCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteUpdateAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteUpsertCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteUpsertAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteRemoveAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Task ExecuteDeleteCommandAsync<TEntity, TKey>(DbCommand command, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+  Task ExecuteRemoveAsync<TEntity, TKey>(TDbCommand command, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 

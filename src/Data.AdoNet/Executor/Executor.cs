@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.Tracking;
@@ -7,16 +8,23 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
-internal partial class Executor : IExecutor
+internal partial class Executor<TDbCommand> : IExecutor<TDbCommand>
+  where TDbCommand : DbCommand
 {
-  private readonly ICommandBuilder _commandBuilder;
+  private readonly ICommandBuilder<TDbCommand> _commandBuilder;
   private readonly IMaterializer _materializer;
+  private readonly ICommandInterceptor<TDbCommand> _interceptor;
   private readonly ITrackingContext _trackingContext;
 
-  public Executor(ICommandBuilder commandBuilder, IMaterializer materializer, ITrackingContext trackingContext)
+  public Executor(
+    ICommandBuilder<TDbCommand> commandBuilder,
+    IMaterializer materializer,
+    ICommandInterceptor<TDbCommand> interceptor,
+    ITrackingContext trackingContext)
   {
     _commandBuilder = commandBuilder;
     _materializer = materializer;
+    _interceptor = interceptor;
     _trackingContext = trackingContext;
   }
 
@@ -24,35 +32,36 @@ internal partial class Executor : IExecutor
   {
     foreach (INavigationModel navigationModel in model.Navigations)
     {
-      if (!navigationModel.HasMember)
+      if (navigationModel is not IAccessibleNavigationModel accessibleNavigationModel)
         continue;
 
-      object? child = navigationModel.GetValue(node);
+      object? child = accessibleNavigationModel.GetValue(node);
       if (child is null)
         continue;
 
-      if (navigationModel.IsCollection)
+      if (accessibleNavigationModel.IsCollection)
       {
-        IEnumerable collection = (IEnumerable)child;
+        IEnumerable collection = CopyCollection(accessibleNavigationModel.CollectionAccessor, node, child);
+
         foreach (object? element in collection)
         {
           if (element is null)
             continue;
 
-          bool continueVisiting = callback(element, navigationModel.To, new NavigationContext(node, navigationModel), state);
+          bool continueVisiting = callback(element, accessibleNavigationModel.To, new NavigationContext(node, accessibleNavigationModel), state);
           if (!continueVisiting)
             continue;
 
-          VisitGraph(element, navigationModel.To, state, callback);
+          VisitGraph(element, accessibleNavigationModel.To, state, callback);
         }
       }
       else
       {
-        bool continueVisiting = callback(child, navigationModel.To, new NavigationContext(node, navigationModel), state);
+        bool continueVisiting = callback(child, accessibleNavigationModel.To, new NavigationContext(node, accessibleNavigationModel), state);
         if (!continueVisiting)
           continue;
 
-        VisitGraph(child, navigationModel.To, state, callback);
+        VisitGraph(child, accessibleNavigationModel.To, state, callback);
       }
     }
   }
@@ -70,14 +79,9 @@ internal partial class Executor : IExecutor
 
       if (accessibleNavigationModel.IsCollection)
       {
-        _ = accessibleNavigationModel.CollectionAccessor.TryGetNonEnumeratedCount(node, out int count);
-        List<object?> list = new(count);
-        foreach (object? element in (IEnumerable)child)
-        {
-          list.Add(element);
-        }
+        IEnumerable collection = CopyCollection(accessibleNavigationModel.CollectionAccessor, node, child);
 
-        foreach (object? element in list)
+        foreach (object? element in collection)
         {
           if (element is null)
             continue;
@@ -100,5 +104,17 @@ internal partial class Executor : IExecutor
     }
   }
 
-  private readonly record struct VisitGraphState(Executor Self, DbCommand Command);
+  private static IEnumerable CopyCollection(ICollectionAccessor accessor, object node, object child)
+  {
+    _ = accessor.TryGetNonEnumeratedCount(node, out int count);
+    List<object?> list = new(count);
+    foreach (object? element in (IEnumerable)child)
+    {
+      list.Add(element);
+    }
+
+    return list;
+  }
+
+  private readonly record struct VisitGraphState(Executor<TDbCommand> Self, TDbCommand Command);
 }

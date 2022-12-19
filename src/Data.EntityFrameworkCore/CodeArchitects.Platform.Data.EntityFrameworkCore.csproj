@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj">
       <SetTargetFramework>TargetFramework=net6.0</SetTargetFramework>
     </ProjectReference>
+    <ProjectReference Include="..\Data\CodeArchitects.Platform.Data.csproj" />
   </ItemGroup>
 
   <Target Name="IncludeP2PAssets">

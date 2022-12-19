@@ -5,7 +5,8 @@ using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
-internal class CommandBuilder : ICommandBuilder
+internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
+  where TDbCommand : IDbCommand
 {
   private readonly ISqlTextBuilder _sqlBuilder;
 
@@ -14,13 +15,13 @@ internal class CommandBuilder : ICommandBuilder
     _sqlBuilder = sqlBuilder;
   }
 
-  public void BuildSelectCommand<TEntity, TKey>(IDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
+  public void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     IEntityModel<TEntity, TKey> model = spec.Entity;
 
-    command.CommandText = _sqlBuilder.BuildSelectText(spec);
+    command.CommandText = _sqlBuilder.BuildFindText(spec);
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
@@ -29,7 +30,7 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildInsertCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context)
+  public void BuildInsertCommand(TDbCommand command, object node, IEntityModel model, in NavigationContext context)
   {
     command.Parameters.Clear();
     command.CommandText = _sqlBuilder.BuildInsertText(model);
@@ -45,7 +46,7 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildUpdateCommand(IDbCommand command, object node, IEntityModel model, in NavigationContext context)
+  public void BuildUpdateCommand(TDbCommand command, object node, IEntityModel model, in NavigationContext context)
   {
     command.Parameters.Clear();
     command.CommandText = _sqlBuilder.BuildUpdateText(model);
@@ -58,7 +59,7 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildUpsertCommand(IDbCommand command, object node, IEntityModel model)
+  public void BuildUpsertCommand(TDbCommand command, object node, IEntityModel model)
   {
     command.Parameters.Clear();
     command.CommandText = _sqlBuilder.BuildUpsertText(model);
@@ -73,10 +74,10 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildDeleteCommand(IDbCommand command, object node, IEntityModel model)
+  public void BuildRemoveCommand(TDbCommand command, object node, IEntityModel model)
   {
     command.Parameters.Clear();
-    command.CommandText = _sqlBuilder.BuildDeleteText(model);
+    command.CommandText = _sqlBuilder.BuildRemoveText(model);
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
@@ -85,11 +86,11 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  public void BuildDeleteCommand<TEntity, TKey>(IDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
+  public void BuildRemoveCommand<TEntity, TKey>(TDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    command.CommandText = _sqlBuilder.BuildDeleteText(model);
+    command.CommandText = _sqlBuilder.BuildRemoveText(model);
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {
@@ -98,7 +99,7 @@ internal class CommandBuilder : ICommandBuilder
     }
   }
 
-  private static void CreateParameter(IDbCommand command, string name, object? value)
+  protected virtual void CreateParameter(TDbCommand command, string name, object? value)
   {
     IDbDataParameter parameter = command.CreateParameter();
     parameter.ParameterName = name;

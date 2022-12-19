@@ -23,12 +23,6 @@ internal class SimpleNavigationLeaf : ISimpleNavigationLeaf
     return visitor.VisitSimpleLeaf(this);
   }
 
-  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : INavigationVisitor<TResult, TState>
-  {
-    return visitor.VisitSimpleLeaf(this, in state);
-  }
-
   public bool Equals(INavigation? other)
   {
     if (other is not ISimpleNavigationLeaf leaf)

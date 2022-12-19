@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 public class CommandBuilderTests
 {
-  private readonly CommandBuilder _sut;
+  private readonly CommandBuilder<IDbCommand> _sut;
 
   public CommandBuilderTests()
   {
@@ -15,7 +15,7 @@ public class CommandBuilderTests
   }
 
   [Fact]
-  public void BuildSelectCommand_ShouldCreateCorrectParameters_WhenEntityHasSimpleKey()
+  public void BuildFindCommand_ShouldCreateCorrectParameters_WhenEntityHasSimpleKey()
   {
     // Arrange
     int id = 3;
@@ -33,7 +33,7 @@ public class CommandBuilderTests
     NavigationSpec<SimpleEntity, int> spec = new(model, Array.Empty<INavigation>());
 
     // Act
-    _sut.BuildSelectCommand(commandMock.Object, id, spec);
+    _sut.BuildFindCommand(commandMock.Object, id, spec);
 
     // Assert
     commandMock.VerifySet(command => command.CommandText = null);
@@ -47,7 +47,7 @@ public class CommandBuilderTests
   }
 
   [Fact]
-  public void BuildSelectCommand_ShouldCreateCorrectParameters_WhenEntityHasCompositeKey()
+  public void BuildFindCommand_ShouldCreateCorrectParameters_WhenEntityHasCompositeKey()
   {
     // Arrange
     Guid id1 = Guid.NewGuid();
@@ -71,7 +71,7 @@ public class CommandBuilderTests
     NavigationSpec<CompositeEntity, (Guid, int)> spec = new(model, Array.Empty<INavigation>());
 
     // Act
-    _sut.BuildSelectCommand(commandMock.Object, (id1, id2), spec);
+    _sut.BuildFindCommand(commandMock.Object, (id1, id2), spec);
 
     // Assert
     commandMock.VerifySet(command => command.CommandText = null);

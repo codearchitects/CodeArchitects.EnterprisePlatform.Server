@@ -17,7 +17,7 @@ internal class Materializer : IMaterializer, IMaterializerHub
   {
     _collectionFactory = collectionFactory;
     _readerProvider = readerProvider;
-    _materializedEntities = new();
+    _materializedEntities = new(IdentityCacheKeyEqualityComparer.Instance);
     _identityCollections = new();
   }
 
