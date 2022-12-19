@@ -69,7 +69,7 @@ components:
     path: src\Messaging.Dapr.AspNetCore
     type: dotnet-package
 
-  # tests
+  # unit tests
   - name: CodeArchitects.Platform.Analyzer.Tests
     path: tests\Analyzer.Tests
     type: dotnet-test
@@ -106,6 +106,16 @@ components:
   - name: CodeArchitects.Platform.Messaging.UnitTests
     path: tests\Messaging.UnitTests
     type: dotnet-test
+
+  # functional tests
+  - name: CodeArchitects.Platform.Data.AdoNet.FunctionalTests
+    path: tests\Data.AdoNet.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests
+    path: tests\Data.EntityFrameworkCore.FunctionalTests
+    type: dotnet-test
+
+  # integration tests
   # - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
   #   path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
   #   type: dotnet-test
