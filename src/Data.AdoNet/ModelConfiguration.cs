@@ -1,7 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
-using System.Data.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -105,10 +104,4 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
   {
     return s_supportedColumnTypes.Contains(type);
   }
-}
-
-public abstract class ModelConfiguration<TDbConnection> : ModelConfiguration
-  where TDbConnection : DbConnection
-{
-  protected internal abstract TDbConnection CreateConnection();
 }

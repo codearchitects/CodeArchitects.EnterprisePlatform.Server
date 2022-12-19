@@ -19,7 +19,7 @@ internal partial class Executor<TDbCommand> : IExecutor<TDbCommand>
   public Executor(
     ICommandBuilder<TDbCommand> commandBuilder,
     IMaterializer materializer,
-    ICommandInterceptor<TDbCommand> interceptor,
+    ICommandInterceptorAggregator<TDbCommand> interceptor,
     ITrackingContext trackingContext)
   {
     _commandBuilder = commandBuilder;

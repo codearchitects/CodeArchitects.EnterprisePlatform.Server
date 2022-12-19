@@ -6,16 +6,18 @@ namespace CodeArchitects.Platform.Data.AdoNet;
 internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConnection>
   where TDbConnection : DbConnection
 {
-  private bool _startTransaction;
+  private readonly IConnectionFactory<TDbConnection> _connectionFactory;
   private readonly List<Execution<TDbConnection, DbTransaction>> _executions;
-  
-  public StateManager(TDbConnection connection)
+  private bool _startTransaction;
+  private TDbConnection? _connection;
+
+  public StateManager(IConnectionFactory<TDbConnection> connectionFactory)
   {
-    Connection = connection;
+    _connectionFactory = connectionFactory;
     _executions = new(2);
   }
 
-  public TDbConnection Connection { get; }
+  public TDbConnection Connection => _connection ??= _connectionFactory.CreateConnection();
 
   public void AddExecution(Execution<TDbConnection, DbTransaction> execution, bool startTransaction)
   {

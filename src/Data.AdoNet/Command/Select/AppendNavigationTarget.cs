@@ -36,13 +36,14 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Target.TableName);
-    _stringBuilder.AppendLine(" AS t");
+    _stringBuilder.AppendTableAlias();
+    _stringBuilder.AppendLine();
 
     foreach (INavigation child in navigation.Children)
     {
       _stringBuilder.Append("LEFT JOIN ");
       _stringBuilder.AppendNavigationTarget(child);
-      _stringBuilder.Append($" AS {SqlStringBuilder.TableAlias}");
+      _stringBuilder.AppendTableAlias();
       _stringBuilder.Append(child.Model.Id);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
@@ -71,12 +72,11 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Model.JoinEntity.TableName);
-    _stringBuilder.Append($" AS {SqlStringBuilder.TableAlias}");
+    _stringBuilder.AppendTableAlias();
     _stringBuilder.AppendLine();
     _stringBuilder.Append("INNER JOIN ");
     _stringBuilder.AppendEscaped(navigation.Target.TableName);
-    _stringBuilder.Append($" AS {SqlStringBuilder.TableAlias}");
-    _stringBuilder.Append(navigation.Model.Id);
+    _stringBuilder.AppendTableAlias(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();
@@ -112,7 +112,8 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Model.JoinEntity.TableName);
-    _stringBuilder.AppendLine($" AS {SqlStringBuilder.TableAlias}");
+    _stringBuilder.AppendTableAlias();
+    _stringBuilder.AppendLine();
     _stringBuilder.AppendLine("INNER JOIN (");
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
@@ -120,21 +121,21 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Target.TableName);
-    _stringBuilder.AppendLine($" AS {SqlStringBuilder.TableAlias}");
+    _stringBuilder.AppendTableAlias();
+    _stringBuilder.AppendLine();
 
     foreach (INavigation child in navigation.Children)
     {
       _stringBuilder.Append("LEFT JOIN ");
       _stringBuilder.AppendNavigationTarget(child);
-      _stringBuilder.Append($" AS {SqlStringBuilder.TableAlias}");
-      _stringBuilder.Append(child.Model.Id);
+      _stringBuilder.AppendTableAlias(child.Model.Id);
       _stringBuilder.Append(" ON ");
       _stringBuilder.AppendJoinConditions(child);
       _stringBuilder.AppendLine();
     }
 
-    _stringBuilder.Append($") AS {SqlStringBuilder.TableAlias}");
-    _stringBuilder.Append(navigation.Model.Id);
+    _stringBuilder.Append(')');
+    _stringBuilder.AppendTableAlias(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();

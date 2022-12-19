@@ -7,7 +7,7 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
-internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnection>
+internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnection>
   where TDbConnection : DbConnection
   where TDbCommand : DbCommand
 {
@@ -19,7 +19,7 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
   public DataContext(
     IStateManager<TDbConnection> stateManager,
     IExecutor<TDbCommand> executor,
-    ICommandInterceptor<TDbCommand> interceptor,
+    ICommandInterceptorAggregator<TDbCommand> interceptor,
     IDataModel model)
   {
     _stateManager = stateManager;
@@ -31,8 +31,6 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
   public TDbConnection Connection => _stateManager.Connection;
 
   IDbConnection IDataContext.Connection => _stateManager.Connection;
-
-  protected abstract TDbCommand CreateCommand(TDbConnection connection);
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
@@ -47,6 +45,9 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (includeAction is null)
+      throw new ArgumentNullException(nameof(includeAction));
+
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
     RootIncluder<TEntity, TKey> includer = new(entityModel);
@@ -59,6 +60,9 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
     bool startTransaction = ShouldStartTransaction(model, entity);
@@ -76,6 +80,9 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
     bool startTransaction = ShouldStartTransaction(model, entity);
@@ -93,6 +100,9 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
     IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
@@ -121,17 +131,28 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
 
   public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
   {
+    if (execution is null)
+      throw new ArgumentNullException(nameof(execution));
+
     return _stateManager.ExecuteAsync(execution, startTransaction, cancellationToken);
   }
 
   public Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
   {
+    if (execution is null)
+      throw new ArgumentNullException(nameof(execution));
+
     return _stateManager.ExecuteAsync(execution, startTransaction, cancellationToken);
   }
 
   public void VisitGraph<TEntity, TState>(TEntity entity, TState state, VisitNodeCallback<TState> callback)
     where TEntity : class
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (callback is null)
+      throw new ArgumentNullException(nameof(callback));
+
     IEntityModel model = EnsureEntity<TEntity>();
 
     callback(entity, model, default, state);
@@ -141,10 +162,20 @@ internal abstract class DataContext<TDbConnection, TDbCommand> : IDataContext<TD
   public async Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
     where TEntity : class
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (callback is null)
+      throw new ArgumentNullException(nameof(callback));
+
     IEntityModel model = EnsureEntity<TEntity>();
 
     await callback(entity, model, default, state, cancellationToken);
     await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  }
+
+  protected virtual TDbCommand CreateCommand(TDbConnection connection)
+  {
+    return (TDbCommand)connection.CreateCommand();
   }
 
   private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken = default)

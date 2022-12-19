@@ -87,8 +87,8 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name"
       FROM "Root"
       WHERE "Id" = :p0
-      ) AS t
-      LEFT JOIN "ChildA" AS t1 ON t."Id" = t1."RootId"
+      ) t
+      LEFT JOIN "ChildA" t1 ON t."Id" = t1."RootId"
       """;
   }
 
@@ -128,9 +128,9 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name"
       FROM "Root"
       WHERE "Id" = :p0
-      ) AS t
-      LEFT JOIN "ChildA" AS t1 ON t."Id" = t1."RootId"
-      LEFT JOIN "ChildB" AS t2 ON t."Id" = t2."RootId"
+      ) t
+      LEFT JOIN "ChildA" t1 ON t."Id" = t1."RootId"
+      LEFT JOIN "ChildB" t2 ON t."Id" = t2."RootId"
       """;
   }
 
@@ -175,12 +175,12 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name"
       FROM "Root"
       WHERE "Id" = :p0
-      ) AS t
+      ) t
       LEFT JOIN (
       SELECT t9."Id", t9."Name", t."RootId"
-      FROM "RootManyToMany" AS t
-      INNER JOIN "ManyToMany" AS t9 ON t."ManyToManyId" = t9."Id"
-      ) AS t9 ON t."Id" = t9."RootId"
+      FROM "RootManyToMany" t
+      INNER JOIN "ManyToMany" t9 ON t."ManyToManyId" = t9."Id"
+      ) t9 ON t."Id" = t9."RootId"
       """;
   }
 
@@ -248,19 +248,19 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name"
       FROM "Root"
       WHERE "Id" = :p0
-      ) AS t
-      LEFT JOIN "ChildB" AS t2 ON t."Id" = t2."RootId"
+      ) t
+      LEFT JOIN "ChildB" t2 ON t."Id" = t2."RootId"
       LEFT JOIN (
       SELECT t."Id" AS "Id_1", t."Name" AS "Name_1", t."RootId" AS "RootId_1", t4."Id_4", t4."Name_4", t4."ChildAId_4", t4."Id_6", t4."Name_6", t4."ChildDId_6", t5."Id" AS "Id_5", t5."Name" AS "Name_5", t5."ChildAId" AS "ChildAId_5"
-      FROM "ChildA" AS t
+      FROM "ChildA" t
       LEFT JOIN (
       SELECT t."Id" AS "Id_4", t."Name" AS "Name_4", t."ChildAId" AS "ChildAId_4", t6."Id" AS "Id_6", t6."Name" AS "Name_6", t6."ChildDId" AS "ChildDId_6"
-      FROM "ChildD" AS t
-      LEFT JOIN "ChildE" AS t6 ON t."Id" = t6."ChildDId"
-      ) AS t4 ON t."Id" = t4."ChildAId_4"
-      LEFT JOIN "ChildF" AS t5 ON t."Id" = t5."ChildAId"
-      ) AS t1 ON t."Id" = t1."RootId_1"
-      LEFT JOIN "ChildC" AS t3 ON t."Id" = t3."RootId"
+      FROM "ChildD" t
+      LEFT JOIN "ChildE" t6 ON t."Id" = t6."ChildDId"
+      ) t4 ON t."Id" = t4."ChildAId_4"
+      LEFT JOIN "ChildF" t5 ON t."Id" = t5."ChildAId"
+      ) t1 ON t."Id" = t1."RootId_1"
+      LEFT JOIN "ChildC" t3 ON t."Id" = t3."RootId"
       """;
   }
 
@@ -297,8 +297,8 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name", "RootId"
       FROM "ChildA"
       WHERE "Id" = :p0
-      ) AS t
-      LEFT JOIN "Root" AS t7 ON t."RootId" = t7."Id"
+      ) t
+      LEFT JOIN "Root" t7 ON t."RootId" = t7."Id"
       """;
   }
 
@@ -346,12 +346,12 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name", "RootId"
       FROM "ChildA"
       WHERE "Id" = :p0
-      ) AS t
+      ) t
       LEFT JOIN (
       SELECT t."Id" AS "Id_7", t."Name" AS "Name_7", t2."Id" AS "Id_2", t2."Name" AS "Name_2", t2."RootId" AS "RootId_2"
-      FROM "Root" AS t
-      LEFT JOIN "ChildB" AS t2 ON t."Id" = t2."RootId"
-      ) AS t7 ON t."RootId" = t7."Id_7"
+      FROM "Root" t
+      LEFT JOIN "ChildB" t2 ON t."Id" = t2."RootId"
+      ) t7 ON t."RootId" = t7."Id_7"
       """;
   }
 
@@ -407,16 +407,16 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name", "MTMEntityId"
       FROM "ChildG"
       WHERE "Id" = :p0
-      ) AS t
+      ) t
       LEFT JOIN (
       SELECT t."Id" AS "Id_11", t."Name" AS "Name_11", t10."Id" AS "Id_10", t10."Name" AS "Name_10"
-      FROM "ManyToMany" AS t
+      FROM "ManyToMany" t
       LEFT JOIN (
       SELECT t10."Id", t10."Name", t."ManyToManyId"
-      FROM "RootManyToMany" AS t
-      INNER JOIN "Root" AS t10 ON t."RootId" = t10."Id"
-      ) AS t10 ON t."Id" = t10."ManyToManyId"
-      ) AS t11 ON t."MTMEntityId" = t11."Id_11"
+      FROM "RootManyToMany" t
+      INNER JOIN "Root" t10 ON t."RootId" = t10."Id"
+      ) t10 ON t."Id" = t10."ManyToManyId"
+      ) t11 ON t."MTMEntityId" = t11."Id_11"
       """;
   }
 
@@ -483,20 +483,20 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name", "MTMEntityId"
       FROM "ChildG"
       WHERE "Id" = :p0
-      ) AS t
+      ) t
       LEFT JOIN (
       SELECT t."Id" AS "Id_11", t."Name" AS "Name_11", t10."Id_10", t10."Name_10", t10."Id_1", t10."Name_1", t10."RootId_1"
-      FROM "ManyToMany" AS t
+      FROM "ManyToMany" t
       LEFT JOIN (
       SELECT t10."Id_10", t10."Name_10", t10."Id_1", t10."Name_1", t10."RootId_1", t."ManyToManyId"
-      FROM "RootManyToMany" AS t
+      FROM "RootManyToMany" t
       INNER JOIN (
       SELECT t."Id" AS "Id_10", t."Name" AS "Name_10", t1."Id" AS "Id_1", t1."Name" AS "Name_1", t1."RootId" AS "RootId_1"
-      FROM "Root" AS t
-      LEFT JOIN "ChildA" AS t1 ON t."Id" = t1."RootId"
-      ) AS t10 ON t."RootId" = t10."Id_10"
-      ) AS t10 ON t."Id" = t10."ManyToManyId"
-      ) AS t11 ON t."MTMEntityId" = t11."Id_11"
+      FROM "Root" t
+      LEFT JOIN "ChildA" t1 ON t."Id" = t1."RootId"
+      ) t10 ON t."RootId" = t10."Id_10"
+      ) t10 ON t."Id" = t10."ManyToManyId"
+      ) t11 ON t."MTMEntityId" = t11."Id_11"
       """;
   }
 
@@ -574,24 +574,24 @@ public partial class SqlTextBuilderTests
       SELECT "Id", "Name", "MTMEntityId"
       FROM "ChildG"
       WHERE "Id" = :p0
-      ) AS t
+      ) t
       LEFT JOIN (
       SELECT t."Id" AS "Id_11", t."Name" AS "Name_11", t10."Id_10", t10."Name_10", t10."Id_1", t10."Name_1", t10."RootId_1", t10."Id_4", t10."Name_4", t10."ChildAId_4"
-      FROM "ManyToMany" AS t
+      FROM "ManyToMany" t
       LEFT JOIN (
       SELECT t10."Id_10", t10."Name_10", t10."Id_1", t10."Name_1", t10."RootId_1", t10."Id_4", t10."Name_4", t10."ChildAId_4", t."ManyToManyId"
-      FROM "RootManyToMany" AS t
+      FROM "RootManyToMany" t
       INNER JOIN (
       SELECT t."Id" AS "Id_10", t."Name" AS "Name_10", t1."Id_1", t1."Name_1", t1."RootId_1", t1."Id_4", t1."Name_4", t1."ChildAId_4"
-      FROM "Root" AS t
+      FROM "Root" t
       LEFT JOIN (
       SELECT t."Id" AS "Id_1", t."Name" AS "Name_1", t."RootId" AS "RootId_1", t4."Id" AS "Id_4", t4."Name" AS "Name_4", t4."ChildAId" AS "ChildAId_4"
-      FROM "ChildA" AS t
-      LEFT JOIN "ChildD" AS t4 ON t."Id" = t4."ChildAId"
-      ) AS t1 ON t."Id" = t1."RootId_1"
-      ) AS t10 ON t."RootId" = t10."Id_10"
-      ) AS t10 ON t."Id" = t10."ManyToManyId"
-      ) AS t11 ON t."MTMEntityId" = t11."Id_11"
+      FROM "ChildA" t
+      LEFT JOIN "ChildD" t4 ON t."Id" = t4."ChildAId"
+      ) t1 ON t."Id" = t1."RootId_1"
+      ) t10 ON t."RootId" = t10."Id_10"
+      ) t10 ON t."Id" = t10."ManyToManyId"
+      ) t11 ON t."MTMEntityId" = t11."Id_11"
       """;
   }
 

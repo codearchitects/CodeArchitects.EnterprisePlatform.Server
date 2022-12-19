@@ -2,7 +2,6 @@
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.Tracking;
 using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;

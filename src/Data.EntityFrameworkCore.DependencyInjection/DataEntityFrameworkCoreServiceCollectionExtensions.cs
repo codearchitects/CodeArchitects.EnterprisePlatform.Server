@@ -1,23 +1,31 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class DataServiceCollectionExtensions
+public static class DataEntityFrameworkCoreServiceCollectionExtensions
 {
   public static IServiceCollection AddData<TDbContext>(this IServiceCollection services)
     where TDbContext : DbContext
   {
-    if (services is null)
-      throw new ArgumentNullException(nameof(services));
+    ArgumentNullException.ThrowIfNull(services);
 
-    services.AddScoped<ITrackingContext, TrackingContext>();
+    services.TryAddScoped<ITrackingContext, TrackingContext>();
+
     services.AddScoped<IPredicateProvider, PredicateProvider>();
-    services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<DbContext>().Model));
+    services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<TDbContext>().Model));
     services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
+
+    services.AddScoped<IDefaultEntityFactory, DefaultEntityFactory>();
+    services.AddScoped<IDefaultEntityFactoryFactory>(sp => new DefaultEntityFactoryFactory(sp.GetRequiredService<TDbContext>().Model));
+    services.AddSingleton<IDefaultEntityFactoryCache>(DefaultEntityFactoryCache.Create());
+
     services.AddScoped<IStateManager<TDbContext>, StateManager<TDbContext>>();
+
     services.AddScoped<IDataContext<TDbContext>, DataContext<TDbContext>>();
     services.AddScoped<IDataContext>(sp => sp.GetRequiredService<IDataContext<TDbContext>>());
 

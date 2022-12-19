@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
-using System.Data;
-using System.Data.Common;
 using System.Diagnostics;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;

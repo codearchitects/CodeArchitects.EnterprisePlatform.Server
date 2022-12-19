@@ -161,7 +161,7 @@ internal class RowReaderProvider : IRowReaderProvider
     }
   }
 
-  protected virtual MethodInfo GetReadMethod(Type type)
+  private static MethodInfo GetReadMethod(Type type)
   {
     if (type.IsEnum)
       return GetReadMethod(type.GetEnumUnderlyingType());

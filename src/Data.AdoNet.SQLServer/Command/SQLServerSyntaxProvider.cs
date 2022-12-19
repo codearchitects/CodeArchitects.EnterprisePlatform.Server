@@ -14,6 +14,8 @@ internal class SQLServerSyntaxProvider : ISyntaxProvider
 
   public bool HasOutputAfter => false;
 
+  public bool AppendASKeyword => true;
+
   public string GetOutputAfter(string tableName, string columnName)
   {
     throw new NotSupportedException();

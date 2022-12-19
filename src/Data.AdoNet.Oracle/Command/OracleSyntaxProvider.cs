@@ -14,9 +14,11 @@ internal class OracleSyntaxProvider : ISyntaxProvider
 
   public bool HasOutputAfter => true;
 
+  public bool AppendASKeyword => false;
+
   public string GetOutputAfter(string tableName, string columnName)
   {
-    return $"RETURING {tableName}.\"{columnName}\"";
+    return $"RETURNING \"{columnName}\" INTO \"{columnName}\"";
   }
 
   public string GetOutputBefore(string tableName, string columnName)

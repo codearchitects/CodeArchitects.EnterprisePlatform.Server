@@ -11,7 +11,7 @@ internal delegate void AppendAction<TState, in T>(in SqlStringBuilder stringBuil
 
 internal struct SqlStringBuilder
 {
-  public const string TableAlias = "t";
+  private const string s_tableAlias = "t";
 
   private readonly StringBuilder _stringBuilder;
   private readonly ISyntaxProvider _syntaxProvider;
@@ -164,13 +164,13 @@ internal struct SqlStringBuilder
 
   public void AppendColumn(IColumnModel column)
   {
-    Append($"{TableAlias}.");
+    Append($"{s_tableAlias}.");
     AppendEscaped(column.Name);
   }
 
   public void AppendColumn(IColumnModel column, int tableIndex)
   {
-    Append(TableAlias);
+    Append(s_tableAlias);
     Append(tableIndex);
     Append('.');
     AppendEscaped(column.Name);
@@ -178,7 +178,7 @@ internal struct SqlStringBuilder
 
   public void AppendColumn(IColumnModel column, int tableIndex, int columnIndex)
   {
-    Append(TableAlias);
+    Append(s_tableAlias);
     Append(tableIndex);
     Append('.');
     AppendEscapedWithIndex(column.Name, columnIndex);
@@ -220,12 +220,27 @@ internal struct SqlStringBuilder
     }
   }
 
+  public void AppendTableAlias()
+  {
+    Append(' ');
+    if (_syntaxProvider.AppendASKeyword)
+    {
+      Append("AS ");
+    }
+    Append(s_tableAlias);
+  }
+
+  public void AppendTableAlias(int index)
+  {
+    AppendTableAlias();
+    Append(index);
+  }
+
   public void AppendLeftJoin(INavigation child)
   {
     Append("LEFT JOIN ");
     AppendNavigationTarget(child);
-    Append($" AS {TableAlias}");
-    Append(child.Model.Id);
+    AppendTableAlias(child.Model.Id);
     Append(" ON ");
     AppendJoinConditions(child);
   }

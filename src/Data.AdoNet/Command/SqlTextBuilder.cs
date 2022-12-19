@@ -121,7 +121,8 @@ internal class SqlTextBuilder : ISqlTextBuilder
       stringBuilder.AppendLine("FROM (");
       BuildFindTextNoJoins(in stringBuilder, entityModel);
       stringBuilder.AppendLine();
-      stringBuilder.Append($") AS {SqlStringBuilder.TableAlias}");
+      stringBuilder.Append(')');
+      stringBuilder.AppendTableAlias();
 
       foreach (INavigation child in navigations)
       {

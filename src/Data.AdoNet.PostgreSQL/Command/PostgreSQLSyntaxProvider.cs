@@ -14,6 +14,8 @@ internal class PostgreSQLSyntaxProvider : ISyntaxProvider
 
   public bool HasOutputAfter => true;
 
+  public bool AppendASKeyword => true;
+
   public string GetOutputAfter(string tableName, string columnName)
   {
     return $"RETURNING \"{tableName}\".\"{columnName}\"";

@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreSample", "EFCoreSampl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platform", "Platform", "{E952FB0E-4E02-45E1-BE90-D754AE432154}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore", "..\..\src\Data.EntityFrameworkCore.AspNetCore\CodeArchitects.Platform.Data.EntityFrameworkCore.AspNetCore.csproj", "{57194799-85A8-4E60-AEB5-F37F40E75608}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore", "..\..\src\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj", "{B1DC1246-8E64-4BC7-8969-26F17FD122F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.Shared", "..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj", "{F2E1B30B-C64A-4513-9425-E22AFD4060A3}"
@@ -25,6 +23,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet", "..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj", "{2D0B5C02-0FC8-41A9-94F6-4639F623D147}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection", "..\..\src\Data.EntityFrameworkCore.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection.csproj", "{3DAB4595-1682-460F-9738-D52454DDA0A4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.SqlServer", "..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SqlServer.csproj", "{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.DependencyInjection", "..\..\src\Data.AdoNet.DependencyInjection\CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj", "{20F87886-7120-4079-BB69-0630D15D879D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +39,6 @@ Global
 		{F2AC3DEE-5F30-4223-B196-400E6458597C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2AC3DEE-5F30-4223-B196-400E6458597C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2AC3DEE-5F30-4223-B196-400E6458597C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{57194799-85A8-4E60-AEB5-F37F40E75608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57194799-85A8-4E60-AEB5-F37F40E75608}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57194799-85A8-4E60-AEB5-F37F40E75608}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57194799-85A8-4E60-AEB5-F37F40E75608}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1DC1246-8E64-4BC7-8969-26F17FD122F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1DC1246-8E64-4BC7-8969-26F17FD122F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1DC1246-8E64-4BC7-8969-26F17FD122F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,12 +71,23 @@ Global
 		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F87886-7120-4079-BB69-0630D15D879D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20F87886-7120-4079-BB69-0630D15D879D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20F87886-7120-4079-BB69-0630D15D879D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20F87886-7120-4079-BB69-0630D15D879D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{57194799-85A8-4E60-AEB5-F37F40E75608} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{B1DC1246-8E64-4BC7-8969-26F17FD122F5} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{F2E1B30B-C64A-4513-9425-E22AFD4060A3} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{6655B03D-12FE-44D1-AE45-F19ABDC29231} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
@@ -84,6 +95,9 @@ Global
 		{C8D537E7-A291-445A-A031-484A5F3F911E} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{17F6C8A1-A123-4483-BED9-47917C925CD6} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{2D0B5C02-0FC8-41A9-94F6-4639F623D147} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
+		{3DAB4595-1682-460F-9738-D52454DDA0A4} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
+		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
+		{20F87886-7120-4079-BB69-0630D15D879D} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C18616EF-F29C-4DC6-85E9-96946263D242}

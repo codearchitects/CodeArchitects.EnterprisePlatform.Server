@@ -67,41 +67,44 @@ internal class RepositoryFactory
 
     AdoNet.IDataContext CreateSqlServerContext()
     {
-      AdoNet.StateManager<SqlConnection> stateManager = new(_fixture.SqlServerConnection);
+      DelegateConnectionFactory<SqlConnection> connectionFactory = new(() => _fixture.SqlServerConnection);
+      AdoNet.StateManager<SqlConnection> stateManager = new(connectionFactory);
       SqlTextBuilder sqlBuilder = new(sqlCache, new SQLServerSyntaxProvider());
       CommandBuilder<SqlCommand> commandBuilder = new(sqlBuilder);
       RowReaderProvider rowReaderProvider = RowReaderProvider.Create();
       Materializer materializer = new(collectionFactory, rowReaderProvider);
-      ICommandInterceptor<SqlCommand> interceptor = Mock.Of<ICommandInterceptor<SqlCommand>>();
+      ICommandInterceptorAggregator<SqlCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<SqlCommand>>();
       Executor<SqlCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new SQLServerDataContext(stateManager, executor, interceptor, dataModel);
+      return new DataContext<SqlConnection, SqlCommand>(stateManager, executor, interceptor, dataModel);
     }
 
     AdoNet.IDataContext CreatePostgresContext()
     {
-      AdoNet.StateManager<NpgsqlConnection> stateManager = new(_fixture.PostgresConnection);
+      DelegateConnectionFactory<NpgsqlConnection> connectionFactory = new(() => _fixture.PostgresConnection);
+      AdoNet.StateManager<NpgsqlConnection> stateManager = new(connectionFactory);
       SqlTextBuilder sqlBuilder = new(sqlCache, new PostgreSQLSyntaxProvider());
       CommandBuilder<NpgsqlCommand> commandBuilder = new(sqlBuilder);
       RowReaderProvider rowReaderProvider = RowReaderProvider.Create();
       Materializer materializer = new(collectionFactory, rowReaderProvider);
-      ICommandInterceptor<NpgsqlCommand> interceptor = Mock.Of<ICommandInterceptor<NpgsqlCommand>>();
+      ICommandInterceptorAggregator<NpgsqlCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<NpgsqlCommand>>();
       Executor<NpgsqlCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new PostgreSQLDataContext(stateManager, executor, interceptor, dataModel);
+      return new DataContext<NpgsqlConnection, NpgsqlCommand>(stateManager, executor, interceptor, dataModel);
     }
 
     AdoNet.IDataContext CreateOracleContext()
     {
-      AdoNet.StateManager<OracleConnection> stateManager = new(_fixture.OracleConnection);
+      DelegateConnectionFactory<OracleConnection> connectionFactory = new(() => _fixture.OracleConnection);
+      AdoNet.StateManager<OracleConnection> stateManager = new(connectionFactory);
       SqlTextBuilder sqlBuilder = new(sqlCache, new OracleSyntaxProvider());
       AdoNet.Oracle.Command.OracleCommandBuilder commandBuilder = new(sqlBuilder);
       RowReaderProvider rowReaderProvider = RowReaderProvider.Create();
       Materializer materializer = new(collectionFactory, rowReaderProvider);
-      ICommandInterceptor<OracleCommand> interceptor = Mock.Of<ICommandInterceptor<OracleCommand>>();
+      ICommandInterceptorAggregator<OracleCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<OracleCommand>>();
       Executor<OracleCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new OracleDataContext(stateManager, executor, interceptor, dataModel);
+      return new DataContext<OracleConnection, OracleCommand>(stateManager, executor, interceptor, dataModel);
     }
   }
 
