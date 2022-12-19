@@ -12,7 +12,9 @@ class EntityWithSimplePropertyKey
 
 class EntityWithSimpleFieldKey
 {
+#pragma warning disable CS0649
   public int Id;
+#pragma warning restore CS0649
 }
 
 class EntityWithSimpleShadowKey

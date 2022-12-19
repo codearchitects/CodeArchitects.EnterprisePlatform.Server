@@ -288,8 +288,10 @@ public class ReflectionExtensionsTests
 
     public string PublicField = "PublicFieldValue";
 
-#pragma warning disable IDE0044 // Add readonly modifier. Reason: accessed via reflection
+#pragma warning disable CS0414
+#pragma warning disable IDE0044
     private string NonPublicField = "NonPublicFieldValue";
-#pragma warning restore IDE0044 // Add readonly modifier
+#pragma warning restore IDE0044
+#pragma warning restore CS0414
   }
 }
