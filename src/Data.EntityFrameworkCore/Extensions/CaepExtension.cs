@@ -3,16 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
-internal class DataExtension : DataExtensionBase
+internal class CaepExtension : CaepExtensionBase
 {
-  private readonly IEnumerable<IDataExtensionPlugin> _plugins;
+  private readonly IEnumerable<ICaepExtensionPlugin> _plugins;
 
-  public DataExtension(IEnumerable<IDataExtensionPlugin> plugins)
+  public CaepExtension(IEnumerable<ICaepExtensionPlugin> plugins)
   {
     _plugins = plugins;
   }
 
-  public override DbContextOptionsExtensionInfo Info => new DataExtensionInfo(this);
+  public override DbContextOptionsExtensionInfo Info => new CaepExtensionInfo(this);
 
   public override void ApplyServices(IServiceCollection services)
   {
@@ -21,22 +21,22 @@ internal class DataExtension : DataExtensionBase
 
     PluginServiceCollection pluginServices = new(services);
 
-    foreach (IDataExtensionPlugin plugin in _plugins)
+    foreach (ICaepExtensionPlugin plugin in _plugins)
     {
       plugin.ApplyServices(pluginServices);
     }
   }
 
-  private class DataExtensionInfo : DbContextOptionsExtensionInfo
+  private class CaepExtensionInfo : DbContextOptionsExtensionInfo
   {
-    public DataExtensionInfo(DataExtension extension)
+    public CaepExtensionInfo(CaepExtension extension)
       : base(extension)
     {
     }
 
     public override bool IsDatabaseProvider => false;
 
-    public override string LogFragment => "CodeArchitects:Data";
+    public override string LogFragment => "CodeArchitects:Caep";
 
     public override int GetServiceProviderHashCode()
     {

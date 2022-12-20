@@ -1,7 +1,7 @@
 ﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
-internal interface IDataOptionsBuilderInfrastructure
+internal interface ICaepOptionsBuilderInfrastructure
 {
   void AddOrUpdatePlugin<TPlugin>(TPlugin plugin)
-    where TPlugin : class, IDataExtensionPlugin;
+    where TPlugin : class, ICaepExtensionPlugin;
 }

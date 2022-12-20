@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Diagnostics.CodeAnalysis;
@@ -17,7 +18,7 @@ internal static class AnnotationExtensions
   public static Type GetTenantIdType(this IReadOnlyModel model)
   {
     if (!model.TryGetAnnotationValue(MultitenancyAnnotationNames.TenantIdType, out Type? type))
-      throw new InvalidOperationException($"Multitenancy was not configured. Add a call to '{nameof(MultitenancyDataOptionsBuilderExtensions.UseMultitenancy)}' to your DataExtension configuration.");
+      throw new InvalidOperationException($"Multitenancy was not configured. Add a call to '{nameof(MultitenancyCaepOptionsBuilderExtensions.UseMultitenancy)}' to your {nameof(CaepExtension)} configuration.");
 
     return type;
   }

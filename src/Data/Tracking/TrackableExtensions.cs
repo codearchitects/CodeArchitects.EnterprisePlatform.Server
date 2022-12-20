@@ -44,7 +44,7 @@ public static class TrackableExtensions
     return destination;
   }
 
-  public static IEnumerable<TDestination> MapCore<TTrackable, TDestination>(this IEnumerable<TTrackable> trackables, ITrackingContext context, Func<TTrackable, TDestination> mappingFunc)
+  private static IEnumerable<TDestination> MapCore<TTrackable, TDestination>(this IEnumerable<TTrackable> trackables, ITrackingContext context, Func<TTrackable, TDestination> mappingFunc)
     where TTrackable : ITrackable
     where TDestination : class
   {

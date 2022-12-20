@@ -2,20 +2,20 @@
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
-internal class DataExtension : DataExtensionBase
+internal class CaepExtension : CaepExtensionBase
 {
   public override DbContextOptionsExtensionInfo Info => new DataExtensionInfo(this);
 
   private class DataExtensionInfo : DbContextOptionsExtensionInfo
   {
-    public DataExtensionInfo(DataExtension extension)
+    public DataExtensionInfo(CaepExtension extension)
       : base(extension)
     {
     }
 
     public override bool IsDatabaseProvider => false;
 
-    public override string LogFragment => "CodeArchitects:Data";
+    public override string LogFragment => "CodeArchitects:Caep";
 
     public override long GetServiceProviderHashCode()
     {

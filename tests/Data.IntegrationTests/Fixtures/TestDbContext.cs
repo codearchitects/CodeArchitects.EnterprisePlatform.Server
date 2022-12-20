@@ -147,7 +147,7 @@ public class SqlServerDbContext : TestDbContext // For SqlServer migrations
   {
     optionsBuilder
       .UseSqlServer("-")
-      .UseData();
+      .UseCaep();
   }
 }
 
@@ -157,6 +157,6 @@ public class PostgresDbContext : TestDbContext // For Postgres migrations
   {
     optionsBuilder
       .UseNpgsql("-")
-      .UseData();
+      .UseCaep();
   }
 }

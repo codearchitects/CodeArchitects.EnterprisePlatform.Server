@@ -9,8 +9,17 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Methods for adding the ADO.NET data context to the application services.
+/// </summary>
 public static class DataAdoNetServiceCollectionExtensions
 {
+  /// <summary>
+  /// Injects the services needed to support the ADO.NET data context.
+  /// </summary>
+  /// <param name="services">The service collection.</param>
+  /// <param name="configurationAction">An action that specifies the ADO.NET configuration.</param>
+  /// <returns>The same <see cref="IServiceCollection"/> instance.</returns>
   public static IServiceCollection AddData(this IServiceCollection services, Func<IAdoNetConfigurationBuilder, IAdoNetConfigurationBuilderWithProvider> configurationAction)
   {
     if (services is null)
@@ -19,7 +28,7 @@ public static class DataAdoNetServiceCollectionExtensions
       throw new ArgumentNullException(nameof(configurationAction));
 
     if (services.Any(service => service.ServiceType == typeof(IDataContext)))
-      throw new InvalidOperationException($"'{nameof(AddData)}' was already called. Having multiple database providers at the same time is not supported.");
+      throw new InvalidOperationException($"'{nameof(AddData)}' was already called. Having multiple database providers at the same time is not yet supported.");
 
     AdoNetConfigurationBuilder configurationBuilder = new();
     configurationAction(configurationBuilder);

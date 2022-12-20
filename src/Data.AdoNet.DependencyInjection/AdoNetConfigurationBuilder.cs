@@ -55,7 +55,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     if (modelConfigurationType is null)
       throw new ArgumentNullException(nameof(modelConfigurationType));
 
-    if (!typeof(ModelConfiguration).IsAssignableFrom(modelConfigurationType))
+    if (!modelConfigurationType.IsSubclassOf(typeof(ModelConfiguration)))
       throw new ArgumentException($"Type '{modelConfigurationType}' does not extend '{nameof(ModelConfiguration)}'.");
 
     _modelConfigurationType = modelConfigurationType;

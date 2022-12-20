@@ -14,7 +14,6 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor<TDbCommand> _executor;
   private readonly ICommandInterceptor<TDbCommand> _interceptor;
-  private readonly IDataModel _model;
 
   public DataContext(
     IStateManager<TDbConnection> stateManager,
@@ -25,10 +24,12 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     _stateManager = stateManager;
     _executor = executor;
     _interceptor = interceptor;
-    _model = model;
+    Model = model;
   }
 
   public TDbConnection Connection => _stateManager.Connection;
+
+  public IDataModel Model { get; }
 
   IDbConnection IDataContext.Connection => _stateManager.Connection;
 
@@ -209,7 +210,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (!_model.TryGetEntity(out IEntityModel<TEntity, TKey>? entityModel))
+    if (!Model.TryGetEntity(out IEntityModel<TEntity, TKey>? entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;
@@ -217,7 +218,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
   private IEntityModel EnsureEntity<TEntity>()
   {
-    if (!_model.TryGetEntity(typeof(TEntity), out IEntityModel? entityModel))
+    if (!Model.TryGetEntity(typeof(TEntity), out IEntityModel? entityModel))
       throw new InvalidOperationException($"'{typeof(TEntity).Name}' is not registered as a database entity.");
 
     return entityModel;

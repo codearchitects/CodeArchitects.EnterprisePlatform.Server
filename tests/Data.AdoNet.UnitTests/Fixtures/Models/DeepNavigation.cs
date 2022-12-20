@@ -471,7 +471,7 @@ internal static class DeepNavigation
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(propertyInfo))
-        .SetJoinEntity(_ => _
+        .SetJunctionEntity(_ => _
           .SetTableName("RootManyToMany"))
         .SetFromKeyPairs(_ => _
           .Add(_ => _
@@ -497,7 +497,7 @@ internal static class DeepNavigation
         .Setup(mock => mock
           .Setup(x => x.Member)
           .Returns(propertyInfo))
-        .SetJoinEntity(_ => _
+        .SetJunctionEntity(_ => _
           .SetTableName("RootManyToMany"))
         .SetFromKeyPairs(_ => _
           .Add(_ => _

@@ -7,8 +7,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Methods for adding the Entity Framework Core data context to the application services.
+/// </summary>
 public static class DataEntityFrameworkCoreServiceCollectionExtensions
 {
+  /// <summary>
+  /// Injects the services needed to support the Entity Framework Core data context.
+  /// </summary>
+  /// <param name="services">The service collection.</param>
+  /// <returns>The same <see cref="IServiceCollection"/> instance.</returns>
   public static IServiceCollection AddData<TDbContext>(this IServiceCollection services)
     where TDbContext : DbContext
   {

@@ -3,6 +3,9 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Oracle;
 
+/// <summary>
+/// The Oracle database provider.
+/// </summary>
 public class OracleProvider : DatabaseProvider
 {
   internal override Type SyntaxProviderType => typeof(OracleSyntaxProvider);
@@ -13,6 +16,11 @@ public class OracleProvider : DatabaseProvider
 
   internal override Type CommandBuilderType => typeof(Command.OracleCommandBuilder);
 
+  /// <summary>
+  /// Specifies the connection string to the database.
+  /// </summary>
+  /// <param name="connectionString">The connection string.</param>
+  /// <returns>The same <see cref="OracleProvider"/> for further configuration.</returns>
   public OracleProvider UseConnection(string connectionString)
   {
     if (connectionString is null)
@@ -22,6 +30,12 @@ public class OracleProvider : DatabaseProvider
     return this;
   }
 
+  /// <summary>
+  /// Specifies the connection string to the database.
+  /// </summary>
+  /// <param name="connectionString">The connection string.</param>
+  /// <param name="orclCredential">The credentials to use for authentication.</param>
+  /// <returns>The same <see cref="OracleProvider"/> for further configuration.</returns>
   public OracleProvider UseConnection(string connectionString, OracleCredential orclCredential)
   {
     if (connectionString is null)
@@ -33,6 +47,11 @@ public class OracleProvider : DatabaseProvider
     return this;
   }
 
+  /// <summary>
+  /// Specifies a factory that creates instances of <see cref="OracleConnection"/>.
+  /// </summary>
+  /// <param name="connectionFactory">The factory function.</param>
+  /// <returns>The same <see cref="OracleProvider"/> for further configuration.</returns>
   public OracleProvider UseConnectionFactory(Func<OracleConnection> connectionFactory)
   {
     if (connectionFactory is null)
@@ -42,6 +61,11 @@ public class OracleProvider : DatabaseProvider
     return this;
   }
 
+  /// <summary>
+  /// Specifies a factory that creates instances of <see cref="OracleConnection"/>.
+  /// </summary>
+  /// <param name="connectionFactoryType">The connection factory type. It must implement <see cref="IConnectionFactory{TDbConnection}"/> of <see cref="OracleConnection"/>.</param>
+  /// <returns>The same <see cref="OracleProvider"/> for further configuration.</returns>
   public OracleProvider UseConnectionFactory(Type connectionFactoryType)
   {
     if (connectionFactoryType is null)

@@ -34,21 +34,21 @@ public class TestLocalData
       .UseSqlServer(fixture.SqlServerConnectionString)
       .EnableSensitiveDataLogging()
       .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseData()
+      .UseCaep()
       .Options);
 
     _postgresOptionsLazy = new(() => new DbContextOptionsBuilder()
       .UseNpgsql(fixture.PostgresConnectionString)
       .EnableSensitiveDataLogging()
       .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseData()
+      .UseCaep()
       .Options);
 
     _oracleOptionsLazy = new(() => new DbContextOptionsBuilder()
       .UseOracle(fixture.OracleConnectionString)
       .EnableSensitiveDataLogging()
       .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseData()
+      .UseCaep()
       .Options);
   }
 

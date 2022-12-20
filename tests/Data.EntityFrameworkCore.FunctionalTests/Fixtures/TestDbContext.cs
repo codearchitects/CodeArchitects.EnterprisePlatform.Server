@@ -42,7 +42,7 @@ public class TestDbContext : DbContext
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
-    optionsBuilder.UseData(data => data
+    optionsBuilder.UseCaep(data => data
       .UseMultitenancy(new MultitenancyDescriptor(MultitenancyContext))
       .UseSoftDelete(new SoftDeleteDescriptor(SoftDeleteContext)));
   }

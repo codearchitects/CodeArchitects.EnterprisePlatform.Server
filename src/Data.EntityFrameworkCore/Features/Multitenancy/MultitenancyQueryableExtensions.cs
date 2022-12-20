@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 
+/// <summary>
+/// Multitenancy extension methods for <see cref="IQueryable{T}"/>.
+/// </summary>
 public static class MultitenancyQueryableExtensions
 {
   internal static readonly MethodInfo s_asNoMultitenancyMethodInfo;
@@ -22,6 +25,12 @@ public static class MultitenancyQueryableExtensions
       types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
   }
 
+  /// <summary>
+  /// Disables the multitenancy filter for the query.
+  /// </summary>
+  /// <typeparam name="TEntity">The entity type.</typeparam>
+  /// <param name="source">The queryable.</param>
+  /// <returns>An <see cref="IQueryable{T}"/> that will ignore the multitenancy filter.</returns>
   [Experimental]
   public static IQueryable<TEntity> AsNoMultitenancy<TEntity>(this IQueryable<TEntity> source)
     where TEntity : class
@@ -34,6 +43,12 @@ public static class MultitenancyQueryableExtensions
     return source;
   }
 
+  /// <summary>
+  /// Enables the multitenancy filter for the query.
+  /// </summary>
+  /// <typeparam name="TEntity">The entity type.</typeparam>
+  /// <param name="source">The queryable.</param>
+  /// <returns>An <see cref="IQueryable{T}"/> that will use the multitenancy filter.</returns>
   [Experimental]
   public static IQueryable<TEntity> AsMultitenancy<TEntity>(this IQueryable<TEntity> source)
     where TEntity : class

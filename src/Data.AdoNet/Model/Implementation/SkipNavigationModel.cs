@@ -30,7 +30,7 @@ internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationMo
 
   ISkipNavigationModel ISkipNavigationModel.Inverse => Inverse;
 
-  IEntityModel ISkipNavigationModel.JoinEntity => JoinEntity;
+  IEntityModel ISkipNavigationModel.JunctionEntity => JoinEntity;
 
   public void AddFromJoinColumn(IPrimaryKeyColumnModel primaryKeyColumn, string name)
   {
@@ -68,7 +68,7 @@ internal abstract class SkipNavigationModel : NavigationModel, ISkipNavigationMo
     }
   }
 
-  public object CreateJoin(object from, object to)
+  public object CreateJunction(object from, object to)
   {
     Dictionary<string, object?> join = new(FromKeyPairs.Count + ToKeyPairs.Count);
     

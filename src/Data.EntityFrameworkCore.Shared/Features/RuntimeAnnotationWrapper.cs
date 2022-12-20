@@ -1,9 +1,9 @@
 ﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features;
 
-public record RuntimeAnnotationWrapper<TAnnotation>(TAnnotation Annotation)
+internal record RuntimeAnnotationWrapper<TAnnotation>(TAnnotation Annotation)
   where TAnnotation : notnull;
 
-public static class RuntimeAnnotationWrapper
+internal static class RuntimeAnnotationWrapper
 {
   public static RuntimeAnnotationWrapper<TAnnotation> Create<TAnnotation>(TAnnotation annotation)
     where TAnnotation : notnull

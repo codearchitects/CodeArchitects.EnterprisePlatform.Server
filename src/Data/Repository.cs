@@ -1,9 +1,20 @@
 ﻿namespace CodeArchitects.Platform.Data;
 
+/// <summary>
+/// Base implementation of <see cref="IRepository{TEntity, TKey}"/>.
+/// </summary>
+/// <remarks>
+/// This class is meant to be extended by specific implementations which will internally use some ORM to perform the operations.
+/// </remarks>
+/// <typeparam name="TEntity">The entity type.</typeparam>
+/// <typeparam name="TKey">The entity's primary key type.</typeparam>
 public abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
+  /// <summary>
+  /// The data context used by the repository.
+  /// </summary>
   protected abstract IDataContext Context { get; }
 
   public virtual Task<TEntity?> FindAsync(TKey key, CancellationToken cancellationToken = default)

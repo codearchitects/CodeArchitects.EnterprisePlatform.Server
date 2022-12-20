@@ -84,17 +84,17 @@ internal partial class Executor<TDbCommand>
           return true;
 
         case IAccessibleSkipNavigationModel skipNavigationModel:
-          object joinEntity;
+          object junctionEntity;
 
           switch (trackingState)
           {
             case TrackingState.Added:
-              joinEntity = skipNavigationModel.CreateJoin(parent, node);
-              await self.ExecuteInsertAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
+              junctionEntity = skipNavigationModel.CreateJunction(parent, node);
+              await self.ExecuteInsertAsync(command, junctionEntity, skipNavigationModel.JunctionEntity, default, cancellationToken);
               break;
             case TrackingState.Removed:
-              joinEntity = skipNavigationModel.CreateJoin(parent, node);
-              await self.ExecuteRemoveAsync(command, joinEntity, skipNavigationModel.JoinEntity, cancellationToken);
+              junctionEntity = skipNavigationModel.CreateJunction(parent, node);
+              await self.ExecuteRemoveAsync(command, junctionEntity, skipNavigationModel.JunctionEntity, cancellationToken);
               skipNavigationModel.CollectionAccessor.Remove(parent, node);
               break;
             case TrackingState.Modified:

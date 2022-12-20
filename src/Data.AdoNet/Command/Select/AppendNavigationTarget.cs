@@ -71,7 +71,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
-    _stringBuilder.AppendEscaped(navigation.Model.JoinEntity.TableName);
+    _stringBuilder.AppendEscaped(navigation.Model.JunctionEntity.TableName);
     _stringBuilder.AppendTableAlias();
     _stringBuilder.AppendLine();
     _stringBuilder.Append("INNER JOIN ");
@@ -111,7 +111,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
-    _stringBuilder.AppendEscaped(navigation.Model.JoinEntity.TableName);
+    _stringBuilder.AppendEscaped(navigation.Model.JunctionEntity.TableName);
     _stringBuilder.AppendTableAlias();
     _stringBuilder.AppendLine();
     _stringBuilder.AppendLine("INNER JOIN (");

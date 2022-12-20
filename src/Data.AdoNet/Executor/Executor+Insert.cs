@@ -33,8 +33,8 @@ internal partial class Executor<TDbCommand>
           }
 
         case IAccessibleSkipNavigationModel skipNavigationModel:
-          object joinEntity = skipNavigationModel.CreateJoin(parent, node);
-          await self.ExecuteInsertAsync(command, joinEntity, skipNavigationModel.JoinEntity, default, cancellationToken);
+          object junctionEntity = skipNavigationModel.CreateJunction(parent, node);
+          await self.ExecuteInsertAsync(command, junctionEntity, skipNavigationModel.JunctionEntity, default, cancellationToken);
           return false;
         
         default:

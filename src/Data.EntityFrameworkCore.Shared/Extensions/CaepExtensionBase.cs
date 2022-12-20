@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
-internal abstract class DataExtensionBase : IDbContextOptionsExtension
+internal abstract class CaepExtensionBase : IDbContextOptionsExtension
 {
   public abstract DbContextOptionsExtensionInfo Info { get; }
 

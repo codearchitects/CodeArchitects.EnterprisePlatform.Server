@@ -5,6 +5,9 @@ using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
+/// <summary>
+/// Represents a database provider.
+/// </summary>
 public abstract class DatabaseProvider
 {
   private protected DatabaseProvider() { }

@@ -6,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.SoftDelete;
 
-internal class SoftDeleteDataPlugin : IDataExtensionPlugin
+internal class SoftDeleteCaepPlugin : ICaepExtensionPlugin
 {
   private readonly ISoftDeleteDescriptor _descriptor;
 
-  public SoftDeleteDataPlugin(ISoftDeleteDescriptor descriptor)
+  public SoftDeleteCaepPlugin(ISoftDeleteDescriptor descriptor)
   {
     _descriptor = descriptor;
   }

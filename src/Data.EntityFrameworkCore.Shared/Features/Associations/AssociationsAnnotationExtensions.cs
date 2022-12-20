@@ -12,8 +12,18 @@ using TNavigation =
 #endif
   ;
 
-public static class AnnotationExtensions
+/// <summary>
+/// Extension methods for configuring associations.
+/// </summary>
+public static class AssociationsAnnotationExtensions
 {
+  /// <summary>
+  /// Specifies that an association is a composition.
+  /// </summary>
+  /// <typeparam name="TPrincipalEntity">The principal entity type in this relationship.</typeparam>
+  /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
+  /// <param name="builder">The relationship builder.</param>
+  /// <returns>The same <see cref="ReferenceCollectionBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
   public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> AsComposition<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
@@ -27,6 +37,13 @@ public static class AnnotationExtensions
     return builder;
   }
 
+  /// <summary>
+  /// Specifies that an association is an aggregation.
+  /// </summary>
+  /// <typeparam name="TPrincipalEntity">The principal entity type in this relationship.</typeparam>
+  /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
+  /// <param name="builder">The relationship builder.</param>
+  /// <returns>The same <see cref="ReferenceCollectionBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
   public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> AsAggregation<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
@@ -40,6 +57,13 @@ public static class AnnotationExtensions
     return builder;
   }
 
+  /// <summary>
+  /// Specifies that an association is a composition.
+  /// </summary>
+  /// <typeparam name="TPrincipalEntity">The principal entity type in this relationship.</typeparam>
+  /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
+  /// <param name="builder">The relationship builder.</param>
+  /// <returns>The same <see cref="ReferenceReferenceBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
   public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> AsComposition<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
@@ -53,6 +77,13 @@ public static class AnnotationExtensions
     return builder;
   }
 
+  /// <summary>
+  /// Specifies that an association is an aggregation.
+  /// </summary>
+  /// <typeparam name="TPrincipalEntity">The principal entity type in this relationship.</typeparam>
+  /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
+  /// <param name="builder">The relationship builder.</param>
+  /// <returns>The same <see cref="ReferenceReferenceBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
   public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> AsAggregation<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
@@ -77,6 +108,11 @@ public static class AnnotationExtensions
   }
 
 
+  /// <summary>
+  /// Indicates whether a navigation is a composition.
+  /// </summary>
+  /// <param name="navigation">The navigation.</param>
+  /// <returns><c>true</c> if the navigation represents a composition, <c>false</c> otherwise.</returns>
   public static bool IsComposition(this TNavigation navigation)
   {
     if (navigation is null)
@@ -85,6 +121,11 @@ public static class AnnotationExtensions
     return navigation.Is(AssociationKind.Composition);
   }
 
+  /// <summary>
+  /// Indicates whether a navigation is an aggregation.
+  /// </summary>
+  /// <param name="navigation">The navigation.</param>
+  /// <returns><c>true</c> if the navigation represents an aggregation, <c>false</c> otherwise.</returns>
   public static bool IsAggregation(this TNavigation navigation)
   {
     if (navigation is null)

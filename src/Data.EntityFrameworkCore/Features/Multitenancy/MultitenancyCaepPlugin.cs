@@ -6,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 
-internal class MultitenancyDataPlugin : IDataExtensionPlugin
+internal class MultitenancyCaepPlugin : ICaepExtensionPlugin
 {
   private readonly IMultitenancyDescriptor _descriptor;
 
-  public MultitenancyDataPlugin(IMultitenancyDescriptor descriptor)
+  public MultitenancyCaepPlugin(IMultitenancyDescriptor descriptor)
   {
     _descriptor = descriptor;
   }
