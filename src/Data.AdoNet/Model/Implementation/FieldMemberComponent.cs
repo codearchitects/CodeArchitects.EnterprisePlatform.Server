@@ -24,11 +24,13 @@ internal class FieldMemberComponent<T> : AccessibleMemberComponent<T>
 
   public static Getter<T> BuildGetAccessor(FieldInfo field, string? memberName = null)
   {
+    Type entityType = field.DeclaringType!;
     memberName ??= field.Name;
     DynamicMethod getMethod = new($"getvalue_{memberName}", field.FieldType, Type.EmptyTypes, field.DeclaringType!);
     ILGenerator il = getMethod.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Ldfld, field);
     if (typeof(T) == typeof(object) && field.FieldType.IsValueType)
     {
@@ -41,11 +43,13 @@ internal class FieldMemberComponent<T> : AccessibleMemberComponent<T>
 
   public static Setter<T> BuildSetAccessor(FieldInfo field, string? memberName = null)
   {
+    Type entityType = field.DeclaringType!;
     memberName ??= field.Name;
     DynamicMethod setMethod = new($"setvalue_{memberName}", typeof(void), new[] { field.FieldType }, field.DeclaringType!);
     ILGenerator il = setMethod.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
+    il.Emit(OpCodes.Castclass, entityType);
     il.Emit(OpCodes.Ldarg_1);
     il.Emit(OpCodes.Stfld, field);
     if (typeof(T) == typeof(object) && field.FieldType.IsValueType)
