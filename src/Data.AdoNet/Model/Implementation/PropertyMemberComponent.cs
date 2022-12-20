@@ -57,7 +57,7 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
       return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
     }
 
-    DynamicMethod method = new($"getvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
+    DynamicMethod method = new($"setvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);
     ILGenerator il = method.GetILGenerator();
 
     il.Emit(OpCodes.Ldarg_0);
