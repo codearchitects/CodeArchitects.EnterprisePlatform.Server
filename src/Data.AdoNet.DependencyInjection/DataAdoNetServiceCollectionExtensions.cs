@@ -27,9 +27,6 @@ public static class DataAdoNetServiceCollectionExtensions
     if (configurationAction is null)
       throw new ArgumentNullException(nameof(configurationAction));
 
-    if (services.Any(service => service.ServiceType == typeof(IDataContext)))
-      throw new InvalidOperationException($"'{nameof(AddData)}' was already called. Having multiple database providers at the same time is not yet supported.");
-
     AdoNetConfigurationBuilder configurationBuilder = new();
     configurationAction(configurationBuilder);
 
@@ -38,15 +35,17 @@ public static class DataAdoNetServiceCollectionExtensions
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
 
-    services.AddSingleton(typeof(ISyntaxProvider), provider.SyntaxProviderType);
-    services.AddSingleton<ISqlTextCache>(SqlTextCache.Create());
-    services.AddSingleton<ISqlTextBuilder, SqlTextBuilder>();
-    services.AddSingleton(commandBuilderServiceType, provider.CommandBuilderType);
+    SqlTextCache sqlCache = SqlTextCache.Create();
+    ISyntaxProvider syntaxProvider = provider.CreateSyntaxProvider();
+    SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
+    object commandBuilder = provider.CreateCommandBuilder(sqlBuilder);
+
+    services.AddSingleton(commandBuilderServiceType, commandBuilder);
 
     // Materializer
-    services.AddSingleton<IIdentityCollectionFactory>(IdentityCollectionFactory.Create());
-    services.AddSingleton<IRowReaderProvider>(RowReaderProvider.Create());
-    services.AddScoped<IMaterializer, Materializer>();
+    services.TryAddSingleton<IIdentityCollectionFactory>(IdentityCollectionFactory.Create());
+    services.TryAddSingleton<IRowReaderProvider>(RowReaderProvider.Create());
+    services.TryAddScoped<IMaterializer, Materializer>();
 
     // Tracking
     services.TryAddScoped<ITrackingContext, TrackingContext>();
@@ -99,8 +98,8 @@ public static class DataAdoNetServiceCollectionExtensions
     services.AddScoped(stateManagerServiceType, stateManagerImplementationType);
 
     // Data model
-    services.AddSingleton(typeof(ModelConfiguration), configurationBuilder.ModelConfigurationType);
-    services.AddSingleton(sp => sp.GetRequiredService<ModelConfiguration>().CreateDataModel());
+    services.TryAddSingleton(typeof(ModelConfiguration), configurationBuilder.ModelConfigurationType);
+    services.TryAddSingleton(sp => sp.GetRequiredService<ModelConfiguration>().CreateDataModel());
 
     // Data context
     Type dataContextType = provider.MakeGenericType(typeof(IDataContext<>));

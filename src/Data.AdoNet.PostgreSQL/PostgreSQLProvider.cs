@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.PostgreSQL.Command;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.PostgreSQL.Command;
 using Npgsql;
 
 namespace CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
@@ -6,13 +7,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 /// <summary>
 /// The PostgreSQL database provider.
 /// </summary>
-public class PostgreSQLProvider : DatabaseProvider
+public class PostgreSQLProvider : DatabaseProvider<NpgsqlConnection, NpgsqlCommand>
 {
-  private protected override Type DbConnectionType => typeof(NpgsqlConnection);
-
-  private protected override Type DbCommandType => typeof(NpgsqlCommand);
-
-  internal override Type SyntaxProviderType => typeof(PostgreSQLSyntaxProvider);
+  internal override ISyntaxProvider CreateSyntaxProvider() => new PostgreSQLSyntaxProvider();
 
   /// <summary>
   /// Specifies the connection string to the database.

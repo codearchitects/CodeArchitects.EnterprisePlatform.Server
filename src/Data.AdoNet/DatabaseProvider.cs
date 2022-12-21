@@ -16,15 +16,15 @@ public abstract class DatabaseProvider
 
   private protected abstract Type DbCommandType { get; }
 
-  internal abstract Type SyntaxProviderType { get; }
+  internal abstract Type DataContextType { get; }
 
   internal IConnectionFactory<DbConnection>? DelegateConnectionFactory { get; private protected set; }
 
   internal Type? ConnectionFactoryType { get; private protected set; }
 
-  internal virtual Type DataContextType => MakeGenericType(typeof(DataContext<,>));
+  internal abstract ISyntaxProvider CreateSyntaxProvider();
 
-  internal virtual Type CommandBuilderType => MakeGenericType(typeof(CommandBuilder<>));
+  internal abstract object CreateCommandBuilder(ISqlTextBuilder sqlBuilder);
 
   internal Type MakeGenericType(Type genericTypeDefinition)
   {

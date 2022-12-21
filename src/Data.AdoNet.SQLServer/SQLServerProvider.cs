@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.SQLServer.Command;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.SQLServer.Command;
 using Microsoft.Data.SqlClient;
 
 namespace CodeArchitects.Platform.Data.AdoNet.SQLServer;
@@ -6,13 +7,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.SQLServer;
 /// <summary>
 /// The SQL Server database provider.
 /// </summary>
-public class SQLServerProvider : DatabaseProvider
+public class SQLServerProvider : DatabaseProvider<SqlConnection, SqlCommand>
 {
-  private protected override Type DbConnectionType => typeof(SqlConnection);
-
-  private protected override Type DbCommandType => typeof(SqlCommand);
-
-  internal override Type SyntaxProviderType => typeof(SQLServerSyntaxProvider);
+  internal override ISyntaxProvider CreateSyntaxProvider() => new SQLServerSyntaxProvider();
 
   /// <summary>
   /// Specifies the connection string to the database.

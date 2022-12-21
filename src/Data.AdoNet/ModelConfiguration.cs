@@ -7,6 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet;
 
 /// <summary>
 /// This class is used to configure the persistence model of the database.
+/// Subclasses will be injected as a singleton service, therefore do not use scoped dependencies inside it.
 /// </summary>
 public abstract class ModelConfiguration // TODO: The whole model building section needs a refactoring
 {
@@ -45,6 +46,9 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
   private readonly DataModelBuilder _modelBuilder;
   private DataModel? _dataModel;
 
+  /// <summary>
+  /// Creates a new instance of <see cref="ModelConfiguration"/>.
+  /// </summary>
   public ModelConfiguration()
   {
     _modelBuilder = new();

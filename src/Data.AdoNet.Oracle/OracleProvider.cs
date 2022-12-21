@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
 using Oracle.ManagedDataAccess.Client;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Oracle;
@@ -6,15 +7,14 @@ namespace CodeArchitects.Platform.Data.AdoNet.Oracle;
 /// <summary>
 /// The Oracle database provider.
 /// </summary>
-public class OracleProvider : DatabaseProvider
+public class OracleProvider : DatabaseProvider<OracleConnection, OracleCommand>
 {
-  internal override Type SyntaxProviderType => typeof(OracleSyntaxProvider);
+  internal override ISyntaxProvider CreateSyntaxProvider() => new OracleSyntaxProvider();
 
-  private protected override Type DbConnectionType => typeof(OracleConnection);
-
-  private protected override Type DbCommandType => typeof(OracleCommand);
-
-  internal override Type CommandBuilderType => typeof(Command.OracleCommandBuilder);
+  private protected override CommandBuilder<OracleCommand> CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder)
+  {
+    return new Command.OracleCommandBuilder(sqlBuilder);
+  }
 
   /// <summary>
   /// Specifies the connection string to the database.
