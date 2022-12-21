@@ -5,20 +5,20 @@ using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
-internal interface ICommandBuilder<TDbCommand>
+internal interface ICommandBuilder<in TDbCommand>
   where TDbCommand : IDbCommand
 {
   void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  void BuildInsertCommand(TDbCommand command, object node, IEntityModel model, in NavigationContext context);
+  void BuildInsertCommand(TDbCommand command, object entity, IEntityModel model, in NavigationContext context);
 
-  void BuildUpdateCommand(TDbCommand command, object node, IEntityModel model, in NavigationContext context);
+  void BuildUpdateCommand(TDbCommand command, object entity, IEntityModel model, in NavigationContext context);
 
-  void BuildUpsertCommand(TDbCommand command, object node, IEntityModel model);
+  void BuildUpsertCommand(TDbCommand command, object entity, IEntityModel model);
 
-  void BuildRemoveCommand(TDbCommand command, object node, IEntityModel model);
+  void BuildRemoveCommand(TDbCommand command, object entity, IEntityModel model);
 
   void BuildRemoveCommand<TEntity, TKey>(TDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class

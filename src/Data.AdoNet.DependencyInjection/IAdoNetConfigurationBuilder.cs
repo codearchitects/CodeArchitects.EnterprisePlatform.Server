@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet;
+﻿using CodeArchitects.Platform.Data;
+using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using System.Reflection;
@@ -15,7 +16,7 @@ public interface IAdoNetConfigurationBuilder
   /// </summary>
   /// <typeparam name="TProvider">The database provider type.</typeparam>
   /// <param name="configureAction">An action to configure the provider.</param>
-  /// <returns>A <see cref="IAdoNetConfigurationBuilderWithProvider"/> that can be used for further configuration.</returns>
+  /// <returns>A <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
   IAdoNetConfigurationBuilderWithProvider UseProvider<TProvider>(Action<TProvider> configureAction)
     where TProvider : DatabaseProvider, new();
 }
@@ -29,22 +30,28 @@ public interface IAdoNetConfigurationBuilderWithProvider
   /// Specifies the model configuration to use to build the persistence model.
   /// </summary>
   /// <param name="modelConfigurationType">The model configuration type.</param>
-  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> that can be used for further configuration.</returns>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
   IAdoNetConfigurationBuilderWithProvider UseModel(Type modelConfigurationType);
 
   /// <summary>
   /// Adds a command interceptor to the services.
   /// </summary>
   /// <param name="interceptorType">The interceptor type.</param>
-  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> that can be used for further configuration.</returns>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
   IAdoNetConfigurationBuilderWithProvider AddCommandInterceptor(Type interceptorType);
+
+  // /// <summary>
+  // /// Specifies the seed type to use for seeding the database.
+  // /// </summary>
+  // /// <param name="seedType">The seed type. It must extend <see cref="DataSeed"/>.</param>
+  // /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  // IAdoNetConfigurationBuilderWithProvider UseSeed(Type seedType);
 
   /// <summary>
   /// Scans the specifies assembly and looks for a <see cref="ModelConfiguration"/> type to use and registers any found <see cref="ICommandInterceptor{TCommand}"/> implementation.
   /// </summary>
   /// <param name="assembly">The assembly to scan.</param>
   /// <param name="serviceTypes">Specifies which services to look for.</param>
-  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> that can be used for further configuration.</returns>
-  IAdoNetConfigurationBuilderWithProvider ScanServicesFromAssembly(Assembly assembly, AdoNetServiceTypes serviceTypes = AdoNetServiceTypes.All);
-
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  IAdoNetConfigurationBuilderWithProvider ScanAssemblyForServices(Assembly assembly, AdoNetServiceTypes serviceTypes = AdoNetServiceTypes.All);
 }

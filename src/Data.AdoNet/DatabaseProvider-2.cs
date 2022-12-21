@@ -18,12 +18,12 @@ public abstract class DatabaseProvider<TDbConnection, TDbCommand> : DatabaseProv
 
   internal override Type DataContextType => typeof(DataContext<TDbConnection, TDbCommand>);
 
-  internal sealed override object CreateCommandBuilder(ISqlTextBuilder sqlBuilder)
+  private protected sealed override object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder)
   {
-    return CreateCommandBuilderCore(sqlBuilder);
+    return CreateCommandBuilder(sqlBuilder);
   }
 
-  private protected virtual CommandBuilder<TDbCommand> CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder)
+  private protected virtual CommandBuilder<TDbCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder)
   {
     return new CommandBuilder<TDbCommand>(sqlBuilder);
   }

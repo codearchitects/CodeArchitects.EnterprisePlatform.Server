@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 
 /// <summary>
-/// Indicates what services to scan for when calling <see cref="IAdoNetConfigurationBuilderWithProvider.ScanServicesFromAssembly(System.Reflection.Assembly, AdoNetServiceTypes)"/>.
+/// Indicates what services to scan for when calling <see cref="IAdoNetConfigurationBuilderWithProvider.ScanAssemblyForServices(System.Reflection.Assembly, AdoNetServiceTypes)"/>.
 /// </summary>
 [Flags]
 public enum AdoNetServiceTypes
@@ -22,6 +22,11 @@ public enum AdoNetServiceTypes
   /// Look for command interceptors.
   /// </summary>
   CommandInterceptors = 2,
+
+  /// <summary>
+  /// Look for data seed.
+  /// </summary>
+  DataSeed = 4,
 
   /// <summary>
   /// Look for all types of services.

@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Data.EntityFrameworkCore;
+﻿using CodeArchitects.Platform.Data;
+using CodeArchitects.Platform.Data.EntityFrameworkCore;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Tracking;
@@ -6,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
+
+using IDataContext = CodeArchitects.Platform.Data.EntityFrameworkCore.IDataContext;
 
 /// <summary>
 /// Methods for adding the Entity Framework Core data context to the application services.
@@ -21,6 +25,35 @@ public static class DataEntityFrameworkCoreServiceCollectionExtensions
     where TDbContext : DbContext
   {
     ArgumentNullException.ThrowIfNull(services);
+
+    return services.AddDataCore<TDbContext>(new EntityFrameworkCoreConfigurationBuilder());
+  }
+
+  /// <summary>
+  /// Injects the services needed to support the Entity Framework Core data context.
+  /// </summary>
+  /// <param name="services">The service collection.</param>
+  /// <param name="configurationAction">An action that specifies the Entity Framework Core configuration.</param>
+  /// <returns>The same <see cref="IServiceCollection"/> instance.</returns>
+  public static IServiceCollection AddData<TDbContext>(this IServiceCollection services, Action<IEntityFrameworkCoreConfigurationBuilder> configurationAction)
+    where TDbContext : DbContext
+  {
+    ArgumentNullException.ThrowIfNull(services);
+    ArgumentNullException.ThrowIfNull(configurationAction);
+
+    EntityFrameworkCoreConfigurationBuilder configurationBuilder = new();
+    configurationAction(configurationBuilder);
+
+    return services.AddDataCore<TDbContext>(configurationBuilder);
+  }
+
+  private static IServiceCollection AddDataCore<TDbContext>(this IServiceCollection services, EntityFrameworkCoreConfigurationBuilder configurationBuilder)
+    where TDbContext : DbContext
+  {
+    if (configurationBuilder.SeedType is not null)
+    {
+      services.AddSingleton(typeof(DataSeed), configurationBuilder.SeedType);
+    }
 
     services.TryAddScoped<ITrackingContext, TrackingContext>();
 

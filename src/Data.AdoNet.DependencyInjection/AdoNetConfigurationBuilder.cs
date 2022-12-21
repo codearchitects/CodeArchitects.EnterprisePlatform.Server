@@ -21,6 +21,8 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
 
   public IReadOnlyCollection<Type> CommandInterceptorTypes => _commandInterceptorTypes;
 
+  public Type? SeedType { get; private set; }
+
   public IAdoNetConfigurationBuilderWithProvider UseProvider<TProvider>(Action<TProvider> configureAction)
     where TProvider : DatabaseProvider, new()
   {
@@ -62,7 +64,19 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     return this;
   }
 
-  public IAdoNetConfigurationBuilderWithProvider ScanServicesFromAssembly(Assembly assembly, AdoNetServiceTypes serviceTypes = AdoNetServiceTypes.All)
+  public IAdoNetConfigurationBuilderWithProvider UseSeed(Type seedType)
+  {
+    if (seedType is null)
+      throw new ArgumentNullException(nameof(seedType));
+
+    if (!seedType.IsSubclassOf(typeof(DataSeed)))
+      throw new ArgumentException($"Type '{seedType}' does not extend '{nameof(DataSeed)}'.");
+
+    SeedType = seedType;
+    return this;
+  }
+
+  public IAdoNetConfigurationBuilderWithProvider ScanAssemblyForServices(Assembly assembly, AdoNetServiceTypes serviceTypes = AdoNetServiceTypes.All)
   {
     if (assembly is null)
       throw new ArgumentNullException(nameof(assembly));
@@ -77,6 +91,11 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     if (serviceTypes.HasFlag(AdoNetServiceTypes.CommandInterceptors))
     {
       AddCommandInterceptors();
+    }
+
+    if (serviceTypes.HasFlag(AdoNetServiceTypes.DataSeed))
+    {
+      AddDataSeed();
     }
 
     return this;
@@ -94,13 +113,28 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       }
 
       _modelConfigurationType = modelConfigurationType
-        ?? throw new InvalidOperationException($"A class extending '{nameof(ModelConfiguration)}' was not find in the provided assembly.");
+        ?? throw new InvalidOperationException($"A class extending '{nameof(ModelConfiguration)}' was not found in the provided assembly.");
     }
 
     void AddCommandInterceptors()
     {
       Type commandInterceptorInterfaceType = Provider.MakeGenericType(typeof(ICommandInterceptor<>));
       _commandInterceptorTypes.AddRange(types.Where(type => commandInterceptorInterfaceType.IsAssignableFrom(type)));
+    }
+
+    void AddDataSeed()
+    {
+      Type? seedType;
+      try
+      {
+        seedType = types.SingleOrDefault(type => typeof(DataSeed).IsAssignableFrom(type));
+      }
+      catch (InvalidOperationException)
+      {
+        throw new InvalidOperationException($"Found more than one class extending '{nameof(DataSeed)}' in the provided assembly.");
+      }
+
+      SeedType = seedType;
     }
   }
 }

@@ -22,9 +22,18 @@ public abstract class DatabaseProvider
 
   internal Type? ConnectionFactoryType { get; private protected set; }
 
-  internal abstract ISyntaxProvider CreateSyntaxProvider();
+  private protected abstract ISyntaxProvider CreateSyntaxProvider();
 
-  internal abstract object CreateCommandBuilder(ISqlTextBuilder sqlBuilder);
+  private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder);
+
+  internal object CreateCommandBuilder()
+  {
+    SqlTextCache sqlCache = SqlTextCache.Create();
+    ISyntaxProvider syntaxProvider = CreateSyntaxProvider();
+    SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
+
+    return CreateCommandBuilderCore(sqlBuilder);
+  }
 
   internal Type MakeGenericType(Type genericTypeDefinition)
   {
@@ -34,7 +43,7 @@ public abstract class DatabaseProvider
         IsDbConnection(argument) ? DbConnectionType :
         IsDbCommand(argument) ? DbCommandType :
         throw new ArgumentException($"Could not resolve generic type parameter for type '{genericTypeDefinition.Name}'", nameof(genericTypeDefinition)));
-    
+
     return genericTypeDefinition.MakeGenericType(typeArguments);
 
     static bool IsDbConnection(Type typeArgument)

@@ -34,11 +34,7 @@ public static class DataAdoNetServiceCollectionExtensions
 
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
-
-    SqlTextCache sqlCache = SqlTextCache.Create();
-    ISyntaxProvider syntaxProvider = provider.CreateSyntaxProvider();
-    SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
-    object commandBuilder = provider.CreateCommandBuilder(sqlBuilder);
+    object commandBuilder = provider.CreateCommandBuilder();
 
     services.AddSingleton(commandBuilderServiceType, commandBuilder);
 
