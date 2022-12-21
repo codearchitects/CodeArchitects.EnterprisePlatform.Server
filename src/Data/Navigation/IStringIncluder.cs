@@ -12,7 +12,7 @@ public interface IStringIncluder<TEntity>
   /// </summary>
   /// <remarks>
   /// To include a single entity, specify the name of the navigation entity: <c>"Navigation"</c>.
-  /// Sub-navigations can be added, with an arbitrary depth, using the dot '.' to navigate throgh the object's graph: <c>"Navigation.SubNavigation"</c>.
+  /// Sub-navigations can be added, with an arbitrary depth, using the dot '.' to navigate through the object's graph: <c>"Navigation.SubNavigation"</c>.
   /// </remarks>
   /// <param name="navigation">A string representing the path to the related entity to include.</param>
   /// <returns>An <see cref="IStringIncluder{TEntity}"/> that can be used to further specify the related entities to include.</returns>

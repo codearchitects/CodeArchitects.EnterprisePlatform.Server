@@ -14,7 +14,7 @@ public interface IQueryRootExpressionInterceptor
   bool ShouldApply { get; }
 
   /// <summary>
-  /// Applies the modification to the query expression. The supplied expression is a root entity expression or the result of previous inteceptors.
+  /// Applies the modification to the query expression. The supplied expression is a root entity expression or the result of previous interceptors.
   /// </summary>
   /// <param name="expression">The expression to intercept.</param>
   /// <param name="entity">The entity type.</param>

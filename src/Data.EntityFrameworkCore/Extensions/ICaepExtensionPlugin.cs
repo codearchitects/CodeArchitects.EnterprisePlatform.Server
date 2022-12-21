@@ -1,13 +1,13 @@
 ﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
 /// <summary>
-/// Interface that a plugin for the CAEP extension must implement.
+/// Interface that a plug-in for the CAEP extension must implement.
 /// </summary>
 public interface ICaepExtensionPlugin
 {
   /// <summary>
-  /// Applies the plugin's services.
+  /// Applies the plug-in's services.
   /// </summary>
-  /// <param name="services">The plugin service collection.</param>
+  /// <param name="services">The plug-in service collection.</param>
   void ApplyServices(IPluginServiceCollection services);
 }
