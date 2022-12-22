@@ -39,7 +39,7 @@ internal partial class Executor<TDbCommand>
           return false;
         
         default:
-          Debug.Fail("This point should be unreacheable.");
+          Debug.Fail("This point should be unreachable.");
           return false;
       }
     };
