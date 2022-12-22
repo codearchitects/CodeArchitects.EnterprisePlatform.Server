@@ -139,7 +139,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityOnly_WhenNavigationIsOneToManyComposition(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityOnly_WhenNavigationIsOneToManyIntraAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Customer customer = Customer.One();
@@ -169,7 +169,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToManyCompositionAndNavigationIsAdded(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToManyInterAggregateAndNavigationIsAdded(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -205,7 +205,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToManyCompositionAndNavigationIsRemoved(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToManyInterAggregateAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -279,7 +279,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToManyCompositionAndNavigationIsModified(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToManyInterAggregateAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -303,7 +303,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityOnly_WhenNavigationIsOneToOneComposition(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityOnly_WhenNavigationIsOneToOneInterAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Person first = Person.One();
@@ -330,7 +330,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToOneCompositionAndNavigationIsAdded(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToOneInterAggregateAndNavigationIsAdded(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -363,7 +363,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToOneCompositionAndNavigationIsRemoved(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToOneInterAggregateAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -394,7 +394,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToOneCompositionAndNavigationIsModified(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToOneInterAggregateAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;
@@ -416,7 +416,7 @@ public class UpdateAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task UpdateAsync_ShouldUpdateEntityAndAddOrModifyOrDeleteChildren_WhenNavigationIsOneToManyAggregation(RepositoryDependencies dependencies)
+  public async Task UpdateAsync_ShouldUpdateEntityAndAddOrModifyOrDeleteChildren_WhenNavigationIsOneToManyIntraAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     ITrackingContext trackingContext = dependencies.TrackingContext;

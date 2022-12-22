@@ -6,9 +6,9 @@ public class Product
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public Category? Category { get; set; } // OTM composition, on dependent
-  public Typology? Typology { get; set; } // OTM composition, on dependent
-  public List<CartItem>? CartItems { get; set; } // MTM
+  public Category? Category { get; set; } // OTM inter-aggregate, on dependent
+  public Typology? Typology { get; set; } // OTM inter-aggregate, on dependent
+  public List<CartItem>? CartItems { get; set; } // MTM inter-aggregate
 
   private static readonly Faker<Product> s_faker = new Faker<Product>()
     .RuleFor(product => product.Id, Guid.NewGuid)

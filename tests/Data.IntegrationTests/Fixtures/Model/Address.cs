@@ -6,7 +6,7 @@ public class Address
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public Customer? Customer { get; set; } // OTO aggregation, on dependent
+  public Customer? Customer { get; set; } // OTO intra-aggregate, on dependent
 
   private static readonly Faker<Address> s_faker = new Faker<Address>()
     .RuleFor(address => address.Id, Guid.NewGuid)

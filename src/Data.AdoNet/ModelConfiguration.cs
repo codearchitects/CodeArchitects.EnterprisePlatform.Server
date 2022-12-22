@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+using CodeArchitects.Platform.Data.Features.Associations;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -83,32 +84,32 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
   }
 
   /// <summary>
-  /// Configures an aggregation relationship.
+  /// Configures a relationship between two entities belonging to the same aggregate.
   /// </summary>
   /// <typeparam name="TFrom">The type of the "from" entity of the relationship.</typeparam>
   /// <typeparam name="TTo">The type of the "to" entity of the relationship.</typeparam>
   /// <param name="buildAction">The action that configures the relationship.</param>
-  protected void Aggregation<TFrom, TTo>(Action<IAggregationBuilder<TFrom, TTo>> buildAction)
+  protected void Aggregate<TFrom, TTo>(Action<IIntraAggregateBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
     Association(
-      AssociationKind.Aggregation,
+      AssociationKind.IntraAggregate,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
 
   /// <summary>
-  /// Configures an composition relationship.
+  /// Configures a relationship between two entities belonging to different aggregates.
   /// </summary>
   /// <typeparam name="TFrom">The type of the "from" entity of the relationship.</typeparam>
   /// <typeparam name="TTo">The type of the "to" entity of the relationship.</typeparam>
   /// <param name="buildAction">The action that configures the relationship.</param>
-  protected void Composition<TFrom, TTo>(Action<ICompositionBuilder<TFrom, TTo>> buildAction)
+  protected void Associate<TFrom, TTo>(Action<IInterAggregateBuilder<TFrom, TTo>> buildAction)
     where TFrom : class
     where TTo : class
   {
     Association(
-      AssociationKind.Composition,
+      AssociationKind.InterAggregate,
       buildAction ?? throw new ArgumentNullException(nameof(buildAction)));
   }
 

@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
+using CodeArchitects.Platform.Data.Features.Associations;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;

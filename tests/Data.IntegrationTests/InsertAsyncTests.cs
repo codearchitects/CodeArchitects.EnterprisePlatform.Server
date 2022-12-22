@@ -56,7 +56,7 @@ public class InsertAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task InsertAsync_ShouldInsertEntityAndAddLinks_WhenNavigationIsOneToManyComposition(RepositoryDependencies dependencies)
+  public async Task InsertAsync_ShouldInsertEntityAndAddLinks_WhenNavigationIsOneToManyInterAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Customer customer = Customer.One();
@@ -80,7 +80,7 @@ public class InsertAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task InsertAsync_ShouldInsertEntityAndAddLinks_WhenNavigationIsOneToOneComposition(RepositoryDependencies dependencies)
+  public async Task InsertAsync_ShouldInsertEntityAndAddLinks_WhenNavigationIsOneToOneInterAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Person first = Person.One();
@@ -102,7 +102,7 @@ public class InsertAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task InsertAsync_ShouldInsertEntityAndChildren_WhenNavigationIsOneToManyAggregation(RepositoryDependencies dependencies)
+  public async Task InsertAsync_ShouldInsertEntityAndChildren_WhenNavigationIsOneToManyIntraAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Cart cart = Cart.One();
@@ -125,7 +125,7 @@ public class InsertAsyncTests : TestBase
   }
 
   [Theory, RepositoryDependenciesData]
-  public async Task InsertAsync_ShouldInsertEntityAndChild_WhenNavigationIsOneToOneAggregation(RepositoryDependencies dependencies)
+  public async Task InsertAsync_ShouldInsertEntityAndChild_WhenNavigationIsOneToOneIntraAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
     Customer customer = Customer.One();

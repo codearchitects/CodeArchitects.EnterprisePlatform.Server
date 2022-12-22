@@ -75,7 +75,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           if (navigation.IsOnDependent)
             return false;
 
-          if (navigation.IsAggregation())
+          if (navigation.IsIntraAggregate())
           {
             node.Entry.State = EntityState.Added;
             return true;
@@ -142,7 +142,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           }
           return false;
         case INavigation navigation:
-          return !navigation.IsOnDependent && navigation.IsAggregation();
+          return !navigation.IsOnDependent && navigation.IsIntraAggregate();
         default:
           Debug.Fail("This point should be unreacheable.");
           return false;
@@ -168,7 +168,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
         case INavigation navigation: // One-to-one or one-to-many navigation
           if (navigation.IsOnDependent)
           {
-            if (navigation.IsAggregation())
+            if (navigation.IsIntraAggregate())
               return false;
 
             switch (state)
@@ -187,7 +187,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
             return false;
           }
 
-          if (navigation.IsComposition())
+          if (navigation.IsInterAggregate())
           {
             if (navigation.IsCollection)
             {

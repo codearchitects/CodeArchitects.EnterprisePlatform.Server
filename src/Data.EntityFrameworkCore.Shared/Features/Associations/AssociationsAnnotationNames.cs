@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Names for association annotations.
-/// Use the <see cref="AssociationsAnnotationExtensions.IsComposition"/> and <see cref="AssociationsAnnotationExtensions.IsAggregation"/> methods to retrieve the annotations from the metadata.
+/// Use the <see cref="AssociationsAnnotationExtensions.IsInterAggregate"/> and <see cref="AssociationsAnnotationExtensions.IsIntraAggregate"/> methods to retrieve the annotations from the metadata.
 /// </summary>
 public static class AssociationsAnnotationNames
 {

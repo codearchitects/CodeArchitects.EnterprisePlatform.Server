@@ -5,10 +5,10 @@ namespace CodeArchitects.Platform.Data.AdoNet;
 public partial class ModelConfigurationTests
 {
   [Fact]
-  public void ShouldCreateADataModelWithAOneToManyAggregation()
+  public void ShouldCreateADataModelWithAOneToManyIntraAggregate()
   {
     // Arrange
-    WithAOneToManyAggregation.TestModelConfiguration sut = new();
+    WithAOneToManyIntraAggregate.TestModelConfiguration sut = new();
 
     // Act
     IDataModel dataModel = sut.CreateDataModel();
@@ -17,10 +17,10 @@ public partial class ModelConfigurationTests
   }
 
   [Fact]
-  public void ShouldCreateADataModelWithAManyToManyComposition()
+  public void ShouldCreateADataModelWithAManyToManyInterAggregate()
   {
     // Arrange
-    WithAManyToManyComposition.TestModelConfiguration sut = new();
+    WithAManyToManyInterAggregate.TestModelConfiguration sut = new();
 
     // Act
     IDataModel dataModel = sut.CreateDataModel();

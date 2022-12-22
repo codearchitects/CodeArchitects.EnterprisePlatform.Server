@@ -1,6 +1,8 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+﻿using CodeArchitects.Platform.Data.Features.Associations;
 
-internal class AssociationBuilder<TFrom, TTo> : IAggregationBuilder<TFrom, TTo>, ICompositionBuilder<TFrom, TTo>
+namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+
+internal class AssociationBuilder<TFrom, TTo> : IIntraAggregateBuilder<TFrom, TTo>, IInterAggregateBuilder<TFrom, TTo>
   where TFrom : class
   where TTo : class
 {

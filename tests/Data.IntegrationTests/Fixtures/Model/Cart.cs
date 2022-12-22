@@ -6,8 +6,8 @@ public class Cart
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public List<CartItem>? Items { get; set; } // OTM aggregation, on principal
-  public Customer? Customer { get; set; } // OTM composition, on dependent
+  public List<CartItem>? Items { get; set; } // OTM intra-aggregate, on principal
+  public Customer? Customer { get; set; } // OTM inter-aggregate, on dependent
 
   private static readonly Faker<Cart> s_faker = new Faker<Cart>()
     .RuleFor(cart => cart.Id, Guid.NewGuid)

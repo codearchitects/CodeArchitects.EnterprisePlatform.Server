@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.Features.Associations;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
@@ -169,7 +170,7 @@ internal class SqlTextBuilder : ISqlTextBuilder
       stringBuilder.AppendEscaped(columnModel.Name);
       stringBuilder.Append(" = ");
 
-      if (columnModel is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.Aggregation, HasMember: false } })
+      if (columnModel is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.IntraAggregate, HasMember: false } })
       {
         stringBuilder.Append("COALESCE(");
         stringBuilder.AppendParameter(columnModel);

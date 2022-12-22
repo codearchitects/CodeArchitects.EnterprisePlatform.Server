@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.Features.Associations;
 using CodeArchitects.Platform.Data.Tracking;
 using System.Data;
 using System.Diagnostics;
@@ -24,7 +25,7 @@ internal partial class Executor<TDbCommand>
         case IAccessibleSimpleNavigationModel simpleNavigationModel:
           if (simpleNavigationModel.IsOnDependent)
           {
-            if (simpleNavigationModel.AssociationKind is AssociationKind.Aggregation)
+            if (simpleNavigationModel.AssociationKind is AssociationKind.IntraAggregate)
               return false;
 
             switch (trackingState)
@@ -41,7 +42,7 @@ internal partial class Executor<TDbCommand>
             return false;
           }
 
-          if (simpleNavigationModel.AssociationKind is AssociationKind.Composition)
+          if (simpleNavigationModel.AssociationKind is AssociationKind.InterAggregate)
           {
             switch (trackingState)
             {
@@ -104,7 +105,7 @@ internal partial class Executor<TDbCommand>
           return false;
 
         default:
-          Debug.Fail("This point should be unreacheable.");
+          Debug.Fail("This point should be unreachable.");
           return false;
       }
     };

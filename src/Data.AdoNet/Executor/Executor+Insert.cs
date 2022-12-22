@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.Features.Associations;
 using System.Diagnostics;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
@@ -21,7 +22,7 @@ internal partial class Executor<TDbCommand>
           if (simpleNavigationModel.IsOnDependent)
             return false;
 
-          if (simpleNavigationModel.AssociationKind is AssociationKind.Aggregation)
+          if (simpleNavigationModel.AssociationKind is AssociationKind.IntraAggregate)
           {
             await self.ExecuteInsertAsync(command, node, model, in context, cancellationToken);
             return true;

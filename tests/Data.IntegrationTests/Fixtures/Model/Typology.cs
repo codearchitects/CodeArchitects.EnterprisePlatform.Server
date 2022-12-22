@@ -6,7 +6,7 @@ public class Typology
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public List<Category>? Categories { get; set; } // MTM
+  public List<Category>? Categories { get; set; } // MTM inter-aggregate
 
   private static readonly Faker<Typology> s_faker = new Faker<Typology>()
     .RuleFor(typology => typology.Id, Guid.NewGuid)

@@ -2,7 +2,7 @@
 
 public partial class ModelConfigurationTests
 {
-  private static class WithAOneToManyAggregation
+  private static class WithAOneToManyIntraAggregate
   {
     public class Parent
     {
@@ -29,7 +29,7 @@ public partial class ModelConfigurationTests
 
         Entity<Child>();
 
-        Aggregation<Parent, Child>(aggregation => aggregation
+        Aggregate<Parent, Child>(aggregate => aggregate
           .OneToMany()
           .Navigation(x => x.Children)
           .UsingForeignKey(x => x.ParentId));
@@ -37,7 +37,7 @@ public partial class ModelConfigurationTests
     }
   }
 
-  private static class WithAManyToManyComposition
+  private static class WithAManyToManyInterAggregate
   {
     public class EntityA
     {
@@ -61,7 +61,7 @@ public partial class ModelConfigurationTests
 
         Entity<EntityB>();
 
-        Composition<EntityA, EntityB>(composition => composition
+        Associate<EntityA, EntityB>(associate => associate
           .ManyToMany()
           .Navigation(x => x.Others)
           .InverseNavigation(x => x.Others));

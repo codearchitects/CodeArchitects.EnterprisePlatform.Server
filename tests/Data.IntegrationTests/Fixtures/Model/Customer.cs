@@ -6,9 +6,9 @@ public class Customer
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public List<Cart>? Carts { get; set; } // OTM composition, on principal
-  public List<CustomerClaim>? Claims { get; set; } // OTM aggregation, on principal
-  public Address? Address { get; set; } // OTO aggregation, on principal
+  public List<Cart>? Carts { get; set; } // OTM inter-aggregate, on principal
+  public List<CustomerClaim>? Claims { get; set; } // OTM intra-aggregate, on principal
+  public Address? Address { get; set; } // OTO intra-aggregate, on principal
 
   private static readonly Faker<Customer> s_faker = new Faker<Customer>()
     .RuleFor(customer => customer.Id, Guid.NewGuid)

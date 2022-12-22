@@ -6,7 +6,7 @@ public class Person
 {
   public Guid Id { get; set; }
   public string? Name { get; set; }
-  public Person? Partner { get; set; } // OTO composition
+  public Person? Partner { get; set; } // OTO inter-aggregate
 
   private static readonly Faker<Person> s_faker = new Faker<Person>()
     .RuleFor(person => person.Id, Guid.NewGuid)

@@ -169,22 +169,22 @@ public partial class MaterializationTests
       Entity<ChildC>();
       Entity<ChildD>();
 
-      Composition<Parent, ChildA>(composition => composition
+      Associate<Parent, ChildA>(associate => associate
         .OneToMany()
         .Navigation(parent => parent.ChildrenA)
         .UsingForeignKey(childA => childA.ParentId));
 
-      Composition<Parent, ChildB>(composition => composition
+      Associate<Parent, ChildB>(associate => associate
         .OneToMany()
         .Navigation(parent => parent.ChildrenB)
         .UsingForeignKey(childB => childB.ParentId));
 
-      Composition<Parent, ChildC>(composition => composition
+      Associate<Parent, ChildC>(associate => associate
         .OneToOne()
         .Navigation(parent => parent.ChildC)
         .UsingForeignKey(childC => childC.ParentId));
 
-      Composition<ChildA, ChildD>(composition => composition
+      Associate<ChildA, ChildD>(associate => associate
         .OneToMany()
         .Navigation(childA => childA.ChildrenD)
         .UsingForeignKey(childD => childD.ChildAId));
