@@ -1,8 +1,5 @@
-﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
-using CodeArchitects.Platform.Data.EntityFrameworkCore.Fixtures.Model;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using CodeArchitects.Platform.Data.Features.Multitenancy;
-using Microsoft.EntityFrameworkCore;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Fixtures;
 

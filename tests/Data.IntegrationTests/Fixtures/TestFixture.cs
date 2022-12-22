@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.Fixtures.Model;
-using Docker.DotNet;
+﻿using Docker.DotNet;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;

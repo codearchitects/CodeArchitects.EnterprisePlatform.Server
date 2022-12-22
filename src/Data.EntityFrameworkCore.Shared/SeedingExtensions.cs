@@ -57,7 +57,7 @@ public static class SeedingExtensions
 
   private static void SeedCore(DbContext dbContext, DataSeed seed)
   {
-    Seeder seeder = new Seeder(dbContext);
+    Seeder seeder = new(dbContext);
     seeder.Apply(seed);
   }
 }

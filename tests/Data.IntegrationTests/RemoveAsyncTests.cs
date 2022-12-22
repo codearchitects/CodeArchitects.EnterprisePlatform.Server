@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.Fixtures;
 using CodeArchitects.Platform.Data.Fixtures.Model;
-using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data;

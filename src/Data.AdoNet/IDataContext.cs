@@ -28,7 +28,7 @@ public interface IDataContext : Data.IDataContext
   Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default);
 
   /// <summary>
-  /// Visits all nodes in the graph represented by the specified entity, except the root node.
+  /// Visits all nodes in the graph represented by the specified entity, starting from the root node.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity.</typeparam>
   /// <typeparam name="TState">The type of the state object passed to the callback.</typeparam>
@@ -40,7 +40,7 @@ public interface IDataContext : Data.IDataContext
     where TEntity : class;
 
   /// <summary>
-  /// Asynchronously visits all nodes in the graph represented by the specified entity, except the root node.
+  /// Asynchronously visits all nodes in the graph represented by the specified entity, starting from the root node.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity.</typeparam>
   /// <typeparam name="TState">The type of the state object passed to the callback.</typeparam>

@@ -31,7 +31,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     if (_provider is not null)
       throw new InvalidOperationException("Cannot specify multiple database provider.");
 
-    TProvider provider = new TProvider();
+    TProvider provider = new();
     configureAction(provider);
 
     _provider = provider;
