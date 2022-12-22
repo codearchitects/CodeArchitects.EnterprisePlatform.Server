@@ -13,6 +13,7 @@ internal class OracleCommandBuilder : CommandBuilder<OracleCommand>
   protected override void CreateParameter(OracleCommand command, string name, object? value)
   {
     OracleParameter parameter = command.CreateParameter();
+
     if (value is null)
     {
       value = DBNull.Value;
@@ -24,6 +25,7 @@ internal class OracleCommandBuilder : CommandBuilder<OracleCommand>
         parameter.OracleDbType = OracleDbType.Raw;
       }
     }
+
     parameter.ParameterName = name;
     parameter.Value = value ?? DBNull.Value;
     command.Parameters.Add(parameter);
