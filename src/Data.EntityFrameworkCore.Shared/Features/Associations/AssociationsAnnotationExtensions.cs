@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -31,6 +32,9 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
+    if (EFCoreEnvironment.IsMigration)
+      return builder;
+
     builder.Metadata.DependentToPrincipal?.IsComposition();
     builder.Metadata.PrincipalToDependent?.IsComposition();
 
@@ -50,6 +54,9 @@ public static class AssociationsAnnotationExtensions
   {
     if (builder is null)
       throw new ArgumentException(nameof(builder));
+
+    if (EFCoreEnvironment.IsMigration)
+      return builder;
 
     builder.Metadata.DependentToPrincipal?.IsAggregation();
     builder.Metadata.PrincipalToDependent?.IsAggregation();
@@ -71,6 +78,9 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
+    if (EFCoreEnvironment.IsMigration)
+      return builder;
+
     builder.Metadata.DependentToPrincipal?.IsComposition();
     builder.Metadata.PrincipalToDependent?.IsComposition();
 
@@ -91,6 +101,9 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
+    if (EFCoreEnvironment.IsMigration)
+      return builder;
+
     builder.Metadata.DependentToPrincipal?.IsAggregation();
     builder.Metadata.PrincipalToDependent?.IsAggregation();
 
@@ -99,12 +112,12 @@ public static class AssociationsAnnotationExtensions
 
   private static IAnnotation IsComposition(this IMutableNavigation navigation)
   {
-    return navigation.AddAnnotation(AssociationsAnnotationNames.AssociationKind, RuntimeAnnotationWrapper.Create(AssociationKind.Composition));
+    return navigation.AddAnnotation(AssociationsAnnotationNames.AssociationKind, AssociationKind.Composition);
   }
 
   private static IAnnotation IsAggregation(this IMutableNavigation navigation)
   {
-    return navigation.AddAnnotation(AssociationsAnnotationNames.AssociationKind, RuntimeAnnotationWrapper.Create(AssociationKind.Aggregation));
+    return navigation.AddAnnotation(AssociationsAnnotationNames.AssociationKind, AssociationKind.Aggregation);
   }
 
 
@@ -137,7 +150,7 @@ public static class AssociationsAnnotationExtensions
   private static bool Is(this TNavigation navigation, AssociationKind kind)
   {
     return
-      navigation.TryGetRuntimeAnnotationValue(AssociationsAnnotationNames.AssociationKind, out AssociationKind value) &&
+      navigation.TryGetAnnotationValue(AssociationsAnnotationNames.AssociationKind, out AssociationKind value) &&
       value == kind;
   }
 }

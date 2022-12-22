@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Diagnostics.CodeAnalysis;
 
@@ -34,7 +35,10 @@ public static class MaterializationAnnotationExtensions
     if (factory is null)
       throw new ArgumentException(nameof(factory));
 
-    builder.HasAnnotation(MaterializationAnnotationNames.DefaultFactory, RuntimeAnnotationWrapper.Create(factory));
+    if (EFCoreEnvironment.IsMigration)
+      return builder;
+
+    builder.HasAnnotation(MaterializationAnnotationNames.DefaultFactory, factory);
     return builder;
   }
 
@@ -50,6 +54,6 @@ public static class MaterializationAnnotationExtensions
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    return entityType.TryGetRuntimeAnnotationValue(MaterializationAnnotationNames.DefaultFactory, out factory);
+    return entityType.TryGetAnnotationValue(MaterializationAnnotationNames.DefaultFactory, out factory);
   }
 }

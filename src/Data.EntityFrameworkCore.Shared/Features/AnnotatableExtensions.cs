@@ -29,17 +29,4 @@ internal static class AnnotatableExtensions
     value = annotationValue;
     return true;
   }
-
-  public static bool TryGetRuntimeAnnotationValue<TValue>(this TAnnotatable annotatable, string annotationName, [NotNullWhen(true)] out TValue? value)
-    where TValue : notnull
-  {
-    if (!TryGetAnnotationValue(annotatable, annotationName, out RuntimeAnnotationWrapper<TValue>? wrapper))
-    {
-      value = default;
-      return false;
-    }
-
-    value = wrapper.Annotation;
-    return true;
-  }
 }

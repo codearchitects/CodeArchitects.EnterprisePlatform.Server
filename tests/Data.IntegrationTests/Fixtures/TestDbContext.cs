@@ -160,3 +160,13 @@ public class PostgresDbContext : TestDbContext // For Postgres migrations
       .UseCaep();
   }
 }
+
+public class OracleDbContext : TestDbContext // For Oracle migrations
+{
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+    optionsBuilder
+      .UseOracle("-")
+      .UseCaep();
+  }
+}
