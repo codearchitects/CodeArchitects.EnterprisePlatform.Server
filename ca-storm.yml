@@ -35,8 +35,8 @@ components:
   - name: CodeArchitects.Platform.Data.AdoNet.SQLServer
     path: src\Data.AdoNet.SQLServer
     type: dotnet-package
-  - name: CodeArchitects.Platform.Data.AdoNet.AutoMapper
-    path: src\Data.AdoNet.AutoMapper
+  - name: CodeArchitects.Platform.Data.AutoMapper
+    path: src\Data.AutoMapper
     type: dotnet-package
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore
     path: src\Data.EntityFrameworkCore
