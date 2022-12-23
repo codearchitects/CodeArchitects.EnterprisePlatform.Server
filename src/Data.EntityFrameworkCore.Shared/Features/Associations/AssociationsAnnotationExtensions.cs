@@ -26,7 +26,7 @@ public static class AssociationsAnnotationExtensions
   /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
   /// <param name="builder">The relationship builder.</param>
   /// <returns>The same <see cref="ReferenceCollectionBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
-  public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> IntraAggregate<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
+  public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> Aggregate<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
   {
@@ -49,7 +49,7 @@ public static class AssociationsAnnotationExtensions
   /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
   /// <param name="builder">The relationship builder.</param>
   /// <returns>The same <see cref="ReferenceCollectionBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
-  public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> InterAggregate<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
+  public static ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> Associate<TPrincipalEntity, TDependentEntity>(this ReferenceCollectionBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
   {
@@ -72,7 +72,7 @@ public static class AssociationsAnnotationExtensions
   /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
   /// <param name="builder">The relationship builder.</param>
   /// <returns>The same <see cref="ReferenceReferenceBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
-  public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> IntraAggregate<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
+  public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> Aggregate<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
   {
@@ -95,7 +95,7 @@ public static class AssociationsAnnotationExtensions
   /// <typeparam name="TDependentEntity">The dependent entity type in this relationship.</typeparam>
   /// <param name="builder">The relationship builder.</param>
   /// <returns>The same <see cref="ReferenceReferenceBuilder{TPrincipalEntity, TDependentEntity}"/> for further configuration.</returns>
-  public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> InterAggregate<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
+  public static ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> Associate<TPrincipalEntity, TDependentEntity>(this ReferenceReferenceBuilder<TPrincipalEntity, TDependentEntity> builder)
     where TPrincipalEntity : class
     where TDependentEntity : class
   {

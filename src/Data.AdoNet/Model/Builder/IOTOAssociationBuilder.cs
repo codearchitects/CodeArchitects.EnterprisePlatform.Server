@@ -47,19 +47,19 @@ public interface IOTOAssociationBuilder<TFrom, TTo>
   /// <typeparam name="TForeignKey">The foreign key type.</typeparam>
   /// <param name="expression">An expression that represents the path to the foreign key.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the one-to-one relationship.</returns>
-  IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression);
+  IOTOAssociationBuilder<TFrom, TTo> ForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression);
 
   /// <summary>
   /// Specifies the foreign key property or properties of the navigation.
   /// </summary>
   /// <param name="keyNames">The names of the foreign keys.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the one-to-one relationship.</returns>
-  IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params Name[] keyNames);
+  IOTOAssociationBuilder<TFrom, TTo> ForeignKey(params Name[] keyNames);
 
   /// <summary>
   /// Specifies the foreign key property or properties of the navigation.
   /// </summary>
   /// <param name="keyNames">The names of the foreign key properties.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the one-to-one relationship.</returns>
-  IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params string[] keyNames);
+  IOTOAssociationBuilder<TFrom, TTo> ForeignKey(params string[] keyNames);
 }

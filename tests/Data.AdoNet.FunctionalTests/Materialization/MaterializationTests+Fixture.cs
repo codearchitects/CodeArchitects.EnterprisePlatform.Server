@@ -172,22 +172,22 @@ public partial class MaterializationTests
       Associate<Parent, ChildA>(associate => associate
         .OneToMany()
         .Navigation(parent => parent.ChildrenA)
-        .UsingForeignKey(childA => childA.ParentId));
+        .ForeignKey(childA => childA.ParentId));
 
       Associate<Parent, ChildB>(associate => associate
         .OneToMany()
         .Navigation(parent => parent.ChildrenB)
-        .UsingForeignKey(childB => childB.ParentId));
+        .ForeignKey(childB => childB.ParentId));
 
       Associate<Parent, ChildC>(associate => associate
         .OneToOne()
         .Navigation(parent => parent.ChildC)
-        .UsingForeignKey(childC => childC.ParentId));
+        .ForeignKey(childC => childC.ParentId));
 
       Associate<ChildA, ChildD>(associate => associate
         .OneToMany()
         .Navigation(childA => childA.ChildrenD)
-        .UsingForeignKey(childD => childD.ChildAId));
+        .ForeignKey(childD => childD.ChildAId));
     }
   }
 }

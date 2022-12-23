@@ -35,57 +35,57 @@ internal class TestModelConfiguration : ModelConfiguration
       .OneToMany()
       .Navigation(cart => cart.Items)
       .InverseNavigation(item => item.Cart)
-      .UsingForeignKey(item => item.CartId));
+      .ForeignKey(item => item.CartId));
 
     Associate<Customer, Cart>(associate => associate
       .OneToMany()
       .Navigation(customer => customer.Carts)
       .InverseNavigation(cart => cart.Customer)
-      .UsingForeignKey(Column("CustomerId")));
+      .ForeignKey(Column("CustomerId")));
 
     Associate<ShippingAddress, CartItem>(associate => associate
       .OneToMany()
       .InverseNavigation(item => item.ShippingAddress)
-      .UsingForeignKey(Column("ShippingAddressId")));
+      .ForeignKey(Column("ShippingAddressId")));
 
     Associate<CartItem, Product>(associate => associate
       .ManyToMany()
       .Navigation(item => item.Products)
-      .UsingJunctionTable("CartItemProduct")
-      .UsingJunctionColumnNames("CartItemIndex", "CartItemCartId", "ProductId"));
+      .JunctionTable("CartItemProduct")
+      .JunctionColumnNames("CartItemIndex", "CartItemCartId", "ProductId"));
 
     Associate<Category, Product>(associate => associate
       .OneToMany()
       .InverseNavigation(product => product.Category)
-      .UsingForeignKey(Column("CategoryId")));
+      .ForeignKey(Column("CategoryId")));
 
     Associate<Typology, Product>(associate => associate
       .OneToMany()
       .InverseNavigation(product => product.Typology)
-      .UsingForeignKey(Column("TypologyId")));
+      .ForeignKey(Column("TypologyId")));
 
     Associate<Category, Typology>(associate => associate
       .ManyToMany()
       .Navigation(category => category.Typologies)
       .InverseNavigation(typology => typology.Categories)
-      .UsingJunctionTable("CategoryTypology")
-      .UsingJunctionColumnNames("CategoryId", "TypologyId"));
+      .JunctionTable("CategoryTypology")
+      .JunctionColumnNames("CategoryId", "TypologyId"));
 
     Aggregate<Customer, Address>(aggregate => aggregate
       .OneToOne()
       .Navigation(customer => customer.Address)
       .InverseNavigation(address => address.Customer)
-      .UsingForeignKey(Column("CustomerId")));
+      .ForeignKey(Column("CustomerId")));
 
     Aggregate<Customer, CustomerClaim>(aggregate => aggregate
       .OneToMany()
       .Navigation(customer => customer.Claims)
-      .UsingForeignKey(Column("CustomerId")));
+      .ForeignKey(Column("CustomerId")));
 
     Associate<Person, Person>(associate => associate
       .OneToOne()
       .Navigation(person => person.Partner)
       .InverseNavigation(person => person.Partner)
-      .UsingForeignKey(Column("PartnerId")));
+      .ForeignKey(Column("PartnerId")));
   }
 }

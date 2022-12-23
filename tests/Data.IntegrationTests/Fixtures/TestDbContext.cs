@@ -46,12 +46,12 @@ public class TestDbContext : DbContext
         .HasMany(cart => cart.Items)
         .WithOne(item => item.Cart!)
         .HasForeignKey(item => item.CartId)
-        .IntraAggregate();
+        .Aggregate();
 
       entity
         .HasOne(cart => cart.Customer!)
         .WithMany(customer => customer.Carts!)
-        .InterAggregate();
+        .Associate();
     });
 
     modelBuilder.Entity<CartItem>(entity =>
@@ -63,7 +63,7 @@ public class TestDbContext : DbContext
         .HasOne(item => item.ShippingAddress!)
         .WithMany()
         .IsRequired(false)
-        .InterAggregate();
+        .Associate();
 
       entity
         .HasMany(item => item.Products)
@@ -85,12 +85,12 @@ public class TestDbContext : DbContext
       entity
         .HasOne(product => product.Category!)
         .WithMany()
-        .InterAggregate();
+        .Associate();
 
       entity
         .HasOne(product => product.Typology!)
         .WithMany()
-        .InterAggregate();
+        .Associate();
     });
 
     modelBuilder.Entity<Category>(entity =>
@@ -117,7 +117,7 @@ public class TestDbContext : DbContext
       entity
         .HasMany(customer => customer.Claims)
         .WithOne()
-        .IntraAggregate();
+        .Aggregate();
     });
 
     modelBuilder.Entity<Address>(entity =>
@@ -126,7 +126,7 @@ public class TestDbContext : DbContext
         .HasOne(address => address.Customer!)
         .WithOne(customer => customer.Address!)
         .HasForeignKey<Address>("CustomerId")
-        .IntraAggregate();
+        .Aggregate();
     });
 
     modelBuilder.Entity<Person>(entity =>
@@ -134,7 +134,7 @@ public class TestDbContext : DbContext
       entity
         .HasOne(person => person.Partner!)
         .WithOne()
-        .InterAggregate();
+        .Associate();
     });
 
     modelBuilder.Entity<SerialEntity>();

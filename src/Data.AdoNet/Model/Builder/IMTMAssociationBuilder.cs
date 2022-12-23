@@ -42,12 +42,12 @@ public interface IMTMAssociationBuilder<TFrom, TTo>
   /// </summary>
   /// <param name="tableName">The name of the junction table.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the many-to-many relationship.</returns>
-  IMTMAssociationBuilder<TFrom, TTo> UsingJunctionTable(string tableName);
+  IMTMAssociationBuilder<TFrom, TTo> JunctionTable(string tableName);
 
   /// <summary>
   /// Specifies the names of the columns of the junction table used to support the many-to-many relationship.
   /// </summary>
   /// <param name="keyNames">The names of the columns.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the many-to-many relationship.</returns>
-  IMTMAssociationBuilder<TFrom, TTo> UsingJunctionColumnNames(params string[] keyNames);
+  IMTMAssociationBuilder<TFrom, TTo> JunctionColumnNames(params string[] keyNames);
 }

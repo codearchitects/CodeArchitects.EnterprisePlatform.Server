@@ -79,7 +79,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression)
+  public IOTOAssociationBuilder<TFrom, TTo> ForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression)
   {
     _foreignKeyNames.Clear();
     _foreignKeyNames.AddRange(GetKeyNames(expression.Body));
@@ -87,7 +87,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params string[] keyNames)
+  public IOTOAssociationBuilder<TFrom, TTo> ForeignKey(params string[] keyNames)
   {
     CheckKeyArity(keyNames.Length);
 
@@ -103,7 +103,7 @@ internal class OTONavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTOAssociationBuilder<TFrom, TTo> UsingForeignKey(params Name[] keyNames)
+  public IOTOAssociationBuilder<TFrom, TTo> ForeignKey(params Name[] keyNames)
   {
     CheckKeyArity(keyNames.Length);
 

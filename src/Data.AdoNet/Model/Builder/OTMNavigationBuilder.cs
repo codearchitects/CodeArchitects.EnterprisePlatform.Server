@@ -83,7 +83,7 @@ internal class OTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTMAssociationBuilder<TFrom, TTo> UsingForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression)
+  public IOTMAssociationBuilder<TFrom, TTo> ForeignKey<TForeignKey>(Expression<Func<TTo, TForeignKey>> expression)
   {
     _foreignKeyNames.Clear();
     _foreignKeyNames.AddRange(GetKeyNames(expression.Body));
@@ -91,7 +91,7 @@ internal class OTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTMAssociationBuilder<TFrom, TTo> UsingForeignKey(params string[] keyNames)
+  public IOTMAssociationBuilder<TFrom, TTo> ForeignKey(params string[] keyNames)
   {
     CheckKeyArity(keyNames.Length);
 
@@ -107,7 +107,7 @@ internal class OTMNavigationBuilder<TFrom, TTo> : NavigationModelBuilder<TFrom, 
     return this;
   }
 
-  public IOTMAssociationBuilder<TFrom, TTo> UsingForeignKey(params Name[] keyNames)
+  public IOTMAssociationBuilder<TFrom, TTo> ForeignKey(params Name[] keyNames)
   {
     CheckKeyArity(keyNames.Length);
 

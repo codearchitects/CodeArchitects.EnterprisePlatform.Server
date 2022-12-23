@@ -32,7 +32,7 @@ public partial class ModelConfigurationTests
         Aggregate<Parent, Child>(aggregate => aggregate
           .OneToMany()
           .Navigation(x => x.Children)
-          .UsingForeignKey(x => x.ParentId));
+          .ForeignKey(x => x.ParentId));
       }
     }
   }
