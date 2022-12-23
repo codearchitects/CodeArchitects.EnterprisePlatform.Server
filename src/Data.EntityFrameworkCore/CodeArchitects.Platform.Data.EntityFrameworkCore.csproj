@@ -23,6 +23,7 @@
   <Target Name="IncludeP2PAssets">
     <ItemGroup>
       <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.xml" />
     </ItemGroup>
   </Target>
 
