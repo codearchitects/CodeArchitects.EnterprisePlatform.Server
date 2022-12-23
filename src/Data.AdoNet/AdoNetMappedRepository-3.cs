@@ -3,19 +3,21 @@
 namespace CodeArchitects.Platform.Data.AdoNet;
 
 /// <summary>
-/// An ADO.NET implementation of <see cref="Repository{TEntity, TKey}"/>.
+/// An ADO.NET implementation of <see cref="MappedRepository{TTable, TEntity, TKey}"/>.
 /// </summary>
-/// <typeparam name="TEntity">The entity type.</typeparam>
+/// <typeparam name="TTable">The table entity type.</typeparam>
+/// <typeparam name="TEntity">The domain entity type.</typeparam>
 /// <typeparam name="TKey">The entity's primary key type.</typeparam>
-public class AdoNetRepository<TEntity, TKey> : Repository<TEntity, TKey>
+public abstract class AdoNetMappedRepository<TTable, TEntity, TKey> : MappedRepository<TTable, TEntity, TKey>
+  where TTable : class
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
   /// <summary>
-  /// Initializes a new instance of the <see cref="AdoNetRepository{TEntity, TKey}"/> class.
+  /// Initializes a new instance of the <see cref="AdoNetMappedRepository{TTable, TEntity, TKey}"/> class.
   /// </summary>
   /// <param name="context">The ADO.NET data context used by the repository.</param>
-  public AdoNetRepository(IDataContext context)
+  public AdoNetMappedRepository(IDataContext context)
   {
     Context = context;
   }

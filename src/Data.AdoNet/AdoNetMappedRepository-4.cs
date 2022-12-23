@@ -3,21 +3,23 @@
 namespace CodeArchitects.Platform.Data.AdoNet;
 
 /// <summary>
-/// An ADO.NET implementation of <see cref="Repository{TEntity, TKey}"/> that uses a specific type of <see cref="DbConnection"/>.
+/// An ADO.NET implementation of <see cref="MappedRepository{TTable, TEntity, TKey}"/> that uses a specific type of <see cref="DbConnection"/>.
 /// </summary>
 /// <typeparam name="TConnection">The type of database connection used by this repository.</typeparam>
-/// <typeparam name="TEntity">The entity type.</typeparam>
+/// <typeparam name="TTable">The table entity type.</typeparam>
+/// <typeparam name="TEntity">The domain entity type.</typeparam>
 /// <typeparam name="TKey">The entity's primary key type.</typeparam>
-public class AdoNetRepository<TConnection, TEntity, TKey> : AdoNetRepository<TEntity, TKey>
+public abstract class AdoNetMappedRepository<TConnection, TTable, TEntity, TKey> : AdoNetMappedRepository<TTable, TEntity, TKey>
   where TConnection : DbConnection
+  where TTable : class
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
   /// <summary>
-  /// Initializes a new instance of the <see cref="AdoNetRepository{TEntity, TKey}"/> class.
+  /// Initializes a new instance of the <see cref="AdoNetMappedRepository{TConnection, TTable, TEntity, TKey}"/> class.
   /// </summary>
   /// <param name="context">The ADO.NET data context used by the repository.</param>
-  public AdoNetRepository(IDataContext<TConnection> context)
+  public AdoNetMappedRepository(IDataContext<TConnection> context)
     : base(context)
   {
   }
