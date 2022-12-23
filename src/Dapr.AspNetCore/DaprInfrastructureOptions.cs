@@ -99,12 +99,12 @@ internal class DaprInfrastructureOptions :
 
   #region Deprecated methods
 
-  public IConfiguredDaprInfrastructureOptionsBuilder SetServiceOptions(IConfigurationSection serviceConfiguration)
+  public IConfiguredDaprInfrastructureOptionsBuilder AddServiceOptions(IConfigurationSection serviceConfiguration)
   {
     return SetConfiguration(serviceConfiguration);
   }
 
-  public IConfiguredDaprInfrastructureOptionsBuilder SetServiceOptions(IConfiguration configuration)
+  public IConfiguredDaprInfrastructureOptionsBuilder AddServiceOptions(IConfiguration configuration)
   {
     return SetConfiguration(configuration);
   }

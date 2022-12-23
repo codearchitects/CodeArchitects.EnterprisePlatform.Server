@@ -24,7 +24,7 @@ public interface IDaprInfrastructureOptionsBuilder
   IConfiguredDaprInfrastructureOptionsBuilder SetConfiguration(IConfigurationSection configurationSection);
 
   /// <summary>
-  /// Uses the given configuration object and the the given key to retrieve the Dapr infrastructure configuration section.
+  /// Uses the given configuration object and the given key to retrieve the Dapr infrastructure configuration section.
   /// </summary>
   /// <param name="configuration">The configuration object.</param>
   /// <param name="key">The path of the Dapr infrastructure configuration section.</param>
@@ -33,10 +33,10 @@ public interface IDaprInfrastructureOptionsBuilder
 
   #region Deprecated methods
   [Obsolete($"This method will be removed in next release. Use the {nameof(SetConfiguration)} method instead.")]
-  IConfiguredDaprInfrastructureOptionsBuilder SetServiceOptions(IConfigurationSection serviceConfiguration);
+  IConfiguredDaprInfrastructureOptionsBuilder AddServiceOptions(IConfigurationSection serviceConfiguration);
 
   [Obsolete($"This method will be removed in next release. Use the {nameof(SetConfiguration)} method instead.")]
-  IConfiguredDaprInfrastructureOptionsBuilder SetServiceOptions(IConfiguration configuration);
+  IConfiguredDaprInfrastructureOptionsBuilder AddServiceOptions(IConfiguration configuration);
   #endregion
 }
 
