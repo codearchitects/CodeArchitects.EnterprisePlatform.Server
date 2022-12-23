@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet;
+﻿using CodeArchitects.Platform.Data;
+using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Executor;
@@ -6,6 +7,7 @@ using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using IDataContext = CodeArchitects.Platform.Data.AdoNet.IDataContext;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -91,7 +93,10 @@ public static class DataAdoNetServiceCollectionExtensions
       throw new InvalidOperationException("No connection factory was specified.");
     }
 
-    services.AddScoped(stateManagerServiceType, stateManagerImplementationType);
+    services.AddScoped(stateManagerImplementationType);
+    services.AddScoped(stateManagerServiceType, sp => sp.GetRequiredService(stateManagerImplementationType));
+    services.AddScoped(typeof(IUnitOfWorkManager), sp => sp.GetRequiredService(stateManagerImplementationType));
+    services.AddScoped(sp => sp.GetRequiredService<IUnitOfWorkManager>().Begin());
 
     // Data model
     services.TryAddSingleton(typeof(ModelConfiguration), configurationBuilder.ModelConfigurationType);
