@@ -25,11 +25,15 @@ public class DefaultMultitenancyDescriptor<TTenantId> : IMultitenancyDescriptor
     UsesModificationInterceptors = usesModificationInterceptors;
   }
 
+  /// <inheritdoc/>
   public virtual Type TenantIdType => typeof(TTenantId);
 
+  /// <inheritdoc/>
   public virtual Type? MultitenancyContextType => typeof(ProfileMultitenancyContext<TTenantId>);
 
+  /// <inheritdoc/>
   public virtual Func<IServiceProvider, IMultitenancyContext>? MultitenancyContextImplementationFactory => null;
 
+  /// <inheritdoc/>
   public virtual bool UsesModificationInterceptors { get; }
 }

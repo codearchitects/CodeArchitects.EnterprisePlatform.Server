@@ -150,8 +150,3 @@ public readonly struct Index : IEquatable<Index>
   }
 }
 #endif
-
-public static class C
-{
-  public static Index I() => default;
-}

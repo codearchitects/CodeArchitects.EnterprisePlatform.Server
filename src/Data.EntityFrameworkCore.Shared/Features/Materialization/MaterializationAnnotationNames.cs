@@ -1,8 +1,8 @@
 ﻿namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Materialization;
 
 /// <summary>
-/// Names for materialization annotations.
-/// Use the <see cref="MaterializationAnnotationExtensions.TryGetDefaultFactory"/> method to retrieve the annotations from the metadata.
+/// Names for association annotations.
+/// Use the extension methods defined in <see cref="MaterializationAnnotationExtensions"/> to retrieve the annotations from the metadata.
 /// </summary>
 public static class MaterializationAnnotationNames
 {

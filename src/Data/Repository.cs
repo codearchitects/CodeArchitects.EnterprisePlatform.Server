@@ -15,31 +15,37 @@ public abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
 {
   private protected abstract IDataContext DataContext { get; }
 
+  /// <inheritdoc/>
   public virtual async Task<TEntity?> FindAsync(TKey key, CancellationToken cancellationToken = default)
   {
     return await DataContext.FindAsync<TEntity, TKey>(key, cancellationToken);
   }
 
+  /// <inheritdoc/>
   public virtual async Task<TEntity?> FindAsync(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
   {
     return await DataContext.FindAsync(key, includeAction, cancellationToken);
   }
 
+  /// <inheritdoc/>
   public virtual async Task InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     await DataContext.InsertAsync<TEntity, TKey>(entity, cancellationToken);
   }
 
+  /// <inheritdoc/>
   public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     await DataContext.UpdateAsync<TEntity, TKey>(entity, cancellationToken);
   }
 
+  /// <inheritdoc/>
   public virtual async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     await DataContext.RemoveAsync<TEntity, TKey>(entity, cancellationToken);
   }
 
+  /// <inheritdoc/>
   public virtual async Task RemoveAsync(TKey key, CancellationToken cancellationToken = default)
   {
     await DataContext.RemoveAsync<TEntity, TKey>(key, cancellationToken);

@@ -42,6 +42,7 @@ public sealed class InvalidTrackingStateException : Exception
   /// </summary>
   public TrackingState State { get; }
 
+  /// <inheritdoc/>
   public override void GetObjectData(SerializationInfo info, StreamingContext context)
   {
     info.AddValue(nameof(EntityTypeName), EntityTypeName);

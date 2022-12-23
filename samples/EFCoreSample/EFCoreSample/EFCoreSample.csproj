@@ -27,9 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Application\CodeArchitects.Platform.Application.csproj" />
-    <ProjectReference Include="..\..\..\src\Data.AdoNet.DependencyInjection\CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj" />
-    <ProjectReference Include="..\..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SqlServer.csproj" />
-    <ProjectReference Include="..\..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
     <ProjectReference Include="..\..\..\src\Data.AutoMapper\CodeArchitects.Platform.Data.AutoMapper.csproj" />
     <ProjectReference Include="..\..\..\src\Data.EntityFrameworkCore.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" />

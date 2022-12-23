@@ -19,7 +19,7 @@ public sealed class IncludeException : Exception
   /// <summary>
   /// Initializes a new instance of the <see cref="IncludeException"/> class with a specified error message.
   /// </summary>
-  /// <param name="message"></param>
+  /// <param name="message">The message that describes the error.</param>
   public IncludeException(string message)
     : base(message)
   {
@@ -28,8 +28,8 @@ public sealed class IncludeException : Exception
   /// <summary>
   /// Initializes a new instance of the <see cref="IncludeException"/> class with a specified error message and the reference to the inner exception that is the cause of this exception.
   /// </summary>
-  /// <param name="message"></param>
-  /// <param name="inner"></param>
+  /// <param name="message">The message that describes the error.</param>
+  /// <param name="inner">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
   public IncludeException(string message, Exception inner)
     : base(message, inner)
   {

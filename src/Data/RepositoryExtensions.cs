@@ -68,6 +68,7 @@ public static class RepositoryExtensions
   /// <typeparam name="TEntity">The entity type.</typeparam>
   /// <typeparam name="TKey1">The first component of the composite primary key type.</typeparam>
   /// <typeparam name="TKey2">The second component of the composite primary key type.</typeparam>
+  /// <param name="repository">The repository to perform the operation on.</param>
   /// <param name="key1">The value of the first component of the composite primary key for the entity to be found.</param>
   /// <param name="key2">The value of the second component of the composite primary key for the entity to be found.</param>
   /// <param name="includeAction">Specifies which related entities to include in the query.</param>

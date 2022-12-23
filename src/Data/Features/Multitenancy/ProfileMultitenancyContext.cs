@@ -23,7 +23,9 @@ public class ProfileMultitenancyContext<TTenantId> : IMultitenancyContext
   /// </summary>
   protected ITenantProfile<TTenantId> Profile { get; }
 
+  /// <inheritdoc/>
   public virtual bool ShouldFilter => true;
 
+  /// <inheritdoc/>
   public object TenantId => Profile.TenantId;
 }

@@ -3,10 +3,10 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
-[Experimental]
 /// <summary>
 /// Represents a model for initializing an entity instance.
 /// </summary>
+[Experimental]
 public interface IInitializerModel
 {
   /// <summary>

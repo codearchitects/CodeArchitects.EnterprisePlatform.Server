@@ -36,7 +36,6 @@ public static class MultitenancyModelExtensions
   /// Specifies that an entity is multi-tenant.
   /// </summary>
   /// <typeparam name="TEntity">The entity type being configured.</typeparam>
-  /// <typeparam name="TProperty">The multitenancy property type.</typeparam>
   /// <param name="builder">The entity type builder.</param>
   /// <param name="propertyName">The name of the tenant id property.</param>
   /// <returns>The same <see cref="EntityTypeBuilder{TEntity}"/> for further configuration.</returns>

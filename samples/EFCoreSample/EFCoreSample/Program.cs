@@ -1,13 +1,10 @@
-using CodeArchitects.Platform.Data.AdoNet.SQLServer;
 using CodeArchitects.Platform.Data.AutoMapper;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using EFCoreSample;
-using EFCoreSample.Domain.Model;
 using EFCoreSample.Domain.Repositories;
 using EFCoreSample.Infrastructure.Data;
 using EFCoreSample.Infrastructure.Repositories;
-using EFCoreSample.Mapping;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,12 +28,8 @@ string connectionString = builder.Configuration.GetConnectionString("SqlServer")
 builder.Services.AddDbContext<DataContext>(options => options
   .UseSqlServer(connectionString)
   .LogTo(Console.WriteLine, LogLevel.Debug)
-  .UseData(data => data
+  .UseCaep(data => data
     .UseMultitenancy<MultitenancyDescriptor>()));
-
-builder.Services.AddData(configuration => configuration
-  .UseProvider<SQLServerProvider>(provider => provider.UseConnection(connectionString))
-  .UseModel<DataConfiguration>());
 
 builder.Services.AddData<DataContext>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

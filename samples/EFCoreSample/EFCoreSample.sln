@@ -21,13 +21,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AutoMapper", "..\..\src\Data.AutoMapper\CodeArchitects.Platform.Data.AutoMapper.csproj", "{17F6C8A1-A123-4483-BED9-47917C925CD6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet", "..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj", "{2D0B5C02-0FC8-41A9-94F6-4639F623D147}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection", "..\..\src\Data.EntityFrameworkCore.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection.csproj", "{3DAB4595-1682-460F-9738-D52454DDA0A4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.SqlServer", "..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SqlServer.csproj", "{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.DependencyInjection", "..\..\src\Data.AdoNet.DependencyInjection\CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj", "{20F87886-7120-4079-BB69-0630D15D879D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,22 +61,10 @@ Global
 		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17F6C8A1-A123-4483-BED9-47917C925CD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2D0B5C02-0FC8-41A9-94F6-4639F623D147}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DAB4595-1682-460F-9738-D52454DDA0A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{20F87886-7120-4079-BB69-0630D15D879D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20F87886-7120-4079-BB69-0630D15D879D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20F87886-7120-4079-BB69-0630D15D879D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20F87886-7120-4079-BB69-0630D15D879D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,10 +76,7 @@ Global
 		{686DB84D-FC3D-4075-B2C1-6DA54E25D0BE} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{C8D537E7-A291-445A-A031-484A5F3F911E} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{17F6C8A1-A123-4483-BED9-47917C925CD6} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
-		{2D0B5C02-0FC8-41A9-94F6-4639F623D147} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 		{3DAB4595-1682-460F-9738-D52454DDA0A4} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
-		{97E8DD11-C08B-4FE4-AE6B-831E89A8DFE1} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
-		{20F87886-7120-4079-BB69-0630D15D879D} = {E952FB0E-4E02-45E1-BE90-D754AE432154}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C18616EF-F29C-4DC6-85E9-96946263D242}

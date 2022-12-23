@@ -29,7 +29,7 @@ public static class TrackableExtensions
   /// </summary>
   /// <typeparam name="TTrackable">The trackable type.</typeparam>
   /// <typeparam name="TDestination">The destination type.</typeparam>
-  /// <param name="trackable">The trackable to map.</param>
+  /// <param name="trackables">The trackable to map.</param>
   /// <param name="context">The tracking context.</param>
   /// <param name="mappingFunc">The mapping function.</param>
   /// <returns>The mapped list.</returns>
@@ -49,7 +49,7 @@ public static class TrackableExtensions
   /// </summary>
   /// <typeparam name="TTrackable">The trackable type.</typeparam>
   /// <typeparam name="TDestination">The destination type.</typeparam>
-  /// <param name="trackable">The trackable to map.</param>
+  /// <param name="trackables">The trackable to map.</param>
   /// <param name="context">The tracking context.</param>
   /// <param name="mappingFunc">The mapping function.</param>
   /// <returns>The mapped array.</returns>
