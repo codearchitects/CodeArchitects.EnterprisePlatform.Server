@@ -20,15 +20,8 @@ internal class RootIncluder<TEntity, TKey> : Includer<TEntity>, IIncluder<TEntit
 
   public IStringIncluder<TEntity> Include(string navigation)
   {
-    try
-    {
-      _root.AddLeaf(navigation);
+    _root.AddLeaf(navigation);
 
-      return this;
-    }
-    catch (IncludeException ex)
-    {
-      throw WrapIncludeException(ex, nameof(navigation));
-    }
+    return this;
   }
 }

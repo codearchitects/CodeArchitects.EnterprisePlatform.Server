@@ -59,12 +59,12 @@ internal class SqlTextCache : ISqlTextCache
 
   public bool TryGetUpsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    throw new NotImplementedException();
+    return _upsertTexts.TryGetValue(entityModel, out text);
   }
 
   public void AddUpsertText(IEntityModel entityModel, string text)
   {
-    throw new NotImplementedException();
+    _upsertTexts.Add(entityModel, text);
   }
 
   public bool TryGetRemoveText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
