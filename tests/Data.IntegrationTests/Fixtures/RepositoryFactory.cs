@@ -5,6 +5,7 @@ using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
 using CodeArchitects.Platform.Data.AdoNet.PostgreSQL.Command;
 using CodeArchitects.Platform.Data.AdoNet.SQLServer.Command;
@@ -13,6 +14,8 @@ using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 
@@ -48,8 +51,10 @@ internal class RepositoryFactory
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    SqlTextCache sqlCache = SqlTextCache.Create();
+    MemoryCache cache = new(new MemoryCacheOptions());
+    SqlTextCache sqlCache = new(cache);
     IdentityCollectionFactory collectionFactory = IdentityCollectionFactory.Create();
+    NavigationTreeFactory navigationTreeFactory = new();
     IDataModel dataModel = new TestModelConfiguration().CreateDataModel();
 
     AdoNet.IDataContext dataContext = provider switch
@@ -73,7 +78,7 @@ internal class RepositoryFactory
       ICommandInterceptorAggregator<SqlCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<SqlCommand>>();
       Executor<SqlCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new DataContext<SqlConnection, SqlCommand>(stateManager, executor, interceptor, dataModel);
+      return new DataContext<SqlConnection, SqlCommand>(stateManager, executor, interceptor, navigationTreeFactory, dataModel);
     }
 
     AdoNet.IDataContext CreatePostgresContext()
@@ -87,7 +92,7 @@ internal class RepositoryFactory
       ICommandInterceptorAggregator<NpgsqlCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<NpgsqlCommand>>();
       Executor<NpgsqlCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new DataContext<NpgsqlConnection, NpgsqlCommand>(stateManager, executor, interceptor, dataModel);
+      return new DataContext<NpgsqlConnection, NpgsqlCommand>(stateManager, executor, interceptor, navigationTreeFactory, dataModel);
     }
 
     AdoNet.IDataContext CreateOracleContext()
@@ -101,7 +106,7 @@ internal class RepositoryFactory
       ICommandInterceptorAggregator<OracleCommand> interceptor = Mock.Of<ICommandInterceptorAggregator<OracleCommand>>();
       Executor<OracleCommand> executor = new(commandBuilder, materializer, interceptor, trackingContext);
 
-      return new DataContext<OracleConnection, OracleCommand>(stateManager, executor, interceptor, dataModel);
+      return new DataContext<OracleConnection, OracleCommand>(stateManager, executor, interceptor, navigationTreeFactory, dataModel);
     }
   }
 

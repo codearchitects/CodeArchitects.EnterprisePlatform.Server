@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data;
+﻿using CodeArchitects.Platform.Data.Navigation;
+
+namespace CodeArchitects.Platform.Data;
 
 /// <summary>
 /// Provides access to a data store for entities of a specific type.

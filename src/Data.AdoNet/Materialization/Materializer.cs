@@ -21,17 +21,17 @@ internal class Materializer : IMaterializer, IMaterializerHub
     _identityCollections = new();
   }
 
-  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+  public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IRowReader rowReader = _readerProvider.GetRowReader(spec.Entity);
+    IRowReader rowReader = _readerProvider.GetRowReader(root.Entity);
 
     object? entity = null;
     while (await reader.ReadAsync(cancellationToken))
     {
       int offset = 0;
-      entity = rowReader.ReadRow(reader, ref offset, this, spec.Navigations);
+      entity = rowReader.ReadRow(reader, ref offset, this, root.Navigations);
     }
 
     foreach (IIdentityCollection list in _identityCollections)

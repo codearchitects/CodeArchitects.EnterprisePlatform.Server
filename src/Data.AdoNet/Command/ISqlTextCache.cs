@@ -6,8 +6,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ISqlTextCache
 {
-  bool TryGetFindText(in NavigationSpec spec, [NotNullWhen(true)] out string? text);
-  void AddFindText(in NavigationSpec spec, string text);
+  bool TryGetFindText(INavigationRoot root, [NotNullWhen(true)] out string? text);
+  void AddFindText(INavigationRoot root, string text);
 
   bool TryGetInsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text);
   void AddInsertText(IEntityModel entityModel, string text);

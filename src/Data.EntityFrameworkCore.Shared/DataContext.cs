@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Navigation;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
+using CodeArchitects.Platform.Data.Navigation;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -90,7 +91,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           }
 
         default:
-          Debug.Fail("This point should be unreacheable.");
+          Debug.Fail("This point should be unreachable.");
           return false;
       }
     });
@@ -144,7 +145,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
         case INavigation navigation:
           return !navigation.IsOnDependent && navigation.IsIntraAggregate();
         default:
-          Debug.Fail("This point should be unreacheable.");
+          Debug.Fail("This point should be unreachable.");
           return false;
       }
     });
@@ -249,7 +250,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           return true;
 
         default:
-          Debug.Fail("This point should be unreacheable.");
+          Debug.Fail("This point should be unreachable.");
           return false;
       }
     });

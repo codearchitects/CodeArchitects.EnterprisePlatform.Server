@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Fixtures;
+using CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
 using CodeArchitects.Platform.Data.AdoNet.PostgreSQL.Command;
@@ -13,7 +15,7 @@ public partial class SqlTextBuilderTests
 {
   public abstract class SelectTextDataAttribute : DataAttribute
   {
-    private protected abstract NavigationSpec Spec { get; }
+    private protected abstract INavigationRoot Root { get; }
 
     protected abstract string ExpectedTextSQLServer { get; }
 
@@ -25,15 +27,15 @@ public partial class SqlTextBuilderTests
     {
       ISqlTextCache cache = Mock.Of<ISqlTextCache>();
 
-      yield return new object[] { new SqlTextBuilder(cache, new SQLServerSyntaxProvider()), Spec, ExpectedTextSQLServer };
-      yield return new object[] { new SqlTextBuilder(cache, new PostgreSQLSyntaxProvider()), Spec, ExpectedTextPostgreSQL };
-      yield return new object[] { new SqlTextBuilder(cache, new OracleSyntaxProvider()), Spec, ExpectedTextOracle };
+      yield return new object[] { new SqlTextBuilder(cache, new SQLServerSyntaxProvider()), Root, ExpectedTextSQLServer };
+      yield return new object[] { new SqlTextBuilder(cache, new PostgreSQLSyntaxProvider()), Root, ExpectedTextPostgreSQL };
+      yield return new object[] { new SqlTextBuilder(cache, new OracleSyntaxProvider()), Root, ExpectedTextOracle };
     }
   }
 
   public class NoIncludeAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(RootEntity, Array.Empty<INavigation>());
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.Root, int>(RootEntity, Array.Empty<INavigation>());
 
     protected override string ExpectedTextSQLServer => """
       SELECT [Id], [Name]
@@ -56,7 +58,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeOneAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(RootEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.Root, int>(RootEntity, new INavigation[]
     {
       new SimpleNavigationLeaf(RootToChildANavigation)
     });
@@ -94,7 +96,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeTwoAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(RootEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.Root, int>(RootEntity, new INavigation[]
     {
       new SimpleNavigationLeaf(RootToChildANavigation),
       new SimpleNavigationLeaf(RootToChildBNavigation)
@@ -136,7 +138,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeManyToManyAsLeafAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(RootEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.Root, int>(RootEntity, new INavigation[]
     {
       new SkipNavigationLeaf(RootToManyToManyNavigation)
     });
@@ -186,7 +188,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeAllAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(RootEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.Root, int>(RootEntity, new INavigation[]
     {
       new SimpleNavigationLeaf(RootToChildBNavigation),
         new SimpleNavigationNode(RootToChildANavigation, new INavigation[]
@@ -266,7 +268,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeOneInverseDepth1Attribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(ChildAEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.ChildA, int>(ChildAEntity, new INavigation[]
     {
       new SimpleNavigationLeaf(ChildAToRootNavigation)
     });
@@ -304,7 +306,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeOneInverseDepth2Attribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(ChildAEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.ChildA, int>(ChildAEntity, new INavigation[]
     {
       new SimpleNavigationNode(ChildAToRootNavigation, new INavigation[]
       {
@@ -357,7 +359,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeManyToManyAsLeafAfterNodeAttribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(ChildGEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.ChildG, int>(ChildGEntity, new INavigation[]
     {
       new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {
@@ -422,7 +424,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeManyToManyAsNodeDepth1Attribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(ChildGEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.ChildG, int>(ChildGEntity, new INavigation[]
     {
       new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {
@@ -502,7 +504,7 @@ public partial class SqlTextBuilderTests
 
   public class IncludeManyToManyAsNodeDepth2Attribute : SelectTextDataAttribute
   {
-    private protected override NavigationSpec Spec => new(ChildGEntity, new INavigation[]
+    private protected override INavigationRoot Root => new FakeNavigationRoot<DeepNavigation.ChildG, int>(ChildGEntity, new INavigation[]
     {
       new SimpleNavigationNode(ChildGToManyToManyNavigation, new INavigation[]
       {

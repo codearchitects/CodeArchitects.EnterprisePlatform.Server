@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.Navigation;
 using System.Data;
 using System.Data.Common;
 
@@ -14,16 +15,19 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly IExecutor<TDbCommand> _executor;
   private readonly ICommandInterceptor<TDbCommand> _interceptor;
+  private readonly INavigationTreeFactory _navigationTreeFactory;
 
   public DataContext(
     IStateManager<TDbConnection> stateManager,
     IExecutor<TDbCommand> executor,
     ICommandInterceptorAggregator<TDbCommand> interceptor,
+    INavigationTreeFactory navigationTreeFactory,
     IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
     _interceptor = interceptor;
+    _navigationTreeFactory = navigationTreeFactory;
     Model = model;
   }
 
@@ -39,7 +43,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
   {
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
-    return FindAsyncCore(key, NavigationSpec.FromEntity(entityModel), cancellationToken);
+    return FindAsyncCore(key, _navigationTreeFactory.CreateEmpty(entityModel), cancellationToken);
   }
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
@@ -51,10 +55,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
-    RootIncluder<TEntity, TKey> includer = new(entityModel);
-    includeAction(includer);
-
-    return FindAsyncCore(key, includer.Spec, cancellationToken);
+    return FindAsyncCore(key, _navigationTreeFactory.Create(entityModel, includeAction), cancellationToken);
   }
 
   public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -179,7 +180,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     return (TDbCommand)connection.CreateCommand();
   }
 
-  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken = default)
+  private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
@@ -189,7 +190,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     try
     {
-      return await _executor.ExecuteFindAsync(command, key, in spec, cancellationToken);
+      return await _executor.ExecuteFindAsync(command, key, root, cancellationToken);
     }
     finally
     {

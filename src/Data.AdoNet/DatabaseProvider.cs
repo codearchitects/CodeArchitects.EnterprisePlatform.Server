@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Data.AdoNet.Command;
+using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Data.Common;
 
@@ -26,9 +27,9 @@ public abstract class DatabaseProvider
 
   private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder);
 
-  internal object CreateCommandBuilder()
+  internal object CreateCommandBuilder(IMemoryCache cache)
   {
-    SqlTextCache sqlCache = SqlTextCache.Create();
+    SqlTextCache sqlCache = new(cache);
     ISyntaxProvider syntaxProvider = CreateSyntaxProvider();
     SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
 

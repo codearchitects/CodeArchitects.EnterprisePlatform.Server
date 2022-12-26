@@ -43,7 +43,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
 
   public override Type EntityType => typeof(TEntity);
 
-  public override EntityModel Build()
+  public override EntityModel Build(int id)
   {
     Debug.Assert(!HasCompleted, "Builder had already completed.");
     HasCompleted = true;
@@ -56,7 +56,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     InitializerModel initializer = InitializerModel.Create(EntityType);
     PrimaryKeyModel primaryKey = PrimaryKeyModel.Create(keyMembersAndTypes);
 
-    _entity = EntityModel.Create(EntityType, initializer, primaryKey);
+    _entity = EntityModel.Create(EntityType, id, initializer, primaryKey);
     return _entity;
   }
 

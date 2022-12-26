@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class SkipNavigationNode : IncluderNode, ISkipNavigationNode
+internal class SkipNavigationNode : NavigationNode, ISkipNavigationNode
 {
   public SkipNavigationNode(IAccessibleSkipNavigationModel model)
   {
@@ -18,15 +18,5 @@ internal class SkipNavigationNode : IncluderNode, ISkipNavigationNode
   public TResult Accept<TVisitor, TResult>(in TVisitor visitor) where TVisitor : INavigationVisitor<TResult>
   {
     return visitor.VisitSkipNode(this);
-  }
-
-  public bool Equals(INavigation? other)
-  {
-    if (other is not INavigationNode node)
-      return false;
-
-    return
-      Model.Id == node.Model.Id &&
-      NavigationCollection.Equal(Children, node.Children);
   }
 }

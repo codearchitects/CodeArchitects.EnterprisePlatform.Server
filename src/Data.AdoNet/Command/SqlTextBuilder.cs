@@ -15,16 +15,16 @@ internal class SqlTextBuilder : ISqlTextBuilder
     _syntaxProvider = syntaxProvider;
   }
 
-  public string BuildFindText(NavigationSpec spec)
+  public string BuildFindText(INavigationRoot root)
   {
-    if (_cache.TryGetFindText(spec, out string? text))
+    if (_cache.TryGetFindText(root, out string? text))
       return text;
 
     SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildFindText(in stringBuilder, in spec);
+    BuildFindText(in stringBuilder, root);
     text = stringBuilder.ToString();
 
-    _cache.AddFindText(in spec, text);
+    _cache.AddFindText(root, text);
 
     return text;
   }
@@ -85,15 +85,15 @@ internal class SqlTextBuilder : ISqlTextBuilder
     return text;
   }
 
-  private void BuildFindText(in SqlStringBuilder stringBuilder, in NavigationSpec spec)
+  private void BuildFindText(in SqlStringBuilder stringBuilder, INavigationRoot root)
   {
-    if (spec.Navigations is { Count: > 0 } navigations)
+    if (root.Navigations is { Count: > 0 } navigations)
     {
-      BuildFindTextWithJoins(in stringBuilder, spec.Entity, navigations);
+      BuildFindTextWithJoins(in stringBuilder, root.Entity, navigations);
     }
     else
     {
-      BuildFindTextNoJoins(in stringBuilder, spec.Entity);
+      BuildFindTextNoJoins(in stringBuilder, root.Entity);
     }
 
     static void BuildFindTextNoJoins(in SqlStringBuilder stringBuilder, IEntityModel entityModel)

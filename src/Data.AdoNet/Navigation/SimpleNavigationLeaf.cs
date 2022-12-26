@@ -22,12 +22,4 @@ internal class SimpleNavigationLeaf : ISimpleNavigationLeaf
   {
     return visitor.VisitSimpleLeaf(this);
   }
-
-  public bool Equals(INavigation? other)
-  {
-    if (other is not ISimpleNavigationLeaf leaf)
-      return false;
-
-    return Model.Id == leaf.Model.Id;
-  }
 }

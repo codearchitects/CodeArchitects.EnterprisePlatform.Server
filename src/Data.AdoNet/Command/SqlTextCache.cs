@@ -1,89 +1,105 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Collections.Concurrent;
+using Microsoft.Extensions.Caching.Memory;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal class SqlTextCache : ISqlTextCache
 {
-  private readonly IDictionary<NavigationSpec, string> _selectTexts;
-  private readonly IDictionary<IEntityModel, string> _insertTexts;
-  private readonly IDictionary<IEntityModel, string> _updateTexts;
-  private readonly IDictionary<IEntityModel, string> _upsertTexts;
-  private readonly IDictionary<IEntityModel, string> _deleteTexts;
+  private readonly IMemoryCache _cache;
 
-  public SqlTextCache(
-    IDictionary<NavigationSpec, string> selectTexts,
-    IDictionary<IEntityModel, string> insertTexts,
-    IDictionary<IEntityModel, string> updateTexts,
-    IDictionary<IEntityModel, string> upsertTexts,
-    IDictionary<IEntityModel, string> deleteTexts)
+  public SqlTextCache(IMemoryCache cache)
   {
-    _selectTexts = selectTexts;
-    _insertTexts = insertTexts;
-    _updateTexts = updateTexts;
-    _upsertTexts = upsertTexts;
-    _deleteTexts = deleteTexts;
+    _cache = cache;
   }
 
-  public bool TryGetFindText(in NavigationSpec spec, [NotNullWhen(true)] out string? text)
+  public bool TryGetFindText(INavigationRoot root, [NotNullWhen(true)] out string? text)
   {
-    return _selectTexts.TryGetValue(spec, out text);
+    if (!_cache.TryGetValue(root, out object? value))
+    {
+      text = null;
+      return false;
+    }
+
+    text = (string)value;
+    return true;
   }
 
-  public void AddFindText(in NavigationSpec spec, string text)
+  public void AddFindText(INavigationRoot root, string text)
   {
-    _selectTexts.Add(spec, text);
+    ICacheEntry entry = _cache.CreateEntry(root);
+    entry.Value = text;
   }
 
   public bool TryGetInsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    return _insertTexts.TryGetValue(entityModel, out text);
+    return TryGetText(OperationType.Insert, entityModel, out text);
   }
 
   public void AddInsertText(IEntityModel entityModel, string text)
   {
-    _insertTexts.Add(entityModel, text);
+    AddText(OperationType.Insert, entityModel, text);
   }
 
   public bool TryGetUpdateText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    return _updateTexts.TryGetValue(entityModel, out text);
+    return TryGetText(OperationType.Update, entityModel, out text);
   }
 
   public void AddUpdateText(IEntityModel entityModel, string text)
   {
-    _updateTexts.Add(entityModel, text);
+    AddText(OperationType.Update, entityModel, text);
   }
 
   public bool TryGetUpsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    return _upsertTexts.TryGetValue(entityModel, out text);
+    return TryGetText(OperationType.Upsert, entityModel, out text);
   }
 
   public void AddUpsertText(IEntityModel entityModel, string text)
   {
-    _upsertTexts.Add(entityModel, text);
+    AddText(OperationType.Upsert, entityModel, text);
   }
 
   public bool TryGetRemoveText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    return _deleteTexts.TryGetValue(entityModel, out text);
+    return TryGetText(OperationType.Remove, entityModel, out text);
   }
 
   public void AddRemoveText(IEntityModel entityModel, string text)
   {
-    _deleteTexts.Add(entityModel, text);
+    AddText(OperationType.Remove, entityModel, text);
   }
 
-  public static SqlTextCache Create()
+  private bool TryGetText(OperationType operation, IEntityModel entityModel, [NotNullWhen(true)] out string? text)
   {
-    return new(
-      new ConcurrentDictionary<NavigationSpec, string>(),
-      new ConcurrentDictionary<IEntityModel, string>(),
-      new ConcurrentDictionary<IEntityModel, string>(),
-      new ConcurrentDictionary<IEntityModel, string>(),
-      new ConcurrentDictionary<IEntityModel, string>());
+    CacheKey key = new(operation, entityModel);
+    if (!_cache.TryGetValue(key, out object? value))
+    {
+      text = null;
+      return false;
+    }
+
+    text = (string)value;
+    return true;
+  }
+
+  private void AddText(OperationType operation, IEntityModel entityModel, string text)
+  {
+    CacheKey key = new(operation, entityModel);
+    ICacheEntry entry = _cache.CreateEntry(key);
+    entry.Value = text;
+  }
+
+  private record CacheKey(OperationType Operation, IEntityModel EntityModel);
+
+  private enum OperationType
+  {
+    Find,
+    Insert,
+    Update,
+    Upsert,
+    Remove
   }
 }

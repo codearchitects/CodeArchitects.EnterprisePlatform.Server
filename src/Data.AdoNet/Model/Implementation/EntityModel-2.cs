@@ -4,8 +4,8 @@ internal class EntityModel<TEntity, TKey> : EntityModel, IEntityModel<TEntity, T
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public EntityModel(InitializerModel initializer, PrimaryKeyModel<TKey> primaryKey)
-    : base(initializer)
+  public EntityModel(int id, InitializerModel initializer, PrimaryKeyModel<TKey> primaryKey)
+    : base(id, initializer)
   {
     PrimaryKey = primaryKey;
   }

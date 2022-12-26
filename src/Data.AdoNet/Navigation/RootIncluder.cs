@@ -7,20 +7,18 @@ internal class RootIncluder<TEntity, TKey> : Includer<TEntity>, IIncluder<TEntit
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  private readonly NavigationRoot<TEntity, TKey> _root;
-
   public RootIncluder(IEntityModel<TEntity, TKey> entity)
   {
-    _root = new NavigationRoot<TEntity, TKey>(entity);
+    Root = new NavigationRoot<TEntity, TKey>(entity);
   }
 
-  protected override IncluderNode Node => _root;
+  public NavigationRoot<TEntity, TKey> Root { get; }
 
-  public NavigationSpec<TEntity, TKey> Spec => NavigationSpec.FromNavigation(_root);
+  protected override NavigationNode Node => Root;
 
   public IStringIncluder<TEntity> Include(string navigation)
   {
-    _root.AddLeaf(navigation);
+    Root.AddLeaf(navigation);
 
     return this;
   }

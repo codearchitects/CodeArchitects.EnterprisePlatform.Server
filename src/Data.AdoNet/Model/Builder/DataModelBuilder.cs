@@ -23,11 +23,13 @@ internal class DataModelBuilder : INavigationIdGenerator
 
     DataModel dataModel = new();
 
+    int id = 1;
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)
     {
-      EntityModel entity = entityBuilder.Build();
+      EntityModel entity = entityBuilder.Build(id);
       entities.Add(entity);
       dataModel.AddEntity(entity);
+      id++;
     }
 
     foreach (NavigationModelBuilder navigationBuilder in _navigationBuilders)

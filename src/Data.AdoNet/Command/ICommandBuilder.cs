@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 internal interface ICommandBuilder<in TDbCommand>
   where TDbCommand : IDbCommand
 {
-  void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
+  void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, INavigationRoot<TEntity, TKey> root)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 

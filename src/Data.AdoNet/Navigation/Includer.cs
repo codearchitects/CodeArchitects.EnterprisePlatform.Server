@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 internal abstract class Includer<TEntity> : IExpressionIncluder<TEntity>
   where TEntity : class
 {
-  protected abstract IncluderNode Node { get; }
+  protected abstract NavigationNode Node { get; }
 
   public IExpressionIncluder<TEntity> Include<T>(Expression<Func<TEntity, T?>> includeExpression)
     where T : class
@@ -59,7 +59,7 @@ internal abstract class Includer<TEntity> : IExpressionIncluder<TEntity>
   private IExpressionIncluder<TEntity> Include<T>(MemberExpression memberExpression, Action<IExpressionIncluder<T>> thenInclude)
     where T : class
   {
-    IncluderNode childNode = Node.AddNode(memberExpression);
+    NavigationNode childNode = Node.AddNode(memberExpression);
     thenInclude(new ThenIncluder<T>(childNode));
 
     return this;

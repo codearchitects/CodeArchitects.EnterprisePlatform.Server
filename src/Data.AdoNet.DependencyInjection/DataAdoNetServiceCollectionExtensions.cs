@@ -6,6 +6,7 @@ using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
 using CodeArchitects.Platform.Data.Tracking;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using IDataContext = CodeArchitects.Platform.Data.AdoNet.IDataContext;
 
@@ -36,9 +37,9 @@ public static class DataAdoNetServiceCollectionExtensions
 
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
-    object commandBuilder = provider.CreateCommandBuilder();
 
-    services.AddSingleton(commandBuilderServiceType, commandBuilder);
+    services.TryAddSingleton<IMemoryCache, MemoryCache>();
+    services.AddSingleton(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<IMemoryCache>()));
 
     // Materializer
     services.TryAddSingleton<IIdentityCollectionFactory>(IdentityCollectionFactory.Create());

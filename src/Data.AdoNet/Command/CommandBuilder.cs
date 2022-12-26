@@ -15,13 +15,13 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
     _sqlBuilder = sqlBuilder;
   }
 
-  public void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec)
+  public void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, INavigationRoot<TEntity, TKey> root)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityModel<TEntity, TKey> model = spec.Entity;
+    IEntityModel<TEntity, TKey> model = root.Entity;
 
-    command.CommandText = _sqlBuilder.BuildFindText(spec);
+    command.CommandText = _sqlBuilder.BuildFindText(root);
 
     for (int i = 0; i < model.PrimaryKey.Columns.Count; i++)
     {

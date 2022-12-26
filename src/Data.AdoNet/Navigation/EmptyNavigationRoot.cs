@@ -2,20 +2,18 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class NavigationRoot<TEntity, TKey> : NavigationNode, INavigationRoot<TEntity, TKey>
+internal class EmptyNavigationRoot<TEntity, TKey> : INavigationRoot<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>
 {
-  public NavigationRoot(IEntityModel<TEntity, TKey> entity)
+  public EmptyNavigationRoot(IEntityModel<TEntity, TKey> entity)
   {
     Entity = entity;
   }
 
-  public override IEntityModel Target => Entity;
-
   public IEntityModel<TEntity, TKey> Entity { get; }
 
-  public IReadOnlyCollection<INavigation> Navigations => Children;
+  public IReadOnlyCollection<INavigation> Navigations => Array.Empty<INavigation>();
 
   IEntityModel INavigationRoot.Entity => Entity;
 }

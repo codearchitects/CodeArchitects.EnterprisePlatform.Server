@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Fixtures;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
 using static CodeArchitects.Platform.Data.AdoNet.Fixtures.Models.WithDifferentPrimaryKeys;
@@ -30,10 +31,10 @@ public class CommandBuilderTests
       .Returns(1);
 
     IEntityModel<SimpleEntity, int> model = CreateSimpleEntityModel(false);
-    NavigationSpec<SimpleEntity, int> spec = new(model, Array.Empty<INavigation>());
+    FakeNavigationRoot<SimpleEntity, int> root = new(model, Array.Empty<INavigation>());
 
     // Act
-    _sut.BuildFindCommand(commandMock.Object, id, spec);
+    _sut.BuildFindCommand(commandMock.Object, id, root);
 
     // Assert
     commandMock.VerifySet(command => command.CommandText = null);
@@ -68,10 +69,10 @@ public class CommandBuilderTests
       .Returns(2);
 
     IEntityModel<CompositeEntity, (Guid, int)> model = CreateCompositeEntityModel(false);
-    NavigationSpec<CompositeEntity, (Guid, int)> spec = new(model, Array.Empty<INavigation>());
+    FakeNavigationRoot<CompositeEntity, (Guid, int)> root = new(model, Array.Empty<INavigation>());
 
     // Act
-    _sut.BuildFindCommand(commandMock.Object, (id1, id2), spec);
+    _sut.BuildFindCommand(commandMock.Object, (id1, id2), root);
 
     // Assert
     commandMock.VerifySet(command => command.CommandText = null);

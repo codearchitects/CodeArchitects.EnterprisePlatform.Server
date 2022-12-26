@@ -15,7 +15,7 @@ public partial class SqlTextBuilderTests
   [IncludeManyToManyAsLeafAfterNode]
   [IncludeManyToManyAsNodeDepth1]
   [IncludeManyToManyAsNodeDepth2]
-  internal void BuildSelectText_ShouldReturnCorrectSql(SqlTextBuilder sut, NavigationSpec spec, string expectedSql)
+  internal void BuildSelectText_ShouldReturnCorrectSql(SqlTextBuilder sut, INavigationRoot spec, string expectedSql)
   {
     // Arrange
 

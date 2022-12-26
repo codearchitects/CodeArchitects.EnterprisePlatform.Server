@@ -5,11 +5,11 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal abstract class IncluderNode
+internal abstract class NavigationNode
 {
   private readonly Dictionary<int, INavigation> _children;
 
-  public IncluderNode()
+  public NavigationNode()
   {
     _children = new();
   }
@@ -41,14 +41,14 @@ internal abstract class IncluderNode
     }
 
     model = GetNavigationModel(path[..index]);
-    IncluderNode node = GetOrUpdateNode(model);
+    NavigationNode node = GetOrUpdateNode(model);
 
     node.AddLeaf(path[(index + 1)..]);
   }
 
   public void AddLeaf(MemberExpression memberExpression)
   {
-    IncluderNode node = memberExpression.Expression is MemberExpression childMemberExpression
+    NavigationNode node = memberExpression.Expression is MemberExpression childMemberExpression
       ? AddNode(childMemberExpression)
       : this;
 
@@ -57,9 +57,9 @@ internal abstract class IncluderNode
     node.TryAddLeaf(model);
   }
 
-  public IncluderNode AddNode(MemberExpression memberExpression)
+  public NavigationNode AddNode(MemberExpression memberExpression)
   {
-    IncluderNode node = memberExpression.Expression is MemberExpression childMemberExpression
+    NavigationNode node = memberExpression.Expression is MemberExpression childMemberExpression
       ? AddNode(childMemberExpression)
       : this;
 
@@ -68,9 +68,9 @@ internal abstract class IncluderNode
     return node.GetOrUpdateNode(model);
   }
 
-  private IncluderNode GetOrUpdateNode(IAccessibleNavigationModel model)
+  private NavigationNode GetOrUpdateNode(IAccessibleNavigationModel model)
   {
-    if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not IncluderNode node)
+    if (!_children.TryGetValue(model.Id, out INavigation? child) || child is not NavigationNode node)
     {
       switch (model)
       {

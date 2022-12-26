@@ -23,10 +23,10 @@ public partial class MaterializationTests
       { p.Id, p.Name }
     });
 
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, Array.Empty<INavigation>());
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, Array.Empty<INavigation>());
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);
@@ -44,7 +44,7 @@ public partial class MaterializationTests
       { p.Id, p.Name, c.Id, c.Name, c.ParentId }
     });
 
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, new INavigation[]
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, new INavigation[]
     {
       Mock.Of<INavigation>(nav =>
         nav.Model == Model.ParentToChildCNavigation &&
@@ -53,7 +53,7 @@ public partial class MaterializationTests
     });
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);
@@ -72,7 +72,7 @@ public partial class MaterializationTests
       { p.Id, p.Name, a[1].Id, a[1].Name, a[1].ParentId }
     });
 
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, new INavigation[]
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, new INavigation[]
     {
       Mock.Of<INavigation>(nav =>
         nav.Model == Model.ParentToChildANavigation &&
@@ -81,7 +81,7 @@ public partial class MaterializationTests
     });
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);
@@ -101,7 +101,7 @@ public partial class MaterializationTests
       { p.Id, p.Name, c.Id, c.Name, c.ParentId, childrenA[0].Id, childrenA[0].Name, childrenA[0].ParentId },
       { p.Id, p.Name, c.Id, c.Name, c.ParentId, childrenA[1].Id, childrenA[1].Name, childrenA[1].ParentId }
     });
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, new INavigation[]
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, new INavigation[]
     {
       Mock.Of<INavigation>(nav =>
         nav.Model == Model.ParentToChildCNavigation &&
@@ -114,7 +114,7 @@ public partial class MaterializationTests
     });
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);
@@ -138,7 +138,7 @@ public partial class MaterializationTests
       { p.Id, p.Name, a[1].Id, a[1].Name, a[1].ParentId, b[1].Id, b[1].Name, b[1].ParentId },
       { p.Id, p.Name, a[1].Id, a[1].Name, a[1].ParentId, b[2].Id, b[2].Name, b[2].ParentId }
     });
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, new INavigation[]
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, new INavigation[]
     {
       Mock.Of<INavigation>(nav =>
         nav.Model == Model.ParentToChildANavigation &&
@@ -151,7 +151,7 @@ public partial class MaterializationTests
     });
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);
@@ -185,7 +185,7 @@ public partial class MaterializationTests
       { p.Id, p.Name, a[1].Id, a[1].Name, a[1].ParentId, d1[1].Id, d1[1].Name, d1[1].ChildAId, b[1].Id, b[1].Name, b[1].ParentId },
       { p.Id, p.Name, a[1].Id, a[1].Name, a[1].ParentId, d1[1].Id, d1[1].Name, d1[1].ChildAId, b[1].Id, b[2].Name, b[2].ParentId }
     });
-    var spec = new NavigationSpec<Parent, Guid>(Model.ParentModel, new INavigation[]
+    var root = new FakeNavigationRoot<Parent, Guid>(Model.ParentModel, new INavigation[]
     {
       Mock.Of<INavigation>(nav =>
         nav.Model == Model.ParentToChildANavigation &&
@@ -204,7 +204,7 @@ public partial class MaterializationTests
     });
 
     // Act
-    Parent? materialized = await _sut.ReadEntityAsync(reader, spec, CancellationToken.None);
+    Parent? materialized = await _sut.ReadEntityAsync(reader, root, CancellationToken.None);
 
     // Assert
     materialized.Should().BeEquivalentTo(p);

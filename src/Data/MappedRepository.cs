@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data;
+﻿using CodeArchitects.Platform.Data.Navigation;
+
+namespace CodeArchitects.Platform.Data;
 
 /// <summary>
 /// Base implementation of <see cref="IRepository{TEntity, TKey}"/> which performs mapping between table entities and domain entities.

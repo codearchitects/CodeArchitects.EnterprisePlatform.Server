@@ -1,16 +1,15 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Materialization;
 
-internal class IdentityCacheKeyEqualityComparer : EqualityComparer<IdentityCacheKey>
+internal class IdentityCacheKeyEqualityComparer : IEqualityComparer<IdentityCacheKey>
 {
   public static readonly IdentityCacheKeyEqualityComparer Instance = new();
 
   private IdentityCacheKeyEqualityComparer() { }
 
-  public override bool Equals(IdentityCacheKey x, IdentityCacheKey y)
+  public bool Equals(IdentityCacheKey x, IdentityCacheKey y)
   {
     if (x.Model != y.Model)
       return false;
@@ -28,7 +27,7 @@ internal class IdentityCacheKeyEqualityComparer : EqualityComparer<IdentityCache
     return x.Key.Equals(y.Key);
   }
 
-  public override int GetHashCode([DisallowNull] IdentityCacheKey obj)
+  public int GetHashCode(IdentityCacheKey obj)
   {
     const int multiplier = -1521134295;
 

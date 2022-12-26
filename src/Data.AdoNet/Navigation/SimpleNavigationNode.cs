@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
-internal class SimpleNavigationNode : IncluderNode, ISimpleNavigationNode
+internal class SimpleNavigationNode : NavigationNode, ISimpleNavigationNode
 {
   public SimpleNavigationNode(IAccessibleSimpleNavigationModel model)
   {
@@ -19,13 +19,5 @@ internal class SimpleNavigationNode : IncluderNode, ISimpleNavigationNode
     where TVisitor : INavigationVisitor<TResult>
   {
     return visitor.VisitSimpleNode(this);
-  }
-
-  public bool Equals(INavigation? other)
-  {
-    if (other is not ISimpleNavigationNode node)
-      return false;
-
-    return Model.Id == node.Model.Id && NavigationCollection.Equal(Children, node.Children);
   }
 }

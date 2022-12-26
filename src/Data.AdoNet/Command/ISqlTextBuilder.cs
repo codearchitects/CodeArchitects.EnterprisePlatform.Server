@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ISqlTextBuilder
 {
-  string BuildFindText(NavigationSpec spec);
+  string BuildFindText(INavigationRoot root);
   string BuildInsertText(IEntityModel entityModel);
   string BuildUpdateText(IEntityModel entityModel);
   string BuildUpsertText(IEntityModel entityModel);

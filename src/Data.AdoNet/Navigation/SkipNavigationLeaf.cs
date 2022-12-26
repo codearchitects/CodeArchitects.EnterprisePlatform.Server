@@ -22,12 +22,4 @@ internal class SkipNavigationLeaf : ISkipNavigationLeaf
   {
     return visitor.VisitSkipLeaf(this);
   }
-
-  public bool Equals(INavigation? other)
-  {
-    if (other is not ISkipNavigationLeaf leaf)
-      return false;
-
-    return Model.Id == leaf.Model.Id;
-  }
 }

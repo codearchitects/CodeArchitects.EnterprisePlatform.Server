@@ -14,7 +14,7 @@ internal abstract class NavigationModelBuilder : BuilderBase, IEquatable<Navigat
 
   public abstract NavigationModel Build(DataModel dataModel);
 
-  public bool Equals([AllowNull] NavigationModelBuilder other)
+  public bool Equals(NavigationModelBuilder? other)
   {
     if (other is null)
       return false;

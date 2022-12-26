@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 internal interface IExecutor<TDbCommand>
   where TDbCommand : IDbCommand
 {
-  Task<TEntity?> ExecuteFindAsync<TEntity, TKey>(TDbCommand command, TKey key, in NavigationSpec<TEntity, TKey> spec, CancellationToken cancellationToken)
+  Task<TEntity?> ExecuteFindAsync<TEntity, TKey>(TDbCommand command, TKey key, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
   
