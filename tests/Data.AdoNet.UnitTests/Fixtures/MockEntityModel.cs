@@ -14,8 +14,6 @@ internal class MockEntityModel<TEntity, TKey> : IEntityModel<TEntity, TKey>
     _mock = mock;
   }
 
-  public int Id => _mock.Id;
-
   public string TableName => _mock.TableName;
 
   public Type Type => _mock.Type;

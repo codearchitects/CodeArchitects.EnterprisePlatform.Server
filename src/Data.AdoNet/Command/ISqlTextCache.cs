@@ -1,23 +1,17 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal interface ISqlTextCache
 {
-  bool TryGetFindText(INavigationRoot root, [NotNullWhen(true)] out string? text);
-  void AddFindText(INavigationRoot root, string text);
+  string GetOrAddFindText(INavigationRoot root, SqlTextBuilder sqlBuilder, Func<INavigationRoot, SqlTextBuilder, string> queryCompiler);
 
-  bool TryGetInsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text);
-  void AddInsertText(IEntityModel entityModel, string text);
+  string GetOrAddInsertText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler);
 
-  bool TryGetUpdateText(IEntityModel entityModel, [NotNullWhen(true)] out string? text);
-  void AddUpdateText(IEntityModel entityModel, string text);
+  string GetOrAddUpdateText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler);
 
-  bool TryGetUpsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text);
-  void AddUpsertText(IEntityModel entityModel, string text);
+  string GetOrAddUpsertText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler);
 
-  bool TryGetRemoveText(IEntityModel entityModel, [NotNullWhen(true)] out string? text);
-  void AddRemoveText(IEntityModel entityModel, string text);
+  string GetOrAddRemoveText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler);
 }

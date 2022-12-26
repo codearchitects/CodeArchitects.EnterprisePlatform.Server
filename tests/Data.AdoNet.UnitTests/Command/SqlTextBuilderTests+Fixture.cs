@@ -25,11 +25,17 @@ public partial class SqlTextBuilderTests
 
     public override IEnumerable<object?[]> GetData(MethodInfo testMethod)
     {
-      ISqlTextCache cache = Mock.Of<ISqlTextCache>();
+      Mock<ISqlTextCache> cacheMock = new(MockBehavior.Strict);
+      cacheMock
+        .Setup(x => x.GetOrAddFindText(It.IsAny<INavigationRoot>(), It.IsAny<SqlTextBuilder>(), It.IsAny<Func<INavigationRoot, SqlTextBuilder, string>>()))
+        .Returns(delegate (INavigationRoot root, SqlTextBuilder sqlBuilder, Func<INavigationRoot, SqlTextBuilder, string> queryCompiler)
+        {
+          return queryCompiler(root, sqlBuilder);
+        });
 
-      yield return new object[] { new SqlTextBuilder(cache, new SQLServerSyntaxProvider()), Root, ExpectedTextSQLServer };
-      yield return new object[] { new SqlTextBuilder(cache, new PostgreSQLSyntaxProvider()), Root, ExpectedTextPostgreSQL };
-      yield return new object[] { new SqlTextBuilder(cache, new OracleSyntaxProvider()), Root, ExpectedTextOracle };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new SQLServerSyntaxProvider()), Root, ExpectedTextSQLServer };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new PostgreSQLSyntaxProvider()), Root, ExpectedTextPostgreSQL };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new OracleSyntaxProvider()), Root, ExpectedTextOracle };
     }
   }
 

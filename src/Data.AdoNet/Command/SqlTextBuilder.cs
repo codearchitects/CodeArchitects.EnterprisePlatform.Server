@@ -17,72 +17,52 @@ internal class SqlTextBuilder : ISqlTextBuilder
 
   public string BuildFindText(INavigationRoot root)
   {
-    if (_cache.TryGetFindText(root, out string? text))
-      return text;
-
-    SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildFindText(in stringBuilder, root);
-    text = stringBuilder.ToString();
-
-    _cache.AddFindText(root, text);
-
-    return text;
+    return _cache.GetOrAddFindText(root, this, static (root, self) =>
+    {
+      SqlStringBuilder stringBuilder = new(self._syntaxProvider);
+      self.BuildFindText(in stringBuilder, root);
+      return stringBuilder.ToString();
+    });
   }
 
   public string BuildInsertText(IEntityModel entityModel)
   {
-    if (_cache.TryGetInsertText(entityModel, out string? text))
-      return text;
-
-    SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildInsertText(in stringBuilder, entityModel);
-    text = stringBuilder.ToString();
-
-    _cache.AddInsertText(entityModel, text);
-
-    return text;
+    return _cache.GetOrAddInsertText(entityModel, this, static (entityModel, self) =>
+    {
+      SqlStringBuilder stringBuilder = new(self._syntaxProvider);
+      self.BuildInsertText(in stringBuilder, entityModel);
+      return stringBuilder.ToString();
+    });
   }
 
   public string BuildUpdateText(IEntityModel entityModel)
   {
-    if (_cache.TryGetUpdateText(entityModel, out string? text))
-      return text;
-
-    SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildUpdateText(in stringBuilder, entityModel);
-    text = stringBuilder.ToString();
-
-    _cache.AddUpdateText(entityModel, text);
-
-    return text;
+    return _cache.GetOrAddUpdateText(entityModel, this, static (entityModel, self) =>
+    {
+      SqlStringBuilder stringBuilder = new(self._syntaxProvider);
+      self.BuildUpdateText(in stringBuilder, entityModel);
+      return stringBuilder.ToString();
+    });
   }
 
   public string BuildUpsertText(IEntityModel entityModel)
   {
-    if (_cache.TryGetUpsertText(entityModel, out string? text))
-      return text;
-
-    SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildUpsertText(in stringBuilder, entityModel);
-    text = stringBuilder.ToString();
-
-    _cache.AddUpsertText(entityModel, text);
-
-    return text;
+    return _cache.GetOrAddUpsertText(entityModel, this, static (entityModel, self) =>
+    {
+      SqlStringBuilder stringBuilder = new(self._syntaxProvider);
+      self.BuildUpsertText(in stringBuilder, entityModel);
+      return stringBuilder.ToString();
+    });
   }
 
   public string BuildRemoveText(IEntityModel entityModel)
   {
-    if (_cache.TryGetRemoveText(entityModel, out string? text))
-      return text;
-
-    SqlStringBuilder stringBuilder = new(_syntaxProvider);
-    BuildRemoveText(in stringBuilder, entityModel);
-    text = stringBuilder.ToString();
-
-    _cache.AddRemoveText(entityModel, text);
-
-    return text;
+    return _cache.GetOrAddRemoveText(entityModel, this, static (entityModel, self) =>
+    {
+      SqlStringBuilder stringBuilder = new(self._syntaxProvider);
+      self.BuildRemoveText(in stringBuilder, entityModel);
+      return stringBuilder.ToString();
+    });
   }
 
   private void BuildFindText(in SqlStringBuilder stringBuilder, INavigationRoot root)

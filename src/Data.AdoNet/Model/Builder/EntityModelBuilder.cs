@@ -9,7 +9,7 @@ internal abstract class EntityModelBuilder : BuilderBase
 
   public abstract Type EntityType { get; }
 
-  public abstract EntityModel Build(int id);
+  public abstract EntityModel Build();
 
   public abstract void AddSimpleNavigation(SimpleNavigationModel navigation, IEnumerable<Name> foreignKeyNames);
 

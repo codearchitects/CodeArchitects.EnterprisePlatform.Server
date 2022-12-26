@@ -13,8 +13,6 @@ internal class NavigationEntityModel : IEntityModel
     Columns = columns;
   }
 
-  public int Id => throw new NotSupportedException("Navigation entities do not have an id.");
-
   public string TableName => _entity.TableName;
 
   public Type Type => _entity.Type;

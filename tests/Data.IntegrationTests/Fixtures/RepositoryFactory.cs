@@ -54,7 +54,7 @@ internal class RepositoryFactory
     MemoryCache cache = new(new MemoryCacheOptions());
     SqlTextCache sqlCache = new(cache);
     IdentityCollectionFactory collectionFactory = IdentityCollectionFactory.Create();
-    NavigationTreeFactory navigationTreeFactory = new();
+    NavigationTreeFactory navigationTreeFactory = new(cache);
     IDataModel dataModel = new TestModelConfiguration().CreateDataModel();
 
     AdoNet.IDataContext dataContext = provider switch

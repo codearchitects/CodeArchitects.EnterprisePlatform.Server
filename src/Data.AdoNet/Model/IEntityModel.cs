@@ -10,11 +10,6 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 public interface IEntityModel
 {
   /// <summary>
-  /// The unique identifier of the entity.
-  /// </summary>
-  int Id { get; }
-
-  /// <summary>
   /// The name of the table in the database that represents this entity.
   /// </summary>
   string TableName { get; }

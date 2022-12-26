@@ -16,4 +16,17 @@ internal class EmptyNavigationRoot<TEntity, TKey> : INavigationRoot<TEntity, TKe
   public IReadOnlyCollection<INavigation> Navigations => Array.Empty<INavigation>();
 
   IEntityModel INavigationRoot.Entity => Entity;
+
+  public override bool Equals(object? obj)
+  {
+    if (obj is not EmptyNavigationRoot<TEntity, TKey> other)
+      return false;
+
+    return Entity == other.Entity;
+  }
+
+  public override int GetHashCode()
+  {
+    return Entity.GetHashCode();
+  }
 }

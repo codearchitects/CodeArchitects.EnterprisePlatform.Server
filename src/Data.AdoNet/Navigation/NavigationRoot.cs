@@ -18,4 +18,21 @@ internal class NavigationRoot<TEntity, TKey> : NavigationNode, INavigationRoot<T
   public IReadOnlyCollection<INavigation> Navigations => Children;
 
   IEntityModel INavigationRoot.Entity => Entity;
+
+  public override bool Equals(object? obj)
+  {
+    if (obj is not NavigationRoot<TEntity, TKey> other)
+      return false;
+
+    return
+      Entity == other.Entity &&
+      NavigationCollectionEqualityComparer.Instance.Equals(Navigations, other.Navigations);
+  }
+
+  public override int GetHashCode()
+  {
+    return HashCode.Combine(
+      Entity,
+      NavigationCollectionEqualityComparer.Instance.GetHashCode(Navigations));
+  }
 }

@@ -14,8 +14,6 @@ internal class JoinEntityModel : IEntityModel
     PrimaryKey = new JoinTablePrimaryKeyModel(_columns);
   }
 
-  public int Id => throw new NotSupportedException("Join entities do not have an id.");
-
   public string TableName { get; }
 
   public Type Type => typeof(Dictionary<string, object>);

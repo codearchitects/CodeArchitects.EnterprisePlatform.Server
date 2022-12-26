@@ -9,9 +9,8 @@ internal abstract class EntityModel : IEntityModel
   private readonly List<ColumnModel> _columns;
   private readonly List<NavigationModel> _navigations;
 
-  public EntityModel(int id, InitializerModel initializer)
+  public EntityModel(InitializerModel initializer)
   {
-    Id = id;
     Initializer = initializer;
     _columns = new();
     _navigations = new();
@@ -23,8 +22,6 @@ internal abstract class EntityModel : IEntityModel
     get => _tableName ?? Type.Name;
     set => _tableName = value;
   }
-
-  public int Id { get; }
 
   public abstract Type Type { get; }
 
@@ -98,9 +95,9 @@ internal abstract class EntityModel : IEntityModel
     return false;
   }
 
-  public static EntityModel Create(Type entityType, int id, InitializerModel initializer, PrimaryKeyModel primaryKey)
+  public static EntityModel Create(Type entityType, InitializerModel initializer, PrimaryKeyModel primaryKey)
   {
     Type type = typeof(EntityModel<,>).MakeGenericType(entityType, primaryKey.Type);
-    return (EntityModel)Activator.CreateInstance(type, new object[] { id, initializer, primaryKey })!;
+    return (EntityModel)Activator.CreateInstance(type, new object[] { initializer, primaryKey })!;
   }
 }

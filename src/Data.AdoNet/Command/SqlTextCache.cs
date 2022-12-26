@@ -1,102 +1,121 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using Microsoft.Extensions.Caching.Memory;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Concurrent;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal class SqlTextCache : ISqlTextCache
 {
   private readonly IMemoryCache _cache;
+  private readonly ConcurrentDictionary<object, object> _locks;
 
   public SqlTextCache(IMemoryCache cache)
   {
     _cache = cache;
+    _locks = new();
   }
 
-  public bool TryGetFindText(INavigationRoot root, [NotNullWhen(true)] out string? text)
+  public string GetOrAddFindText(INavigationRoot root, SqlTextBuilder sqlBuilder, Func<INavigationRoot, SqlTextBuilder, string> queryCompiler)
   {
-    if (!_cache.TryGetValue(root, out object? value))
+    if (_cache.TryGetValue(root, out string text))
+      return text;
+
+    object compilationLock = _locks.GetOrAdd(root, _ => new object());
+    try
     {
-      text = null;
-      return false;
+      lock (compilationLock)
+      {
+        if (_cache.TryGetValue(root, out text))
+          return text;
+
+        text = queryCompiler(root, sqlBuilder);
+        _cache.Set(root, text);
+      }
+    }
+    finally
+    {
+      _locks.TryRemove(root, out _);
     }
 
-    text = (string)value;
-    return true;
+    return text;
   }
 
-  public void AddFindText(INavigationRoot root, string text)
+  public string GetOrAddInsertText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler)
   {
-    ICacheEntry entry = _cache.CreateEntry(root);
-    entry.Value = text;
+    return GetOrAddText(OperationType.Insert, entityModel, sqlBuilder, queryCompiler);
   }
 
-  public bool TryGetInsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
+  public string GetOrAddUpdateText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler)
   {
-    return TryGetText(OperationType.Insert, entityModel, out text);
+    return GetOrAddText(OperationType.Update, entityModel, sqlBuilder, queryCompiler);
   }
 
-  public void AddInsertText(IEntityModel entityModel, string text)
+  public string GetOrAddUpsertText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler)
   {
-    AddText(OperationType.Insert, entityModel, text);
+    return GetOrAddText(OperationType.Upsert, entityModel, sqlBuilder, queryCompiler);
   }
 
-  public bool TryGetUpdateText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
+  public string GetOrAddRemoveText(IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler)
   {
-    return TryGetText(OperationType.Update, entityModel, out text);
+    return GetOrAddText(OperationType.Remove, entityModel, sqlBuilder, queryCompiler);
   }
 
-  public void AddUpdateText(IEntityModel entityModel, string text)
-  {
-    AddText(OperationType.Update, entityModel, text);
-  }
-
-  public bool TryGetUpsertText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
-  {
-    return TryGetText(OperationType.Upsert, entityModel, out text);
-  }
-
-  public void AddUpsertText(IEntityModel entityModel, string text)
-  {
-    AddText(OperationType.Upsert, entityModel, text);
-  }
-
-  public bool TryGetRemoveText(IEntityModel entityModel, [NotNullWhen(true)] out string? text)
-  {
-    return TryGetText(OperationType.Remove, entityModel, out text);
-  }
-
-  public void AddRemoveText(IEntityModel entityModel, string text)
-  {
-    AddText(OperationType.Remove, entityModel, text);
-  }
-
-  private bool TryGetText(OperationType operation, IEntityModel entityModel, [NotNullWhen(true)] out string? text)
+  private string GetOrAddText(OperationType operation, IEntityModel entityModel, SqlTextBuilder sqlBuilder, Func<IEntityModel, SqlTextBuilder, string> queryCompiler)
   {
     CacheKey key = new(operation, entityModel);
-    if (!_cache.TryGetValue(key, out object? value))
+
+    if (_cache.TryGetValue(key, out string text))
+      return text;
+
+
+    object compilationLock = _locks.GetOrAdd(key, _ => new object());
+    try
     {
-      text = null;
-      return false;
+      lock (compilationLock)
+      {
+        if (_cache.TryGetValue(key, out text))
+          return text;
+
+        text = queryCompiler(entityModel, sqlBuilder);
+        _cache.Set(key, text);
+      }
+    }
+    finally
+    {
+      _locks.TryRemove(key, out _);
     }
 
-    text = (string)value;
-    return true;
+    return text;
   }
 
-  private void AddText(OperationType operation, IEntityModel entityModel, string text)
+  private class CacheKey
   {
-    CacheKey key = new(operation, entityModel);
-    ICacheEntry entry = _cache.CreateEntry(key);
-    entry.Value = text;
-  }
+    private readonly OperationType _operation;
+    private readonly IEntityModel _entityModel;
 
-  private record CacheKey(OperationType Operation, IEntityModel EntityModel);
+    public CacheKey(OperationType operation, IEntityModel entityModel)
+    {
+      _operation = operation;
+      _entityModel = entityModel;
+    }
+
+    public override bool Equals(object? obj)
+    {
+      if (obj is not CacheKey other)
+        return false;
+
+      return _operation == other._operation && _entityModel == other._entityModel;
+    }
+
+    public override int GetHashCode()
+    {
+      return HashCode.Combine(_operation, _entityModel);
+    }
+  }
 
   private enum OperationType
   {
-    Find,
     Insert,
     Update,
     Upsert,

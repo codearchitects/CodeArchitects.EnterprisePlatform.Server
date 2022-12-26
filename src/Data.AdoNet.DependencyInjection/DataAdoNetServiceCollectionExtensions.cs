@@ -5,6 +5,7 @@ using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
+using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -102,6 +103,9 @@ public static class DataAdoNetServiceCollectionExtensions
     // Data model
     services.TryAddSingleton(typeof(ModelConfiguration), configurationBuilder.ModelConfigurationType);
     services.TryAddSingleton(sp => sp.GetRequiredService<ModelConfiguration>().CreateDataModel());
+
+    // Navigation
+    services.TryAddSingleton<INavigationTreeFactory, NavigationTreeFactory>();
 
     // Data context
     Type dataContextType = provider.MakeGenericType(typeof(IDataContext<>));
