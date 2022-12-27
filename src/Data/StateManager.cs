@@ -9,10 +9,7 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
     if (_current is not null)
       throw new InvalidOperationException("Another unit of work began and was not disposed.");
 
-    _current = autoSave
-      ? new AutoSaveUnitOfWork(this, cancellationToken)
-      : new UnitOfWork(this);
-
+    _current = new UnitOfWork(this, autoSave, cancellationToken);
     return _current;
   }
 
@@ -25,13 +22,18 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 
   protected abstract Task SaveCoreAsync(CancellationToken cancellationToken);
 
-  private class UnitOfWork : IUnitOfWork
+  private sealed class UnitOfWork : IUnitOfWork
   {
-    protected readonly StateManager _manager;
+    private readonly StateManager _manager;
+    private readonly bool _autoSave;
+    private readonly CancellationToken _cancellationToken;
+    private bool _isDisposed;
 
-    public UnitOfWork(StateManager manager)
+    public UnitOfWork(StateManager manager, bool autoSave, CancellationToken cancellationToken)
     {
       _manager = manager;
+      _autoSave = autoSave;
+      _cancellationToken = cancellationToken;
     }
 
     public Task SaveAsync(CancellationToken cancellationToken = default)
@@ -39,27 +41,14 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
       return _manager.SaveCoreAsync(cancellationToken);
     }
 
-    public virtual ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
+      if (_isDisposed)
+        return new(Task.CompletedTask);
+
+      _isDisposed = true;
       _manager._current = null;
-      return new(Task.CompletedTask);
-    }
-  }
-
-  private sealed class AutoSaveUnitOfWork : UnitOfWork
-  {
-    private readonly CancellationToken _cancellationToken;
-
-    public AutoSaveUnitOfWork(StateManager manager, CancellationToken cancellationToken)
-      : base(manager)
-    {
-      _cancellationToken = cancellationToken;
-    }
-
-    public override ValueTask DisposeAsync()
-    {
-      _manager._current = null;
-      return new(_manager.SaveCoreAsync(_cancellationToken));
+      return new(_autoSave ? _manager.SaveCoreAsync(_cancellationToken) : Task.CompletedTask);
     }
   }
 }

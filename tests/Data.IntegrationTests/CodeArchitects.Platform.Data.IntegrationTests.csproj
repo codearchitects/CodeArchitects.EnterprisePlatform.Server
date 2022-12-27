@@ -48,11 +48,11 @@
     <ProjectReference Include="..\..\src\Data.AdoNet.Oracle\CodeArchitects.Platform.Data.AdoNet.Oracle.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.PostgreSQL\CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj" />
-    <ProjectReference Include="..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
+    <ProjectReference Include="..\..\src\Data.AdoNet.DependencyInjection\CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj">
       <SetTargetFramework>TargetFramework=netcoreapp3.1</SetTargetFramework>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Data.EntityFrameworkCore5\CodeArchitects.Platform.Data.EntityFrameworkCore5.csproj" />
+    <ProjectReference Include="..\..\src\Data.EntityFrameworkCore5.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

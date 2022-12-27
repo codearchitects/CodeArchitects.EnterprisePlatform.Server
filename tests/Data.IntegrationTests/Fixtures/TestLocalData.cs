@@ -1,7 +1,11 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Oracle;
+using CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
+using CodeArchitects.Platform.Data.AdoNet.SQLServer;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.Fixtures.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
 using Xunit.Abstractions;
 
@@ -24,74 +28,117 @@ public class TestLocalData
     nameof(Customer)
   };
 
-  private readonly Lazy<DbContextOptions> _sqlServerOptionsLazy;
-  private readonly Lazy<DbContextOptions> _postgresOptionsLazy;
-  private readonly Lazy<DbContextOptions> _oracleOptionsLazy;
+  private readonly TestFixture _fixture;
+  
+  private IServiceProvider _sqlServerServices = default!;
+  private IServiceProvider _postgresServices = default!;
+  private IServiceProvider _oracleServices = default!;
+
+  private IServiceScope? _scope;
+  private IServiceProvider? _services;
+  private TestDbContext? _dbContext;
 
   public TestLocalData(TestFixture fixture)
   {
-    _sqlServerOptionsLazy = new(() => new DbContextOptionsBuilder()
-      .UseSqlServer(fixture.SqlServerConnectionString)
-      .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseCaep()
-      .Options);
-
-    _postgresOptionsLazy = new(() => new DbContextOptionsBuilder()
-      .UseNpgsql(fixture.PostgresConnectionString)
-      .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseCaep()
-      .Options);
-
-    _oracleOptionsLazy = new(() => new DbContextOptionsBuilder()
-      .UseOracle(fixture.OracleConnectionString)
-      .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(this))
-      .UseCaep()
-      .Options);
+    _fixture = fixture;
   }
 
-  private bool _isInitialized;
-  private TestDbContext? _dbContext;
+  private bool _isExecuting;
   private DbProvider _provider = s_defaultProvider;
 
-  public TestDbContext DbContext => _dbContext ?? throw new InvalidOperationException("No context was initialized.");
+  public IServiceProvider Services => _services ?? throw new InvalidOperationException("Services were not initialized.");
+
+  public TestDbContext DbContext => _dbContext ?? throw new InvalidOperationException("Services were not initialized.");
 
   public ITestOutputHelper? Output { get; private set; }
 
-  public void EnsureCreated()
+  public void Initialize()
   {
-    new TestDbContext(_sqlServerOptionsLazy.Value).Database.EnsureCreated();
-    new TestDbContext(_postgresOptionsLazy.Value).Database.EnsureCreated();
-    new TestDbContext(_oracleOptionsLazy.Value).Database.EnsureCreated();
+    ServiceCollection sqlServerServiceCollection = new();
+    ServiceCollection postgresServiceCollection = new();
+    ServiceCollection oracleServiceCollection = new();
+
+    sqlServerServiceCollection.AddDbContext<TestDbContext>(options => options
+      .UseSqlServer(_fixture.SqlServerConnectionString)
+      .EnableSensitiveDataLogging()
+      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseCaep());
+
+    sqlServerServiceCollection.AddData<TestDbContext>();
+
+    sqlServerServiceCollection.AddData(options => options
+      .UseProvider<SQLServerProvider>(provider => provider.UseConnection(_fixture.SqlServerConnectionString))
+      .UseModel<TestModelConfiguration>());
+
+    postgresServiceCollection.AddDbContext<TestDbContext>(options => options
+      .UseNpgsql(_fixture.PostgresConnectionString)
+      .EnableSensitiveDataLogging()
+      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseCaep());
+
+    postgresServiceCollection.AddData<TestDbContext>();
+
+    postgresServiceCollection.AddData(options => options
+      .UseProvider<PostgreSQLProvider>(provider => provider.UseConnection(_fixture.PostgresConnectionString))
+      .UseModel<TestModelConfiguration>());
+
+    oracleServiceCollection.AddDbContext<TestDbContext>(options => options
+      .UseOracle(_fixture.OracleConnectionString)
+      .EnableSensitiveDataLogging()
+      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseCaep());
+
+    oracleServiceCollection.AddData<TestDbContext>();
+
+    oracleServiceCollection.AddData(options => options
+      .UseProvider<OracleProvider>(provider => provider.UseConnection(_fixture.OracleConnectionString))
+      .UseModel<TestModelConfiguration>());
+
+    _sqlServerServices = sqlServerServiceCollection.BuildServiceProvider();
+    _postgresServices = postgresServiceCollection.BuildServiceProvider();
+    _oracleServices = oracleServiceCollection.BuildServiceProvider();
+
+    using IServiceScope sqlServerScope = _sqlServerServices.CreateScope();
+    using IServiceScope postgresScope = _postgresServices.CreateScope();
+    using IServiceScope oracleScope = _oracleServices.CreateScope();
+
+    TestDbContext dbContext;
+
+    dbContext = sqlServerScope.ServiceProvider.GetRequiredService<TestDbContext>();
+    dbContext.Database.EnsureCreated();
+
+    dbContext = postgresScope.ServiceProvider.GetRequiredService<TestDbContext>();
+    dbContext.Database.EnsureCreated();
+
+    dbContext = oracleScope.ServiceProvider.GetRequiredService<TestDbContext>();
+    dbContext.Database.EnsureCreated();
   }
 
   public void Setup(ITestOutputHelper output)
   {
-    if (_isInitialized)
+    if (_isExecuting)
       throw new InvalidOperationException("Another test is already executing.");
-    _isInitialized = true;
 
+    _isExecuting = true;
     Output = output;
   }
 
-  public void InitializeContext(DbProvider provider, IEnumerable<object>? seed)
+  public void InitializeServices(DbProvider provider, IEnumerable<object>? seed)
   {
-    if (!_isInitialized)
-      throw new InvalidOperationException("Local data was not initialized.");
-    if (_dbContext is not null)
-      throw new InvalidOperationException("Another context was already initialized.");
+    if (!_isExecuting)
+      throw new InvalidOperationException("Local data was not set up.");
 
     _provider = provider;
-    DbContextOptions options = provider switch
+    IServiceProvider services = provider switch
     {
-      DbProvider.SqlServer => _sqlServerOptionsLazy.Value,
-      DbProvider.Postgres  => _postgresOptionsLazy.Value,
-      DbProvider.Oracle    => _oracleOptionsLazy.Value,
+      DbProvider.SqlServer => _sqlServerServices,
+      DbProvider.Postgres  => _postgresServices,
+      DbProvider.Oracle    => _oracleServices,
       _                    => throw Errors.Unreacheable
     };
-    _dbContext = new(options);
+    _scope = services.CreateScope();
+    _services = _scope.ServiceProvider;
+    _dbContext = _services.GetRequiredService<TestDbContext>();
 
     if (seed is not null)
     {
@@ -102,7 +149,7 @@ public class TestLocalData
 
   public void Reset()
   {
-    if (!_isInitialized)
+    if (!_isExecuting)
       throw new InvalidOperationException("No data to reset.");
 
     DbConnection connection = DbContext.Database.GetDbConnection();
@@ -120,10 +167,9 @@ public class TestLocalData
     connection.Close();
 
     Output = null;
-    DbContext.Dispose();
-    _dbContext = null;
+    _scope?.Dispose();
     _provider = s_defaultProvider;
 
-    _isInitialized = false;
+    _isExecuting = false;
   }
 }

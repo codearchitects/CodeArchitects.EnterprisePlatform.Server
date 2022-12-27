@@ -48,8 +48,6 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsManyToManyAndNavigationIsAdded(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Category category = Category.One();
     Typology typology0 = Typology.One();
     Typology typology1 = Typology.One();
@@ -57,6 +55,7 @@ public class UpdateAsyncTests : TestBase
     string? oldTypologyName = typology0.Name;
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
     typology0.Name = "New typology name";
@@ -84,8 +83,6 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsManyToManyAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Category category = Category.One();
     Typology typology0 = Typology.One();
     Typology typology1 = Typology.One();
@@ -93,6 +90,7 @@ public class UpdateAsyncTests : TestBase
     string? oldTypologyName = typology0.Name;
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
     typology0.Name = "New typology name";
@@ -118,14 +116,13 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldThrow_WhenNavigationIsManyToManyAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Category category = Category.One();
     Typology typology0 = Typology.One();
     Typology typology1 = Typology.One();
     category.Typologies = new() { typology0, typology1 };
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(category, TrackingState.Modified);
     trackingContext.SetTrackingState(typology0, TrackingState.Modified);
@@ -172,8 +169,6 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToManyInterAggregateAndNavigationIsAdded(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
@@ -181,6 +176,7 @@ public class UpdateAsyncTests : TestBase
     string? oldCartName = cart0.Name;
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
     cart0.Name = "New cart name";
@@ -208,8 +204,6 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToManyInterAggregateAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
@@ -217,6 +211,7 @@ public class UpdateAsyncTests : TestBase
     string? oldCartName = cart0.Name;
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
     cart0.Name = "New cart name";
@@ -242,8 +237,6 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndRemoveOrAddLinksOfAggregateEntity_WhenNavigationIsManyToManyAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Product product1 = Product.One();
     Product product2 = Product.One();
     Product product3 = Product.One();
@@ -252,6 +245,7 @@ public class UpdateAsyncTests : TestBase
     item.Products = new() { product1, product2 };
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, new object[] { cart, item, product1, product2, product3 });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";
     item.Name = "New item name";
@@ -282,14 +276,13 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToManyInterAggregateAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Customer customer = Customer.One();
     Cart cart0 = Cart.One();
     Cart cart1 = Cart.One();
     customer.Carts = new() { cart0, cart1 };
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(customer, TrackingState.Modified);
     trackingContext.SetTrackingState(cart0, TrackingState.Modified);
@@ -333,13 +326,12 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndAddLinks_WhenNavigationIsOneToOneInterAggregateAndNavigationIsAdded(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Person first = Person.One();
     Person second = Person.One();
     string? oldSecondName = second.Name;
 
     var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     first.Name = "New customer name";
     second.Name = "New second name";
@@ -366,13 +358,12 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndRemoveLinks_WhenNavigationIsOneToOneInterAggregateAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Person first = Person.One();
     Person second = Person.One();
     string? oldSecondName = second.Name;
 
     var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     first.Name = "New customer name";
     second.Name = "New second name";
@@ -397,13 +388,12 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldThrow_WhenNavigationIsOneToOneInterAggregateAndNavigationIsModified(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Person first = Person.One();
     Person second = Person.One();
     first.Partner = second;
 
     var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(first, TrackingState.Modified);
     trackingContext.SetTrackingState(second, TrackingState.Modified);
@@ -419,14 +409,13 @@ public class UpdateAsyncTests : TestBase
   public async Task UpdateAsync_ShouldUpdateEntityAndAddOrModifyOrDeleteChildren_WhenNavigationIsOneToManyIntraAggregate(RepositoryDependencies dependencies)
   {
     // Arrange
-    ITrackingContext trackingContext = dependencies.TrackingContext;
-
     Cart cart = Cart.One();
     CartItem item0 = CartItem.One(cart.Id);
     CartItem item1 = CartItem.One(cart.Id);
     cart.Items = new() { item0, item1 };
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, new object[] { cart, item0, item1 });
+    ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";
     item1.Name = "New item name";

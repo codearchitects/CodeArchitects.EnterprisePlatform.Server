@@ -1,9 +1,14 @@
-﻿using Docker.DotNet;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet;
+using CodeArchitects.Platform.Data.EntityFrameworkCore;
+using CodeArchitects.Platform.Data.Tracking;
+using Docker.DotNet;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using System.Runtime.InteropServices;
@@ -22,7 +27,6 @@ public class TestFixture : IAsyncLifetime
   private readonly Lazy<OracleConnection> _oracleConnectionLazy;
 
   private readonly TestLocalData _localData;
-  private readonly RepositoryFactory _repositoryFactory;
 
   public TestFixture()
   {
@@ -55,10 +59,11 @@ public class TestFixture : IAsyncLifetime
     _oracleConnectionLazy = new(() => new OracleConnection(OracleConnectionString));
 
     _localData = new(this);
-    _repositoryFactory = new(this);
   }
 
   public TestDbContext DbContext => _localData.DbContext;
+
+  public ITrackingContext TrackingContext => _localData.Services.GetRequiredService<ITrackingContext>();
 
   public string SqlServerConnectionString => _msSqlContainer.ConnectionString + "TrustServerCertificate=True;";
 
@@ -78,9 +83,14 @@ public class TestFixture : IAsyncLifetime
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    _localData.InitializeContext(dependencies.Provider, seed);
+    _localData.InitializeServices(dependencies.Provider, seed);
 
-    return _repositoryFactory.CreateRepository<TEntity, TKey>(dependencies);
+    return dependencies.Implementation switch
+    {
+      RepositoryImplementation.AdoNet => new AdoNetRepository<TEntity, TKey>(_localData.Services.GetRequiredService<AdoNet.IDataContext>()),
+      RepositoryImplementation.EFCore => new EFCoreRepository<TEntity, TKey>(_localData.Services.GetRequiredService<EntityFrameworkCore.IDataContext>()),
+      _                               => throw Errors.Unreacheable
+    };
   }
 
   public void Setup(ITestOutputHelper output)
@@ -110,7 +120,7 @@ public class TestFixture : IAsyncLifetime
     await _postgresContainer.StartAsync();
     await _oracleContainer.StartAsync();
 
-    _localData.EnsureCreated();
+    _localData.Initialize();
   }
 
   async Task IAsyncLifetime.DisposeAsync()

@@ -71,15 +71,15 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
 
   protected virtual void Dispose(bool disposing)
   {
-    if (!_isDisposed)
-    {
-      if (disposing)
-      {
-        _connection?.Dispose();
-      }
+    if (_isDisposed)
+      return;
 
-      _isDisposed = true;
+    if (disposing)
+    {
+      _connection?.Dispose();
     }
+
+    _isDisposed = true;
   }
 
   private void EnsureNotDisposed()

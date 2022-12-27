@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data;
 using CodeArchitects.Platform.Data.EntityFrameworkCore;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Materialization;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 using CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection;
 using CodeArchitects.Platform.Data.Tracking;
@@ -59,8 +60,12 @@ public static class DataEntityFrameworkCoreServiceCollectionExtensions
     services.AddScoped<ITrackingContext, TrackingContext>();
 
     services.AddScoped<IPredicateProvider, PredicateProvider>();
-    services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<DbContext>().Model));
+    services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<TDbContext>().Model));
     services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
+
+    services.AddScoped<IDefaultEntityFactory, DefaultEntityFactory>();
+    services.AddScoped<IDefaultEntityFactoryFactory>(sp => new DefaultEntityFactoryFactory(sp.GetRequiredService<TDbContext>().Model));
+    services.AddSingleton<IDefaultEntityFactoryCache>(DefaultEntityFactoryCache.Create());
 
     services.AddScoped<StateManager<TDbContext>>();
     services.AddScoped<IStateManager<TDbContext>>(sp => sp.GetRequiredService<StateManager<TDbContext>>());
