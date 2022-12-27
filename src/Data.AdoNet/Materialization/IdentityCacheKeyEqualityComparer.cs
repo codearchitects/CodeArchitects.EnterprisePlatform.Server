@@ -43,17 +43,9 @@ internal class IdentityCacheKeyEqualityComparer : IEqualityComparer<IdentityCach
         processedBytes += 4;
       }
 
-      switch (bytes.Length - processedBytes)
+      if (processedBytes != bytes.Length)
       {
-        case 1:
-          hashCode = hashCode * multiplier + bytes[^1];
-          break;
-        case 2:
-          hashCode = hashCode * multiplier + MemoryMarshal.AsRef<short>(bytes.AsSpan(processedBytes, 2));
-          break;
-        case 3:
-          hashCode = hashCode * multiplier + MemoryMarshal.AsRef<int>(bytes.AsSpan(processedBytes - 1, 4));
-          break;
+        hashCode = hashCode * multiplier + MemoryMarshal.AsRef<int>(bytes.AsSpan(bytes.Length - 4, 4));
       }
 
       return hashCode;

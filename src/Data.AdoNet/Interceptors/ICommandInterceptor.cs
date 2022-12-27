@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
-using System.Data.Common;
+﻿using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Interceptors;
 
@@ -7,7 +6,6 @@ namespace CodeArchitects.Platform.Data.AdoNet.Interceptors;
 /// Allows interception of the command after it is created and after it is built.
 /// </summary>
 /// <typeparam name="TDbCommand">The command type.</typeparam>
-[Experimental]
 public interface ICommandInterceptor<TDbCommand>
   where TDbCommand : DbCommand
 {
