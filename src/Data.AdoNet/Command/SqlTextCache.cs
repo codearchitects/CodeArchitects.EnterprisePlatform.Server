@@ -89,30 +89,7 @@ internal class SqlTextCache : ISqlTextCache
     return text;
   }
 
-  private class CacheKey
-  {
-    private readonly OperationType _operation;
-    private readonly IEntityModel _entityModel;
-
-    public CacheKey(OperationType operation, IEntityModel entityModel)
-    {
-      _operation = operation;
-      _entityModel = entityModel;
-    }
-
-    public override bool Equals(object? obj)
-    {
-      if (obj is not CacheKey other)
-        return false;
-
-      return _operation == other._operation && _entityModel == other._entityModel;
-    }
-
-    public override int GetHashCode()
-    {
-      return HashCode.Combine(_operation, _entityModel);
-    }
-  }
+  private record CacheKey(OperationType Operation, IEntityModel EntityModel);
 
   private enum OperationType
   {
