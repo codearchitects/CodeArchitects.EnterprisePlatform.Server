@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Data.Tracking;
-using System.Reflection;
+﻿using System.Reflection;
 using Xunit.Sdk;
 
 namespace CodeArchitects.Platform.Data.Fixtures;
