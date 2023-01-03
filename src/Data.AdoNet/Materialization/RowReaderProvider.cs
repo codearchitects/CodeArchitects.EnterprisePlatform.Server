@@ -147,7 +147,7 @@ internal class RowReaderProvider : IRowReaderProvider
       Debug.Assert(primaryKey.Type.IsGenericType);
 
       Type[] componentTypes = primaryKey.Type.GetGenericArguments();
-      Type valueTupleType = componentTypes.Length switch
+      Type tupleType = componentTypes.Length switch
       {
         2 => typeof(Tuple<,>),
         3 => typeof(Tuple<,,>),
@@ -155,7 +155,7 @@ internal class RowReaderProvider : IRowReaderProvider
         _ => throw Errors.Unreacheable
       };
 
-      return valueTupleType.MakeGenericType(componentTypes).GetRequiredConstructor(
+      return tupleType.MakeGenericType(componentTypes).GetRequiredConstructor(
         bindingAttr: BindingFlags.Instance | BindingFlags.Public,
         types: componentTypes);
     }

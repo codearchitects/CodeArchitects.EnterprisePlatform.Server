@@ -2,8 +2,8 @@
 
 namespace CodeArchitects.Platform.Messaging.Dapr.Bindings;
 
-public interface IStateStoreOutputMetadata : ITypedOutputMetadata
+internal interface IStateStoreOutputMetadata : ITypedOutputMetadata
 {
-  string StoreName { get; }
+  string Store { get; }
   string Key { get; }
 }

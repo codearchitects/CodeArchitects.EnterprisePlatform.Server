@@ -17,6 +17,6 @@ internal class StateStoreOutputBinding : IOutputBinding<IStateStoreOutputMetadat
     if (context.Result is not { } result)
       return Task.CompletedTask;
 
-    return _dapr.SaveStateAsync(context.Metadata.StoreName, context.Metadata.Key, result, cancellationToken: cancellationToken);
+    return _dapr.SaveStateAsync(context.Metadata.Store, context.Metadata.Key, result, cancellationToken: cancellationToken);
   }
 }
