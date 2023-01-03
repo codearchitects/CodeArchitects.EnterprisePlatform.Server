@@ -35,7 +35,9 @@ internal class NavigationTreeFactory : INavigationTreeFactory
         include(includer);
         root = includer.Root;
 
-        _cache.Set(include, root);
+        ICacheEntry entry = _cache.CreateEntry(include);
+        entry.Value = root;
+        entry.Size = ComputeEntrySize(root);
       }
     }
     finally
@@ -51,5 +53,27 @@ internal class NavigationTreeFactory : INavigationTreeFactory
     where TKey : IEquatable<TKey>
   {
     return new EmptyNavigationRoot<TEntity, TKey>(entityModel);
+  }
+
+  private static long ComputeEntrySize(INavigationRoot root)
+  {
+    long size = 2;
+    foreach (INavigation navigation in root.Navigations)
+    {
+      size += ComputeSize(navigation);
+    }
+
+    return size;
+
+    static long ComputeSize(INavigation navigation)
+    {
+      long size = 2;
+      foreach (INavigation child in navigation.Children)
+      {
+        size += ComputeSize(child);
+      }
+
+      return size;
+    }
   }
 }

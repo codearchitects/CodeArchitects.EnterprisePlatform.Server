@@ -39,7 +39,7 @@ public static class DataAdoNetServiceCollectionExtensions
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
 
-    services.TryAddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions()));
+    services.TryAddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions { SizeLimit = 10240 }));
     services.AddSingleton(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<IMemoryCache>()));
 
     // Materializer
