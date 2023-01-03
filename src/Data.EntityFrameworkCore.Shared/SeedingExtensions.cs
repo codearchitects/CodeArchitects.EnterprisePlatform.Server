@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -21,6 +22,18 @@ public static class SeedingExtensions
       throw new ArgumentNullException(nameof(context));
 
     SeedCore(context, seed);
+  }
+
+  /// <summary>
+  /// Applies the registered seed to the database.
+  /// </summary>
+  /// <param name="context">The db context.</param>
+  public static void Seed(this DbContext context)
+  {
+    if (context is null)
+      throw new ArgumentNullException(nameof(context));
+
+    SeedCore(context, context.GetService<DataSeed>());
   }
 
   /// <summary>

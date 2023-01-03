@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Interceptors;
 /// Allows interception of the command after it is created and after it is built.
 /// </summary>
 /// <typeparam name="TDbCommand">The command type.</typeparam>
-public interface ICommandInterceptor<TDbCommand>
+public interface ICommandInterceptor<in TDbCommand>
   where TDbCommand : DbCommand
 {
   /// <summary>

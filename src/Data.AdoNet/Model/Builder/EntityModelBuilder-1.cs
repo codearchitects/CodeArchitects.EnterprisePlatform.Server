@@ -57,6 +57,7 @@ internal class EntityModelBuilder<TEntity> : EntityModelBuilder, IEntityModelBui
     PrimaryKeyModel primaryKey = PrimaryKeyModel.Create(keyMembersAndTypes);
 
     _entity = EntityModel.Create(EntityType, initializer, primaryKey);
+    _entity.TableName = _tableName;
     return _entity;
   }
 
