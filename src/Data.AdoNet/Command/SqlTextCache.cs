@@ -80,7 +80,9 @@ internal class SqlTextCache : ISqlTextCache
           return text;
 
         text = queryCompiler(entityModel, sqlBuilder);
-        _cache.Set(key, text);
+        ICacheEntry entry = _cache.CreateEntry(key);
+        entry.Value = text;
+        entry.Size = text.Length / 4;
       }
     }
     finally
