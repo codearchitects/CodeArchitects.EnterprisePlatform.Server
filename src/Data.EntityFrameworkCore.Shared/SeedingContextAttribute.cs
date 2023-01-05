@@ -17,7 +17,7 @@ public class SeedingContextAttribute : Attribute
     if (dbContextType is null)
       throw new ArgumentNullException(nameof(dbContextType));
 
-    if (typeof(DbContext).IsAssignableFrom(dbContextType))
+    if (!typeof(DbContext).IsAssignableFrom(dbContextType))
       throw new ArgumentException($"'{dbContextType.Name}' does not extends '{nameof(DbContext)}'.", nameof(dbContextType));
 
     DbContextType = dbContextType;

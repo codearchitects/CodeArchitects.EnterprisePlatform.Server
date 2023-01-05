@@ -33,7 +33,7 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
       throw new ModelConfigurationException($"An association '{FromType.Name}' -> '{ToType.Name}' was defined, but '{FromType.Name}' is not an entity.");
 
     if (!dataModel.TryGetEntity(ToType, out EntityModel? toEntity))
-      throw new ModelConfigurationException($"An association '{ToType.Name}' -> '{ToType.Name}' was defined, but '{ToType.Name}' is not an entity.");
+      throw new ModelConfigurationException($"An association '{FromType.Name}' -> '{ToType.Name}' was defined, but '{ToType.Name}' is not an entity.");
 
     return Build(fromEntity, toEntity);
   }
