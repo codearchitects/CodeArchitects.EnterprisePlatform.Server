@@ -16,9 +16,11 @@ internal class PredicateTemplateFactory : IPredicateTemplateFactory
   }
 
   public Expression<Func<TEntity, bool>> CreateFindPredicateTemplate<TEntity, TKey>()
+    where TEntity : class
+    where TKey : IEquatable<TKey>
   {
-    IEntityType entityModel = _model.FindEntityType(typeof(TEntity))!;
-    IReadOnlyList<IProperty> keyModels = entityModel.FindPrimaryKey()!.Properties;
+    IEntityType entityType = _model.FindEntityType(typeof(TEntity))!;
+    IReadOnlyList<IProperty> keyModels = entityType.FindPrimaryKey()!.Properties;
 
     ParameterExpression entity = Expression.Parameter(typeof(TEntity), nameof(entity));
 

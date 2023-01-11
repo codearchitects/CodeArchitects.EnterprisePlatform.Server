@@ -7,6 +7,7 @@ using CodeArchitects.Platform.Data.Tracking;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -261,6 +262,20 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     }
 
     await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public async Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (await DbContext.Set<TEntity>().AnyAsync(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity), cancellationToken))
+    {
+      await UpdateAsync<TEntity, TKey>(entity, cancellationToken);
+    }
+    else
+    {
+      await InsertAsync<TEntity, TKey>(entity, cancellationToken);
+    }
   }
 
   public async Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)

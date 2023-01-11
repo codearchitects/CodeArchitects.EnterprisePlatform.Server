@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
@@ -15,7 +16,7 @@ public partial class PredicateProviderTests
     const int id = 12;
     Expression<Func<EntityWithSimplePropertyKey, bool>> expected = entity => entity.Id == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
+    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
 
     // Act
     var predicate = sut.GetFindPredicate<EntityWithSimplePropertyKey, int>(id);
@@ -34,7 +35,7 @@ public partial class PredicateProviderTests
     const int id = 12;
     Expression<Func<EntityWithSimpleFieldKey, bool>> expected = entity => entity.Id == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
+    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
 
     // Act
     var predicate = sut.GetFindPredicate<EntityWithSimpleFieldKey, int>(id);
@@ -53,7 +54,7 @@ public partial class PredicateProviderTests
     const int id = 12;
     Expression<Func<EntityWithSimpleShadowKey, bool>> expected = entity => EF.Property<int>(entity, "Id") == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
+    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
 
     // Act
     var predicate = sut.GetFindPredicate<EntityWithSimpleShadowKey, int>(id);
@@ -73,7 +74,7 @@ public partial class PredicateProviderTests
     const string id2 = "id2";
     Expression<Func<EntityWithCompositeKey, bool>> expected = entity => entity.Id1 == id1 && entity.Id2 == id2;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
+    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
 
     // Act
     var predicate = sut.GetFindPredicate<EntityWithCompositeKey, (int, string)>((id1, id2));

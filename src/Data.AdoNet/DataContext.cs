@@ -98,6 +98,26 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     }, startTransaction, cancellationToken);
   }
 
+  public Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      TDbCommand command = CreateCommand(OperationType.Upsert, Connection);
+
+      command.Transaction = transaction;
+      await _executor.ExecuteUpsertAsync(command, entity, model, cancellationToken);
+    }, startTransaction, cancellationToken);
+  }
+
   public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>

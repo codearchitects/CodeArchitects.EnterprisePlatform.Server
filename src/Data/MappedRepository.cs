@@ -64,6 +64,13 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual async Task UpsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+  {
+    TTable table = EntityToTable(entity);
+    await DataContext.UpsertAsync<TTable, TKey>(table, cancellationToken);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     TTable table = EntityToTable(entity);

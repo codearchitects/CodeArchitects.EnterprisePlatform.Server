@@ -43,6 +43,13 @@ public interface IRepository<TEntity, TKey>
   Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
 
   /// <summary>
+  /// Inserts or updates an existing entity in the repository.
+  /// </summary>
+  /// <param name="entity">The entity to be inserted or updated.</param>
+  /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
+  Task UpsertAsync(TEntity entity, CancellationToken cancellationToken = default);
+
+  /// <summary>
   /// Removes an existing entity from the repository.
   /// </summary>
   /// <param name="entity">The entity to be removed.</param>

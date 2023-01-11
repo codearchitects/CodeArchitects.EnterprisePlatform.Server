@@ -5,8 +5,8 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
 
 internal class TupleReplacer : ExpressionVisitor
 {
-  private int _index;
   private readonly ITuple _tuple;
+  private int _index;
 
   public TupleReplacer(ITuple tuple)
   {

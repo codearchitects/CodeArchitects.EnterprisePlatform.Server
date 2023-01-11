@@ -55,6 +55,17 @@ public interface IDataContext
     where TKey : IEquatable<TKey>;
 
   /// <summary>
+  /// Inserts or updates an existing entity in the repository.
+  /// </summary>
+  /// <typeparam name="TEntity">The entity type.</typeparam>
+  /// <typeparam name="TKey">The entity's primary key type.</typeparam>
+  /// <param name="entity">The entity to be inserted or updated.</param>
+  /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
+  Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
+
+  /// <summary>
   /// Removes an existing entity from the repository.
   /// </summary>
   /// <typeparam name="TEntity">The entity type.</typeparam>

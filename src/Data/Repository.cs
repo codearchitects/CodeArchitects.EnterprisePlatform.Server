@@ -42,6 +42,12 @@ public abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
   }
 
   /// <inheritdoc/>
+  public virtual async Task UpsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+  {
+    await DataContext.UpsertAsync<TEntity, TKey>(entity, cancellationToken);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     await DataContext.RemoveAsync<TEntity, TKey>(entity, cancellationToken);

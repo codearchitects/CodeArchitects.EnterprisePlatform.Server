@@ -21,6 +21,11 @@ public enum OperationType
   Update,
 
   /// <summary>
+  /// The Upsert operation.
+  /// </summary>
+  Upsert,
+
+  /// <summary>
   /// The Remove operation.
   /// </summary>
   Remove
