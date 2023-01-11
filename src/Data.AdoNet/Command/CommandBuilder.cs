@@ -99,6 +99,11 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
     }
   }
 
+  public void BuildCountCommand(TDbCommand command, IEntityModel model)
+  {
+    command.CommandText = _sqlBuilder.BuildCountText(model);
+  }
+
   protected virtual void CreateParameter(TDbCommand command, string name, object? value)
   {
     IDbDataParameter parameter = command.CreateParameter();

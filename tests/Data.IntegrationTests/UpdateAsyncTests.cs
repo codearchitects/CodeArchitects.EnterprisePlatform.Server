@@ -24,7 +24,11 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new() { typology0, typology1 };
     string? oldTypologyName = typology0.Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(typology0, typology1);
+      seeder.Seed(category);
+    });
 
     category.Name = "New category name";
     typology0.Name = "New typology name";
@@ -54,7 +58,11 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new() { typology0 };
     string? oldTypologyName = typology0.Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(typology0, typology1);
+      seeder.Seed(category);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
@@ -89,7 +97,11 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new() { typology0, typology1 };
     string? oldTypologyName = typology0.Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(typology0, typology1);
+      seeder.Seed(category);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
@@ -121,7 +133,11 @@ public class UpdateAsyncTests : TestBase
     Typology typology1 = Typology.One();
     category.Typologies = new() { typology0, typology1 };
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new object[] { typology0, typology1, category });
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(typology0, typology1);
+      seeder.Seed(category);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(category, TrackingState.Modified);
@@ -145,7 +161,11 @@ public class UpdateAsyncTests : TestBase
     customer.Carts = new() { cart0, cart1 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart0, cart1);
+      seeder.Seed(customer);
+    });
 
     customer.Name = "New customer name";
     cart0.Name = "New cart name";
@@ -175,7 +195,11 @@ public class UpdateAsyncTests : TestBase
     customer.Carts = new() { cart0 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart0, cart1);
+      seeder.Seed(customer);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
@@ -210,7 +234,11 @@ public class UpdateAsyncTests : TestBase
     customer.Carts = new() { cart0, cart1 };
     string? oldCartName = cart0.Name;
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart0, cart1);
+      seeder.Seed(customer);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
@@ -243,8 +271,14 @@ public class UpdateAsyncTests : TestBase
     Cart cart = Cart.One();
     CartItem item = CartItem.One(cart.Id);
     item.Products = new() { product1, product2 };
+    cart.Items = new() { item };
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, new object[] { cart, item, product1, product2, product3 });
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart);
+      seeder.Seed(item);
+      seeder.Seed(product1, product2, product3);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";
@@ -281,7 +315,11 @@ public class UpdateAsyncTests : TestBase
     Cart cart1 = Cart.One();
     customer.Carts = new() { cart0, cart1 };
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new object[] { cart0, cart1, customer });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart0, cart1);
+      seeder.Seed(customer);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(customer, TrackingState.Modified);
@@ -304,7 +342,11 @@ public class UpdateAsyncTests : TestBase
     first.Partner = second;
     string? oldSecondName = second.Name;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(first);
+      seeder.Seed(second);
+    }, seedImplementation: RepositoryImplementation.EFCore);
 
     first.Name = "New first name";
     second.Name = "New second name";
@@ -330,7 +372,11 @@ public class UpdateAsyncTests : TestBase
     Person second = Person.One();
     string? oldSecondName = second.Name;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(first);
+      seeder.Seed(second);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     first.Name = "New customer name";
@@ -362,7 +408,11 @@ public class UpdateAsyncTests : TestBase
     Person second = Person.One();
     string? oldSecondName = second.Name;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(first);
+      seeder.Seed(second);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     first.Name = "New customer name";
@@ -392,7 +442,12 @@ public class UpdateAsyncTests : TestBase
     Person second = Person.One();
     first.Partner = second;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new object[] { first, second });
+    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(first);
+      seeder.Seed(second);
+    }, seedImplementation: RepositoryImplementation.EFCore);
+
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     trackingContext.SetTrackingState(first, TrackingState.Modified);
@@ -414,7 +469,11 @@ public class UpdateAsyncTests : TestBase
     CartItem item1 = CartItem.One(cart.Id);
     cart.Items = new() { item0, item1 };
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, new object[] { cart, item0, item1 });
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
+    {
+      seeder.Seed(cart);
+      seeder.Seed(item0, item1);
+    });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";

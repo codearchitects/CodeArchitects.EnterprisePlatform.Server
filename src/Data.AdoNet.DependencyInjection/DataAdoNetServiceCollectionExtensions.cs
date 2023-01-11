@@ -35,6 +35,9 @@ public static class DataAdoNetServiceCollectionExtensions
     configurationAction(configurationBuilder);
 
     DatabaseProvider provider = configurationBuilder.Provider;
+    Type providerType = provider.GetType();
+    services.AddSingleton(providerType, provider);
+    services.AddSingleton(typeof(DatabaseProvider), sp => sp.GetRequiredService(providerType));
 
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));

@@ -23,4 +23,6 @@ internal interface ICommandBuilder<in TDbCommand>
   void BuildRemoveCommand<TEntity, TKey>(TDbCommand command, TKey key, IEntityModel<TEntity, TKey> model)
     where TEntity : class
     where TKey : IEquatable<TKey>;
+
+  void BuildCountCommand(TDbCommand command, IEntityModel model);
 }

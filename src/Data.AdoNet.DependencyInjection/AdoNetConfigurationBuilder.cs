@@ -93,10 +93,10 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       AddCommandInterceptors();
     }
 
-    // if (serviceTypes.HasFlag(AdoNetServiceTypes.DataSeed))
-    // {
-    //   AddDataSeed();
-    // }
+    if (serviceTypes.HasFlag(AdoNetServiceTypes.DataSeed))
+    {
+      AddDataSeed();
+    }
 
     return this;
 

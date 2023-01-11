@@ -1,4 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Executor;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -17,6 +19,17 @@ public abstract class DatabaseProvider<TDbConnection, TDbCommand> : DatabaseProv
   private protected sealed override Type DbCommandType => typeof(TDbCommand);
 
   internal override Type DataContextType => typeof(DataContext<TDbConnection, TDbCommand>);
+
+  internal sealed override void ApplySeed(IServiceProvider services, DataSeed seed)
+  {
+    IExecutor<TDbCommand> executor = (IExecutor<TDbCommand>)services.GetService(typeof(IExecutor<TDbCommand>))!;
+    IStateManager<TDbConnection> stateManager = (IStateManager<TDbConnection>)services.GetService(typeof(IStateManager<TDbConnection>))!;
+    ICommandBuilder<TDbCommand> commandBuilder = (ICommandBuilder<TDbCommand>)services.GetService(typeof(ICommandBuilder<TDbCommand>))!;
+    IDataModel dataModel = (IDataModel)services.GetService(typeof(IDataModel))!;
+
+    Seeder<TDbConnection, TDbCommand> seeder = new(executor, stateManager, commandBuilder, dataModel);
+    seeder.Apply(seed);
+  }
 
   private protected sealed override object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder)
   {

@@ -10,7 +10,7 @@ public class FindAsyncTests : TestBase
 {
   private readonly Customer _customer;
   private readonly Category _category;
-  private readonly IEnumerable<object> _seed;
+  private readonly Action<ISeeder> _seedingAction;
 
   public FindAsyncTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
@@ -32,7 +32,11 @@ public class FindAsyncTests : TestBase
       Typology.One()
     };
 
-    _seed = new object[] { _customer, _category };
+    _seedingAction = seeder =>
+    {
+      seeder.Seed(_customer);
+      seeder.Seed(_category);
+    };
   }
 
   [Theory, RepositoryDependenciesData]
@@ -54,7 +58,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id);
@@ -72,7 +76,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     CartItem item = _customer.Carts![1].Items![0];
 
-    var sut = _fixture.CreateRepository<CartItem, (int, Guid)>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<CartItem, (int, Guid)>(dependencies, _seedingAction);
 
     // Act
     CartItem? fromDb = await sut.FindAsync(item.Index, item.CartId);
@@ -91,7 +95,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
@@ -113,7 +117,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
@@ -133,7 +137,7 @@ public class FindAsyncTests : TestBase
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeManyToMany(RepositoryDependencies dependencies)
   {
     // Arrange
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, _seedingAction);
 
     // Act
     Category? fromDb = await sut.FindAsync(_category.Id, _ => _
@@ -154,7 +158,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
@@ -178,7 +182,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
@@ -203,7 +207,7 @@ public class FindAsyncTests : TestBase
     // Arrange
     Cart cart = _customer.Carts![0];
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, _seedingAction);
 
     // Act
     Cart? fromDb = await sut.FindAsync(cart.Id, _ => _
@@ -224,7 +228,7 @@ public class FindAsyncTests : TestBase
   public async Task FindAsync_ShouldReturnEntityWithCorrectNavigations_WhenIncludeCollectionThenCollection(RepositoryDependencies dependencies)
   {
     // Arrange
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, _seed);
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, _seedingAction);
 
     // Act
     Customer? fromDb = await sut.FindAsync(_customer.Id, _ => _

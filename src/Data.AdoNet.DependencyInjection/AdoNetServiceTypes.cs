@@ -23,10 +23,10 @@ public enum AdoNetServiceTypes
   /// </summary>
   CommandInterceptors = 2,
 
-  // /// <summary>
-  // /// Look for data seed.
-  // /// </summary>
-  // DataSeed = 4,
+  /// <summary>
+  /// Look for data seed.
+  /// </summary>
+  DataSeed = 4,
 
   /// <summary>
   /// Look for all types of services.

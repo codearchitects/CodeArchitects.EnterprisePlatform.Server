@@ -20,6 +20,8 @@ public static class SeedingExtensions
   {
     if (context is null)
       throw new ArgumentNullException(nameof(context));
+    if (seed is null)
+      throw new ArgumentNullException(nameof(seed));
 
     SeedCore(context, seed);
   }
@@ -62,7 +64,6 @@ public static class SeedingExtensions
       ? seedingContextAttribute.DbContextType
       : typeof(DbContext);
 
-    using IServiceScope scope = services.CreateScope();
     using DbContext dbContext = (DbContext)services.GetRequiredService(dbContextType);
 
     SeedCore(dbContext, seed);

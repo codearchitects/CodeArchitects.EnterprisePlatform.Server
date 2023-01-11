@@ -40,7 +40,7 @@ public class InsertAsyncTests : TestBase
     Category category = Category.One();
     category.Typologies = new() { typology };
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, new[] { typology });
+    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder => seeder.Seed(typology));
 
     // Act
     await sut.InsertAsync(category);
@@ -64,7 +64,7 @@ public class InsertAsyncTests : TestBase
     cart.Items = CartItem.Many(1, cart.Id);
     customer.Carts = new() { cart };
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, new[] { cart });
+    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder => seeder.Seed(cart));
 
     // Act
     await sut.InsertAsync(customer);
@@ -87,7 +87,7 @@ public class InsertAsyncTests : TestBase
     Person second = Person.One();
     second.Partner = first;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, new[] { first });
+    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder => seeder.Seed(first));
 
     // Act
     await sut.InsertAsync(second);

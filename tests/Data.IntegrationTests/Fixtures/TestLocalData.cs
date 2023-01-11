@@ -1,11 +1,17 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Oracle;
 using CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 using CodeArchitects.Platform.Data.AdoNet.SQLServer;
+using CodeArchitects.Platform.Data.EntityFrameworkCore;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.Fixtures.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
 using Xunit.Abstractions;
 
@@ -123,7 +129,7 @@ public class TestLocalData
     Output = output;
   }
 
-  public void InitializeServices(DbProvider provider, IEnumerable<object>? seed)
+  public void InitializeServices(DbProvider provider, DataSeed seed, RepositoryImplementation seedImplementation)
   {
     if (!_isExecuting)
       throw new InvalidOperationException("Local data was not set up.");
@@ -140,10 +146,22 @@ public class TestLocalData
     _services = _scope.ServiceProvider;
     _dbContext = _services.GetRequiredService<TestDbContext>();
 
-    if (seed is not null)
+    switch (seedImplementation)
     {
-      _dbContext.AddRange(seed);
-      _dbContext.SaveChanges();
+      case RepositoryImplementation.EFCore:
+        _dbContext.Seed(seed);
+        break;
+      case RepositoryImplementation.AdoNet:
+        DatabaseProvider databaseProvider = provider switch
+        {
+          DbProvider.SqlServer => services.GetRequiredService<SQLServerProvider>(),
+          DbProvider.Postgres  => services.GetRequiredService<PostgreSQLProvider>(),
+          DbProvider.Oracle    => services.GetRequiredService<OracleProvider>(),
+          _                    => throw Errors.Unreacheable
+        };
+
+        databaseProvider.ApplySeed(services, seed);
+        break;
     }
   }
 

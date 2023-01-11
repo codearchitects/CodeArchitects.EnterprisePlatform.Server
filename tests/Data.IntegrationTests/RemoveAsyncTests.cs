@@ -18,7 +18,7 @@ public class RemoveAsyncTests : TestBase
     // Arrange
     Product product = Product.One();
 
-    var sut = _fixture.CreateRepository<Product, Guid>(dependencies, new[] { product });
+    var sut = _fixture.CreateRepository<Product, Guid>(dependencies, seeder => seeder.Seed(product));
 
     // Act
     await sut.RemoveAsync(product.Id);

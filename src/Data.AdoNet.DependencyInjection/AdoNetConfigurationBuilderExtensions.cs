@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet;
+﻿using CodeArchitects.Platform.Data;
+using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using System.Data.Common;
@@ -40,20 +41,20 @@ public static class AdoNetConfigurationBuilderExtensions
     return builder.AddCommandInterceptor(typeof(TInterceptor));
   }
 
-  // /// <summary>
-  // /// Specifies the seed type to use for seeding the database.
-  // /// </summary>
-  // /// <typeparam name="TDataSeed">>The seed type.</typeparam>
-  // /// <param name="builder">The ADO.NET configuration builder.</param>
-  // /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
-  // public static IAdoNetConfigurationBuilderWithProvider UseSeed<TDataSeed>(this IAdoNetConfigurationBuilderWithProvider builder)
-  //   where TDataSeed : DataSeed
-  // {
-  //   if (builder is null)
-  //     throw new ArgumentNullException(nameof(builder));
-  // 
-  //   return builder.UseSeed(typeof(TDataSeed));
-  // }
+  /// <summary>
+  /// Specifies the seed type to use for seeding the database.
+  /// </summary>
+  /// <typeparam name="TDataSeed">>The seed type.</typeparam>
+  /// <param name="builder">The ADO.NET configuration builder.</param>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  public static IAdoNetConfigurationBuilderWithProvider UseSeed<TDataSeed>(this IAdoNetConfigurationBuilderWithProvider builder)
+    where TDataSeed : DataSeed
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+  
+    return builder.UseSeed(typeof(TDataSeed));
+  }
 
   /// <summary>
   /// Scans the specifies assembly and looks for a <see cref="ModelConfiguration"/> type to use and registers any found <see cref="ICommandInterceptor{TCommand}"/> implementation.

@@ -10,4 +10,5 @@ internal interface ISqlTextBuilder
   string BuildUpdateText(IEntityModel entityModel);
   string BuildUpsertText(IEntityModel entityModel);
   string BuildRemoveText(IEntityModel entityModel);
+  string BuildCountText(IEntityModel entityModel);
 }

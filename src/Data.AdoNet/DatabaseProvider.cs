@@ -27,6 +27,19 @@ public abstract class DatabaseProvider
 
   private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder);
 
+  public void ApplySeed(IServiceProvider services)
+  {
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+
+    if (services.GetService(typeof(DataSeed)) is not DataSeed seed)
+      return;
+
+    ApplySeed(services, seed);
+  }
+
+  internal abstract void ApplySeed(IServiceProvider services, DataSeed seed);
+
   internal object CreateCommandBuilder(IMemoryCache cache)
   {
     SqlTextCache sqlCache = new(cache);

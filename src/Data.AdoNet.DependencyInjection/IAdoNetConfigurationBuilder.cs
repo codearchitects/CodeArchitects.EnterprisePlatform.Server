@@ -39,12 +39,12 @@ public interface IAdoNetConfigurationBuilderWithProvider
   /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
   IAdoNetConfigurationBuilderWithProvider AddCommandInterceptor(Type interceptorType);
 
-  // /// <summary>
-  // /// Specifies the seed type to use for seeding the database.
-  // /// </summary>
-  // /// <param name="seedType">The seed type. It must extend <see cref="DataSeed"/>.</param>
-  // /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
-  // IAdoNetConfigurationBuilderWithProvider UseSeed(Type seedType);
+  /// <summary>
+  /// Specifies the seed type to use for seeding the database.
+  /// </summary>
+  /// <param name="seedType">The seed type. It must extend <see cref="DataSeed"/>.</param>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  IAdoNetConfigurationBuilderWithProvider UseSeed(Type seedType);
 
   /// <summary>
   /// Scans the specifies assembly and looks for a <see cref="ModelConfiguration"/> type to use and registers any found <see cref="ICommandInterceptor{TCommand}"/> implementation.

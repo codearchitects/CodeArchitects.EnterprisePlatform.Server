@@ -79,11 +79,17 @@ public class TestFixture : IAsyncLifetime
 
   public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>(
     RepositoryDependencies dependencies,
-    IEnumerable<object>? seed = null)
+    Action<ISeeder>? seedingAction = null,
+    RepositoryImplementation seedImplementation = ((RepositoryImplementation)(-1)))
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    _localData.InitializeServices(dependencies.Provider, seed);
+    if (seedImplementation == ((RepositoryImplementation)(-1)))
+    {
+      seedImplementation = dependencies.Implementation;
+    }
+
+    _localData.InitializeServices(dependencies.Provider, new TestDataSeed(seedingAction ?? (seeder => { })), seedImplementation);
 
     return dependencies.Implementation switch
     {

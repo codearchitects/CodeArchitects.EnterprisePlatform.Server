@@ -65,6 +65,11 @@ internal class SqlTextBuilder : ISqlTextBuilder
     });
   }
 
+  public string BuildCountText(IEntityModel entityModel)
+  {
+    return $"SELECT COUNT(*) FROM {_syntaxProvider.EscapeLeft}{entityModel.TableName}{_syntaxProvider.EscapeRight}";
+  }
+
   private void BuildFindText(in SqlStringBuilder stringBuilder, INavigationRoot root)
   {
     if (root.Navigations is { Count: > 0 } navigations)
