@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.Common.Utils;
 /// <summary>
 /// Extension methods using reflection.
 /// </summary>
-public static class ReflectionExtensions
+internal static class ReflectionExtensions
 {
   /// <summary>
   /// Invokes a public method using reflection.
