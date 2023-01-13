@@ -4,7 +4,17 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 {
   private UnitOfWork? _current;
 
-  public IUnitOfWork Begin(bool autoSave = false, CancellationToken cancellationToken = default)
+  public IUnitOfWork Begin(CancellationToken cancellationToken = default)
+  {
+    return BeginCore(false, cancellationToken);
+  }
+
+  public IUnitOfWork Begin(bool autoSave, CancellationToken cancellationToken = default)
+  {
+    return BeginCore(autoSave, cancellationToken);
+  }
+
+  private IUnitOfWork BeginCore(bool autoSave, CancellationToken cancellationToken)
   {
     if (_current is not null)
       throw new InvalidOperationException("Another unit of work began and was not disposed.");
