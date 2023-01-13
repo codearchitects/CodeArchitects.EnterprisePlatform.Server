@@ -39,6 +39,12 @@ public static class DataAdoNetServiceCollectionExtensions
     services.AddSingleton(providerType, provider);
     services.AddSingleton(typeof(DatabaseProvider), sp => sp.GetRequiredService(providerType));
 
+    // Seed
+    if (configurationBuilder.SeedType is { } seedType)
+    {
+      services.AddSingleton(typeof(DataSeed), seedType);
+    }
+
     // Command
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
 

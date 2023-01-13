@@ -52,9 +52,9 @@ public static class DataEntityFrameworkCoreServiceCollectionExtensions
   private static IServiceCollection AddDataCore<TDbContext>(this IServiceCollection services, EntityFrameworkCoreConfigurationBuilder configurationBuilder)
     where TDbContext : DbContext
   {
-    if (configurationBuilder.SeedType is not null)
+    if (configurationBuilder.SeedType is { } seedType)
     {
-      services.AddSingleton(typeof(DataSeed), configurationBuilder.SeedType);
+      services.AddSingleton(typeof(DataSeed), seedType);
     }
 
     services.AddScoped<ITrackingContext, TrackingContext>();
