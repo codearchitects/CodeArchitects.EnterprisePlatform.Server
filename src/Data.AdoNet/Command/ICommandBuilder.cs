@@ -25,4 +25,6 @@ internal interface ICommandBuilder<in TDbCommand>
     where TKey : IEquatable<TKey>;
 
   void BuildCountCommand(TDbCommand command, IEntityModel model);
+
+  string BuildCustomCommand(string query, INavigationRoot root);
 }

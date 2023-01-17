@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
@@ -16,18 +17,21 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
   private readonly IExecutor<TDbCommand> _executor;
   private readonly ICommandInterceptor<TDbCommand> _interceptor;
   private readonly INavigationTreeFactory _navigationTreeFactory;
+  private readonly ICommandBuilder<TDbCommand> _commandBuilder;
 
   public DataContext(
     IStateManager<TDbConnection> stateManager,
     IExecutor<TDbCommand> executor,
     ICommandInterceptorAggregator<TDbCommand> interceptor,
     INavigationTreeFactory navigationTreeFactory,
+    ICommandBuilder<TDbCommand> commandBuilder,
     IDataModel model)
   {
     _stateManager = stateManager;
     _executor = executor;
     _interceptor = interceptor;
     _navigationTreeFactory = navigationTreeFactory;
+    _commandBuilder = commandBuilder;
     Model = model;
   }
 
@@ -193,6 +197,15 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     await callback(entity, model, default, state, cancellationToken);
     await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  }
+
+  public string IncludeNavigations<TEntity, TKey>(string query, IncludeAction<TEntity> includeAction)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
+
+    return _commandBuilder.BuildCustomCommand(query, _navigationTreeFactory.Create(entityModel, includeAction));
   }
 
   protected virtual TDbCommand CreateCommand(TDbConnection connection)

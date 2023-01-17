@@ -11,4 +11,5 @@ internal interface ISqlTextBuilder
   string BuildUpsertText(IEntityModel entityModel);
   string BuildRemoveText(IEntityModel entityModel);
   string BuildCountText(IEntityModel entityModel);
+  string BuildCustomText(string query, INavigationRoot root);
 }

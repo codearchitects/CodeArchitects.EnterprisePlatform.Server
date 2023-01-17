@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.Features.Associations;
 
@@ -68,6 +69,13 @@ internal class SqlTextBuilder : ISqlTextBuilder
   public string BuildCountText(IEntityModel entityModel)
   {
     return $"SELECT COUNT(*) FROM {_syntaxProvider.EscapeLeft}{entityModel.TableName}{_syntaxProvider.EscapeRight}";
+  }
+
+  public string BuildCustomText(string query, INavigationRoot root)
+  {
+    SqlStringBuilder stringBuilder = new(_syntaxProvider);
+    BuildCustomText(in stringBuilder, query, root);
+    return stringBuilder.ToString();
   }
 
   private void BuildFindText(in SqlStringBuilder stringBuilder, INavigationRoot root)
@@ -189,5 +197,23 @@ internal class SqlTextBuilder : ISqlTextBuilder
     stringBuilder.AppendEscaped(entityModel.TableName);
     stringBuilder.Append(" WHERE ");
     stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
+  }
+
+  private void BuildCustomText(in SqlStringBuilder stringBuilder, string query, INavigationRoot root)
+  {
+    stringBuilder.Append("SELECT ");
+    stringBuilder.AppendColumns(root.Entity.Columns);
+    stringBuilder.AppendChildrenColumns(root.Navigations);
+    stringBuilder.AppendLine();
+    stringBuilder.AppendLine("FROM (");
+    stringBuilder.AppendLine(query);
+    stringBuilder.Append(')');
+    stringBuilder.AppendTableAlias();
+
+    foreach (INavigation child in root.Navigations)
+    {
+      stringBuilder.AppendLine();
+      stringBuilder.AppendLeftJoin(child);
+    }
   }
 }

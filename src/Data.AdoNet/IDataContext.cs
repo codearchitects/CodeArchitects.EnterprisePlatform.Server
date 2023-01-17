@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.CodeAnalysis;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.Navigation;
 using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -51,4 +52,12 @@ public interface IDataContext : Data.IDataContext
   [Experimental]
   Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
     where TEntity : class;
+
+  /// <summary>
+  /// TBD
+  /// </summary>
+  [Experimental]
+  string IncludeNavigations<TEntity, TKey>(string query, IncludeAction<TEntity> includeAction)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
 }

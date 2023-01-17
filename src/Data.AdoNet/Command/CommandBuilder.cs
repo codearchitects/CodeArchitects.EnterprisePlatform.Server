@@ -104,6 +104,11 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
     command.CommandText = _sqlBuilder.BuildCountText(model);
   }
 
+  public string BuildCustomCommand(string query, INavigationRoot root)
+  {
+    return _sqlBuilder.BuildCustomText(query, root);
+  }
+
   protected virtual void CreateParameter(TDbCommand command, string name, object? value)
   {
     IDbDataParameter parameter = command.CreateParameter();
