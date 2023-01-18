@@ -222,6 +222,50 @@ public class ShopService
 }
 ```
 
+## Associazioni e aggregati
+
+Nell'esempio precedente, le entità `Cart` e `Product` venivano gestite da due repository diversi (`ICartRepository` e `IProductRepository`, rispettivamente). Il Domain Driven Design (DDD) introduce il concetto di aggregato, ovvero di insieme di entità relazionate tra loro e trattate come una sola, in cui esiste un'entità, chiamata Aggregate Root, dalla quale accedere all'intero aggregato.
+
+In questo caso, si può pensare di costruire un aggregato formato da `Cart` e `Product` legati da una relazione 1-a-molti (un carrello contiene più prodotti), in cui `Cart` è l'Aggregate Root. Per far ciò, oltre a fare in modo che ci sia almeno una proprietà di navigazione tra le due entità (ad esempio, `Cart.Products` o `Product.Cart`), è necessario istruire il Data Access Layer in modo tale che tenga conto di queste relazioni quando vengono effettuate delle letture o delle scritture.
+
+Ovviamente, se due entità sono relazionate (e quindi c'è almeno una proprietà di navigazione) non è detto che facciano parte dello stesso aggregato. In generale, le associazioni si distinguono in due tipi.
+
+1. Intra-aggregato: quando le due entità fanno parte dello stesso aggregato e la seconda è gerarchicamente dipendente dalla prima
+2. Inter-aggregato: quando le due entità non fanno parte dello stesso aggregato oppure le due entità sono gerarchicamente indipendenti
+
+Per quanto riguarda le molteplicità, sono supportati i seguenti tipi di relazione:
+
+- Uno-a-uno: sia intra-aggregato che inter-aggregato
+- Uno-a-molti: sia intra-aggregato che inter-aggregato
+- Molti-a-molti: solo inter-aggregato, in quanto sempre gerarchicamente indipendenti
+
+### Lettura
+
+Per quanto riguarda la lettura dal database, non c'è distinzione tra i due tipi di associazione, in quanto il metodo `FindAsync` presenta due overload: il primo accetta solo l'id dell'entità e non legge le varie proprietà di navigazione, mentre il secondo accetta una funzione che specifica, in maniera fluente, le proprietà di navigazione da includere nella query.
+
+```cs
+ICartRepository repo = ...;
+
+Cart cart1 = await repo.FindAsync(id1); // cart1.Products è null
+Cart cart2 = await repo.FindAsync(id2, _ => _
+  .Include(cart => cart.Products)); // cart2.Products non è null
+```
+
+Questo comportamento è identico, che l'associazione sia intra-aggregato o inter-aggregato.
+
+### Scrittura
+
+Per quanto riguarda le scritture, InsertAsync e UpdateAsync hanno un comportamento diverso in base al tipo di associazione.
+
+Tenendo in considerazione il fatto che l'Aggregate Root è l'oggetto dal quale si accede a tutto l'aggregato, l'operazione di Insert fatta sull'Aggregate Root provocherà la Insert di tutte le proprietà e sub-proprietà di navigazione che rientrano nell'aggregato (intra-aggregate). Invece, la Insert non verrà provocata per le proprietà di navigazione che non rientrano nell'aggregato (inter-aggregate); queste entità saranno considerate già esistenti e verrà creata solo la rappresentazione della relazione inter-aggregato a livello di database. Questo significa che verranno valorizzate eventuali foreign keys e record nelle tabelle associative (junction tables, in caso di relazioni molti-a-molti). L'operazione di Update funziona esattamente allo stesso modo. Invece il funzionamento dell'operazione di Delete è uguale a quello dell'operazione di Find; ciononostante, se si vuole predisporre l'eliminazione a cascata di tutte le entità dell'aggregato quando si elimina l'Aggregate Root, basterà impostare il delete behavior a livello di database.
+
+### Configurazione
+
+Per la configurazione delle associazioni, vedere le rispettive sezioni della documentazione dei due provider:
+
+- [Entity Framework Core](efcore.md#associazioni)
+- [ADO.NET](adonet.md#associazioni)
+
 ## Seeding
 
 Per effettuare il seeding del database è possibile estendere la classe base `DataSeed`:
@@ -240,3 +284,229 @@ public class ApplicationDataSeed : DataSeed
   }
 }
 ```
+
+## Mapped repository
+
+Uno dei compiti principali di un ORM è quello di semplificare lo sviluppo del proprio modello delle entità, permettendo di accedere al database utilizzando un modello dati che è progettato secondo le regole di business. Per questo motivo, la struttura delle classi che vengono persistite non rispecchia perfettamente la struttura tabellare propria di un database. L'ORM si occupa di colmare questa differenza attraverso opportuni mapping.
+
+Qualora, però, si voglia avere il controllo completo sul processo di mapping, oppure il mapping sia troppo complicato per le capacità di un ORM, è possibile utilizzare la classe base `MappedRepository` (nelle sue due varianti `EFCoreMappedRepository` e `AdoNetMappedRepository`), che prevede la definizione di un livello di mapping personalizzato tra classi che modellano esattamente la struttura del database ed entità di business. Si dovranno implementare i due metodi astratti `EntityToTable` e `TableToEntity` in cui verrà effettuato il mapping.
+
+Ad esempio, considerando l'entità `Product` e il suo equivalente lato database `ProductTable` e il provider ADO.NET, il repository verrebbe modificato nel seguente modo:
+
+```cs
+using CodeArchitects.Platform.Data.AdoNet;
+
+public class ProductRepository : MappedAdoNetRepository<ProductTable, Product, Guid>, IProductRepository
+{
+  public ProductRepository(IDataContext context)
+    : base(context)
+  {
+  }
+
+  protected override ProductTable EntityToTable(Product entity)
+  {
+    // Mapping Product -> ProductTable
+  }
+
+  protected override Product TableToEntity(ProductTable table)
+  {
+    // Mapping ProductTable -> Product
+  }
+}
+```
+
+> Nota: l'overload del metodo FindAsync che permette di specificare le proprietà di navigazione da includere tramite lambda, non è supportato dai mapped repository. Ciononostante, questo metodo (come tutti i metodi delle classi base dei repository) sono virtuali ed è possibile definirne un override secondo necessità.
+
+## How-to
+
+### Impostare un livello di persistenza specificando l'ORM
+
+Analizziamo lo yml di un microservizio di nome Store.
+
+```yml
+name: Store
+type: service
+description: Store service
+namespace: Ca.ShoppingCart.Store
+components:
+  - type: database
+    provider: sqlserver
+    name: store
+data:
+  orm: EntityFrameworkCore
+entities:
+  - name: Category
+    description: Category entity
+    type: entity
+    fields:
+      - name: name
+        type: string
+        description: Category name
+      - name: description
+        type: string
+        description: Category description
+  - name: Product
+    description: Product Entity
+    useRepository: true
+    fields:
+      - name: denomination
+        type: string
+        description: Product name
+      - name: category
+        type: Category
+        description: Product category
+        isOptional: true
+      - name: description
+        type: string
+        description: Product description
+      - name: price
+        type: decimal
+        description: Product price
+associations:
+  - type: associate
+    multiplicity: one-to-many
+    from:
+      entity: Category
+    to:
+      entity: Product
+      navigation: Category
+```
+
+La sezione `components` contiene un elemento di tipo `database` con provider `sqlserver`, e questo genera un container Docker con SQLServer per lo sviluppo locale nel file `docker-compose`, oltre ad istruire il livello di persistenza ad utilizzare SQLServer.
+
+La sezione `data` contiene il campo `orm` che specifica che si vuole utilizzare Entity Framework Core come ORM. Questo installerà i pacchetti di `CodeArchitects.Platform.Data.EntityFrameworkCore.*` e genererà i repository utilizzando la rispettiva classe base `EFCoreRepository`.
+
+La sezione `entities` definisce le entità, e per `Product` verrà generato anche un repository.
+
+La sezione `associations` definisce l'associazione uno-a-molti tra l'entità `Category` e l'entità `Product`.
+
+### Utilizzare database multipli
+
+Per utilizzare database multipli, è sufficiente indicare più components di tipo `database`.
+
+```yml
+name: Store
+type: service
+description: Store service
+namespace: Ca.ShoppingCart.Store
+components:
+  - type: database
+    provider: sqlserver
+    name: store_sqlserver
+  - type: database
+    provider: postgres
+    name: store_postgres
+```
+
+Questo farà in modo che venga generato il codice che servirà ad abilitare la possibilità di utilizzare un database o l'altro secondo delle particolari condizioni.
+
+In particolare, in `appsettings.Development.json` verranno generate le stringhe di connessione ai database e una proprietà chiamata `Provider` che servirà a selezionare il database da utilizzare:
+
+```json
+  "Provider": "sqlserver",
+  "ConnectionStrings": {
+    "sqlserver": "...",
+    "postgres": "..."
+  }
+```
+
+La proprietà `Provider` potrà assumere valori diversi a seconda dell'ambiente, in modo tale da poter selezionare il database giusto in ogni circostanza.
+
+In modalità split (`generationMode: split`), utilizzando Entity Framework Core, verranno creati anche dei progetti che conterranno le migrazioni di ciascun provider. Questi progetti saranno nominati secondo la convenzione {Prefisso}.{NomeSoluzione}.Data.{NomeSoluzione}_{NomeProvider} (ad esempio Ca.ShoppingCart.Store.Data.Store_postgres). Per effettuare le migrazioni, impostare il progetto eseguibile come progetto di startup e includere i riferimenti ai progetti in cui si vogliono effettuare le migrazioni. Selezionare poi questi come progetto di default nel package manager quando si lancia il comando Add-Migration.
+
+### Creare table and domain entities
+
+Ci sono due modi per utilizzare la feature delle table entities. Il primo è quello di creare separatamente l'entità di dominio e la rispettiva table.
+
+```yml
+entities:
+  - name: Product
+    description: Product
+    type: domain
+    fields:
+      - name: name
+        type: string
+        description: Name
+      - name: price
+        type: decimal
+        description: Price
+  - name: ProductTable
+    description: Product table
+    useMappedRepository: Product
+    type: table
+    fields:
+      - name: name
+        type: string
+        description: Name
+      - name: price
+        type: decimal
+        description: Price
+```
+
+Avendo specificato `useMappedRepository`, verrà creato un repository che eredita da (supponendo di utilizzare EFCore) `EFCoreMappedRepository<ProductTable, Product, Guid>`. Bisognerà definire gli override dei metodi di mapping; in questo esempio, il mapping viene effettuato a mano, ma si potrebbe utilizzare AutoMapper, richiedendo un'istanza di `IMapper` tramite Dependency Injection.
+
+```cs
+using CodeArchitects.Platform.Data.EntityFrameworkCore;
+
+public class ProductRepository : EFCoreMappedRepository<ProductTable, Product, Guid>, IProductRepository
+{
+  public ProductRepository(IDataContext context)
+    : base(context)
+  {
+  }
+
+  protected override ProductTable EntityToTable(Product entity)
+  {
+    return new ProductTable
+    {
+      Id = entity.Id,
+      Name = entity.Name,
+      Price = entity.Price
+    };
+  }
+
+  protected override Product TableToEntity(ProductTable table)
+  {
+    return new Product
+    {
+      Id = table.Id,
+      Name = table.Name,
+      Price = table.Price
+    };
+  }
+}
+```
+
+Il secondo modo è quello di specificare `table and domain` come `type` dell'entità.
+
+```yml
+entities:
+  - name: Product
+    description: Product
+    type: table and domain
+    useRepository: true
+    fields:
+      - name: name
+        type: string
+        description: Name
+      - name: price
+        type: decimal
+        description: Price
+```
+
+In questo modo, verranno automaticamente generati entrambi i tipi di entità, che avranno esattamente la stessa struttura.
+
+### Generare dei mappings tra entità table e domain
+
+Il procedimento è analogo a quello per la generazione dei mappings tra entità e DTO.
+
+```yml
+mappings:
+  - entity: Product
+    table: ProductTable
+  - entity: Product
+    table: ProductTable
+    inverse: true
+```
+
+Questo yml genererà nella configurazione di AutoMapper il codice per mappare da `Product` a `ProductTable` e viceversa (mapping bidirezionale).

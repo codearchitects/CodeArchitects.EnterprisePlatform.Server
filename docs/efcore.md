@@ -1,5 +1,12 @@
 # DAL con Entity Framework Core 7
 
+Per utilizzare Entity Framework Core come ORM, impostare appropriatamente il valore del campo `data.orm` dello yml.
+
+```yml
+data:
+  orm: EntityFrameworkCore
+```
+
 ## Configurazione
 
 Per utilizzare le funzionalità della libreria CodeArchitects.Platform.Data.EntityFrameworkCore all'interno di un'applicazione ASP.NET Core, è necessario configurare il container di Dependency Injection attraverso gli appositi metodi.
@@ -109,4 +116,259 @@ modelBuilder.Entity<MyEntity>(entity =>
 {
   entity.IsSoftDelete(x => x.IsDeleted);
 });
+```
+
+## Associazioni
+
+I tipi di associazione vengono definite attraverso i metodi di estensione `Aggregate()` e `Associate()`, da usare in congiunzione con le fluent API di configurazione di EFCore.
+
+### Configurazione associazione uno-a-uno, intra-aggregato
+
+Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e facenti parte dello stesso aggregato, con `Customer` come Aggregate Root.
+
+```cs
+public class Customer
+{
+  public Guid Id { get; set; }
+  public Address? ShippingAddress { get; set; }
+}
+
+public class Address
+{
+  public Guid Id { get; set; }
+  public Customer? Customer { get; set; }
+}
+```
+
+La relazione è modellabile con il seguente yml:
+
+```yml
+associations:
+  - type: aggregate
+    multiplicity: one-to-one
+    from:
+      entity: Customer
+      navigation: ShippingAddress
+    to:
+      entity: Address
+      navigation: Customer
+```
+
+Che genererà la seguente configurazione:
+
+```cs
+public class MyDbContext : DbContext
+{
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Customer>(entity =>
+    {
+      entity
+        .HasOne(x => x.ShippingAddress)
+        .WithOne(x => x.Customer)
+        .Aggregate()
+        .HasForeignKey<Address>();
+    });
+  }
+}
+```
+
+### Configurazione associazione uno-a-uno, inter-aggregato
+
+Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e non facenti parte dello stesso aggregato.
+
+```cs
+public class Customer
+{
+  public Guid Id { get; set; }
+  public Address? ShippingAddress { get; set; }
+}
+
+public class Address
+{
+  public Guid Id { get; set; }
+  public Customer? Customer { get; set; }
+}
+```
+
+La relazione è modellabile con il seguente yml:
+
+```yml
+associations:
+  - type: associate
+    multiplicity: one-to-one
+    from:
+      entity: Customer
+      navigation: ShippingAddress
+    to:
+      entity: Address
+      navigation: Customer
+```
+
+Che genererà la seguente configurazione:
+
+```cs
+public class MyDbContext : DbContext
+{
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Customer>(entity =>
+    {
+      entity
+        .HasOne(x => x.ShippingAddress)
+        .WithOne(x => x.Customer)
+        .Associate()
+        .HasForeignKey<Address>();
+    });
+  }
+}
+```
+
+### Configurazione associazione uno-a-molti, intra-aggregato
+
+Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e facenti parte dello stesso aggregato, con `Cart` come Aggregate Root.
+
+```cs
+public class Cart
+{
+  public Guid Id { get; set; }
+  public IEnumerable<Product>? Products { get; set; }
+}
+
+public class Product
+{
+  public Guid Id { get; set; }
+  public Cart? Cart { get; set; }
+}
+```
+
+La relazione è modellabile con il seguente yml:
+
+```yml
+associations:
+  - type: aggregate
+    multiplicity: one-to-many
+    from:
+      entity: Cart
+      navigation: Products
+    to:
+      entity: Product
+      navigation: Cart
+```
+
+Che genererà la seguente configurazione:
+
+```cs
+public class MyDbContext : DbContext
+{
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Product>(entity =>
+    {
+      entity
+        .HasMany(x => x.Products)
+        .WithOne(x => x.Cart)
+        .Aggregate();
+    });
+  }
+}
+```
+
+### Configurazione associazione uno-a-molti, inter-aggregato
+
+Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e non facenti parte dello stesso aggregato.
+
+```cs
+public class Cart
+{
+  public Guid Id { get; set; }
+  public IEnumerable<Product>? Products { get; set; }
+}
+
+public class Product
+{
+  public Guid Id { get; set; }
+  public Cart? Cart { get; set; }
+}
+```
+
+La relazione è modellabile con il seguente yml:
+
+```yml
+associations:
+  - type: associate
+    multiplicity: one-to-many
+    from:
+      entity: Cart
+      navigation: Products
+    to:
+      entity: Product
+      navigation: Cart
+```
+
+Che genererà la seguente configurazione:
+
+```cs
+public class MyDbContext : DbContext
+{
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Product>(entity =>
+    {
+      entity
+        .HasMany(x => x.Products)
+        .WithOne(x => x.Cart)
+        .Associate();
+    });
+  }
+}
+```
+
+### Configurazione associazione molti-a-molti
+
+Supponiamo di avere le entità `Student` e `Teacher`, in relazione molti-a-molti.
+
+```cs
+public class Student
+{
+  public Guid Id { get; set; }
+  public IEnumerable<Teacher>? Teachers { get; set; }
+}
+
+public class Teacher
+{
+  public Guid Id { get; set; }
+  public IEnumerable<Student>? Students { get; set; }
+}
+```
+
+La relazione è modellabile con il seguente yml:
+
+```yml
+associations:
+  - type: associate
+    multiplicity: many-to-many
+    from:
+      entity: Student
+      navigation: Teachers
+    to:
+      entity: Teacher
+      navigation: Students
+```
+
+Che genererà la seguente configurazione:
+
+```cs
+public class MyDbContext : DbContext
+{
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<Student>(entity =>
+    {
+      entity
+        .HasMany(x => x.Teachers)
+        .WithMany(x => x.Students);
+    });
+  }
+}
 ```
