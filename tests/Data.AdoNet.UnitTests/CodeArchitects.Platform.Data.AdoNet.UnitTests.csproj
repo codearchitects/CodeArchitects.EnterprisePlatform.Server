@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>preview</LangVersion>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <EnablePreviewFeatures>true</EnablePreviewFeatures>
 
     <IsPackable>false</IsPackable>
 
@@ -30,14 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj">
-      <SetTargetFramework>TargetFramework=net6.0</SetTargetFramework>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Data.AdoNet.Oracle\CodeArchitects.Platform.Data.AdoNet.Oracle.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.PostgreSQL\CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
-    <ProjectReference Include="..\..\src\Emit\CodeArchitects.Platform.Emit.csproj" />
   </ItemGroup>
 
 </Project>

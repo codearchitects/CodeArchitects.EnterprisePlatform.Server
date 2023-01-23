@@ -7,7 +7,7 @@ services:
       context: ../..
       dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Publisher/Dockerfile
     ports:
-      - 50000:80
+      - 20000:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -32,7 +32,7 @@ services:
       context: ../..
       dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Dockerfile
     ports:
-      - 50001:80
+      - 20001:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:

@@ -2,6 +2,9 @@ version: 1
 
 components:
   # packages
+  - name: CodeArchitects.Platform.Actors
+    path: src\Actors
+    type: dotnet-package
   - name: CodeArchitects.Platform.Analyzer
     path: src\Analyzer
     type: dotnet-package

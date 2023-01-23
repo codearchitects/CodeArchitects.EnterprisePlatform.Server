@@ -2,6 +2,7 @@
 
 [assembly: CLSCompliant(true)]
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Application")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore")]
@@ -22,9 +23,14 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr.AspNetCore")]
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.UnitTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.Analyzer.FunctionalTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.FunctionalTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.IntegrationTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.UnitTests")]
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
