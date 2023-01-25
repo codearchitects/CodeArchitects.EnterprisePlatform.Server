@@ -22,9 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj">
-      <SetTargetFramework>TargetFramework=$(TargetFramework)</SetTargetFramework>
-    </ProjectReference>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
     <ProjectReference Include="..\Data\CodeArchitects.Platform.Data.csproj" />
   </ItemGroup>
 

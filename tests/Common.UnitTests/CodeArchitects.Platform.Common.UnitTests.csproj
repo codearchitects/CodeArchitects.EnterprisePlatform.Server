@@ -25,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj">
-      <SetTargetFramework>TargetFramework=net6.0</SetTargetFramework>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj" />
   </ItemGroup>
 
 </Project>
