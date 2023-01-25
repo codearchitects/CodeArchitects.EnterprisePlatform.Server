@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj">
-      <SetTargetFramework>TargetFramework=netcoreapp3.1</SetTargetFramework>
-    </ProjectReference>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
   </ItemGroup>
 
 </Project>
