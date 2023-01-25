@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Collections;
+using CodeArchitects.Platform.Common.Utils;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;

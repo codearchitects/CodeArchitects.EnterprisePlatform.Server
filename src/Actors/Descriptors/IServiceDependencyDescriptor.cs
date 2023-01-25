@@ -2,4 +2,5 @@
 
 internal interface IServiceDependencyDescriptor : IDependencyDescriptor
 {
+  bool IsOptional { get; }
 }

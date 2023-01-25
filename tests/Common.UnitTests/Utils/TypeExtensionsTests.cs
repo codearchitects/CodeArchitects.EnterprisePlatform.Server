@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Reflection;
+
+namespace CodeArchitects.Platform.Common.Utils;
 
 public class TypeExtensionsTests
 {

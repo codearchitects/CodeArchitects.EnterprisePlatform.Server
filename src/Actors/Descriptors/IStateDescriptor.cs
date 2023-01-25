@@ -1,4 +1,7 @@
-﻿namespace CodeArchitects.Platform.Actors.Descriptors;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+
+namespace CodeArchitects.Platform.Actors.Descriptors;
 
 internal interface IStateDescriptor
 {
@@ -6,5 +9,10 @@ internal interface IStateDescriptor
 
   bool IsStateless { get; }
 
-  IReadOnlyList<object?>? DefaultComponents { get; }
+  [MemberNotNullWhen(true, nameof(DefaultValues))]
+  bool IsVirtual { get; }
+
+  IReadOnlyList<FieldInfo> Fields { get; }
+
+  IReadOnlyList<object?>? DefaultValues { get; }
 }

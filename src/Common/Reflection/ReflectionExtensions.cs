@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Reflection;
+using CodeArchitects.Platform.Common.Utils;
 using System.Diagnostics.CodeAnalysis;
 
 namespace System.Reflection;
@@ -122,11 +123,13 @@ internal static class ReflectionExtensions
     foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
     {
       string fieldName = field.Name;
-      if (
-        propertyName.MatchesAutoGenConvention(fieldName)          ||
+      bool match =
+        propertyName.MatchesBackingFieldConvention(fieldName)     ||
         propertyName.MatchesCamelCaseConvention(fieldName)        ||
         propertyName.MatchesUnderscorePrefixConvention(fieldName) ||
-        propertyName.MatchesMemberPrefixConvention(fieldName))
+        propertyName.MatchesMemberPrefixConvention(fieldName);
+
+      if (match)
       {
         backingField = field;
         return true;

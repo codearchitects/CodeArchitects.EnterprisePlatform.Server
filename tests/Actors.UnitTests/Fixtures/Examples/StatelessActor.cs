@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+using CodeArchitects.Platform.Actors.Metadata;
+using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
@@ -26,19 +28,21 @@ internal interface IStatelessActorFactory
 internal static class StatelessActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
+  public static readonly IActorMetadata Metadata;
 
   static StatelessActorFixture()
   {
-    ConstructorInfo constructor = typeof(StatelessActor).GetRequiredConstructor(
+    ConstructorInfo constructorInfo = typeof(StatelessActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(IService1) });
 
-    ParameterInfo[] constructorParameters = constructor.GetParameters();
+    ParameterInfo[] constructorParameters = constructorInfo.GetParameters();
 
     MethodInfo factoryGetMethod = typeof(IStatelessActorFactory).GetRequiredMethod(
       name: nameof(IStatelessActorFactory.Get),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
+
 
     IServiceDependencyDescriptor service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -46,23 +50,27 @@ internal static class StatelessActorFixture
       .SetName("service1")
       .SetType(typeof(IService1))
       .SetIndex(0)
-      .SetCategoryIndex(0));
+      .SetCategoryIndex(0)
+      .SetIsOptional(false));
+
+    IConstructorDescriptor constructor = ConstructorDescriptorBuilder.Build(_ => _
+      .SetConstructor(constructorInfo)
+      .SetDependencies(service1Dependency)
+      .SetContextDependency(null as IContextDependencyDescriptor)
+      .SetServiceDependencies(service1Dependency)
+      .SetStateDependencies());
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetType(typeof(StatelessActor))
-      .SetConstructor(_ => _
-        .SetConstructor(constructor)
-        .SetDependencies(service1Dependency)
-        .SetContextDependency(null as IContextDependencyDescriptor)
-        .SetServiceDependencies(service1Dependency)
-        .SetStateDependencies()));
+      .SetConstructor(constructor)
+      .SetMethods());
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IStatelessActor))
-      .SetImplementationType(typeof(StatelessActor))
-      .SetIsVirtual(true)
-      .SetStartingImplementation(implementation)
+      .SetActorType(typeof(StatelessActor))
+      .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
+      .SetIsPolymorphic(false)
       .SetId(_ => _
         .SetIdType(typeof(string))
         .SetHasIdSource(false)
@@ -71,11 +79,27 @@ internal static class StatelessActorFixture
       .SetState(_ => _
         .SetStateType(typeof(NoState))
         .SetIsStateless(true)
-        .SetDefaultComponents())
+        .SetIsVirtual(true)
+        .SetFields()
+        .SetDefaultValues())
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)
         .SetGetMethod(factoryGetMethod))
-      .SetMethods());
+      .SetConstructor(constructor));
+
+
+    Metadata = ActorMetadataBuilder.Build(_ => _
+      .SetInterfaceType(typeof(IStatelessActor))
+      .SetActorType(typeof(StatelessActor))
+      .SetIsExplicitVirtual(false)
+      .SetFactoryType(typeof(IStatelessActorFactory))
+      .SetConstructor(constructorInfo)
+      .SetStateFields()
+      .SetImplementations(_ => _
+        .Add(_ => _
+          .SetIsDefault(true)
+          .SetImplementationType(typeof(StatelessActor))
+          .SetConstructor(constructorInfo))));
   }
 }

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Reflection;
 using CodeArchitects.Platform.Messaging.AspNetCore.Configuration;
 using CodeArchitects.Platform.Messaging.Bindings;
 using Microsoft.Extensions.DependencyInjection;

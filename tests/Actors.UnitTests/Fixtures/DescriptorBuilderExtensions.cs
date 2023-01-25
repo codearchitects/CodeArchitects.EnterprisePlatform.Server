@@ -32,6 +32,15 @@ internal static class DescriptorBuilderExtensions
         .Callback<IDependencyDescriptorVisitor>(visitor => visitor.VisitStateDependency(mock.Object)));
   }
 
+  public static VoidMethodDescriptorBuilder InitDefaults(this VoidMethodDescriptorBuilder builder)
+  {
+    return builder
+      .SetKind(MethodKind.Void)
+      .Setup(mock => mock
+        .Setup(x => x.Accept(It.IsAny<IMethodDescriptorVisitor>()))
+        .Callback<IMethodDescriptorVisitor>(visitor => visitor.VisitVoidMethod(mock.Object)));
+  }
+
   public static TaskMethodDescriptorBuilder InitDefaults(this TaskMethodDescriptorBuilder builder)
   {
     return builder

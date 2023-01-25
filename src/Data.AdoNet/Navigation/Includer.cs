@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Reflection;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Linq.Expressions;
 

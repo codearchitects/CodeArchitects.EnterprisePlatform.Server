@@ -4,11 +4,11 @@ internal interface IActorDescriptor
 {
   Type InterfaceType { get; }
 
-  Type ImplementationType { get; }
+  Type ActorType { get; }
 
-  bool IsVirtual { get; }
+  bool IsPolymorphic { get; }
 
-  IImplementationDescriptor StartingImplementation { get; }
+  IImplementationDescriptor DefaultImplementation { get; }
 
   IReadOnlyList<IImplementationDescriptor> Implementations { get; }
 
@@ -18,5 +18,5 @@ internal interface IActorDescriptor
 
   IActorFactoryDescriptor Factory { get; }
 
-  IReadOnlyList<IMethodDescriptor> Methods { get; }
+  IConstructorDescriptor Constructor { get; }
 }

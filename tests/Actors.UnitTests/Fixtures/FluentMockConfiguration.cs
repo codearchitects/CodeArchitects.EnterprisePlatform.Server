@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Metadata;
 using FluentMock;
 
 [assembly: GenerateFluentMockFor(typeof(IActorDescriptor))]
@@ -8,6 +9,7 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IStateDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IActorFactoryDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IMethodDescriptor))]
+[assembly: GenerateFluentMockFor(typeof(IVoidMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(ITaskMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(ITaskTMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IValueTaskMethodDescriptor))]
@@ -16,3 +18,8 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IContextDependencyDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IServiceDependencyDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IStateDependencyDescriptor))]
+
+[assembly: GenerateFluentMockFor(typeof(IActorMetadata))]
+[assembly: GenerateFluentMockFor(typeof(IStateFieldMetadata))]
+[assembly: GenerateFluentMockFor(typeof(IImplementationMetadata))]
+[assembly: GenerateFluentMockFor(typeof(IMethodMetadata))]

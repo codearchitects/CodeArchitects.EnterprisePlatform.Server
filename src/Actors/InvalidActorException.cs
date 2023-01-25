@@ -1,0 +1,148 @@
+﻿using System.Reflection;
+
+namespace CodeArchitects.Platform.Actors;
+
+public class InvalidActorException : Exception
+{
+  private InvalidActorException(Type actorType, string message)
+    : base(message)
+  {
+    ActorType = actorType;
+  }
+
+  public Type ActorType { get; }
+
+  // Class errors
+
+  internal static InvalidActorException GenericActorsAreNotSupported(Type actorType)
+    => Create(actorType, ErrorMessages.GenericActorsAreNotSupported, actorType.Name);
+
+  internal static InvalidActorException MissingActorInterface(Type actorType)
+    => Create(actorType, ErrorMessages.MissingActorInterface, actorType.Name);
+
+  internal static InvalidActorException AmbiguousActorInterface(Type actorType)
+    => Create(actorType, ErrorMessages.AmbiguousActorInterface, actorType.Name);
+
+  internal static InvalidActorException InterfaceNotImplemented(Type actorType)
+    => Create(actorType, ErrorMessages.InterfaceNotImplemented, actorType.Name);
+
+  internal static InvalidActorException InterfaceTypeIsNotAnInterface(Type actorType, Type interfaceType)
+    => Create(actorType, ErrorMessages.InterfaceTypeIsNotAnInterface, actorType.Name, interfaceType.Name);
+
+  internal static InvalidActorException PropertiesAreNotSupported(Type actorType, Type interfaceType)
+    => Create(actorType, ErrorMessages.PropertiesAreNotSupported, actorType.Name, interfaceType.Name);
+
+  internal static InvalidActorException EventsAreNotSupported(Type actorType, Type interfaceType)
+    => Create(actorType, ErrorMessages.EventsAreNotSupported, actorType.Name, interfaceType.Name);
+
+  internal static InvalidActorException ActorCannotBeVirtual(Type actorType)
+    => Create(actorType, ErrorMessages.ActorCannotBeVirtual, actorType.Name);
+
+  internal static InvalidActorException MultipleDefaultImplementations(Type actorType)
+    => Create(actorType, ErrorMessages.MultipleDefaultImplementations, actorType.Name);
+
+
+  // State errors
+
+  internal static InvalidActorException AmbiguousActorIdSource(Type actorType)
+    => Create(actorType, ErrorMessages.AmbiguousActorIdSource, actorType.Name);
+
+  internal static InvalidActorException StateMustBeDefinedInBaseActor(Type actorType)
+    => Create(actorType, ErrorMessages.StateMustBeDefinedInBaseActor, actorType.Name);
+
+  internal static InvalidActorException InvalidStateType(Type actorType, FieldInfo field)
+    => Create(actorType, ErrorMessages.InvalidStateType, actorType.Name, field.Name);
+
+  internal static InvalidActorException InvalidDefaultValue(Type actorType, FieldInfo field)
+    => Create(actorType, ErrorMessages.InvalidDefaultValue, actorType.Name, field.Name);
+
+
+  // Constructor errors
+
+  internal static InvalidActorException MissingStateParameters(Type actorType)
+    => Create(actorType, ErrorMessages.MissingStateParameters, actorType.Name);
+
+  internal static InvalidActorException AmbiguousStateParameter(Type actorType, ParameterInfo parameter)
+    => Create(actorType, ErrorMessages.AmbiguousStateParameter, actorType.Name, parameter.Name);
+
+  internal static InvalidActorException AmbiguousActorConstructor(Type actorType)
+    => Create(actorType, ErrorMessages.AmbiguousActorConstructor, actorType.Name);
+
+  internal static InvalidActorException DuplicateActorContext(Type actorType, ParameterInfo parameter)
+    => Create(actorType, ErrorMessages.DuplicateActorContext, actorType.Name, parameter.Name);
+
+  internal static InvalidActorException WrongGenericActorContext(Type actorType, string? parameterName)
+    => Create(actorType, ErrorMessages.WrongGenericActorContext, actorType.Name, parameterName);
+
+
+  // Method errors
+
+  internal static InvalidActorException InvalidMethodReturnType(Type actorType, MethodInfo method)
+    => Create(actorType, ErrorMessages.InvalidMethodReturnType, actorType.Name, method.Name, method.ReturnType.Name);
+
+  internal static InvalidActorException CancellationTokenMustBeLastParameter(Type actorType, MethodInfo method)
+    => Create(actorType, ErrorMessages.CancellationTokenMustBeLastParameter, actorType.Name, method.Name);
+
+  internal static InvalidActorException DuplicateCancellationTokenParameters(Type actorType, MethodInfo method)
+    => Create(actorType, ErrorMessages.DuplicateCancellationTokenParameters, actorType.Name, method.Name);
+
+  internal static InvalidActorException GenericMethodsAreNotSupported(Type actorType, MethodInfo method)
+    => Create(actorType, ErrorMessages.GenericMethodsAreNotSupported, actorType.Name, method.Name);
+
+
+  // Factory errors
+
+  internal static InvalidActorException MissingActorFactoryType(Type actorType)
+    => Create(actorType, ErrorMessages.MissingActorFactoryType, actorType.Name);
+
+  internal static InvalidActorException InvalidActorFactoryType(Type actorType, Type factoryType)
+    => Create(actorType, ErrorMessages.InvalidActorFactoryType, actorType.Name, factoryType.Name);
+
+  internal static InvalidActorException AmbiguousActorFactoryType(Type actorType)
+    => Create(actorType, ErrorMessages.AmbiguousActorFactoryType, actorType.Name);
+
+
+  private static InvalidActorException Create(Type actorType, string template, params object?[] args)
+  {
+    template = "Invalid actor type: '{0}'. " + template;
+    return new InvalidActorException(actorType, string.Format(template, args));
+  }
+
+  private static class ErrorMessages
+  {
+    // Class errors
+    public const string GenericActorsAreNotSupported = "Actor '{0}' is generic, which is not supported.";
+    public const string MissingActorInterface = "An actor must implement an interface which exposes its public methods, but '{0}' does not implement any interface.";
+    public const string AmbiguousActorInterface = "Could not infer the actor interface type because '{0}' implements more than one interface.";
+    public const string InterfaceNotImplemented = "'{0}' does not implement the specified interface type.";
+    public const string InterfaceTypeIsNotAnInterface = "'{1}' was specified as the interface type of the actor, but it is not an interface.";
+    public const string PropertiesAreNotSupported = "Interface '{1}' defines properties, which are not supported.";
+    public const string EventsAreNotSupported = "Interface '{1}' defines events, which are not supported.";
+    public const string ActorCannotBeVirtual = "'{0}' cannot be a virtual actor because a default value for its state could not be computed. For simple state types, either configure the its default value or provide a default parameter value. For complex state types, provide a parameterless constructor for the class.";
+    public const string MultipleDefaultImplementations = "Multiple default implementations found for actor '{0}'.";
+
+    // State errors
+    public const string AmbiguousActorIdSource = "Multiple components of the actor's state can be used as the actor id source.";
+    public const string StateMustBeDefinedInBaseActor = "Each component of the actor's state must be defined in the actor's base class.";
+    public const string InvalidStateType = "The type of field '{1}' cannot be used as an actor state.";
+    public const string InvalidDefaultValue = "The provided default value for state component '{1}' is of the wrong type.";
+
+    // Constructor errors
+    public const string MissingStateParameters = "Could not find a corresponding parameter for each state field.";
+    public const string AmbiguousStateParameter = "Parameter '{1}' can be associated to more than one state component.";
+    public const string AmbiguousActorConstructor = "Could not infer the actor constructor.";
+    public const string DuplicateActorContext = "Duplicate IActorContext dependency '{1}' inside the actor constructor.";
+    public const string WrongGenericActorContext = "The actor context parameter '{1}' must be of type 'IActorContext<{0}>'.";
+
+    // Method errors
+    public const string InvalidMethodReturnType = "Actor methods may return Task, Task<T>, ValueTask, ValueTask<T> or void. Method '{1}' returns '{2}'.";
+    public const string CancellationTokenMustBeLastParameter = "Method '{1}' has a CancellationToken parameter, but it is not its last parameter.";
+    public const string DuplicateCancellationTokenParameters = "Method '{1}' has more than one CancellationToken parameter.";
+    public const string GenericMethodsAreNotSupported = "Method '{1}' is generic, which is not supported.";
+
+    // Factory errors
+    public const string MissingActorFactoryType = "Could not find a suitable factory interface for '{0}'.";
+    public const string InvalidActorFactoryType = "Actor factory '{1}' is not an interface or has the wrong method signatures.";
+    public const string AmbiguousActorFactoryType = "Multiple actor factories were specified for '{0}'.";
+  }
+}
