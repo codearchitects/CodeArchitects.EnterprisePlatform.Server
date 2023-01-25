@@ -8,7 +8,7 @@
 public class MessageHandlerAttribute : Attribute
 {
   /// <summary>
-  /// Initializes a new <see cref="MessageHandlerAttribute"/> instance without specifing a bus name.
+  /// Initializes a new <see cref="MessageHandlerAttribute"/> instance without specifying a bus name.
   /// </summary>
   public MessageHandlerAttribute()
   {

@@ -1,10 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: CLSCompliant(true)]
+
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Application")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.Oracle")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.PostgreSQL")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.SQLServer")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore5")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.Shared")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Emit")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore")]
@@ -13,5 +22,9 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Messaging.Dapr.AspNetCore")]
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.FunctionalTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.UnitTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.IntegrationTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests")]

@@ -3,9 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace CodeArchitects.Platform.Analyzer.Analyzers;
@@ -13,8 +11,8 @@ namespace CodeArchitects.Platform.Analyzer.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class RepositoryAnalyzer : DiagnosticAnalyzer
 {
-  private readonly static Regex s_iRepositoryRegex = new Regex(@"CodeArchitects\.Platform\.Data\.IRepository<[^<>,]+, [^<>,]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
-  private readonly static Regex s_iQueryableRegex = new Regex(@"System\.Linq\.IQueryable<[^<>,]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
+  private readonly static Regex s_iRepositoryRegex = new(@"CodeArchitects\.Platform\.Data\.IRepository<[^<>,]+, [^<>,]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
+  private readonly static Regex s_iQueryableRegex = new(@"System\.Linq\.IQueryable<[^<>,]+>", RegexOptions.Compiled, TimeSpan.FromMilliseconds(500));
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
     DiagnosticDescriptors.CAESP002);

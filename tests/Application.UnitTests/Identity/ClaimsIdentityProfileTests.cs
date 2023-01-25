@@ -13,7 +13,7 @@ public class ClaimsIdentityProfileTests
     // Arrange
     ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.Identity!.IsAuthenticated == expected, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new ClaimsIdentityProfile(principal);
+    ClaimsIdentityProfile sut = new(principal);
 
     // Act
     bool actual = sut.IsAuthenticated;
@@ -26,9 +26,9 @@ public class ClaimsIdentityProfileTests
   public void IsAuthenticated_ShouldBeFalse_WhenClaimsPrincipalHasNoIdentities()
   {
     // Arrange
-    ClaimsPrincipal principal = new ClaimsPrincipal(Enumerable.Empty<ClaimsIdentity>());
+    ClaimsPrincipal principal = new(Enumerable.Empty<ClaimsIdentity>());
 
-    ClaimsIdentityProfile sut = new ClaimsIdentityProfile(principal);
+    ClaimsIdentityProfile sut = new(principal);
 
     // Act
     bool isAuthenticated = sut.IsAuthenticated;
@@ -41,10 +41,10 @@ public class ClaimsIdentityProfileTests
   public void UserId_ShouldBe_ValueOfNameIdentifierClaim()
   {
     // Arrange
-    Claim userIdClaim = new Claim(ClaimTypes.NameIdentifier, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
+    Claim userIdClaim = new(ClaimTypes.NameIdentifier, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
     ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.FindFirst(ClaimTypes.NameIdentifier) == userIdClaim, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new ClaimsIdentityProfile(principal);
+    ClaimsIdentityProfile sut = new(principal);
 
     // Act
     Guid userId = sut.UserId;
@@ -57,10 +57,10 @@ public class ClaimsIdentityProfileTests
   public void TenantId_ShouldBe_ValueOfTenantIdClaim()
   {
     // Arrange
-    Claim tenantIdClaim = new Claim(ClaimConstants.TenantId, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
+    Claim tenantIdClaim = new(ClaimConstants.TenantId, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
     ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.FindFirst(ClaimConstants.TenantId) == tenantIdClaim, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new ClaimsIdentityProfile(principal);
+    ClaimsIdentityProfile sut = new(principal);
 
     // Act
     Guid tenantId = sut.TenantId;

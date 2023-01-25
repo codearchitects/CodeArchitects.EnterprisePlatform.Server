@@ -5,13 +5,16 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapr.Client" Version="1.8.0" />
+    <PackageReference Include="Dapr.Client" Version="1.9.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
     <ProjectReference Include="..\Messaging\CodeArchitects.Platform.Messaging.csproj" />
   </ItemGroup>
 

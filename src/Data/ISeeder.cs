@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+﻿namespace CodeArchitects.Platform.Data;
 
-namespace CodeArchitects.Platform.Data;
-
+/// <summary>
+/// Object used to add data to the seed.
+/// </summary>
 public interface ISeeder
 {
-  void Seed<TEntity>(IEnumerable<TEntity> entities) where TEntity : class;
-}
-
-public static class SeederExtensions
-{
-  public static void Seed<TEntity>(this ISeeder seeder, params TEntity[] entities) where TEntity : class
-    => seeder.Seed(entities);
+  /// <summary>
+  /// Adds a collection of entities to the seed.
+  /// </summary>
+  /// <typeparam name="TEntity">The entity type.</typeparam>
+  /// <param name="entities">The entity collection.</param>
+  void Seed<TEntity>(IEnumerable<TEntity> entities)
+    where TEntity : class;
 }

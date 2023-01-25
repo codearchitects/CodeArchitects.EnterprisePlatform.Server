@@ -1,9 +1,6 @@
 ﻿using CodeArchitects.Platform.Application.Identity;
 using CodeArchitects.Platform.Common.Identity;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -29,7 +26,9 @@ public static class ApplicationServiceCollectionExtensions
 
         return context?.User;
       })
-      .AddScoped<IIdentityProfile, ClaimsIdentityProfile>();
+      .AddScoped<IIdentityProfile<Guid, Guid>, ClaimsIdentityProfile>()
+      .AddScoped<IUserProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>())
+      .AddScoped<ITenantProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>());
   }
 
   /// <summary>
@@ -41,7 +40,7 @@ public static class ApplicationServiceCollectionExtensions
   /// <returns>The service collection.</returns>
   /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="TImplementation"/> does not have a constructor which accepts a single parameter of type <see cref="ClaimsPrincipal"/>.</exception>
   public static IServiceCollection AddIdentityProfile<TInterface, TImplementation>(this IServiceCollection services)
-    where TInterface : class, IIdentityProfile
+    where TInterface : class, IIdentityProfile<Guid, Guid>
     where TImplementation : class, TInterface
   {
     return services
@@ -54,6 +53,8 @@ public static class ApplicationServiceCollectionExtensions
         return context?.User;
       })
       .AddScoped<TInterface, TImplementation>()
-      .AddScoped<IIdentityProfile>(sp => sp.GetRequiredService<TInterface>());
+      .AddScoped<IIdentityProfile<Guid, Guid>>(sp => sp.GetRequiredService<TInterface>())
+      .AddScoped<IUserProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>())
+      .AddScoped<ITenantProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>());
   }
 }

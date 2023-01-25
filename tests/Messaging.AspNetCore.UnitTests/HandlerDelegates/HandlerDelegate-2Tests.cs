@@ -21,7 +21,8 @@ public class HandlerDelegate2Tests
   public async Task HandleAsync_ShouldCallHandlerWithMessageAndOutputActionsWithNullResult()
   {
     // Arrange
-    Message1 message = new Message1 { Data = "myData" };
+    Message1 message = new()
+    { Data = "myData" };
     JObject messageJson = JObject.FromObject(message);
 
     Mock<Message1Handler> message1HandlerMock = new(MockBehavior.Strict);

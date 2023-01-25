@@ -1,18 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2PAssets</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.14" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All">
+      <SetTargetFramework>TargetFramework=net6.0</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
     <ProjectReference Include="..\Data\CodeArchitects.Platform.Data.csproj" />
   </ItemGroup>
+
+  <Target Name="IncludeP2PAssets">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.xml" />
+    </ItemGroup>
+  </Target>
 
 </Project>

@@ -8,14 +8,14 @@ namespace CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 public class ComponentSchema
 {
   [Required]
-  public string ApiVersion { get; init; } = default!;
+  public string ApiVersion { get; set; } = default!;
 
   [Required]
-  public string Kind { get; init; } = default!;
+  public string Kind { get; set; } = default!;
 
   [Required]
-  public MetadataSchema Metadata { get; init; } = default!;
+  public MetadataSchema Metadata { get; set; } = default!;
 
   [Required]
-  public SpecSchema Spec { get; init; } = default!;
+  public SpecSchema Spec { get; set; } = default!;
 }

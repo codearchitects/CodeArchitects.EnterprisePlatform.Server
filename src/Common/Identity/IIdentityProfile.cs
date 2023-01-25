@@ -3,20 +3,12 @@
 /// <summary>
 /// Contains information about the current user.
 /// </summary>
-public interface IIdentityProfile
+public interface IIdentityProfile<TUserId, TTenantId> : IUserProfile<TUserId>, ITenantProfile<TTenantId>
+  where TUserId : IEquatable<TUserId>
+  where TTenantId : IEquatable<TTenantId>
 {
   /// <summary>
   /// <c>true</c> if the user is authenticated, <c>false</c> otherwise.
   /// </summary>
   bool IsAuthenticated { get; }
-
-  /// <summary>
-  /// The id of the user.
-  /// </summary>
-  Guid UserId { get; }
-
-  /// <summary>
-  /// The id of the tenant the user belongs to.
-  /// </summary>
-  Guid TenantId { get; }
 }

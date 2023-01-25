@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests;
 
-public class Tests
+public class Tests : IClassFixture<TestFixture>
 {
   [Theory]
   [InlineData("by-reflection")]
@@ -11,8 +11,8 @@ public class Tests
   {
     // Arrange
     Guid messageId = Guid.NewGuid();
-    int millisecondsTimeout = 10000;
-    using HttpClient http = new HttpClient();
+    int millisecondsTimeout = 20000;
+    using HttpClient http = new();
 
     // Act
     Task<HttpResponseMessage> waitTask = http.GetAsync($"http://localhost:50001/wait/{messageId}?millisecondsTimeout={millisecondsTimeout}");
@@ -32,8 +32,8 @@ public class Tests
   {
     // Arrange
     Guid messageId = Guid.NewGuid();
-    int millisecondsTimeout = 10000;
-    using HttpClient http = new HttpClient();
+    int millisecondsTimeout = 20000;
+    using HttpClient http = new();
 
     // Act
     Task<HttpResponseMessage> waitTask = http.GetAsync($"http://localhost:50001/wait/{messageId}?millisecondsTimeout={millisecondsTimeout}");

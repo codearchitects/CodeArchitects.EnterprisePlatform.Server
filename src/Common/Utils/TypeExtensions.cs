@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Common.Utils;
+﻿using System.Runtime.CompilerServices;
+
+namespace CodeArchitects.Platform.Common.Utils;
 
 /// <summary>
 /// Extension methods for the <see cref="Type"/> class.
@@ -85,5 +87,13 @@ internal static class TypeExtensions
     return type
       .GetInterfaces()
       .Where(x => x.IsGenericType && genericInterfaceTypes.Contains(x.GetGenericTypeDefinition()));
+  }
+
+  public static bool IsAnonymousType(this Type type)
+  {
+    return
+      type.Name.StartsWith("<>", StringComparison.Ordinal) &&
+      type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), inherit: false).Length > 0 &&
+      type.Name.Contains("AnonymousType");
   }
 }

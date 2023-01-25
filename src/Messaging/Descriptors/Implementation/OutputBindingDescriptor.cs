@@ -26,7 +26,7 @@ internal record OutputBindingDescriptor(
 
       foreach (Type interfaceType in outputMetadataInterfaceTypes)
       {
-        OutputBindingDescriptor descriptor = new OutputBindingDescriptor(interfaceType, returnAttribute);
+        OutputBindingDescriptor descriptor = new(interfaceType, returnAttribute);
         descriptors.Add(descriptor);
       }
     }

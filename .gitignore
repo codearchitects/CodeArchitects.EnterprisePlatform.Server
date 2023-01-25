@@ -2,8 +2,10 @@
 **/[Bb]in
 **/[Oo]bj
 
+*.user
+
 # storm
-ca-cli.error.log
+ca-cli.*.log
 repo.lock
 coverage.opencover.xml
 .sonarqube

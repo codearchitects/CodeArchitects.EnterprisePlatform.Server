@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Application.SignalR;
 using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -23,7 +21,7 @@ public static class ApplicationSignalRServerBuilderExtensions
     {
       assemblies = new Assembly[] { Assembly.GetCallingAssembly() };
     }
-    HubConfiguration configuration = new HubConfiguration(assemblies);
+    HubConfiguration configuration = new(assemblies);
     builder.Services.AddSingleton(configuration);
     foreach (KeyValuePair<Type, Type> entry in configuration.HubMap)
     {

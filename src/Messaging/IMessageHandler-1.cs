@@ -1,13 +1,13 @@
 ﻿namespace CodeArchitects.Platform.Messaging;
 
 /// <summary>
-/// A class that handles messagees of type <typeparamref name="TMessage"/> and produces no result.
+/// A class that handles messages of type <typeparamref name="TMessage"/> and produces no result.
 /// </summary>
 /// <typeparam name="TMessage">The type of the handled message.</typeparam>
 public interface IMessageHandler<TMessage>
 {
   /// <summary>
-  /// Action that is execuded in response to a message of type <typeparamref name="TMessage"/>.
+  /// Action that is executed in response to a message of type <typeparamref name="TMessage"/>.
   /// </summary>
   /// <param name="message">The message instance.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CodeArchitects.Platform.Application.SignalR;
+﻿namespace CodeArchitects.Platform.Application.SignalR;
 
 /// <summary>
 /// Specifies the hub endpoint.

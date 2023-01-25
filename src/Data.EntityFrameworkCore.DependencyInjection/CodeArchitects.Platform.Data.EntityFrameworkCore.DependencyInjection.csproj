@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>

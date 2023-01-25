@@ -35,8 +35,8 @@ public class PageTests
     IReadOnlyCollection<object> elements = Array.Empty<object>();
 
     // Act
-    Page<object> sut1 = new Page<object>(elements, false);
-    Page<object> sut2 = new Page<object>(elements, 0, false);
+    Page<object> sut1 = new(elements, false);
+    Page<object> sut2 = new(elements, 0, false);
 
     // Assert
     sut1.Count.Should().Be(sut2.Count);
@@ -53,7 +53,7 @@ public class PageTests
     IReadOnlyCollection<object> elements = Array.Empty<object>();
 
     // Act
-    Page<object> sut = new Page<object>(elements, hasNext);
+    Page<object> sut = new(elements, hasNext);
 
     // Assert
     sut.HasNext.Should().Be(hasNext);
@@ -69,7 +69,7 @@ public class PageTests
     IReadOnlyCollection<object> elements = new object[count];
 
     // Act
-    Page<object> sut = new Page<object>(elements, false);
+    Page<object> sut = new(elements, false);
 
     // Assert
     sut.Count.Should().Be(count);
@@ -82,7 +82,7 @@ public class PageTests
     IReadOnlyCollection<int> elements = Enumerable.Range(0, 10).ToArray();
 
     // Act
-    Page<int> sut = new Page<int>(elements, false);
+    Page<int> sut = new(elements, false);
 
     // Assert
     sut.Elements.Should().Equal(elements);
@@ -96,7 +96,7 @@ public class PageTests
     IEnumerator<int> sourceEnumerator = elements.GetEnumerator();
 
     // Act
-    Page<int> sut = new Page<int>(elements, false);
+    Page<int> sut = new(elements, false);
     IEnumerator<int> enumerator = sut.GetEnumerator();
 
     // Assert

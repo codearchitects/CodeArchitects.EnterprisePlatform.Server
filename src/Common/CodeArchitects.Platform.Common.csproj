@@ -1,11 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1;net6.0;</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Condition="$(TargetFramework) == 'netstandard2.0'" Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CodeAnalysis\CodeArchitects.Platform.CodeAnalysis.csproj" />

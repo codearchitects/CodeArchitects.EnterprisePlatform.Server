@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 public class MetadataSchema
 {
   [Required]
-  public string Name { get; init; } = default!;
+  public string Name { get; set; } = default!;
 
-  public string? Namespace { get; init; }
+  public string? Namespace { get; set; }
 }

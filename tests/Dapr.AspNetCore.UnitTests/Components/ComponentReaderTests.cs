@@ -10,7 +10,7 @@ public class ComponentReaderTests
   public void FromFileProvider_ShouldReadComponents(IFileInfo file, ComponentSchema expectedComponent)
   {
     // Arrange
-    ComponentReader sut = new ComponentReader();
+    ComponentReader sut = new();
 
     // Act
     ComponentSchema component = sut.FromFile(file);

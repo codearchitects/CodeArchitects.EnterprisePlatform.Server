@@ -1,12 +1,11 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CodeArchitects.Platform.Common.Utils;
 
 /// <summary>
 /// Extension methods using reflection.
 /// </summary>
-public static class ReflectionExtensions
+internal static class ReflectionExtensions
 {
   /// <summary>
   /// Invokes a public method using reflection.
@@ -25,10 +24,6 @@ public static class ReflectionExtensions
   /// elements, this value is 0, 0.0, or false, depending on the specific element type.
   /// </param>
   /// <returns>An object containing the return value of the invoked method, or null in the case of a constructor.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="methodName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No public instance method with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetMethod(string, BindingFlags)"/>
-  /// <inheritdoc cref="MethodBase.Invoke(object, object[])"/>
   public static object? InvokePublicMethod(this object instance, string methodName, params object[] args)
   {
     if (instance is null)
@@ -63,10 +58,6 @@ public static class ReflectionExtensions
   /// elements, this value is 0, 0.0, or false, depending on the specific element type.
   /// </param>
   /// <returns>An object containing the return value of the invoked method, or null in the case of a constructor.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="methodName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No non-public instance method with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetMethod(string, BindingFlags)"/>
-  /// <inheritdoc cref="MethodBase.Invoke(object, object[])"/>
   public static object? InvokeNonPublicMethod(this object instance, string methodName, params object[] args)
   {
     if (instance is null)
@@ -90,10 +81,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose property value will be returned.</param>
   /// <param name="propertyName">The name of the property to get.</param>
   /// <returns>The property value of the specified object.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="propertyName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No public instance property with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetProperty(string, BindingFlags)"/>
-  /// <inheritdoc cref="PropertyInfo.GetValue(object)"/>
   public static object? GetPublicProperty(this object instance, string propertyName)
   {
     if (instance is null)
@@ -117,10 +104,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose property value will be returned.</param>
   /// <param name="propertyName">The name of the property to get.</param>
   /// <param name="value">The new property value.</param>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="propertyName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No public instance property with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetProperty(string, BindingFlags)"/>
-  /// <inheritdoc cref="PropertyInfo.SetValue(object, object)"/>
   public static void SetPublicProperty(this object instance, string propertyName, object value)
   {
     if (instance is null)
@@ -144,10 +127,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose property value will be returned.</param>
   /// <param name="propertyName">The name of the property to get.</param>
   /// <returns>The property value of the specified object.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="propertyName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No non-public instance property with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetProperty(string, BindingFlags)"/>
-  /// <inheritdoc cref="PropertyInfo.GetValue(object)"/>
   public static object? GetNonPublicProperty(this object instance, string propertyName)
   {
     if (instance is null)
@@ -171,10 +150,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose property value will be returned.</param>
   /// <param name="propertyName">The name of the property to get.</param>
   /// <param name="value">The new property value.</param>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="propertyName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No non-public instance property with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetProperty(string, BindingFlags)"/>
-  /// <inheritdoc cref="PropertyInfo.SetValue(object, object)"/>
   public static void SetNonPublicProperty(this object instance, string propertyName, object value)
   {
     if (instance is null)
@@ -196,10 +171,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose field value will be returned.</param>
   /// <param name="fieldName">The name of the field to get.</param>
   /// <returns>The field value of the specified object.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="fieldName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No public instance field with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetField(string)(string, BindingFlags)"/>
-  /// <inheritdoc cref="FieldInfo.GetValue(object)"/>
   public static object? GetPublicField(this object instance, string fieldName)
   {
     if (instance is null)
@@ -223,10 +194,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose field value will be returned.</param>
   /// <param name="fieldName">The name of the field to get.</param>
   /// <param name="value">The new field value.</param>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="fieldName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No public instance field with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetField(string, BindingFlags)"/>
-  /// <inheritdoc cref="FieldInfo.SetValue(object, object)"/>
   public static void SetPublicField(this object instance, string fieldName, object value)
   {
     if (instance is null)
@@ -250,10 +217,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose field value will be returned.</param>
   /// <param name="fieldName">The name of the field to get.</param>
   /// <returns>The field value of the specified object.</returns>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="fieldName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No non-public instance field with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetField(string)(string, BindingFlags)"/>
-  /// <inheritdoc cref="FieldInfo.GetValue(object)"/>
   public static object? GetNonPublicField(this object instance, string fieldName)
   {
     if (instance is null)
@@ -277,10 +240,6 @@ public static class ReflectionExtensions
   /// <param name="instance">The object whose field value will be returned.</param>
   /// <param name="fieldName">The name of the field to get.</param>
   /// <param name="value">The new field value.</param>
-  /// <exception cref="ArgumentNullException">Either '<paramref name="instance"/>' or '<paramref name="fieldName"/>' is null.</exception>
-  /// <exception cref="MissingMethodException">No non-public instance field with the provided name is found.</exception>
-  /// <inheritdoc cref="Type.GetField(string, BindingFlags)"/>
-  /// <inheritdoc cref="FieldInfo.SetValue(object, object)"/>
   public static void SetNonPublicField(this object instance, string fieldName, object value)
   {
     if (instance is null)

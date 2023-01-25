@@ -10,7 +10,7 @@ internal abstract class BaseHandlerDelegateOneOf<THandler, TMessage, TOneOf> : B
   private readonly IEnumerable<OutputAction>[] _outputActionsArray;
 
   /// <summary>
-  /// Creates a new <see cref="BaseHandlerDelegateOneOf{THandler, TMessage}"/> instance.
+  /// Creates a new <see cref="BaseHandlerDelegate{THandler, TMessage}"/> instance.
   /// </summary>
   /// <param name="outputActionsArray">The pipeline's output actions.</param>
   protected BaseHandlerDelegateOneOf(IEnumerable<OutputAction>[] outputActionsArray)

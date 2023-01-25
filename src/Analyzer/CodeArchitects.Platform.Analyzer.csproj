@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+
   </PropertyGroup>
 
   <ItemGroup>

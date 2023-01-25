@@ -1,7 +1,6 @@
 using CodeArchitects.Platform.Messaging.Bindings;
 using Microsoft.AspNetCore.Mvc;
 using Subscriber;
-using Subscriber.NoResult;
 using Subscriber.WithResult;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -60,9 +60,9 @@ public class OutputAction1Tests
   public void ExecuteAsync_ShouldCallBinding_WhenBindingIsRegistered()
   {
     // Arrange
-    Task expected = new Task(() => { });
-    object message = new object();
-    object? result = new object();
+    Task expected = new(() => { });
+    object message = new();
+    object? result = new();
     CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
     Mock<IOutputBinding<OutputMetadata>> bindingMock = new(MockBehavior.Strict);
