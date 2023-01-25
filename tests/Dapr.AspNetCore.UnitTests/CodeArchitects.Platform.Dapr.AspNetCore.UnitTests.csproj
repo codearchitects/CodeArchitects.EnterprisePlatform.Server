@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj">
+      <SetTargetFramework>TargetFramework=net7.0</SetTargetFramework>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 

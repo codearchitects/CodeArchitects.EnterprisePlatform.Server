@@ -25,6 +25,7 @@
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.Analyzer.FunctionalTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.FunctionalTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests")]

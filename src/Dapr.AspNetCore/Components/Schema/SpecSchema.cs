@@ -8,9 +8,9 @@ namespace CodeArchitects.Platform.Dapr.AspNetCore.Components.Schema;
 public class SpecSchema
 {
   [Required]
-  public string Type { get; init; } = default!;
+  public string Type { get; set; } = default!;
 
-  public string? Version { get; init; }
+  public string? Version { get; set; }
 
-  public MetadataItemSchema[]? Metadata { get; init; }
+  public MetadataItemSchema[]? Metadata { get; set; }
 }

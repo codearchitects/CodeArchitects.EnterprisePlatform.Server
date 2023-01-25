@@ -5,6 +5,6 @@
 /// </summary>
 public class MetadataItemSchema
 {
-  public string? Name { get; init; }
-  public object? Value { get; init; }
+  public string? Name { get; set; }
+  public object? Value { get; set; }
 }
