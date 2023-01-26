@@ -115,28 +115,30 @@ internal static class ReflectionExtensions
     }
   }
 
-  public static bool TryGetBackingFieldByConvention(this PropertyInfo property, [NotNullWhen(true)] out FieldInfo? backingField)
+  public static bool TryGetBackingFieldByConvention(this PropertyInfo property, BackingFieldNameConvention conventions, [NotNullWhen(true)] out FieldInfo? backingField)
   {
     Type type = property.DeclaringType!;
     string propertyName = property.Name;
 
+    backingField = null;
     foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
     {
       string fieldName = field.Name;
       bool match =
-        propertyName.MatchesBackingFieldConvention(fieldName)     ||
-        propertyName.MatchesCamelCaseConvention(fieldName)        ||
-        propertyName.MatchesUnderscorePrefixConvention(fieldName) ||
-        propertyName.MatchesMemberPrefixConvention(fieldName);
+        (conventions & BackingFieldNameConvention.AutoGen) != 0          && propertyName.MatchesAutoGenConvention(fieldName)          ||
+        (conventions & BackingFieldNameConvention.CamelCase) != 0        && propertyName.MatchesCamelCaseConvention(fieldName)        ||
+        (conventions & BackingFieldNameConvention.UnderscorePrefix) != 0 && propertyName.MatchesUnderscorePrefixConvention(fieldName) ||
+        (conventions & BackingFieldNameConvention.MemberPrefix) != 0     && propertyName.MatchesMemberPrefixConvention(fieldName);
 
       if (match)
       {
+        if (backingField is not null)
+          throw new AmbiguousMatchException($"Found multiple backing fields for property '{property.Name}' using convention '{conventions}'.");
+
         backingField = field;
-        return true;
       }
     }
 
-    backingField = null;
-    return false;
+    return backingField is not null;
   }
 }

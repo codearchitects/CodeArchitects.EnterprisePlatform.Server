@@ -27,13 +27,13 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
   public abstract void Accept(IDependencyDescriptorVisitor visitor);
 
 
-  public static IEnumerable<DependencyDescriptor> CreateMany(IActorMetadata actorMetadata)
+  public static IEnumerable<DependencyDescriptor> CreateMany(IActorMetadata actorMetadata, ConstructorInfo constructor)
   {
     CategoryIndices indices = new CategoryIndices();
 
-    foreach (ParameterInfo parameter in actorMetadata.Constructor.GetParameters())
+    foreach (ParameterInfo parameter in constructor.GetParameters())
     {
-      if (string.IsNullOrWhiteSpace(parameter.Name)) // This could only happen if the actor class is emitted by a TypeBuilder
+      if (string.IsNullOrWhiteSpace(parameter.Name)) // This could only happen if the actor class is emitted dynamically
         throw new InvalidOperationException("Found a parameter with a null or whitespace name.");
 
       yield return Create(actorMetadata, parameter, indices);
@@ -73,13 +73,13 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
     {
       string fieldName = metadata.Field.Name;
 
-      if (string.IsNullOrWhiteSpace(fieldName)) // This could only happen if the actor class is emitted by a TypeBuilder
+      if (string.IsNullOrWhiteSpace(fieldName)) // This could only happen if the actor class is emitted dynamically
         throw new InvalidOperationException("Found a field with a null or whitespace name.");
       
       bool match =
-        parameterName.MatchesBackingFieldConvention(fieldName)     ||
-        parameterName.MatchesCamelCaseConvention(fieldName)        ||
         parameterName.MatchesUnderscorePrefixConvention(fieldName) ||
+        parameterName.MatchesCamelCaseConvention(fieldName)        ||
+        parameterName.MatchesAutoGenConvention(fieldName)          ||
         parameterName.MatchesMemberPrefixConvention(fieldName);
 
       if (match)

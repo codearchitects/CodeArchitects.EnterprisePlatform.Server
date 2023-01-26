@@ -3,11 +3,11 @@ using CodeArchitects.Platform.Actors.Metadata;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
-internal class ActorDescriptorFactory
+internal class DescriptorFactory
 {
   private readonly IStateTypeBuilder _stateTypeBuilder;
 
-  public ActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder)
+  public DescriptorFactory(IStateTypeBuilder stateTypeBuilder)
   {
     _stateTypeBuilder = stateTypeBuilder;
   }

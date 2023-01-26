@@ -40,7 +40,7 @@ internal abstract class MethodDescriptor : IMethodDescriptor
   }
 
 
-  public static IEnumerable<MethodDescriptor> CreateMany(Type actorType, IImplementationMetadata implementationMetadata, Type interfaceType)
+  public static IEnumerable<MethodDescriptor> CreateMany(IActorMetadata actorMetadata, IImplementationMetadata implementationMetadata, Type interfaceType)
   {
     Type implementationType = implementationMetadata.ImplementationType;
     InterfaceMapping interfaceMapping = implementationType.GetInterfaceMap(interfaceType);
@@ -55,7 +55,7 @@ internal abstract class MethodDescriptor : IMethodDescriptor
 
       IMethodMetadata methodMetadata = implementationMetadata.GetMethodMetadata(implementationMethod);
 
-      yield return Create(actorType, interfaceMethod, implementationMethod, methodMetadata.IsStateless);
+      yield return Create(actorMetadata.ActorType, interfaceMethod, implementationMethod, methodMetadata.IsStateless);
     }
   }
 

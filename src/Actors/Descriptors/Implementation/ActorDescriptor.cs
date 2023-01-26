@@ -8,21 +8,22 @@ internal abstract class ActorDescriptor : IActorDescriptor
 {
   private IStateDescriptor? _state;
 
-  protected ActorDescriptor(Type interfaceType, Type actorType, IActorIdDescriptor id, IActorFactoryDescriptor factory)
+  protected ActorDescriptor(Type interfaceType, Type actorType, IActorIdDescriptor id, IActorFactoryDescriptor factory, IImplementationDescriptor baseImplementation)
   {
     InterfaceType = interfaceType;
     ActorType = actorType;
     Id = id;
     Factory = factory;
+    BaseImplementation = baseImplementation;
   }
 
   public abstract bool IsPolymorphic { get; }
 
+  public IImplementationDescriptor BaseImplementation { get; }
+
   public abstract IImplementationDescriptor DefaultImplementation { get; }
 
   public abstract IReadOnlyList<IImplementationDescriptor> Implementations { get; }
-
-  public abstract IConstructorDescriptor Constructor { get; }
 
   public Type InterfaceType { get; }
 
@@ -39,23 +40,19 @@ internal abstract class ActorDescriptor : IActorDescriptor
 
   public IActorFactoryDescriptor Factory { get; }
 
-
   public static ActorDescriptor Create(IActorMetadata actorMetadata, IStateDescriptor state)
   {
     Type interfaceType = GetInterfaceType(actorMetadata);
     CheckInterfaceType(interfaceType, actorMetadata.ActorType);
 
-    ConstructorDescriptor constructor = ConstructorDescriptor.Create(actorMetadata, actorMetadata.Constructor);
-    IReadOnlyList<IStateDependencyDescriptor> stateDependencies = constructor.Dependencies
-      .OfType<IStateDependencyDescriptor>()
-      .ToList();
+    ImplementationDescriptor baseImplementation = ImplementationDescriptor.Create(actorMetadata, actorMetadata.BaseImplementation, interfaceType);
 
-    ActorIdDescriptor id = ActorIdDescriptor.Create(actorMetadata, stateDependencies);
+    ActorIdDescriptor id = ActorIdDescriptor.Create(actorMetadata, baseImplementation);
     ActorFactoryDescriptor factory = ActorFactoryDescriptor.Create(actorMetadata, interfaceType, state, id);
 
-    ActorDescriptor actor = actorMetadata.Implementations.Count > 1
-      ? PolymorphicActorDescriptor.Create(actorMetadata, id, factory, constructor, interfaceType)
-      : OrdinaryActorDescriptor.Create(actorMetadata, id, factory, interfaceType);
+    ActorDescriptor actor = actorMetadata.Implementations.Count > 0
+      ? PolymorphicActorDescriptor.Create(actorMetadata, interfaceType, id, factory, baseImplementation)
+      : new OrdinaryActorDescriptor(interfaceType, actorMetadata.ActorType, id, factory, baseImplementation);
 
     actor.State = state;
 

@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Metadata;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
@@ -27,14 +28,32 @@ internal class ImplementationDescriptor : IImplementationDescriptor
 
   public static ImplementationDescriptor Create(IActorMetadata actorMetadata, IImplementationMetadata implementationMetadata, Type interfaceType)
   {
-    ConstructorDescriptor constructor = ConstructorDescriptor.Create(actorMetadata, implementationMetadata.Constructor);
-    ImplementationDescriptor implementation = new ImplementationDescriptor(implementationMetadata.ImplementationType, constructor);
+    Type implementationType = implementationMetadata.ImplementationType;
+    ConstructorDescriptor constructor = ConstructorDescriptor.Create(actorMetadata, GetConstructor(implementationMetadata));
+    ImplementationDescriptor implementation = new ImplementationDescriptor(implementationType, constructor);
 
-    foreach (MethodDescriptor method in MethodDescriptor.CreateMany(actorMetadata.ActorType, implementationMetadata, interfaceType))
+    foreach (MethodDescriptor method in MethodDescriptor.CreateMany(actorMetadata, implementationMetadata, interfaceType))
     {
       implementation.AddMethod(method);
     }
 
     return implementation;
+  }
+
+  private static ConstructorInfo GetConstructor(IImplementationMetadata implementationMetadata)
+  {
+    if (implementationMetadata.Constructor is { } constructor)
+      return constructor;
+
+    try
+    {
+      return implementationMetadata.ImplementationType
+        .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        .Single();
+    }
+    catch (InvalidOperationException)
+    {
+      throw InvalidActorException.AmbiguousActorConstructor(implementationMetadata.ImplementationType);
+    }
   }
 }

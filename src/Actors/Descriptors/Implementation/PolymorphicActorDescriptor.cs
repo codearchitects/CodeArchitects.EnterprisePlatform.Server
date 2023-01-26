@@ -7,10 +7,9 @@ internal class PolymorphicActorDescriptor : ActorDescriptor
   private readonly List<IImplementationDescriptor> _implementations;
   private IImplementationDescriptor? _defaultImplementation;
 
-  public PolymorphicActorDescriptor(Type interfaceType, Type actorType, IActorIdDescriptor id, IActorFactoryDescriptor factory, IConstructorDescriptor constructor)
-    : base(interfaceType, actorType, id, factory)
+  public PolymorphicActorDescriptor(Type interfaceType, Type actorType, IActorIdDescriptor id, IActorFactoryDescriptor factory, IImplementationDescriptor baseImplementation)
+    : base(interfaceType, actorType, id, factory, baseImplementation)
   {
-    Constructor = constructor;
     _implementations = new();
   }
 
@@ -19,8 +18,6 @@ internal class PolymorphicActorDescriptor : ActorDescriptor
   public override IImplementationDescriptor DefaultImplementation => _defaultImplementation ?? Implementations[0];
 
   public override IReadOnlyList<IImplementationDescriptor> Implementations => _implementations;
-
-  public override IConstructorDescriptor Constructor { get; }
 
   public void AddImplementation(IImplementationDescriptor implementation)
   {
@@ -37,9 +34,9 @@ internal class PolymorphicActorDescriptor : ActorDescriptor
   }
 
 
-  public static PolymorphicActorDescriptor Create(IActorMetadata actorMetadata, IActorIdDescriptor id, IActorFactoryDescriptor factory, IConstructorDescriptor constructor, Type interfaceType)
+  public static PolymorphicActorDescriptor Create(IActorMetadata actorMetadata, Type interfaceType, IActorIdDescriptor id, IActorFactoryDescriptor factory, IImplementationDescriptor baseImplementation)
   {
-    PolymorphicActorDescriptor actor = new(interfaceType, actorMetadata.ActorType, id, factory, constructor);
+    PolymorphicActorDescriptor actor = new(interfaceType, actorMetadata.ActorType, id, factory, baseImplementation);
 
     foreach (IImplementationMetadata implementationMetadata in actorMetadata.Implementations)
     {

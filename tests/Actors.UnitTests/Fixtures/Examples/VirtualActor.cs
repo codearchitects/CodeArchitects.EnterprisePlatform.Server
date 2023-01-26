@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Metadata.FluentMock;
+using CodeArchitects.Platform.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
@@ -56,7 +57,7 @@ internal class VirtualActorState
   public int _state2 { get; set; }
 }
 
-[ActorFactory<VirtualActor>]
+[ActorFactory(typeof(VirtualActor))]
 public interface IVirtualActorFactory
 {
   IVirtualActor Get(string id);
@@ -68,23 +69,27 @@ internal static class VirtualActorFixture
   public static IActorDescriptor Descriptor;
   public static IActorMetadata Metadata;
 
+  private static readonly FieldInfo s_objField;
+  private static readonly FieldInfo s_state1Field;
+  private static readonly FieldInfo s_state2Field;
+
   static VirtualActorFixture()
   {
-    ConstructorInfo constructorInfo = typeof(VirtualActor).GetRequiredConstructor(
+    ConstructorInfo constructor = typeof(VirtualActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
       types: new[] { typeof(ComplexObject), typeof(string), typeof(int) });
 
-    ParameterInfo[] constructorParameters = constructorInfo.GetParameters();
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
 
-    FieldInfo objField = typeof(VirtualActor).GetRequiredField(
+    s_objField = typeof(VirtualActor).GetRequiredField(
       name: "_obj",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    FieldInfo state1Field = typeof(VirtualActor).GetRequiredField(
+    s_state1Field = typeof(VirtualActor).GetRequiredField(
       name: "_state1",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    FieldInfo state2Field = typeof(VirtualActor).GetRequiredField(
+    s_state2Field = typeof(VirtualActor).GetRequiredField(
       name: "_state2",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -101,7 +106,7 @@ internal static class VirtualActorFixture
       .SetType(typeof(ComplexObject))
       .SetIndex(0)
       .SetCategoryIndex(0)
-      .SetField(objField));
+      .SetField(s_objField));
 
     IStateDependencyDescriptor state1Dependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -110,7 +115,7 @@ internal static class VirtualActorFixture
       .SetType(typeof(string))
       .SetIndex(1)
       .SetCategoryIndex(1)
-      .SetField(state1Field));
+      .SetField(s_state1Field));
 
     IStateDependencyDescriptor state2Dependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -119,23 +124,22 @@ internal static class VirtualActorFixture
       .SetType(typeof(int))
       .SetIndex(2)
       .SetCategoryIndex(2)
-      .SetField(state2Field));
-
-    IConstructorDescriptor constructor = ConstructorDescriptorBuilder.Build(_ => _
-      .SetConstructor(constructorInfo)
-      .SetDependencies(objDependency, state1Dependency, state2Dependency)
-      .SetContextDependency(null as IContextDependencyDescriptor)
-      .SetServiceDependencies()
-      .SetStateDependencies(objDependency, state1Dependency, state2Dependency));
+      .SetField(s_state2Field));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetType(typeof(VirtualActor))
-      .SetConstructor(constructor)
+      .SetConstructor(_ => _
+        .SetConstructor(constructor)
+        .SetDependencies(objDependency, state1Dependency, state2Dependency)
+        .SetContextDependency(null as IContextDependencyDescriptor)
+        .SetServiceDependencies()
+        .SetStateDependencies(objDependency, state1Dependency, state2Dependency))
       .SetMethods());
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IVirtualActor))
       .SetActorType(typeof(VirtualActor))
+      .SetBaseImplementation(implementation)
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
@@ -148,38 +152,79 @@ internal static class VirtualActorFixture
         .SetStateType(typeof(VirtualActorState))
         .SetIsStateless(false)
         .SetIsVirtual(true)
-        .SetFields(objField, state1Field, state2Field)
+        .SetFields(s_objField, s_state1Field, s_state2Field)
         .SetDefaultValues(new ComplexObject(), State1Default, 0))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))
         .SetCreateAsyncMethod(null)
-        .SetGetMethod(factoryGetMethod))
-      .SetConstructor(constructor));
+        .SetGetMethod(factoryGetMethod)));
 
+
+    IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
+      .SetIsDefault(false)
+      .SetImplementationType(typeof(VirtualActor))
+      .SetConstructor(null));
 
     Metadata = ActorMetadataBuilder.Build(_ => _
-      .SetInterfaceType(typeof(IVirtualActor))
+      .SetInterfaceType(null)
       .SetActorType(typeof(VirtualActor))
       .SetIsExplicitVirtual(true)
       .SetFactoryType(typeof(IVirtualActorFactory))
-      .SetConstructor(constructorInfo)
       .SetStateFields(_ => _
         .Add(_ => _
-          .SetField(objField)
+          .SetField(s_objField)
           .SetDefaultValue(new ComplexObject())
-          .SetIsActorIdSource(false))
+          .Setup(mock => mock
+            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
+            .Returns(false)))
         .Add(_ => _
-          .SetField(state1Field)
+          .SetField(s_state1Field)
           .SetDefaultValue(State1Default)
-          .SetIsActorIdSource(false))
+          .Setup(mock => mock
+            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
+            .Returns(false)))
         .Add(_ => _
-          .SetField(state2Field)
+          .SetField(s_state2Field)
           .SetDefaultValue(0)
-          .SetIsActorIdSource(false)))
-      .SetImplementations(_ => _
-        .Add(_ => _
-          .SetIsDefault(true)
-          .SetImplementationType(typeof(VirtualActor))
-          .SetConstructor(constructorInfo))));
+          .Setup(mock => mock
+            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
+            .Returns(false))))
+      .SetBaseImplementation(baseImplementationMetadata)
+      .SetImplementations());
+  }
+
+  public static void AssertValidMetadata(IActorMetadata metadata)
+  {
+    PropertyInfo? actorIdProperty;
+
+    metadata.InterfaceType.Should().BeNull();
+    metadata.ActorType.Should().Be<VirtualActor>();
+    metadata.IsExplicitVirtual.Should().BeTrue();
+    metadata.FactoryType.Should().Be<IVirtualActorFactory>();
+    metadata.StateFields.Should().HaveCount(3);
+
+    IStateFieldMetadata objField = metadata.StateFields.ElementAt(0);
+    objField.Field.Should().Be(s_objField);
+    objField.DefaultValue.Should().Be(Optional<object?>.None);
+    objField.IsActorIdSource(out actorIdProperty).Should().BeFalse();
+    actorIdProperty.Should().BeNull();
+
+    IStateFieldMetadata state1Field = metadata.StateFields.ElementAt(1);
+    state1Field.Field.Should().Be(s_state1Field);
+    state1Field.DefaultValue.Should().Be(new Optional<object?>(State1Default));
+    state1Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
+    actorIdProperty.Should().BeNull();
+
+    IStateFieldMetadata state2Field = metadata.StateFields.ElementAt(2);
+    state2Field.Field.Should().Be(s_state2Field);
+    state2Field.DefaultValue.Should().Be(Optional<object?>.None);
+    state2Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
+    actorIdProperty.Should().BeNull();
+
+    metadata.BaseImplementation.IsDefault.Should().BeFalse();
+    metadata.BaseImplementation.ImplementationType.Should().Be<VirtualActor>();
+    metadata.BaseImplementation.Constructor.Should().BeNull();
+
+    metadata.Implementations.Should().BeEmpty();
   }
 }

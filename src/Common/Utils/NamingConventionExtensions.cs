@@ -2,7 +2,7 @@
 
 internal static class NamingConventionExtensions
 {
-  public static bool MatchesBackingFieldConvention(this string name, string backingFieldName)
+  public static bool MatchesAutoGenConvention(this string name, string backingFieldName)
   {
     if (backingFieldName.Length != name.Length + 17)
       return false;

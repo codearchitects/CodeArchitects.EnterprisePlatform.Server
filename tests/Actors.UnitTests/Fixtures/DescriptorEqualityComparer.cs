@@ -34,6 +34,9 @@ internal class DescriptorEqualityComparer :
     if (x.IsPolymorphic != y.IsPolymorphic)
       return false;
 
+    if (!Equals(x.BaseImplementation, y.BaseImplementation))
+      return false;
+
     if (!Equals(x.DefaultImplementation, y.DefaultImplementation))
       return false;
 
@@ -47,9 +50,6 @@ internal class DescriptorEqualityComparer :
       return false;
 
     if (!Equals(x.Factory, y.Factory))
-      return false;
-
-    if (!Equals(x.Constructor, y.Constructor))
       return false;
 
     return true;

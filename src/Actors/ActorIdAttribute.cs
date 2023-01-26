@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Actors;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-public class ActorIdAttribute : Attribute
+public sealed class ActorIdAttribute : Attribute
 {
 }

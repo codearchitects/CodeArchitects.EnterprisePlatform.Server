@@ -9,7 +9,5 @@ internal interface IStateFieldMetadata
 
   Optional<object?> DefaultValue { get; }
 
-  bool IsActorIdSource { get; }
-
-  PropertyInfo? ActorIdProperty { get; }
+  bool IsActorIdSource(out PropertyInfo? actorIdProperty);
 }

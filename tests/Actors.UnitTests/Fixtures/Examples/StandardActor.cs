@@ -9,6 +9,15 @@ namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
 
 internal class StandardActorStateComponent
 {
+  public override bool Equals(object? obj)
+  {
+    return true;
+  }
+
+  public override int GetHashCode()
+  {
+    return 0;
+  }
 }
 
 internal interface IStandardActor
@@ -21,11 +30,11 @@ internal interface IStandardActor
   
   ValueTask ValueTaskMethod(CancellationToken cancellationToken);
   
-  [Stateless]
   ValueTask<string> ValueTaskTMethod();
 }
 
-internal class StandardActor : IStandardActor
+[Actor<IStandardActor>]
+internal class StandardActor : IStandardActor, IDisposable
 {
   [State] private readonly string _state1;
   private readonly IService1 _service1;
@@ -64,10 +73,15 @@ internal class StandardActor : IStandardActor
   public ValueTask ValueTaskMethod(CancellationToken cancellationToken)
     => throw new NotImplementedException();
 
+  [Stateless]
   public ValueTask<string> ValueTaskTMethod()
+    => throw new NotImplementedException();
+
+  public void Dispose()
     => throw new NotImplementedException();
 }
 
+[ActorFactory<StandardActor>]
 internal interface IStandardActorFactory
 {
   Task<IStandardActor> CreateAsync(string id, string state1, StandardActorStateComponent state2, CancellationToken cancellationToken = default);
@@ -85,13 +99,22 @@ internal static class StandardActorFixture
   public static readonly IActorDescriptor Descriptor;
   public static readonly IActorMetadata Metadata;
 
+  private static readonly ConstructorInfo s_constructor;
+  private static readonly FieldInfo s_state1Field;
+  private static readonly FieldInfo s_state2Field;
+  private static readonly MethodInfo s_implementationVoidMethod;
+  private static readonly MethodInfo s_implementationTaskMethod;
+  private static readonly MethodInfo s_implementationTaskTMethod;
+  private static readonly MethodInfo s_implementationValueTaskMethod;
+  private static readonly MethodInfo s_implementationValueTaskTMethod;
+
   static StandardActorFixture()
   {
-    FieldInfo state1Field = typeof(StandardActor).GetRequiredField(
+    s_state1Field = typeof(StandardActor).GetRequiredField(
       name: "_state1",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo state2Field = typeof(StandardActor).GetRequiredField(
+    s_state2Field = typeof(StandardActor).GetRequiredField(
       name: "_state2",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -100,7 +123,7 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
-    MethodInfo implementationVoidMethod = typeof(StandardActor).GetRequiredMethod(
+    s_implementationVoidMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.VoidMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
@@ -110,7 +133,7 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
 
-    MethodInfo implementationTaskMethod = typeof(StandardActor).GetRequiredMethod(
+    s_implementationTaskMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.TaskMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
@@ -120,7 +143,7 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(CancellationToken) });
 
-    MethodInfo implementationTaskTMethod = typeof(StandardActor).GetRequiredMethod(
+    s_implementationTaskTMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.TaskTMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(CancellationToken) });
@@ -130,7 +153,7 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(CancellationToken) });
 
-    MethodInfo implementationValueTaskMethod = typeof(StandardActor).GetRequiredMethod(
+    s_implementationValueTaskMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.ValueTaskMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(CancellationToken) });
@@ -140,16 +163,16 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
-    MethodInfo implementationValueTaskTMethod = typeof(StandardActor).GetRequiredMethod(
+    s_implementationValueTaskTMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.ValueTaskTMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
-    ConstructorInfo constructorInfo = typeof(StandardActor).GetRequiredConstructor(
+    s_constructor = typeof(StandardActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string), typeof(IService1), typeof(StandardActorStateComponent), typeof(IActorContext<StandardActor>), typeof(IService2) });
 
-    ParameterInfo[] constructorParameters = constructorInfo.GetParameters();
+    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
 
     MethodInfo factoryCreateAsyncMethod = typeof(IStandardActorFactory).GetRequiredMethod(
       name: nameof(IStandardActorFactory.CreateAsync),
@@ -169,7 +192,7 @@ internal static class StandardActorFixture
       .SetType(typeof(string))
       .SetIndex(0)
       .SetCategoryIndex(0)
-      .SetField(state1Field));
+      .SetField(s_state1Field));
 
     IServiceDependencyDescriptor service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -187,7 +210,7 @@ internal static class StandardActorFixture
       .SetType(typeof(StandardActorStateComponent))
       .SetIndex(2)
       .SetCategoryIndex(1)
-      .SetField(state2Field));
+      .SetField(s_state2Field));
 
     IContextDependencyDescriptor contextDependency = ContextDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -206,21 +229,19 @@ internal static class StandardActorFixture
       .SetCategoryIndex(1)
       .SetIsOptional(true));
 
-    IConstructorDescriptor constructor = ConstructorDescriptorBuilder.Build(_ => _
-      .SetConstructor(constructorInfo)
-      .SetDependencies(state1Dependency, service1Dependency, state2Dependency, contextDependency, service2Dependency)
-      .SetContextDependency(contextDependency)
-      .SetServiceDependencies(service1Dependency, service2Dependency)
-      .SetStateDependencies(state1Dependency, state2Dependency));
-
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetType(typeof(StandardActor))
-      .SetConstructor(constructor)
+      .SetConstructor(_ => _
+        .SetConstructor(s_constructor)
+        .SetDependencies(state1Dependency, service1Dependency, state2Dependency, contextDependency, service2Dependency)
+        .SetContextDependency(contextDependency)
+        .SetServiceDependencies(service1Dependency, service2Dependency)
+        .SetStateDependencies(state1Dependency, state2Dependency))
       .SetMethods(_ => _
         .Add<VoidMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetInterfaceMethod(interfaceVoidMethod)
-          .SetImplementationMethod(implementationVoidMethod)
+          .SetImplementationMethod(s_implementationVoidMethod)
           .SetParameterTypes()
           .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
@@ -228,7 +249,7 @@ internal static class StandardActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetInterfaceMethod(interfaceTaskMethod)
-          .SetImplementationMethod(implementationTaskMethod)
+          .SetImplementationMethod(s_implementationTaskMethod)
           .SetParameterTypes(typeof(int))
           .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
@@ -236,7 +257,7 @@ internal static class StandardActorFixture
         .Add<TaskTMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetInterfaceMethod(interfaceTaskTMethod)
-          .SetImplementationMethod(implementationTaskTMethod)
+          .SetImplementationMethod(s_implementationTaskTMethod)
           .SetParameterTypes(typeof(int), typeof(CancellationToken))
           .SetIsStateless(false)
           .SetHasCancellationTokenParameter(true)
@@ -245,7 +266,7 @@ internal static class StandardActorFixture
         .Add<ValueTaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetInterfaceMethod(interfaceValueTaskMethod)
-          .SetImplementationMethod(implementationValueTaskMethod)
+          .SetImplementationMethod(s_implementationValueTaskMethod)
           .SetParameterTypes(typeof(CancellationToken))
           .SetIsStateless(false)
           .SetHasCancellationTokenParameter(true)
@@ -253,7 +274,7 @@ internal static class StandardActorFixture
         .Add<ValueTaskTMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetInterfaceMethod(interfaceValueTaskTMethod)
-          .SetImplementationMethod(implementationValueTaskTMethod)
+          .SetImplementationMethod(s_implementationValueTaskTMethod)
           .SetParameterTypes()
           .SetIsStateless(true)
           .SetHasCancellationTokenParameter(false)
@@ -263,6 +284,7 @@ internal static class StandardActorFixture
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IStandardActor))
       .SetActorType(typeof(StandardActor))
+      .SetBaseImplementation(implementation)
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
@@ -275,49 +297,97 @@ internal static class StandardActorFixture
         .SetStateType(typeof(StandardActorState))
         .SetIsStateless(false)
         .SetIsVirtual(false)
-        .SetFields(state1Field, state2Field)
+        .SetFields(s_state1Field, s_state2Field)
         .SetDefaultValues(null as IReadOnlyList<object>))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStandardActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
-        .SetGetMethod(factoryGetMethod))
-      .SetConstructor(constructor));
+        .SetGetMethod(factoryGetMethod)));
 
+
+    IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
+      .SetIsDefault(false)
+      .SetImplementationType(typeof(StandardActor))
+      .SetConstructor(s_constructor)
+      .Setup(mock => mock
+        .Setup(x => x.GetMethodMetadata(s_implementationVoidMethod).IsStateless)
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.GetMethodMetadata(s_implementationTaskMethod).IsStateless)
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.GetMethodMetadata(s_implementationTaskTMethod).IsStateless)
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.GetMethodMetadata(s_implementationValueTaskMethod).IsStateless)
+        .Returns(false))
+      .Setup(mock => mock
+        .Setup(x => x.GetMethodMetadata(s_implementationValueTaskTMethod).IsStateless)
+        .Returns(true)));
 
     Metadata = ActorMetadataBuilder.Build(_ => _
       .SetInterfaceType(typeof(IStandardActor))
       .SetActorType(typeof(StandardActor))
       .SetIsExplicitVirtual(false)
       .SetFactoryType(typeof(IStandardActorFactory))
-      .SetConstructor(constructorInfo)
       .SetStateFields(_ => _
         .Add(_ => _
-          .SetField(state1Field)
+          .SetField(s_state1Field)
           .SetDefaultValue(Optional<object?>.None)
-          .SetIsActorIdSource(false))
+          .Setup(mock => mock
+            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
+            .Returns(false)))
         .Add(_ => _
-          .SetField(state2Field)
+          .SetField(s_state2Field)
           .SetDefaultValue(Optional<object?>.None)
-          .SetIsActorIdSource(false)))
-      .SetImplementations(_ => _
-        .Add(_ => _
-          .SetIsDefault(true)
-          .SetImplementationType(typeof(StandardActor))
-          .SetConstructor(constructorInfo)
           .Setup(mock => mock
-            .Setup(x => x.GetMethodMetadata(implementationVoidMethod).IsStateless)
-            .Returns(false))
-          .Setup(mock => mock
-            .Setup(x => x.GetMethodMetadata(implementationTaskMethod).IsStateless)
-            .Returns(false))
-          .Setup(mock => mock
-            .Setup(x => x.GetMethodMetadata(implementationTaskTMethod).IsStateless)
-            .Returns(false))
-          .Setup(mock => mock
-            .Setup(x => x.GetMethodMetadata(implementationValueTaskMethod).IsStateless)
-            .Returns(false))
-          .Setup(mock => mock
-            .Setup(x => x.GetMethodMetadata(implementationValueTaskTMethod).IsStateless)
-            .Returns(true)))));
+            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
+            .Returns(false))))
+      .SetBaseImplementation(baseImplementationMetadata)
+      .SetImplementations());
+  }
+
+  public static void AssertValidMetadata(IActorMetadata metadata)
+  {
+    PropertyInfo? actorIdProperty;
+
+    metadata.InterfaceType.Should().Be<IStandardActor>();
+    metadata.ActorType.Should().Be<StandardActor>();
+    metadata.IsExplicitVirtual.Should().BeFalse();
+    metadata.FactoryType.Should().Be<IStandardActorFactory>();
+    metadata.StateFields.Should().HaveCount(2);
+
+    IStateFieldMetadata state1Field = metadata.StateFields.ElementAt(0);
+    state1Field.Field.Should().Be(s_state1Field);
+    state1Field.DefaultValue.Should().Be(Optional<object?>.None);
+    state1Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
+    actorIdProperty.Should().BeNull();
+
+    IStateFieldMetadata state2Field = metadata.StateFields.ElementAt(1);
+    state2Field.Field.Should().Be(s_state2Field);
+    state2Field.DefaultValue.Should().Be(Optional<object?>.None);
+    state2Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
+    actorIdProperty.Should().BeNull();
+
+    metadata.BaseImplementation.IsDefault.Should().BeFalse();
+    metadata.BaseImplementation.ImplementationType.Should().Be<StandardActor>();
+    metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
+
+    IMethodMetadata voidMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationVoidMethod);
+    voidMethodMetadata.IsStateless.Should().BeFalse();
+
+    IMethodMetadata taskMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationTaskMethod);
+    taskMethodMetadata.IsStateless.Should().BeFalse();
+
+    IMethodMetadata taskTMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationTaskTMethod);
+    taskTMethodMetadata.IsStateless.Should().BeFalse();
+
+    IMethodMetadata valueTaskMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationValueTaskMethod);
+    valueTaskMethodMetadata.IsStateless.Should().BeFalse();
+
+    IMethodMetadata valueTaskTMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationValueTaskTMethod);
+    valueTaskTMethodMetadata.IsStateless.Should().BeTrue();
+
+    metadata.Implementations.Should().BeEmpty();
   }
 }

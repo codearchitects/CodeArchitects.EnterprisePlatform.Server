@@ -1,0 +1,45 @@
+﻿using CodeArchitects.Platform.Actors.Fixtures.Examples;
+
+namespace CodeArchitects.Platform.Actors.Metadata.Reflection;
+
+public class ReflectionActorMetadataTests
+{
+  [Fact]
+  public void Create_ShouldCreateMetadata_ForStandardActor()
+  {
+    // Arrange
+    ReflectionMetadataSource source = new(typeof(StandardActor), typeof(IStandardActorFactory), new ActorAttribute<IStandardActor>(), Array.Empty<Type>());
+
+    // Act
+    ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
+
+    // Assert
+    StandardActorFixture.AssertValidMetadata(metadata);
+  }
+
+  [Fact]
+  public void Create_ShouldCreateMetadata_ForStatelessActor()
+  {
+    // Arrange
+    ReflectionMetadataSource source = new(typeof(StatelessActor), typeof(IStatelessActorFactory), new ActorAttribute(), Array.Empty<Type>());
+
+    // Act
+    ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
+
+    // Assert
+    StatelessActorFixture.AssertValidMetadata(metadata);
+  }
+
+  [Fact]
+  public void Create_ShouldCreateMetadata_ForVirtualActor()
+  {
+    // Arrange
+    ReflectionMetadataSource source = new(typeof(VirtualActor), typeof(IVirtualActorFactory), new ActorAttribute(), Array.Empty<Type>());
+
+    // Act
+    ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
+
+    // Assert
+    VirtualActorFixture.AssertValidMetadata(metadata);
+  }
+}

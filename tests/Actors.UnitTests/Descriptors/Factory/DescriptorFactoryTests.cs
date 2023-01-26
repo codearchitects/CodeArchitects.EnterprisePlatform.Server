@@ -3,12 +3,12 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
-public class ActorDescriptorFactoryTests
+public class DescriptorFactoryTests
 {
   private readonly Mock<IStateTypeBuilder> _stateTypeBuilderMock;
-  private readonly ActorDescriptorFactory _sut;
+  private readonly DescriptorFactory _sut;
 
-  public ActorDescriptorFactoryTests()
+  public DescriptorFactoryTests()
   {
     _stateTypeBuilderMock = new(MockBehavior.Strict);
     _sut = new(_stateTypeBuilderMock.Object);

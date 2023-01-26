@@ -8,7 +8,7 @@ internal interface IImplementationMetadata
 
   Type ImplementationType { get; }
 
-  ConstructorInfo Constructor { get; }
+  ConstructorInfo? Constructor { get; }
 
   IMethodMetadata GetMethodMetadata(MethodInfo implementationMethod);
 }

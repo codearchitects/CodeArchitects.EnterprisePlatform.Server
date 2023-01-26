@@ -40,13 +40,13 @@ internal class ConstructorDescriptor : IConstructorDescriptor
   {
     Type actorType = actorMetadata.ActorType;
     ConstructorDescriptor descriptor = new(actorType, constructor);
-    foreach (DependencyDescriptor dependency in DependencyDescriptor.CreateMany(actorMetadata))
+    foreach (DependencyDescriptor dependency in DependencyDescriptor.CreateMany(actorMetadata, constructor))
     {
       descriptor.AddDependency(dependency);
     }
 
     if (descriptor.StateDependencies.Count < actorMetadata.StateFields.Count)
-      throw InvalidActorException.MissingStateParameters(actorType);
+      throw InvalidActorException.StateComponentsMismatch(actorType);
 
     Debug.Assert(descriptor.StateDependencies.Count == actorMetadata.StateFields.Count, "Found more state dependencies than there are state fields.");
 
@@ -94,7 +94,7 @@ internal class ConstructorDescriptor : IConstructorDescriptor
       Debug.Assert(dependency.CategoryIndex == _descriptor._stateDependencies.Count, "Wrong category index.");
 
       if (_addedStateFields.Contains(dependency.Field))
-        throw InvalidActorException.AmbiguousStateParameter(_actorType, dependency.Parameter);
+        throw InvalidActorException.StateComponentsMismatch(_actorType);
 
       _descriptor._stateDependencies.Add(dependency);
     }

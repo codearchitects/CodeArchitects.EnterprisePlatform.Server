@@ -14,6 +14,9 @@ public class InvalidActorException : Exception
 
   // Class errors
 
+  internal static InvalidActorException DuplicateActorAttribute(Type actorType)
+    => Create(actorType, ErrorMessages.DuplicateActorAttribute, actorType.Name);
+
   internal static InvalidActorException GenericActorsAreNotSupported(Type actorType)
     => Create(actorType, ErrorMessages.GenericActorsAreNotSupported, actorType.Name);
 
@@ -41,6 +44,9 @@ public class InvalidActorException : Exception
   internal static InvalidActorException MultipleDefaultImplementations(Type actorType)
     => Create(actorType, ErrorMessages.MultipleDefaultImplementations, actorType.Name);
 
+  internal static InvalidActorException InvalidImplementation(Type actorType)
+    => Create(actorType, ErrorMessages.InvalidImplementation, actorType.Name);
+
 
   // State errors
 
@@ -56,14 +62,14 @@ public class InvalidActorException : Exception
   internal static InvalidActorException InvalidDefaultValue(Type actorType, FieldInfo field)
     => Create(actorType, ErrorMessages.InvalidDefaultValue, actorType.Name, field.Name);
 
+  internal static InvalidActorException InvalidStateProperty(Type actorType, PropertyInfo property)
+    => Create(actorType, ErrorMessages.InvalidStateProperty, actorType.Name, property.Name);
+
 
   // Constructor errors
 
-  internal static InvalidActorException MissingStateParameters(Type actorType)
-    => Create(actorType, ErrorMessages.MissingStateParameters, actorType.Name);
-
-  internal static InvalidActorException AmbiguousStateParameter(Type actorType, ParameterInfo parameter)
-    => Create(actorType, ErrorMessages.AmbiguousStateParameter, actorType.Name, parameter.Name);
+  internal static InvalidActorException StateComponentsMismatch(Type actorType)
+    => Create(actorType, ErrorMessages.StateComponentsMismatch, actorType.Name);
 
   internal static InvalidActorException AmbiguousActorConstructor(Type actorType)
     => Create(actorType, ErrorMessages.AmbiguousActorConstructor, actorType.Name);
@@ -92,11 +98,17 @@ public class InvalidActorException : Exception
 
   // Factory errors
 
+  internal static InvalidActorException DuplicateActorFactoryAttribute(Type actorType, Type factoryType)
+    => Create(actorType, ErrorMessages.DuplicateActorFactoryAttribute, actorType.Name, factoryType.Name);
+
   internal static InvalidActorException MissingActorFactoryType(Type actorType)
     => Create(actorType, ErrorMessages.MissingActorFactoryType, actorType.Name);
 
   internal static InvalidActorException InvalidActorFactoryType(Type actorType, Type factoryType)
     => Create(actorType, ErrorMessages.InvalidActorFactoryType, actorType.Name, factoryType.Name);
+
+  internal static InvalidActorException ActorTypeIsNotAnActor(Type actorType, Type factoryType)
+    => Create(actorType, ErrorMessages.ActorTypeIsNotAnActor, actorType.Name, factoryType.Name);
 
   internal static InvalidActorException AmbiguousActorFactoryType(Type actorType)
     => Create(actorType, ErrorMessages.AmbiguousActorFactoryType, actorType.Name);
@@ -111,6 +123,7 @@ public class InvalidActorException : Exception
   private static class ErrorMessages
   {
     // Class errors
+    public const string DuplicateActorAttribute = "Duplicate 'Actor' attribute on type '{0}'.";
     public const string GenericActorsAreNotSupported = "Actor '{0}' is generic, which is not supported.";
     public const string MissingActorInterface = "An actor must implement an interface which exposes its public methods, but '{0}' does not implement any interface.";
     public const string AmbiguousActorInterface = "Could not infer the actor interface type because '{0}' implements more than one interface.";
@@ -120,16 +133,17 @@ public class InvalidActorException : Exception
     public const string EventsAreNotSupported = "Interface '{1}' defines events, which are not supported.";
     public const string ActorCannotBeVirtual = "'{0}' cannot be a virtual actor because a default value for its state could not be computed. For simple state types, either configure the its default value or provide a default parameter value. For complex state types, provide a parameterless constructor for the class.";
     public const string MultipleDefaultImplementations = "Multiple default implementations found for actor '{0}'.";
+    public const string InvalidImplementation = "Type '{0}' cannot be an actor implementation because it does not inherit from an actor type.";
 
     // State errors
-    public const string AmbiguousActorIdSource = "Multiple components of the actor's state can be used as the actor id source.";
+    public const string AmbiguousActorIdSource = "Multiple actor id sources were set. Only one state component or one state component property can be configured to be the actor id";
     public const string StateMustBeDefinedInBaseActor = "Each component of the actor's state must be defined in the actor's base class.";
     public const string InvalidStateType = "The type of field '{1}' cannot be used as an actor state.";
     public const string InvalidDefaultValue = "The provided default value for state component '{1}' is of the wrong type.";
+    public const string InvalidStateProperty = "Only auto properties can be state components and '{1}' is not.";
 
     // Constructor errors
-    public const string MissingStateParameters = "Could not find a corresponding parameter for each state field.";
-    public const string AmbiguousStateParameter = "Parameter '{1}' can be associated to more than one state component.";
+    public const string StateComponentsMismatch = "Could not find a one-to-one correspondence between state members and state constructor parameters.";
     public const string AmbiguousActorConstructor = "Could not infer the actor constructor.";
     public const string DuplicateActorContext = "Duplicate IActorContext dependency '{1}' inside the actor constructor.";
     public const string WrongGenericActorContext = "The actor context parameter '{1}' must be of type 'IActorContext<{0}>'.";
@@ -141,8 +155,10 @@ public class InvalidActorException : Exception
     public const string GenericMethodsAreNotSupported = "Method '{1}' is generic, which is not supported.";
 
     // Factory errors
+    public const string DuplicateActorFactoryAttribute = "Duplicate 'ActorFactory' attribute on type '{1}'.";
     public const string MissingActorFactoryType = "Could not find a suitable factory interface for '{0}'.";
     public const string InvalidActorFactoryType = "Actor factory '{1}' is not an interface or has the wrong method signatures.";
+    public const string ActorTypeIsNotAnActor = "'{0}' was specified as the actor type of the factory '{1}', but it is not an actor.";
     public const string AmbiguousActorFactoryType = "Multiple actor factories were specified for '{0}'.";
   }
 }

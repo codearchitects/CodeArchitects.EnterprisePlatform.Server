@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace CodeArchitects.Platform.Actors.Metadata;
+﻿namespace CodeArchitects.Platform.Actors.Metadata;
 
 internal interface IActorMetadata
 {
@@ -12,9 +10,9 @@ internal interface IActorMetadata
 
   Type? FactoryType { get; }
 
-  ConstructorInfo Constructor { get; }
-
   IReadOnlyCollection<IStateFieldMetadata> StateFields { get; }
+
+  IImplementationMetadata BaseImplementation { get; }
 
   IReadOnlyCollection<IImplementationMetadata> Implementations { get; }
 }

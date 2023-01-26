@@ -8,6 +8,8 @@ internal interface IActorDescriptor
 
   bool IsPolymorphic { get; }
 
+  IImplementationDescriptor BaseImplementation { get; }
+
   IImplementationDescriptor DefaultImplementation { get; }
 
   IReadOnlyList<IImplementationDescriptor> Implementations { get; }
@@ -17,6 +19,4 @@ internal interface IActorDescriptor
   IStateDescriptor State { get; }
 
   IActorFactoryDescriptor Factory { get; }
-
-  IConstructorDescriptor Constructor { get; }
 }

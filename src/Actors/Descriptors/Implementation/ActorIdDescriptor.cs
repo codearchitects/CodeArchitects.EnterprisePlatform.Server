@@ -14,20 +14,21 @@ internal abstract class ActorIdDescriptor : IActorIdDescriptor
   public abstract PropertyInfo? StateProperty { get; }
 
 
-  public static ActorIdDescriptor Create(IActorMetadata actorMetadata, IReadOnlyList<IStateDependencyDescriptor> stateDependencies)
+  public static ActorIdDescriptor Create(IActorMetadata actorMetadata, IImplementationDescriptor baseImplementation)
   {
     ActorIdDescriptor? id = null;
     int index = 0;
 
+    IReadOnlyList<IStateDependencyDescriptor> stateDependencies = baseImplementation.Constructor.StateDependencies;
     foreach (IStateFieldMetadata stateField in actorMetadata.StateFields)
     {
-      if (!stateField.IsActorIdSource)
+      if (!stateField.IsActorIdSource(out PropertyInfo? actorIdProperty))
         continue;
 
       if (id is not null)
         throw InvalidActorException.AmbiguousActorIdSource(actorMetadata.ActorType);
 
-      id = new SourceActorIdDescriptor(stateDependencies[index], stateField.ActorIdProperty);
+      id = new SourceActorIdDescriptor(stateDependencies[index], actorIdProperty);
 
       index++;
     }
