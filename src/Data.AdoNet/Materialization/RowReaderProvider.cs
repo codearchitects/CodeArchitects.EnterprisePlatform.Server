@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Collections.Concurrent;
 using System.Data;
@@ -152,7 +152,7 @@ internal class RowReaderProvider : IRowReaderProvider
         2 => typeof(Tuple<,>),
         3 => typeof(Tuple<,,>),
         4 => typeof(Tuple<,,,>),
-        _ => throw Errors.Unreacheable
+        _ => throw Errors.Unreachable
       };
 
       return tupleType.MakeGenericType(componentTypes).GetRequiredConstructor(

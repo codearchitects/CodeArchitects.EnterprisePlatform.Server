@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Common.Exceptions;
 
 namespace CodeArchitects.Platform.Actors.Fixtures;
 
@@ -214,7 +214,7 @@ internal class DescriptorEqualityComparer :
       IValueTaskMethodDescriptor              => y is IValueTaskMethodDescriptor,
       ITaskTMethodDescriptor xTaskT           => y is ITaskTMethodDescriptor yTaskT && SpecificEquals(xTaskT, yTaskT),
       IValueTaskTMethodDescriptor xValueTaskT => y is IValueTaskTMethodDescriptor yValueTaskT && SpecificEquals(xValueTaskT, yValueTaskT),
-      _                                       => throw Errors.Unreacheable,
+      _                                       => throw Errors.Unreachable,
     };
   }
 
@@ -259,7 +259,7 @@ internal class DescriptorEqualityComparer :
       IContextDependencyDescriptor          => y is IContextDependencyDescriptor,
       IServiceDependencyDescriptor xService => y is IServiceDependencyDescriptor yService && SpecificEquals(xService, yService),
       IStateDependencyDescriptor xState     => y is IStateDependencyDescriptor yState && SpecificEquals(xState, yState),
-      _                                     => throw Errors.Unreacheable
+      _                                     => throw Errors.Unreachable
     };
   }
 

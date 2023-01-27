@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
@@ -53,7 +53,7 @@ internal class DataModelBuilder : INavigationIdGenerator
           skipNavigations.Add(skipNavigation);
           break;
         default:
-          throw Errors.Unreacheable;
+          throw Errors.Unreachable;
       };
     }
 

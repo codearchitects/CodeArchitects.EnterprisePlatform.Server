@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -85,7 +85,7 @@ internal abstract class NavigationNode
           return skipNavigationNode;
 
         default:
-          throw Errors.Unreacheable;
+          throw Errors.Unreachable;
       }
     }
 
@@ -100,7 +100,7 @@ internal abstract class NavigationNode
       {
         IAccessibleSimpleNavigationModel navigationModel   => new SimpleNavigationLeaf(navigationModel),
         IAccessibleSkipNavigationModel skipNavigationModel => new SkipNavigationLeaf(skipNavigationModel),
-        _                                                  => throw Errors.Unreacheable
+        _                                                  => throw Errors.Unreachable
       };
 
       _children.Add(model.Id, leaf);

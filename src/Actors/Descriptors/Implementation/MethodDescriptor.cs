@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Metadata;
-using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Common.Exceptions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
@@ -87,7 +87,7 @@ internal abstract class MethodDescriptor : IMethodDescriptor
       MethodKind.TaskT      => new TaskTMethodDescriptor(interfaceMethod, implementationMethod, isStateless, cancellationTokenParameterPosition),
       MethodKind.ValueTask  => new ValueTaskMethodDescriptor(interfaceMethod, implementationMethod, isStateless, cancellationTokenParameterPosition),
       MethodKind.ValueTaskT => new ValueTaskTMethodDescriptor(interfaceMethod, implementationMethod, isStateless, cancellationTokenParameterPosition),
-      _                     => throw Errors.Unreacheable
+      _                     => throw Errors.Unreachable
     };
   }
 
