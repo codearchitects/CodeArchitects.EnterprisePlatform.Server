@@ -21,7 +21,10 @@ internal abstract class ImplementationMetadata : IImplementationMetadata
 
   public IMethodMetadata GetMethodMetadata(MethodInfo implementationMethod)
   {
-    return _methods[implementationMethod];
+    if (_methods.TryGetValue(implementationMethod, out IMethodMetadata metadata))
+      return metadata;
+
+    return DefaultMethodMetadata.Instance;
   }
 
   protected void AddMethodMetadata(MethodMetadata methodMetadata)

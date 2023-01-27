@@ -32,13 +32,15 @@ internal static class StatelessActorFixture
   public static readonly IActorDescriptor Descriptor;
   public static readonly IActorMetadata Metadata;
 
+  private static readonly ConstructorInfo s_constructor;
+
   static StatelessActorFixture()
   {
-    ConstructorInfo constructor = typeof(StatelessActor).GetRequiredConstructor(
+    s_constructor = typeof(StatelessActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(IService1) });
 
-    ParameterInfo[] constructorParameters = constructor.GetParameters();
+    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
 
     MethodInfo factoryGetMethod = typeof(IStatelessActorFactory).GetRequiredMethod(
       name: nameof(IStatelessActorFactory.Get),
@@ -57,7 +59,7 @@ internal static class StatelessActorFixture
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetType(typeof(StatelessActor))
       .SetConstructor(_ => _
-        .SetConstructor(constructor)
+        .SetConstructor(s_constructor)
         .SetDependencies(service1Dependency)
         .SetContextDependency(null as IContextDependencyDescriptor)
         .SetServiceDependencies(service1Dependency)
@@ -104,7 +106,7 @@ internal static class StatelessActorFixture
       .SetImplementations());
   }
 
-  public static void AssertValidMetadata(IActorMetadata metadata)
+  public static void AssertValidMetadata(IActorMetadata metadata, bool hasConstructor)
   {
     metadata.InterfaceType.Should().BeNull();
     metadata.ActorType.Should().Be<StatelessActor>();
@@ -114,8 +116,15 @@ internal static class StatelessActorFixture
 
     metadata.BaseImplementation.IsDefault.Should().BeFalse();
     metadata.BaseImplementation.ImplementationType.Should().Be<StatelessActor>();
-    metadata.BaseImplementation.Constructor.Should().BeNull();
     metadata.BaseImplementation.HasStateFields.Should().BeFalse();
+    if (hasConstructor)
+    {
+      metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
+    }
+    else
+    {
+      metadata.BaseImplementation.Constructor.Should().BeNull();
+    }
 
     metadata.Implementations.Should().BeEmpty();
   }

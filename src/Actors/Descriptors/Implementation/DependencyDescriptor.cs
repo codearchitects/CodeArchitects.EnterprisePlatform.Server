@@ -55,14 +55,13 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
       return new ContextDependencyDescriptor(parameter);
     }
 
-    return new ServiceDependencyDescriptor(parameter)
-    {
-      IsOptional = parameter.HasDefaultValue && parameter.DefaultValue is null
-    };
+    return new ServiceDependencyDescriptor(parameter);
   }
 
   private static bool TryGetStateField(IActorMetadata actorMetadata, ParameterInfo parameter, [NotNullWhen(true)] out FieldInfo? stateField, out int fieldIndex)
   {
+    stateField = null;
+    fieldIndex = -1;
     string parameterName = parameter.Name;
 
     for (int i = 0; i < actorMetadata.StateFields.Count; i++)
@@ -81,14 +80,14 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
 
       if (match)
       {
+        if (stateField is not null)
+          throw InvalidActorException.StateComponentsMismatch(actorMetadata.ActorType);
+
         stateField = metadata.Field;
         fieldIndex = i;
-        return true;
       }
     }
 
-    stateField = null;
-    fieldIndex = -1;
-    return false;
+    return stateField is not null;
   }
 }

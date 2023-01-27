@@ -27,7 +27,7 @@ public class ReflectionActorMetadataTests
     ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
 
     // Assert
-    StatelessActorFixture.AssertValidMetadata(metadata);
+    StatelessActorFixture.AssertValidMetadata(metadata, false);
   }
 
   [Fact]
@@ -40,6 +40,6 @@ public class ReflectionActorMetadataTests
     ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
 
     // Assert
-    VirtualActorFixture.AssertValidMetadata(metadata);
+    VirtualActorFixture.AssertValidMetadata(metadata, false);
   }
 }

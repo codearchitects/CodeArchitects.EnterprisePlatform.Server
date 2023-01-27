@@ -11,7 +11,7 @@ internal class ServiceDependencyDescriptor : DependencyDescriptor, IServiceDepen
 
   public override DependencyKind Kind => DependencyKind.Service;
 
-  public bool IsOptional { get; set; }
+  public bool IsOptional => Parameter.HasDefaultValue;
 
   public override void Accept(IDependencyDescriptorVisitor visitor)
   {

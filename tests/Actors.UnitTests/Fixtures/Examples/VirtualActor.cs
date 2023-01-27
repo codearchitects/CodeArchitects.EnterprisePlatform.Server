@@ -69,17 +69,18 @@ internal static class VirtualActorFixture
   public static IActorDescriptor Descriptor;
   public static IActorMetadata Metadata;
 
+  private static readonly ConstructorInfo s_constructor;
   private static readonly FieldInfo s_objField;
   private static readonly FieldInfo s_state1Field;
   private static readonly FieldInfo s_state2Field;
 
   static VirtualActorFixture()
   {
-    ConstructorInfo constructor = typeof(VirtualActor).GetRequiredConstructor(
+    s_constructor = typeof(VirtualActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
       types: new[] { typeof(ComplexObject), typeof(string), typeof(int) });
 
-    ParameterInfo[] constructorParameters = constructor.GetParameters();
+    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
 
     s_objField = typeof(VirtualActor).GetRequiredField(
       name: "_obj",
@@ -129,7 +130,7 @@ internal static class VirtualActorFixture
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetType(typeof(VirtualActor))
       .SetConstructor(_ => _
-        .SetConstructor(constructor)
+        .SetConstructor(s_constructor)
         .SetDependencies(objDependency, state1Dependency, state2Dependency)
         .SetContextDependency(null as IContextDependencyDescriptor)
         .SetServiceDependencies()
@@ -194,7 +195,7 @@ internal static class VirtualActorFixture
       .SetImplementations());
   }
 
-  public static void AssertValidMetadata(IActorMetadata metadata)
+  public static void AssertValidMetadata(IActorMetadata metadata, bool hasConstructor)
   {
     PropertyInfo? actorIdProperty;
 
@@ -224,8 +225,15 @@ internal static class VirtualActorFixture
 
     metadata.BaseImplementation.IsDefault.Should().BeFalse();
     metadata.BaseImplementation.ImplementationType.Should().Be<VirtualActor>();
-    metadata.BaseImplementation.Constructor.Should().BeNull();
     metadata.BaseImplementation.HasStateFields.Should().BeTrue();
+    if (hasConstructor)
+    {
+      metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
+    }
+    else
+    {
+      metadata.BaseImplementation.Constructor.Should().BeNull();
+    }
 
     metadata.Implementations.Should().BeEmpty();
   }
