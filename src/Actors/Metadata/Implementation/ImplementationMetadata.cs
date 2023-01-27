@@ -17,6 +17,8 @@ internal abstract class ImplementationMetadata : IImplementationMetadata
 
   public abstract ConstructorInfo? Constructor { get; }
 
+  public abstract bool HasStateFields { get; }
+
   public IMethodMetadata GetMethodMetadata(MethodInfo implementationMethod)
   {
     return _methods[implementationMethod];

@@ -105,7 +105,7 @@ internal static class VirtualActorFixture
       .SetName("obj")
       .SetType(typeof(ComplexObject))
       .SetIndex(0)
-      .SetCategoryIndex(0)
+      .SetFieldIndex(0)
       .SetField(s_objField));
 
     IStateDependencyDescriptor state1Dependency = StateDependencyDescriptorBuilder.Build(_ => _
@@ -114,7 +114,7 @@ internal static class VirtualActorFixture
       .SetName("state1")
       .SetType(typeof(string))
       .SetIndex(1)
-      .SetCategoryIndex(1)
+      .SetFieldIndex(1)
       .SetField(s_state1Field));
 
     IStateDependencyDescriptor state2Dependency = StateDependencyDescriptorBuilder.Build(_ => _
@@ -123,7 +123,7 @@ internal static class VirtualActorFixture
       .SetName("state2")
       .SetType(typeof(int))
       .SetIndex(2)
-      .SetCategoryIndex(2)
+      .SetFieldIndex(2)
       .SetField(s_state2Field));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
@@ -163,7 +163,8 @@ internal static class VirtualActorFixture
     IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
       .SetIsDefault(false)
       .SetImplementationType(typeof(VirtualActor))
-      .SetConstructor(null));
+      .SetConstructor(null)
+      .SetHasStateFields(true));
 
     Metadata = ActorMetadataBuilder.Build(_ => _
       .SetInterfaceType(null)
@@ -224,6 +225,7 @@ internal static class VirtualActorFixture
     metadata.BaseImplementation.IsDefault.Should().BeFalse();
     metadata.BaseImplementation.ImplementationType.Should().Be<VirtualActor>();
     metadata.BaseImplementation.Constructor.Should().BeNull();
+    metadata.BaseImplementation.HasStateFields.Should().BeTrue();
 
     metadata.Implementations.Should().BeEmpty();
   }

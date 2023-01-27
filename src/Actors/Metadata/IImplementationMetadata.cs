@@ -10,5 +10,7 @@ internal interface IImplementationMetadata
 
   ConstructorInfo? Constructor { get; }
 
+  bool HasStateFields { get; }
+
   IMethodMetadata GetMethodMetadata(MethodInfo implementationMethod);
 }

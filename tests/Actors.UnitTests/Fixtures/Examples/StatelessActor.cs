@@ -52,7 +52,6 @@ internal static class StatelessActorFixture
       .SetName("service1")
       .SetType(typeof(IService1))
       .SetIndex(0)
-      .SetCategoryIndex(0)
       .SetIsOptional(false));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
@@ -92,7 +91,8 @@ internal static class StatelessActorFixture
     IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
       .SetIsDefault(false)
       .SetImplementationType(typeof(StatelessActor))
-      .SetConstructor(null));
+      .SetConstructor(null)
+      .SetHasStateFields(false));
 
     Metadata = ActorMetadataBuilder.Build(_ => _
       .SetInterfaceType(typeof(IStatelessActor))
@@ -115,6 +115,7 @@ internal static class StatelessActorFixture
     metadata.BaseImplementation.IsDefault.Should().BeFalse();
     metadata.BaseImplementation.ImplementationType.Should().Be<StatelessActor>();
     metadata.BaseImplementation.Constructor.Should().BeNull();
+    metadata.BaseImplementation.HasStateFields.Should().BeFalse();
 
     metadata.Implementations.Should().BeEmpty();
   }

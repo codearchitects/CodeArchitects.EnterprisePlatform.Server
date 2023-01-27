@@ -14,7 +14,5 @@ internal interface IDependencyDescriptor
 
   int Index { get; }
 
-  int CategoryIndex { get; }
-
   void Accept(IDependencyDescriptorVisitor visitor);
 }

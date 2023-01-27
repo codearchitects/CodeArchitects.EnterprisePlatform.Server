@@ -4,15 +4,12 @@ namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
 internal class ServiceDependencyDescriptor : DependencyDescriptor, IServiceDependencyDescriptor
 {
-  public ServiceDependencyDescriptor(ParameterInfo parameter, int categoryIndex)
+  public ServiceDependencyDescriptor(ParameterInfo parameter)
     : base(parameter)
   {
-    CategoryIndex = categoryIndex;
   }
 
   public override DependencyKind Kind => DependencyKind.Service;
-
-  public override int CategoryIndex { get; }
 
   public bool IsOptional { get; set; }
 

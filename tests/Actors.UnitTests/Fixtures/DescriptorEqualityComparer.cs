@@ -251,9 +251,6 @@ internal class DescriptorEqualityComparer :
     if (x.Index != y.Index)
       return false;
 
-    if (x.CategoryIndex != y.CategoryIndex)
-      return false;
-
     return x switch
     {
       IContextDependencyDescriptor          => y is IContextDependencyDescriptor,
@@ -270,7 +267,7 @@ internal class DescriptorEqualityComparer :
 
   private static bool SpecificEquals(IStateDependencyDescriptor x, IStateDependencyDescriptor y)
   {
-    return x.Field == y.Field;
+    return x.Field == y.Field && x.FieldIndex == y.FieldIndex;
   }
 
   public int GetHashCode(IActorDescriptor obj)

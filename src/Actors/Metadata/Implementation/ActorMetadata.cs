@@ -21,7 +21,7 @@ internal abstract class ActorMetadata : IActorMetadata
 
   public Type? FactoryType { get; protected set; }
 
-  public IReadOnlyCollection<IStateFieldMetadata> StateFields => _stateFields;
+  public IReadOnlyList<IStateFieldMetadata> StateFields => _stateFields;
 
   public IReadOnlyCollection<IImplementationMetadata> Implementations => _implementations.Values;
 

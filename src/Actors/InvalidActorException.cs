@@ -53,8 +53,8 @@ public class InvalidActorException : Exception
   internal static InvalidActorException AmbiguousActorIdSource(Type actorType)
     => Create(actorType, ErrorMessages.AmbiguousActorIdSource, actorType.Name);
 
-  internal static InvalidActorException StateMustBeDefinedInBaseActor(Type actorType)
-    => Create(actorType, ErrorMessages.StateMustBeDefinedInBaseActor, actorType.Name);
+  internal static InvalidActorException StateMustBeDefinedInBaseActor(Type actorType, Type implementationType)
+    => Create(actorType, ErrorMessages.StateMustBeDefinedInBaseActor, actorType.Name, implementationType.Name);
 
   internal static InvalidActorException InvalidStateType(Type actorType, FieldInfo field)
     => Create(actorType, ErrorMessages.InvalidStateType, actorType.Name, field.Name);
@@ -137,7 +137,7 @@ public class InvalidActorException : Exception
 
     // State errors
     public const string AmbiguousActorIdSource = "Multiple actor id sources were set. Only one state component or one state component property can be configured to be the actor id";
-    public const string StateMustBeDefinedInBaseActor = "Each component of the actor's state must be defined in the actor's base class.";
+    public const string StateMustBeDefinedInBaseActor = "Each component of the actor's state must be defined in the actor's base class, while implementation '{1}' defines state members.";
     public const string InvalidStateType = "The type of field '{1}' cannot be used as an actor state.";
     public const string InvalidDefaultValue = "The provided default value for state component '{1}' is of the wrong type.";
     public const string InvalidStateProperty = "Only auto properties can be state components and '{1}' is not.";

@@ -191,7 +191,7 @@ internal static class StandardActorFixture
       .SetName("state1")
       .SetType(typeof(string))
       .SetIndex(0)
-      .SetCategoryIndex(0)
+      .SetFieldIndex(0)
       .SetField(s_state1Field));
 
     IServiceDependencyDescriptor service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
@@ -200,7 +200,6 @@ internal static class StandardActorFixture
       .SetName("service1")
       .SetType(typeof(IService1))
       .SetIndex(1)
-      .SetCategoryIndex(0)
       .SetIsOptional(false));
 
     IStateDependencyDescriptor state2Dependency = StateDependencyDescriptorBuilder.Build(_ => _
@@ -209,7 +208,7 @@ internal static class StandardActorFixture
       .SetName("state2")
       .SetType(typeof(StandardActorStateComponent))
       .SetIndex(2)
-      .SetCategoryIndex(1)
+      .SetFieldIndex(1)
       .SetField(s_state2Field));
 
     IContextDependencyDescriptor contextDependency = ContextDependencyDescriptorBuilder.Build(_ => _
@@ -217,8 +216,7 @@ internal static class StandardActorFixture
       .SetParameter(constructorParameters[3])
       .SetName("context")
       .SetType(typeof(IActorContext<StandardActor>))
-      .SetIndex(3)
-      .SetCategoryIndex(0));
+      .SetIndex(3));
 
     IServiceDependencyDescriptor service2Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -226,7 +224,6 @@ internal static class StandardActorFixture
       .SetName("service2")
       .SetType(typeof(IService2))
       .SetIndex(4)
-      .SetCategoryIndex(1)
       .SetIsOptional(true));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
@@ -309,6 +306,7 @@ internal static class StandardActorFixture
       .SetIsDefault(false)
       .SetImplementationType(typeof(StandardActor))
       .SetConstructor(s_constructor)
+      .SetHasStateFields(true)
       .Setup(mock => mock
         .Setup(x => x.GetMethodMetadata(s_implementationVoidMethod).IsStateless)
         .Returns(false))
@@ -372,6 +370,7 @@ internal static class StandardActorFixture
     metadata.BaseImplementation.IsDefault.Should().BeFalse();
     metadata.BaseImplementation.ImplementationType.Should().Be<StandardActor>();
     metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
+    metadata.BaseImplementation.HasStateFields.Should().BeTrue();
 
     IMethodMetadata voidMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationVoidMethod);
     voidMethodMetadata.IsStateless.Should().BeFalse();

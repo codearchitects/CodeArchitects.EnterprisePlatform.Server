@@ -22,8 +22,10 @@ internal class DescriptorFactory
   private IStateDescriptor CreateState(IActorMetadata actorMetadata)
   {
     Type actorType = actorMetadata.ActorType;
-    IReadOnlyCollection<IStateFieldMetadata> stateFields = actorMetadata.StateFields;
+    if (actorType.IsGenericType)
+      throw InvalidActorException.GenericActorsAreNotSupported(actorType);
 
+    IReadOnlyCollection<IStateFieldMetadata> stateFields = actorMetadata.StateFields;
     if (stateFields.Count == 0)
       return NoStateDescriptor.Instance;
 

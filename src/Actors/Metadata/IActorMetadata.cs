@@ -10,7 +10,7 @@ internal interface IActorMetadata
 
   Type? FactoryType { get; }
 
-  IReadOnlyCollection<IStateFieldMetadata> StateFields { get; }
+  IReadOnlyList<IStateFieldMetadata> StateFields { get; }
 
   IImplementationMetadata BaseImplementation { get; }
 

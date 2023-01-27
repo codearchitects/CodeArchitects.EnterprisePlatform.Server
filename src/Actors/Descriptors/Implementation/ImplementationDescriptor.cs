@@ -28,7 +28,12 @@ internal class ImplementationDescriptor : IImplementationDescriptor
 
   public static ImplementationDescriptor Create(IActorMetadata actorMetadata, IImplementationMetadata implementationMetadata, Type interfaceType)
   {
+    Type actorType = actorMetadata.ActorType;
     Type implementationType = implementationMetadata.ImplementationType;
+
+    if (actorType != implementationType && implementationMetadata.HasStateFields)
+      throw InvalidActorException.StateMustBeDefinedInBaseActor(actorType, implementationType);
+
     ConstructorDescriptor constructor = ConstructorDescriptor.Create(actorMetadata, GetConstructor(implementationMetadata));
     ImplementationDescriptor implementation = new ImplementationDescriptor(implementationType, constructor);
 

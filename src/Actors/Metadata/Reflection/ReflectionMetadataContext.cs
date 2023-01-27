@@ -50,6 +50,9 @@ internal class ReflectionMetadataContext
         if (!_sources.TryGetValue(actorType, out ReflectionMetadataSource? source))
           throw InvalidActorException.ActorTypeIsNotAnActor(actorType, type);
 
+        if (source.FactoryType is not null)
+          throw InvalidActorException.AmbiguousActorFactoryType(actorType);
+
         _sources[actorType] = source with { FactoryType = type };
 
         continue;
@@ -58,7 +61,7 @@ internal class ReflectionMetadataContext
       if (IsActorImplementation(type))
       {
         if (!TryGetReflectionMetadataSource(type, out ReflectionMetadataSource? source))
-          throw InvalidActorException.InvalidImplementation(type);
+          throw InvalidActorException.InvalidImplementation(type); // TODO: Try move in descriptors
 
         _sources[source.ActorType] = source with { ImplementationTypes = new List<Type>(source.ImplementationTypes) { type } };
       }
@@ -92,7 +95,7 @@ internal class ReflectionMetadataContext
       if (typeof(IActorFactoryAttribute).IsInstanceOfType(attribute))
       {
         if (actorFactoryAttribute is not null)
-          throw InvalidActorException.DuplicateActorAttribute(type);
+          throw InvalidActorException.DuplicateActorFactoryAttribute(actorFactoryAttribute.ActorType, type);
 
         actorFactoryAttribute = (IActorFactoryAttribute)attribute;
       }

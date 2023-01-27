@@ -84,15 +84,11 @@ internal class ConstructorDescriptor : IConstructorDescriptor
 
     public void VisitServiceDependency(IServiceDependencyDescriptor dependency)
     {
-      Debug.Assert(dependency.CategoryIndex == _descriptor._serviceDependencies.Count, "Wrong category index.");
-
       _descriptor._serviceDependencies.Add(dependency);
     }
 
     public void VisitStateDependency(IStateDependencyDescriptor dependency)
     {
-      Debug.Assert(dependency.CategoryIndex == _descriptor._stateDependencies.Count, "Wrong category index.");
-
       if (_addedStateFields.Contains(dependency.Field))
         throw InvalidActorException.StateComponentsMismatch(_actorType);
 

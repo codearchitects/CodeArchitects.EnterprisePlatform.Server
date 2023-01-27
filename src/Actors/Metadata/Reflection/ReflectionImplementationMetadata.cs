@@ -32,6 +32,10 @@ internal class ReflectionImplementationMetadata : ImplementationMetadata
     }
   }
 
+  public override bool HasStateFields => ImplementationType
+    .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+    .Any(member => member.IsDefined(typeof(StateAttribute)));
+
   public static ReflectionImplementationMetadata Create(Type implementationType)
   {
     ReflectionImplementationMetadata metadata = new(implementationType);

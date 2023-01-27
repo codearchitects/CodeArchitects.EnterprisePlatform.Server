@@ -14,8 +14,6 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
 
   public abstract DependencyKind Kind { get; }
 
-  public abstract int CategoryIndex { get; }
-
   public ParameterInfo Parameter { get; }
 
   public string Name => Parameter.Name ?? $"$p{Index}";
@@ -29,24 +27,22 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
 
   public static IEnumerable<DependencyDescriptor> CreateMany(IActorMetadata actorMetadata, ConstructorInfo constructor)
   {
-    CategoryIndices indices = new CategoryIndices();
-
     foreach (ParameterInfo parameter in constructor.GetParameters())
     {
       if (string.IsNullOrWhiteSpace(parameter.Name)) // This could only happen if the actor class is emitted dynamically
         throw new InvalidOperationException("Found a parameter with a null or whitespace name.");
 
-      yield return Create(actorMetadata, parameter, indices);
+      yield return Create(actorMetadata, parameter);
     }
   }
 
-  private static DependencyDescriptor Create(IActorMetadata actorMetadata, ParameterInfo parameter, CategoryIndices indices)
+  private static DependencyDescriptor Create(IActorMetadata actorMetadata, ParameterInfo parameter)
   {
     Type actorType = actorMetadata.ActorType;
     Type parameterType = parameter.ParameterType;
 
-    if (TryGetStateField(actorMetadata, parameter, out FieldInfo? stateField))
-      return new StateDependencyDescriptor(parameter, stateField, indices.StateIndex++);
+    if (TryGetStateField(actorMetadata, parameter, out FieldInfo? stateField, out int fieldIndex))
+      return new StateDependencyDescriptor(parameter, stateField, fieldIndex);
 
     bool isNonGenericActorContext = parameterType == typeof(IActorContext);
     bool isGenericActorContext = parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(IActorContext<>);
@@ -59,18 +55,19 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
       return new ContextDependencyDescriptor(parameter);
     }
 
-    return new ServiceDependencyDescriptor(parameter, indices.ServicesIndex++)
+    return new ServiceDependencyDescriptor(parameter)
     {
       IsOptional = parameter.HasDefaultValue && parameter.DefaultValue is null
     };
   }
 
-  private static bool TryGetStateField(IActorMetadata actorMetadata, ParameterInfo parameter, [NotNullWhen(true)] out FieldInfo? stateField)
+  private static bool TryGetStateField(IActorMetadata actorMetadata, ParameterInfo parameter, [NotNullWhen(true)] out FieldInfo? stateField, out int fieldIndex)
   {
     string parameterName = parameter.Name;
 
-    foreach (IStateFieldMetadata metadata in actorMetadata.StateFields)
+    for (int i = 0; i < actorMetadata.StateFields.Count; i++)
     {
+      IStateFieldMetadata metadata = actorMetadata.StateFields[i];
       string fieldName = metadata.Field.Name;
 
       if (string.IsNullOrWhiteSpace(fieldName)) // This could only happen if the actor class is emitted dynamically
@@ -85,17 +82,13 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
       if (match)
       {
         stateField = metadata.Field;
+        fieldIndex = i;
         return true;
       }
     }
 
     stateField = null;
+    fieldIndex = -1;
     return false;
-  }
-
-  private class CategoryIndices
-  {
-    public int StateIndex { get; set; }
-    public int ServicesIndex { get; set; }
   }
 }
