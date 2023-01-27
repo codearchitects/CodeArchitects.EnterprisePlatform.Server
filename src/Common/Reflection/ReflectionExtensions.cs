@@ -115,6 +115,38 @@ internal static class ReflectionExtensions
     }
   }
 
+  internal static object? GetValue(this MemberInfo member, object? instance, object?[]? arguments = null)
+  {
+    switch (member)
+    {
+      case PropertyInfo property:
+        return property.GetValue(instance, arguments);
+      case FieldInfo field:
+        if (arguments is not null)
+          throw new ArgumentException("The index value array should be null for fields.");
+        return field.GetValue(instance);
+      default:
+        throw new ArgumentException($"Expected a PropertyInfo or a FieldInfo, but got '{member.GetType().Name}'.");
+    }
+  }
+
+  internal static void SetValue(this MemberInfo member, object? instance, object? value, object?[]? arguments = null)
+  {
+    switch (member)
+    {
+      case PropertyInfo property:
+        property.SetValue(instance, value, arguments);
+        return;
+      case FieldInfo field:
+        if (arguments is not null)
+          throw new ArgumentException("The index value array should be null for fields.");
+        field.SetValue(instance, value);
+        return;
+      default:
+        throw new ArgumentException($"Expected a PropertyInfo or a FieldInfo, but got '{member.GetType().Name}'.");
+    }
+  }
+
   public static bool TryGetBackingFieldByConvention(this PropertyInfo property, BackingFieldNameConvention conventions, [NotNullWhen(true)] out FieldInfo? backingField)
   {
     Type type = property.DeclaringType!;
