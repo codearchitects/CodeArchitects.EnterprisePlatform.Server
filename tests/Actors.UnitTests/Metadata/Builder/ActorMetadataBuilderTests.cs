@@ -63,4 +63,38 @@ public class ActorMetadataBuilderTests
     // Assert
     VirtualActorFixture.AssertValidMetadata(sut, true);
   }
+
+  [Fact]
+  public void It_ShouldBuildMetadata_ForComponentIdSourceActor()
+  {
+    // Arrange
+    ActorMetadataBuilder<ComponentIdSourceActor> sut = new();
+
+    // Act
+    sut.AsBuilder()
+      .HasFactoryType<IComponentIdSourceActorFactory>()
+      .HasActorConstructor(arg => new ComponentIdSourceActor(
+        arg.State<int>(state => state
+          .IsActorId())));
+
+    // Assert
+    ComponentIdSourceActorFixture.AssertValidMetadata(sut, true);
+  }
+
+  [Fact]
+  public void It_ShouldBuildMetadata_ForPropertyIdSourceActor()
+  {
+    // Arrange
+    ActorMetadataBuilder<PropertyIdSourceActor> sut = new();
+
+    // Act
+    sut.AsBuilder()
+      .HasFactoryType<IPropertyIdSourceActorFactory>()
+      .HasActorConstructor(arg => new PropertyIdSourceActor(
+        arg.State<PropertyIdSourceActorStateComponent>(state => state
+          .IsActorIdSource(component => component.Id))));
+
+    // Assert
+    PropertyIdSourceActorFixture.AssertValidMetadata(sut, true);
+  }
 }

@@ -32,11 +32,11 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
       if (string.IsNullOrWhiteSpace(parameter.Name)) // This could only happen if the actor class is emitted dynamically
         throw new InvalidOperationException("Found a parameter with a null or whitespace name.");
 
-      yield return Create(actorMetadata, parameter);
+      yield return Create(actorMetadata, constructor.DeclaringType, parameter);
     }
   }
 
-  private static DependencyDescriptor Create(IActorMetadata actorMetadata, ParameterInfo parameter)
+  private static DependencyDescriptor Create(IActorMetadata actorMetadata, Type implementationType, ParameterInfo parameter)
   {
     Type actorType = actorMetadata.ActorType;
     Type parameterType = parameter.ParameterType;
@@ -49,8 +49,8 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
 
     if (isNonGenericActorContext || isGenericActorContext)
     {
-      if (isGenericActorContext && parameterType.GetGenericArguments()[0] != actorType)
-        throw InvalidActorException.WrongGenericActorContext(actorType, parameter.Name);
+      if (isGenericActorContext & !parameterType.GetGenericArguments()[0].IsAssignableFrom(implementationType))
+        throw InvalidActorException.WrongGenericActorContext(implementationType, parameter.Name);
 
       return new ContextDependencyDescriptor(parameter);
     }

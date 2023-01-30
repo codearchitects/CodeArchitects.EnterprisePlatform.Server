@@ -42,4 +42,30 @@ public class ReflectionActorMetadataTests
     // Assert
     VirtualActorFixture.AssertValidMetadata(metadata, false);
   }
+
+  [Fact]
+  public void Create_ShouldCreateMetadata_ForComponentIdSourceActor()
+  {
+    // Arrange
+    ReflectionMetadataSource source = new(typeof(ComponentIdSourceActor), typeof(IComponentIdSourceActorFactory), new ActorAttribute(), Array.Empty<Type>());
+
+    // Act
+    ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
+
+    // Assert
+    ComponentIdSourceActorFixture.AssertValidMetadata(metadata, false);
+  }
+
+  [Fact]
+  public void Create_ShouldCreateMetadata_ForPropertyIdSourceActor()
+  {
+    // Arrange
+    ReflectionMetadataSource source = new(typeof(PropertyIdSourceActor), typeof(IPropertyIdSourceActorFactory), new ActorAttribute(), Array.Empty<Type>());
+
+    // Act
+    ReflectionActorMetadata metadata = ReflectionActorMetadata.Create(source);
+
+    // Assert
+    PropertyIdSourceActorFixture.AssertValidMetadata(metadata, false);
+  }
 }
