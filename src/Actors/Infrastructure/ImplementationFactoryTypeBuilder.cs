@@ -50,7 +50,7 @@ internal class ImplementationFactoryTypeBuilder
       attributes: FieldAttributes.Private | FieldAttributes.InitOnly);
   }
 
-  private ConstructorBuilder BuildConstructor(TypeBuilder type, FieldInfo servicesField)
+  private ConstructorInfo BuildConstructor(TypeBuilder type, FieldInfo servicesField)
   {
     ConstructorBuilder constructor = type.DefineConstructor(
       attributes: MethodAttributes.Public,
@@ -76,7 +76,7 @@ internal class ImplementationFactoryTypeBuilder
     return constructor;
   }
 
-  private MethodBuilder BuildCreateMethod(TypeBuilder type, FieldInfo servicesField, IActorDescriptor actor)
+  private MethodInfo BuildCreateMethod(TypeBuilder type, FieldInfo servicesField, IActorDescriptor actor)
   {
     Type actorType = actor.ActorType;
     Type stateType = actor.State.StateType;

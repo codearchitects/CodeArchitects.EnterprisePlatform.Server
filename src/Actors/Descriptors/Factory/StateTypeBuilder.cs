@@ -39,7 +39,7 @@ internal class StateTypeBuilder : IStateTypeBuilder
     return type.CreateTypeInfo()!;
   }
 
-  private void BuildAutoProperty(TypeBuilder type, string propertyName, Type propertyType)
+  private PropertyInfo BuildAutoProperty(TypeBuilder type, string propertyName, Type propertyType)
   {
     FieldBuilder backingField = type.DefineField(
       fieldName: $"<{propertyName}>k__BackingField",
@@ -87,5 +87,7 @@ internal class StateTypeBuilder : IStateTypeBuilder
     setterIL.Emit(OpCodes.Ldarg_1);             // Push the value passed to the setter  | Stack: $this, $value
     setterIL.Emit(OpCodes.Stfld, backingField); // Store $value into the backing field  | Stack: -
     setterIL.Emit(OpCodes.Ret);                 // Return                               | Stack: -
+
+    return property;
   }
 }
