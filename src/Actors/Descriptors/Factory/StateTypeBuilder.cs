@@ -20,7 +20,7 @@ internal class StateTypeBuilder : IStateTypeBuilder
 
   public Type Build(Type actorType, IEnumerable<FieldInfo> stateFields, bool isPolymorphic)
   {
-    Debug.Assert(stateFields.Count() > 0, "Expected at least one state component.");
+    Debug.Assert(stateFields.Count() > 0 || isPolymorphic, "Expected at least one state component or a polymorphic actor.");
 
     TypeBuilder type = _module.DefineType(
       name: actorType.GetComponentTypeName(ComponentName),
