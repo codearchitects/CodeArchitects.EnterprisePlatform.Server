@@ -131,7 +131,7 @@ public class ImplementationFactoryTypeBuilderTests
       .Call(typeof(ServiceProviderServiceExtensions), nameof(ServiceProviderServiceExtensions.GetRequiredService), new[] { typeof(IService1) }, new[] { typeof(IServiceProvider) })
       .Ldarg_1()
       .Callvirt(typeof(IActorContextProvider<PolymorphicActor>), nameof(IActorContextProvider<PolymorphicActor>.GetContext), new[] { typeof(PolymorphicActorImplementation1) }, Type.EmptyTypes)
-      .Newobj(typeof(PolymorphicActorImplementation1), new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActorImplementation1>) })
+      .Newobj(typeof(PolymorphicActorImplementation1), new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor, PolymorphicActorImplementation1>) })
       .Ret()
       .Ldarg_2()
       .Ldfld($"<{nameof(PolymorphicActorState._state)}>k__BackingField")

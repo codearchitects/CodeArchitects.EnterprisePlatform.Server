@@ -74,9 +74,6 @@ public class InvalidActorException : Exception
   internal static InvalidActorException AmbiguousActorConstructor(Type actorType)
     => Create(actorType, ErrorMessages.AmbiguousActorConstructor, actorType.Name);
 
-  internal static InvalidActorException DuplicateActorContext(Type actorType, ParameterInfo parameter)
-    => Create(actorType, ErrorMessages.DuplicateActorContext, actorType.Name, parameter.Name);
-
   internal static InvalidActorException WrongGenericActorContext(Type actorType, string? parameterName)
     => Create(actorType, ErrorMessages.WrongGenericActorContext, actorType.Name, parameterName);
 
@@ -145,7 +142,6 @@ public class InvalidActorException : Exception
     // Constructor errors
     public const string StateComponentsMismatch = "Could not find a one-to-one correspondence between state members and state constructor parameters.";
     public const string AmbiguousActorConstructor = "Could not infer the actor constructor.";
-    public const string DuplicateActorContext = "Duplicate IActorContext dependency '{1}' inside the actor constructor.";
     public const string WrongGenericActorContext = "The actor context parameter '{1}' must be of type 'IActorContext<{0}>'.";
 
     // Method errors

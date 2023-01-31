@@ -132,7 +132,7 @@ internal static class VirtualActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)
         .SetDependencies(objDependency, state1Dependency, state2Dependency)
-        .SetContextDependency(null as IContextDependencyDescriptor)
+        .SetContextDependencies()
         .SetServiceDependencies()
         .SetStateDependencies(objDependency, state1Dependency, state2Dependency))
       .SetMethods());

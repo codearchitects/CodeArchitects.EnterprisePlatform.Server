@@ -54,8 +54,8 @@ internal abstract class PolymorphicActor : IPolymorphicActor
 internal class PolymorphicActorImplementation1 : PolymorphicActor
 {
   [ActorConstructor]
-  public PolymorphicActorImplementation1(int state, IService1 service1, IActorContext<PolymorphicActorImplementation1> context)
-    : base(state, service1, context.For<PolymorphicActor>())
+  public PolymorphicActorImplementation1(int state, IService1 service1, IActorContext<PolymorphicActor, PolymorphicActorImplementation1> context)
+    : base(state, service1, context)
   {
   }
 
@@ -202,7 +202,7 @@ internal static class PolymorphicActorFixture
 
     s_implementation1Constructor = typeof(PolymorphicActorImplementation1).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActorImplementation1>) });
+      types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor, PolymorphicActorImplementation1>) });
 
     s_implementation2Constructor = typeof(PolymorphicActorImplementation2).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
@@ -266,7 +266,7 @@ internal static class PolymorphicActorFixture
       .InitDefaults()
       .SetParameter(implementation1ConstructorParameters[2])
       .SetName("context")
-      .SetType(typeof(IActorContext<PolymorphicActorImplementation1>))
+      .SetType(typeof(IActorContext<PolymorphicActor, PolymorphicActorImplementation1>))
       .SetImplementationType(typeof(PolymorphicActorImplementation1))
       .SetIndex(2));
 
@@ -308,7 +308,7 @@ internal static class PolymorphicActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_baseConstructor)
         .SetDependencies(baseStateDependency, baseService1Dependency, baseContextDependency)
-        .SetContextDependency(baseContextDependency)
+        .SetContextDependencies(baseContextDependency)
         .SetServiceDependencies(baseService1Dependency)
         .SetStateDependencies(baseStateDependency))
       .SetMethods(_ => _
@@ -342,7 +342,7 @@ internal static class PolymorphicActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_implementation1Constructor)
         .SetDependencies(implementation1StateDependency, implementation1Service1Dependency, implementation1ContextDependency)
-        .SetContextDependency(implementation1ContextDependency)
+        .SetContextDependencies(implementation1ContextDependency)
         .SetServiceDependencies(implementation1Service1Dependency)
         .SetStateDependencies(implementation1StateDependency))
       .SetMethods(_ => _
@@ -376,7 +376,7 @@ internal static class PolymorphicActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_implementation2Constructor)
         .SetDependencies(implementation2StateDependency, implementation2Service1Dependency, implementation2ContextDependency, implementation2Service2Dependency)
-        .SetContextDependency(implementation2ContextDependency)
+        .SetContextDependencies(implementation2ContextDependency)
         .SetServiceDependencies(implementation2Service1Dependency, implementation2Service2Dependency)
         .SetStateDependencies(implementation2StateDependency))
       .SetMethods(_ => _

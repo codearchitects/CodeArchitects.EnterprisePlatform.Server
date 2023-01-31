@@ -1,12 +1,13 @@
-﻿using System.Linq.Expressions;
+﻿using CodeArchitects.Platform.Actors.Scheduling;
+using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Actors;
 
 public interface IActorContext<TActor> : IActorContext
   where TActor : class
 {
-  Task ScheduleAsync(Expression<Func<TActor, Task>> activity);
+  void Become<TOther>()
+    where TOther : TActor;
 
-  IActorContext<TSuper> For<TSuper>()
-    where TSuper : class;
+  Task<ScheduleId> ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
 }

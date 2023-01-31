@@ -3,6 +3,6 @@
 internal interface IActorContextProvider<TActor>
   where TActor : class
 {
-  IActorContext<TImplementation> GetContext<TImplementation>()
+  IActorContext<TActor, TImplementation> GetContext<TImplementation>()
     where TImplementation : class, TActor;
 }

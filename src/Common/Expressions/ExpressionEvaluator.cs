@@ -253,6 +253,11 @@ internal partial class ExpressionEvaluator : ExpressionVisitor
     }
   }
 
+  public static object? Evaluate(Expression expression, ReadOnlyCollection<ParameterExpression>? parameters = null, object?[]? arguments = null)
+  {
+    return Evaluate<object?>(expression, parameters, arguments);
+  }
+
   private static Exception NotSupported(Type type)
     => new NotSupportedException($"Expression node of type '{type.FullName}' is not supported.");
 

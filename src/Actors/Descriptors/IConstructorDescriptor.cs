@@ -8,7 +8,7 @@ internal interface IConstructorDescriptor
 
   IReadOnlyList<IDependencyDescriptor> Dependencies { get; }
 
-  IContextDependencyDescriptor? ContextDependency { get; }
+  IReadOnlyList<IContextDependencyDescriptor> ContextDependencies { get; }
 
   IReadOnlyList<IServiceDependencyDescriptor> ServiceDependencies { get; }
 

@@ -189,7 +189,10 @@ internal class ImplementationFactoryTypeBuilder
       Debug.Assert(discriminatorField is not null, "A polymorphic actor's state must have the discriminator field.");
 
       il.DeclareLocal(typeof(string));
-      ILabel[] labels = Enumerable.Range(0, implementations.Count + 1).Map(_ => il.DefineLabel());
+      ILabel[] labels = Enumerable
+        .Range(0, implementations.Count + 1)
+        .Select(_ => il.DefineLabel())
+        .ToArray();
 
       il.Emit(OpCodes.Ldarg_2);                    // Push $state                                 | Stack: $state
       il.Emit(OpCodes.Ldfld, discriminatorField!); // Load $discriminator := $state.discriminator | Stack: $discriminator

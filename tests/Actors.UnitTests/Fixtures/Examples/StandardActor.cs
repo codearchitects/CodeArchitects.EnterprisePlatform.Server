@@ -232,7 +232,7 @@ internal static class StandardActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)
         .SetDependencies(state1Dependency, service1Dependency, state2Dependency, contextDependency, service2Dependency)
-        .SetContextDependency(contextDependency)
+        .SetContextDependencies(contextDependency)
         .SetServiceDependencies(service1Dependency, service2Dependency)
         .SetStateDependencies(state1Dependency, state2Dependency))
       .SetMethods(_ => _

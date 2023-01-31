@@ -91,7 +91,7 @@ internal static class PropertyIdSourceActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)
         .SetDependencies(stateDependency)
-        .SetContextDependency(null as IContextDependencyDescriptor)
+        .SetContextDependencies()
         .SetServiceDependencies()
         .SetStateDependencies(stateDependency))
       .SetMethods());

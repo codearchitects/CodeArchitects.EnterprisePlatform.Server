@@ -61,7 +61,7 @@ internal static class StatelessActorFixture
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)
         .SetDependencies(service1Dependency)
-        .SetContextDependency(null as IContextDependencyDescriptor)
+        .SetContextDependencies()
         .SetServiceDependencies(service1Dependency)
         .SetStateDependencies())
       .SetMethods());

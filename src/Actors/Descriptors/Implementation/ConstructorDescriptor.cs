@@ -8,6 +8,7 @@ internal class ConstructorDescriptor : IConstructorDescriptor
 {
   private readonly DependencyAdder _dependencyAdder;
   private readonly List<IDependencyDescriptor> _dependencies;
+  private readonly List<IContextDependencyDescriptor> _contextDependencies;
   private readonly List<IServiceDependencyDescriptor> _serviceDependencies;
   private readonly List<IStateDependencyDescriptor> _stateDependencies;
 
@@ -16,6 +17,7 @@ internal class ConstructorDescriptor : IConstructorDescriptor
     Constructor = constructor;
     _dependencyAdder = new DependencyAdder(actorType, this);
     _dependencies = new();
+    _contextDependencies = new();
     _serviceDependencies = new();
     _stateDependencies = new();
   }
@@ -24,7 +26,7 @@ internal class ConstructorDescriptor : IConstructorDescriptor
 
   public IReadOnlyList<IDependencyDescriptor> Dependencies => _dependencies;
 
-  public IContextDependencyDescriptor? ContextDependency { get; private set; }
+  public IReadOnlyList<IContextDependencyDescriptor> ContextDependencies => _contextDependencies;
 
   public IReadOnlyList<IServiceDependencyDescriptor> ServiceDependencies => _serviceDependencies;
 
@@ -76,10 +78,7 @@ internal class ConstructorDescriptor : IConstructorDescriptor
 
     public void VisitContextDependency(IContextDependencyDescriptor dependency)
     {
-      if (_descriptor.ContextDependency is not null)
-        throw InvalidActorException.DuplicateActorContext(_actorType, dependency.Parameter);
-
-      _descriptor.ContextDependency = dependency;
+      _descriptor._contextDependencies.Add(dependency);
     }
 
     public void VisitServiceDependency(IServiceDependencyDescriptor dependency)

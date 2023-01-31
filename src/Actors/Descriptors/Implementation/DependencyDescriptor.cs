@@ -38,21 +38,28 @@ internal abstract class DependencyDescriptor : IDependencyDescriptor
 
   private static DependencyDescriptor Create(IActorMetadata actorMetadata, Type implementationType, ParameterInfo parameter)
   {
-    Type actorType = actorMetadata.ActorType;
     Type parameterType = parameter.ParameterType;
 
     if (TryGetStateField(actorMetadata, parameter, out FieldInfo? stateField, out int fieldIndex))
       return new StateDependencyDescriptor(parameter, stateField, fieldIndex);
 
-    bool isNonGenericActorContext = parameterType == typeof(IActorContext);
-    bool isGenericActorContext = parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(IActorContext<>);
+    if (parameterType == typeof(IActorContext))
+      return new NonGenericContextDependencyDescriptor(parameter, actorMetadata.ActorType);
 
-    if (isNonGenericActorContext || isGenericActorContext)
+    if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(IActorContext<>))
     {
-      if (isGenericActorContext & !parameterType.GetGenericArguments()[0].IsAssignableFrom(implementationType))
+      if (!parameterType.GetGenericArguments()[0].IsAssignableFrom(implementationType))
         throw InvalidActorException.WrongGenericActorContext(implementationType, parameter.Name);
 
-      return new ContextDependencyDescriptor(parameter);
+      return new GenericContextDependencyDescriptor(parameter);
+    }
+
+    if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(IActorContext<,>))
+    {
+      if (!parameterType.GetGenericArguments()[1].IsAssignableFrom(implementationType))
+        throw InvalidActorException.WrongGenericActorContext(implementationType, parameter.Name);
+
+      return new ImplementationContextDependencyDescriptor(parameter);
     }
 
     return new ServiceDependencyDescriptor(parameter);

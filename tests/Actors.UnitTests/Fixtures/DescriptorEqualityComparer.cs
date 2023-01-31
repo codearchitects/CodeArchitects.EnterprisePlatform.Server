@@ -89,7 +89,7 @@ internal class DescriptorEqualityComparer :
     if (!x.Dependencies.SequenceEqual(y.Dependencies, this))
       return false;
 
-    if (!Equals(x.ContextDependency, y.ContextDependency))
+    if (!x.ContextDependencies.SequenceEqual(y.ContextDependencies, this))
       return false;
 
     if (!x.ServiceDependencies.SequenceEqual(y.ServiceDependencies, this))

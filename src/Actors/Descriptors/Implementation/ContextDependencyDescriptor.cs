@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
-internal class ContextDependencyDescriptor : DependencyDescriptor, IContextDependencyDescriptor
+internal abstract class ContextDependencyDescriptor : DependencyDescriptor, IContextDependencyDescriptor
 {
   public ContextDependencyDescriptor(ParameterInfo parameter)
     : base(parameter)
@@ -11,7 +11,7 @@ internal class ContextDependencyDescriptor : DependencyDescriptor, IContextDepen
 
   public override DependencyKind Kind => DependencyKind.Context;
 
-  public Type ImplementationType => Type.GetGenericArguments()[0];
+  public abstract Type ImplementationType { get; }
 
   public override void Accept(IDependencyDescriptorVisitor visitor)
   {

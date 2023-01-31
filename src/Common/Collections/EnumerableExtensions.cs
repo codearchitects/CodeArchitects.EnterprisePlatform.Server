@@ -1,14 +1,7 @@
-﻿using System.Linq;
-
-namespace CodeArchitects.Platform.Common.Collections;
+﻿namespace CodeArchitects.Platform.Common.Collections;
 
 internal static class EnumerableExtensions
 {
-  public static TResult[] Map<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
-  {
-    return source.Select(selector).ToArray();
-  }
-
   public static TResult[] Map<TSource, TResult>(this IReadOnlyList<TSource> source, Func<TSource, TResult> selector)
   {
     if (source.Count == 0)
