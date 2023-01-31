@@ -2,4 +2,5 @@
 
 internal interface IContextDependencyDescriptor : IDependencyDescriptor
 {
+  Type ImplementationType { get; }
 }

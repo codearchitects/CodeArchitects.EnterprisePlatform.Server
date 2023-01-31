@@ -14,22 +14,23 @@ internal class DescriptorFactory
 
   public IActorDescriptor Create(IActorMetadata actorMetadata)
   {
-    IStateDescriptor state = CreateState(actorMetadata);
+    bool isPolymorphic = actorMetadata.Implementations.Count > 0;
+    IStateDescriptor state = CreateState(actorMetadata, isPolymorphic);
 
-    return ActorDescriptor.Create(actorMetadata, state);
+    return ActorDescriptor.Create(actorMetadata, state, isPolymorphic);
   }
 
-  private IStateDescriptor CreateState(IActorMetadata actorMetadata)
+  private IStateDescriptor CreateState(IActorMetadata actorMetadata, bool isPolymorphic)
   {
     Type actorType = actorMetadata.ActorType;
     if (actorType.IsGenericType)
       throw InvalidActorException.GenericActorsAreNotSupported(actorType);
 
     IReadOnlyCollection<IStateFieldMetadata> stateFields = actorMetadata.StateFields;
-    if (stateFields.Count == 0)
+    if (stateFields.Count == 0 && !isPolymorphic)
       return NoStateDescriptor.Instance;
 
-    Type stateType = _stateTypeBuilder.Build(actorType, stateFields.Select(metadata => metadata.Field));
+    Type stateType = _stateTypeBuilder.Build(actorType, stateFields.Select(metadata => metadata.Field), isPolymorphic);
 
     if (actorMetadata.IsExplicitVirtual)
       return CreateVirtual();

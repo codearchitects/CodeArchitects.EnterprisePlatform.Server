@@ -7,6 +7,8 @@ internal interface IStateDescriptor
 {
   Type StateType { get; }
 
+  FieldInfo? DiscriminatorField { get; }
+
   bool IsStateless { get; }
 
   [MemberNotNullWhen(true, nameof(DefaultValues))]

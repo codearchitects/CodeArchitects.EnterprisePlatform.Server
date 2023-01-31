@@ -113,6 +113,7 @@ internal static class PropertyIdSourceActorFixture
         .SetIsStateless(false)
         .SetIsVirtual(false)
         .SetFields(s_stateField)
+        .SetDiscriminatorField(null)
         .SetDefaultValues(null as IReadOnlyList<object?>))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))

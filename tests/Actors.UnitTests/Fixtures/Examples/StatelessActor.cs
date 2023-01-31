@@ -83,6 +83,7 @@ internal static class StatelessActorFixture
         .SetIsStateless(true)
         .SetIsVirtual(true)
         .SetFields()
+        .SetDiscriminatorField(null)
         .SetDefaultValues())
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))

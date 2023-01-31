@@ -18,12 +18,12 @@ internal interface IPolymorphicActor
 
 internal abstract class PolymorphicActor : IPolymorphicActor
 {
-  [State] private readonly string _state;
+  [State] private readonly int _state;
   private readonly IService1 _service1;
   private readonly IActorContext<PolymorphicActor> _context;
 
   [ActorConstructor]
-  public PolymorphicActor(string state, IService1 service1, IActorContext<PolymorphicActor> context)
+  public PolymorphicActor(int state, IService1 service1, IActorContext<PolymorphicActor> context)
   {
     _state = state;
     _service1 = service1;
@@ -54,7 +54,7 @@ internal abstract class PolymorphicActor : IPolymorphicActor
 internal class PolymorphicActorImplementation1 : PolymorphicActor
 {
   [ActorConstructor]
-  public PolymorphicActorImplementation1(string state, IService1 service1, IActorContext<PolymorphicActorImplementation1> context)
+  public PolymorphicActorImplementation1(int state, IService1 service1, IActorContext<PolymorphicActorImplementation1> context)
     : base(state, service1, context.For<PolymorphicActor>())
   {
   }
@@ -79,7 +79,7 @@ internal class PolymorphicActorImplementation2 : PolymorphicActor
 {
   private readonly IService2 _service2;
 
-  public PolymorphicActorImplementation2(string state, IService1 service1, IActorContext<PolymorphicActor> context, IService2 service2)
+  public PolymorphicActorImplementation2(int state, IService1 service1, IActorContext<PolymorphicActor> context, IService2 service2)
     : base(state, service1, context)
   {
     _service2 = service2;
@@ -95,13 +95,14 @@ internal class PolymorphicActorImplementation2 : PolymorphicActor
 [ActorFactory<PolymorphicActor>]
 internal interface IPolymorphicActorFactory
 {
-  Task<IPolymorphicActor> CreateAsync(string id, string state, CancellationToken cancellationToken = default);
+  Task<IPolymorphicActor> CreateAsync(string id, int state, CancellationToken cancellationToken = default);
   IPolymorphicActor Get(string id);
 }
 
 internal class PolymorphicActorState
 {
   public int _state { get; set; }
+  public string _discriminator { get; set; } = default!;
 }
 
 internal static class PolymorphicActorFixture
@@ -128,7 +129,7 @@ internal static class PolymorphicActorFixture
     MethodInfo factoryCreateAsyncMethod = typeof(IPolymorphicActorFactory).GetRequiredMethod(
       name: nameof(IPolymorphicActorFactory.CreateAsync),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(string), typeof(CancellationToken) });
+      types: new[] { typeof(string), typeof(int), typeof(CancellationToken) });
 
     MethodInfo factoryGetMethod = typeof(IPolymorphicActorFactory).GetRequiredMethod(
       name: nameof(IPolymorphicActorFactory.Get),
@@ -197,15 +198,15 @@ internal static class PolymorphicActorFixture
 
     s_baseConstructor = typeof(PolymorphicActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(IService1), typeof(IActorContext<PolymorphicActor>) });
+      types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor>) });
 
     s_implementation1Constructor = typeof(PolymorphicActorImplementation1).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(IService1), typeof(IActorContext<PolymorphicActorImplementation1>) });
+      types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActorImplementation1>) });
 
     s_implementation2Constructor = typeof(PolymorphicActorImplementation2).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(IService1), typeof(IActorContext<PolymorphicActor>), typeof(IService2) });
+      types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor>), typeof(IService2) });
 
     ParameterInfo[] baseConstructorParameters = s_baseConstructor.GetParameters();
     ParameterInfo[] implementation1ConstructorParameters = s_implementation1Constructor.GetParameters();
@@ -215,11 +216,15 @@ internal static class PolymorphicActorFixture
       name: "_state",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
+    FieldInfo discriminatorField = typeof(PolymorphicActorState).GetRequiredField(
+      name: $"<{nameof(PolymorphicActorState._discriminator)}>k__BackingField",
+      bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
+
     IStateDependencyDescriptor baseStateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetParameter(baseConstructorParameters[0])
       .SetName("state")
-      .SetType(typeof(string))
+      .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
       .SetField(s_stateField));
@@ -237,13 +242,14 @@ internal static class PolymorphicActorFixture
       .SetParameter(baseConstructorParameters[2])
       .SetName("context")
       .SetType(typeof(IActorContext<PolymorphicActor>))
+      .SetImplementationType(typeof(PolymorphicActor))
       .SetIndex(2));
 
     IStateDependencyDescriptor implementation1StateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetParameter(implementation1ConstructorParameters[0])
       .SetName("state")
-      .SetType(typeof(string))
+      .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
       .SetField(s_stateField));
@@ -261,13 +267,14 @@ internal static class PolymorphicActorFixture
       .SetParameter(implementation1ConstructorParameters[2])
       .SetName("context")
       .SetType(typeof(IActorContext<PolymorphicActorImplementation1>))
+      .SetImplementationType(typeof(PolymorphicActorImplementation1))
       .SetIndex(2));
 
     IStateDependencyDescriptor implementation2StateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetParameter(implementation2ConstructorParameters[0])
       .SetName("state")
-      .SetType(typeof(string))
+      .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
       .SetField(s_stateField));
@@ -285,6 +292,7 @@ internal static class PolymorphicActorFixture
       .SetParameter(implementation2ConstructorParameters[2])
       .SetName("context")
       .SetType(typeof(IActorContext<PolymorphicActor>))
+      .SetImplementationType(typeof(PolymorphicActor))
       .SetIndex(2));
 
     IServiceDependencyDescriptor implementation2Service2Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
@@ -410,10 +418,11 @@ internal static class PolymorphicActorFixture
         .SetStateDependency(null as IStateDependencyDescriptor)
         .SetStateProperty(null))
       .SetState(_ => _
-        .SetStateType(typeof(PolymorphicActorState))
+        .SetStateType(new StateTypeDelegator(typeof(PolymorphicActorState), nameof(PolymorphicActorState._discriminator)))
         .SetIsStateless(false)
         .SetIsVirtual(false)
         .SetFields(s_stateField)
+        .SetDiscriminatorField(discriminatorField)
         .SetDefaultValues(null as IReadOnlyList<object>))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPolymorphicActorFactory))

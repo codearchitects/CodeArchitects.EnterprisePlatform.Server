@@ -10,6 +10,8 @@ internal class NoStateDescriptor : IStateDescriptor
 
   public Type StateType => typeof(NoState);
 
+  public FieldInfo? DiscriminatorField => null;
+
   public bool IsStateless => true;
 
   public bool IsVirtual => true;

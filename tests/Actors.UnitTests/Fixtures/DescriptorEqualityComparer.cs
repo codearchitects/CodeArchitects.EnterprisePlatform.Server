@@ -132,7 +132,7 @@ internal class DescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.StateType != y.StateType)
+    if (x.StateType.UnderlyingSystemType != y.StateType.UnderlyingSystemType)
       return false;
 
     if (x.IsStateless != y.IsStateless)
@@ -142,6 +142,9 @@ internal class DescriptorEqualityComparer :
       return false;
 
     if (!x.Fields.SequenceEqual(y.Fields))
+      return false;
+
+    if (x.DiscriminatorField != y.DiscriminatorField)
       return false;
 
     if (x.DefaultValues is not null)
@@ -253,11 +256,16 @@ internal class DescriptorEqualityComparer :
 
     return x switch
     {
-      IContextDependencyDescriptor          => y is IContextDependencyDescriptor,
+      IContextDependencyDescriptor xService => y is IContextDependencyDescriptor yService && SpecificEquals(xService, yService),
       IServiceDependencyDescriptor xService => y is IServiceDependencyDescriptor yService && SpecificEquals(xService, yService),
       IStateDependencyDescriptor xState     => y is IStateDependencyDescriptor yState && SpecificEquals(xState, yState),
       _                                     => throw Errors.Unreachable
     };
+  }
+
+  private static bool SpecificEquals(IContextDependencyDescriptor x, IContextDependencyDescriptor y)
+  {
+    return x.ImplementationType == y.ImplementationType;
   }
 
   private static bool SpecificEquals(IServiceDependencyDescriptor x, IServiceDependencyDescriptor y)

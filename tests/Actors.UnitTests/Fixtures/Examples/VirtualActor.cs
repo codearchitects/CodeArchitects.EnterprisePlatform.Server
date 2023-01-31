@@ -154,6 +154,7 @@ internal static class VirtualActorFixture
         .SetIsStateless(false)
         .SetIsVirtual(true)
         .SetFields(s_objField, s_state1Field, s_state2Field)
+        .SetDiscriminatorField(null)
         .SetDefaultValues(new ComplexObject(), State1Default, 0))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))

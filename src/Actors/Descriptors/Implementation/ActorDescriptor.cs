@@ -40,7 +40,7 @@ internal abstract class ActorDescriptor : IActorDescriptor
 
   public IActorFactoryDescriptor Factory { get; }
 
-  public static ActorDescriptor Create(IActorMetadata actorMetadata, IStateDescriptor state)
+  public static ActorDescriptor Create(IActorMetadata actorMetadata, IStateDescriptor state, bool isPolymorphic)
   {
     Type interfaceType = GetInterfaceType(actorMetadata);
     CheckInterfaceType(interfaceType, actorMetadata.ActorType);
@@ -50,7 +50,7 @@ internal abstract class ActorDescriptor : IActorDescriptor
     ActorIdDescriptor id = ActorIdDescriptor.Create(actorMetadata, baseImplementation);
     ActorFactoryDescriptor factory = ActorFactoryDescriptor.Create(actorMetadata, interfaceType, state, id);
 
-    ActorDescriptor actor = actorMetadata.Implementations.Count > 0
+    ActorDescriptor actor = isPolymorphic
       ? PolymorphicActorDescriptor.Create(actorMetadata, interfaceType, id, factory, baseImplementation)
       : new OrdinaryActorDescriptor(interfaceType, actorMetadata.ActorType, id, factory, baseImplementation);
 

@@ -18,7 +18,7 @@ internal class StateTypeBuilder : IStateTypeBuilder
     _ilProvider = ilProvider;
   }
 
-  public Type Build(Type actorType, IEnumerable<FieldInfo> stateFields)
+  public Type Build(Type actorType, IEnumerable<FieldInfo> stateFields, bool isPolymorphic)
   {
     Debug.Assert(stateFields.Count() > 0, "Expected at least one state component.");
 
@@ -28,17 +28,19 @@ internal class StateTypeBuilder : IStateTypeBuilder
 
     foreach (FieldInfo stateField in stateFields)
     {
-      BuildAutoProperty(type, stateField);
+      BuildAutoProperty(type, stateField.Name, stateField.FieldType);
+    }
+
+    if (isPolymorphic)
+    {
+      BuildAutoProperty(type, "$discriminator", typeof(string));
     }
 
     return type.CreateTypeInfo()!;
   }
 
-  private void BuildAutoProperty(TypeBuilder type, FieldInfo stateField)
+  private void BuildAutoProperty(TypeBuilder type, string propertyName, Type propertyType)
   {
-    string propertyName = stateField.Name;
-    Type propertyType = stateField.FieldType;
-
     FieldBuilder backingField = type.DefineField(
       fieldName: $"<{propertyName}>k__BackingField",
       type: propertyType,

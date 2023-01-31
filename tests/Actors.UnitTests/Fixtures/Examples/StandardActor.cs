@@ -90,7 +90,7 @@ internal interface IStandardActorFactory
 
 internal class StandardActorState
 {
-  public int _state1 { get; set; }
+  public string _state1 { get; set; }
   public StandardActorStateComponent _state2 { get; set; } = default!;
 }
 
@@ -216,6 +216,7 @@ internal static class StandardActorFixture
       .SetParameter(constructorParameters[3])
       .SetName("context")
       .SetType(typeof(IActorContext<StandardActor>))
+      .SetImplementationType(typeof(StandardActor))
       .SetIndex(3));
 
     IServiceDependencyDescriptor service2Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
@@ -295,6 +296,7 @@ internal static class StandardActorFixture
         .SetIsStateless(false)
         .SetIsVirtual(false)
         .SetFields(s_state1Field, s_state2Field)
+        .SetDiscriminatorField(null)
         .SetDefaultValues(null as IReadOnlyList<object>))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStandardActorFactory))

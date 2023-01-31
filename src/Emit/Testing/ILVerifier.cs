@@ -13,6 +13,27 @@ internal class ILVerifier
     _instructions = instructions;
   }
 
+  public void VerifyComplete()
+  {
+    if (_index != _instructions.Count)
+      throw new Exception($"Remaining {_instructions.Count - _index} were not verified.");
+  }
+
+  public ILVerifier Brtrue_S(int position)
+  {
+    return VerifyLabel(OpCodes.Brtrue_S, position);
+  }
+
+  public ILVerifier Br(int position)
+  {
+    return VerifyLabel(OpCodes.Br, position);
+  }
+
+  public ILVerifier Br_S(int position)
+  {
+    return VerifyLabel(OpCodes.Br_S, position);
+  }
+
   public ILVerifier Call(Predicate<MethodBase>? predicate = null)
   {
     return predicate is null
@@ -20,7 +41,17 @@ internal class ILVerifier
       : Verify(OpCodes.Call, predicate);
   }
 
+  public ILVerifier Call(MethodBase methodBase)
+  {
+    return Verify(OpCodes.Call, (MethodBase method) => method.Equals(methodBase));
+  }
+
   public ILVerifier Call(Type declaringType, string methodName, Type[] parameterTypes)
+  {
+    return Call(declaringType, methodName, Type.EmptyTypes, parameterTypes);
+  }
+
+  public ILVerifier Call(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes)
   {
     return Verify(OpCodes.Call, (MethodBase method) =>
     {
@@ -28,6 +59,17 @@ internal class ILVerifier
         return false;
       if (method.Name != methodName)
         return false;
+      
+      if (method.IsGenericMethod)
+      {
+        if (!method.GetGenericArguments().SequenceEqual(typeArguments))
+          return false;
+      }
+      else
+      {
+        if (typeArguments.Length != 0)
+          return false;
+      }
 
       ParameterInfo[] parameters = method.GetParameters();
       if (parameters.Length != parameterTypes.Length)
@@ -52,12 +94,28 @@ internal class ILVerifier
 
   public ILVerifier Callvirt(Type declaringType, string methodName, Type[] parameterTypes)
   {
+    return Callvirt(declaringType, methodName, Type.EmptyTypes, parameterTypes);
+  }
+
+  public ILVerifier Callvirt(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes)
+  {
     return Verify(OpCodes.Callvirt, (MethodBase method) =>
     {
       if (method.DeclaringType != declaringType)
         return false;
       if (method.Name != methodName)
         return false;
+
+      if (method.IsGenericMethod)
+      {
+        if (!method.GetGenericArguments().SequenceEqual(typeArguments))
+          return false;
+      }
+      else
+      {
+        if (typeArguments.Length != 0)
+          return false;
+      }
 
       ParameterInfo[] parameters = method.GetParameters();
       if (parameters.Length != parameterTypes.Length)
@@ -110,9 +168,9 @@ internal class ILVerifier
       : Verify(OpCodes.Ldfld, predicate);
   }
 
-  public ILVerifier Ldfld(Type fieldType, string fieldName)
+  public ILVerifier Ldfld(string fieldName)
   {
-    return Verify(OpCodes.Ldfld, field => field.FieldType == fieldType && field.Name == fieldName);
+    return Verify(OpCodes.Ldfld, (FieldInfo field) => field.Name == fieldName);
   }
 
   public ILVerifier Ldsfld(Predicate<FieldInfo>? predicate = null)
@@ -122,9 +180,24 @@ internal class ILVerifier
       : Verify(OpCodes.Ldsfld, predicate);
   }
 
-  public ILVerifier Ldsfld(Type fieldType, string fieldName)
+  public ILVerifier Ldsfld(string fieldName)
   {
-    return Verify(OpCodes.Ldsfld, field => field.FieldType == fieldType && field.Name == fieldName);
+    return Verify(OpCodes.Ldsfld, (FieldInfo field) => field.Name == fieldName);
+  }
+
+  public ILVerifier Ldloc_0()
+  {
+    return Verify(OpCodes.Ldloc_0);
+  }
+
+  public ILVerifier Ldstr()
+  {
+    return Verify(OpCodes.Ldstr);
+  }
+
+  public ILVerifier Ldstr(string str)
+  {
+    return Verify(OpCodes.Ldstr, str);
   }
 
   public ILVerifier Newobj(Predicate<ConstructorInfo>? predicate = null)
@@ -167,9 +240,9 @@ internal class ILVerifier
       : Verify(OpCodes.Stfld, predicate);
   }
 
-  public ILVerifier Stfld(Type fieldType, string fieldName)
+  public ILVerifier Stfld(string fieldName)
   {
-    return Verify(OpCodes.Stfld, field => field.FieldType == fieldType && field.Name == fieldName);
+    return Verify(OpCodes.Stfld, (FieldInfo field) => field.Name == fieldName);
   }
 
   public ILVerifier Stsfld(Predicate<FieldInfo>? predicate = null)
@@ -179,9 +252,19 @@ internal class ILVerifier
       : Verify(OpCodes.Stsfld, predicate);
   }
 
-  public ILVerifier Stsfld(Type fieldType, string fieldName)
+  public ILVerifier Stsfld(string fieldName)
   {
-    return Verify(OpCodes.Stsfld, field => field.FieldType == fieldType && field.Name == fieldName);
+    return Verify(OpCodes.Stsfld, (FieldInfo field) => field.Name == fieldName);
+  }
+
+  public ILVerifier Stloc_0()
+  {
+    return Verify(OpCodes.Stloc_0);
+  }
+
+  public ILVerifier Throw()
+  {
+    return Verify(OpCodes.Throw);
   }
 
   private ILVerifier Verify(OpCode opcode)
@@ -241,10 +324,10 @@ internal class ILVerifier
     VerifyHasArgument(instruction);
 
     object? value = instruction.Argument.Value;
-    if (value is not ConstructorInfo method)
+    if (value is not ConstructorInfo constructor)
       throw Error(instruction.Position, $"Expected the instruction to have a ConstructorInfo argument but found '{value ?? "<null>"}'.");
 
-    if (!predicate(method))
+    if (!predicate(constructor))
       throw Error(instruction.Position, "The ConstructorInfo argument does not match the provided predicate.");
 
     return this;
@@ -268,7 +351,7 @@ internal class ILVerifier
     return this;
   }
 
-  private ILVerifier Verify(OpCode opcode, Predicate<FakeLabel> predicate)
+  private ILVerifier VerifyLabel(OpCode opcode, int labelPosition)
   {
     FakeInstruction instruction = _instructions[_index++];
 
@@ -280,8 +363,8 @@ internal class ILVerifier
     if (value is not FakeLabel label)
       throw Error(instruction.Position, $"Expected the instruction to have a FakeLabel argument but found '{value ?? "<null>"}'.");
 
-    if (!predicate(label))
-      throw Error(instruction.Position, "The FakeLabel argument does not match the provided predicate.");
+    if (label.Position != labelPosition)
+      throw Error(instruction.Position, $"Expected the label to have position {labelPosition} but found {label.Position}.");
 
     return this;
   }

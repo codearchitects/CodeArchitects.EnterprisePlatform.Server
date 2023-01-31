@@ -11,6 +11,8 @@ internal class ContextDependencyDescriptor : DependencyDescriptor, IContextDepen
 
   public override DependencyKind Kind => DependencyKind.Context;
 
+  public Type ImplementationType => Type.GetGenericArguments()[0];
+
   public override void Accept(IDependencyDescriptorVisitor visitor)
   {
     visitor.VisitContextDependency(this);

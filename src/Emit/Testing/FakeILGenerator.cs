@@ -19,16 +19,24 @@ internal class FakeILGenerator : IILGenerator
     _labels = new();
   }
 
+  public IReadOnlyList<FakeLabel> Labels => _labels;
+
   public void VerifyLocals(IEnumerable<FakeLocalBuilder> locals)
   {
     if (!_locals.SequenceEqual(locals))
       throw new Exception("Invalid locals.");
   }
 
+  public void VerifyLocals(params FakeLocalBuilder[] locals)
+  {
+    VerifyLocals(locals as IEnumerable<FakeLocalBuilder>);
+  }
+
   public void VerifyIL(Action<ILVerifier> verify)
   {
     ILVerifier verifier = new(_instructions);
     verify(verifier);
+    verifier.VerifyComplete();
   }
 
   ILocalBuilder IILGenerator.DeclareLocal(Type localType)
@@ -52,67 +60,67 @@ internal class FakeILGenerator : IILGenerator
 
   void IILGenerator.Emit(OpCode opcode, Type cls)
   {
-    AddInstruction(opcode, cls);
+    AddInstruction(opcode, cls, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, string str)
   {
-    AddInstruction(opcode, str);
+    AddInstruction(opcode, str, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, float arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, sbyte arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, MethodInfo meth)
   {
-    AddInstruction(opcode, meth);
+    AddInstruction(opcode, meth, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, FieldInfo field)
   {
-    AddInstruction(opcode, field);
+    AddInstruction(opcode, field, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, ILocalBuilder local)
   {
-    AddInstruction(opcode, (FakeLocalBuilder)local);
+    AddInstruction(opcode, (FakeLocalBuilder)local, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, ConstructorInfo con)
   {
-    AddInstruction(opcode, con);
+    AddInstruction(opcode, con, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, long arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, int arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, short arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, double arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 4);
   }
 
   void IILGenerator.Emit(OpCode opcode, byte arg)
   {
-    AddInstruction(opcode, arg);
+    AddInstruction(opcode, arg, 1);
   }
 
   void IILGenerator.Emit(OpCode opcode)
@@ -122,7 +130,7 @@ internal class FakeILGenerator : IILGenerator
 
   void IILGenerator.Emit(OpCode opcode, ILabel label)
   {
-    AddInstruction(opcode, (FakeLabel)label);
+    AddInstruction(opcode, (FakeLabel)label, 1);
   }
 
   void IILGenerator.MarkLabel(ILabel loc)
@@ -144,9 +152,9 @@ internal class FakeILGenerator : IILGenerator
     _cursor += opcode.Size;
   }
 
-  private void AddInstruction(OpCode opcode, Optional<object?> argument)
+  private void AddInstruction(OpCode opcode, Optional<object?> argument, int argSize)
   {
     _instructions.Add(new(_cursor, opcode, argument));
-    _cursor += opcode.Size + 4;
+    _cursor += opcode.Size + argSize;
   }
 }

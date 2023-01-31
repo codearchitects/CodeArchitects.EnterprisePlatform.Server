@@ -5,4 +5,5 @@
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.UnitTests")]
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Dynamic")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

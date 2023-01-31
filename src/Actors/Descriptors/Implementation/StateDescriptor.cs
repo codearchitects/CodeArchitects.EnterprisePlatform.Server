@@ -24,6 +24,10 @@ internal abstract class StateDescriptor : IStateDescriptor
 
   public IReadOnlyList<FieldInfo> Fields => _fields;
 
+  public FieldInfo? DiscriminatorField => StateType.GetField(
+    name: "<$discriminator>k__BackingField",
+    bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
+
   protected void AddField(FieldInfo field)
   {
     CheckFieldType(field);
