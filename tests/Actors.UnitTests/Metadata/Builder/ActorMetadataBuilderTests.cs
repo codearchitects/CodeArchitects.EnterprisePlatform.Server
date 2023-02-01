@@ -20,7 +20,7 @@ public class ActorMetadataBuilderTests
         arg.Default<IService1>(),
         arg.State<StandardActorStateComponent>(),
         arg.Default<IActorContext<StandardActor>>(),
-        arg.Optional<IService2>()))
+        arg.Default<IService2?>()))
       .HasMethod((actor, arg) => actor.ValueTaskTMethod(), method => method
         .IsStateless());
 

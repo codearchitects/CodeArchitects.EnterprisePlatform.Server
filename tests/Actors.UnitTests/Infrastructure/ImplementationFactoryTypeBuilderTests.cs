@@ -50,9 +50,9 @@ public class ImplementationFactoryTypeBuilderTests
       .Stfld("_services")
       .Ret());
 
-    createMethodIL.Labels.Should().HaveCount(0);
+    createMethodIL.VerifyNoLabels();
 
-    createMethodIL.VerifyLocals(Array.Empty<FakeLocalBuilder>());
+    createMethodIL.VerifyNoLocals();
 
     createMethodIL.VerifyIL(_ => _
       .Ldarg_2()
@@ -104,12 +104,13 @@ public class ImplementationFactoryTypeBuilderTests
       .Stfld("_services")
       .Ret());
 
-    createMethodIL.Labels.Should().HaveCount(3)
-      .And.ContainSingle(label => label.Position == 0x0023)
-      .And.ContainSingle(label => label.Position == 0x0040)
-      .And.ContainSingle(label => label.Position == 0x0068);
+    createMethodIL.VerifyLabels(_ => _
+      .Position(0x0023)
+      .Position(0x0040)
+      .Position(0x0068));
 
-    createMethodIL.VerifyLocals(new FakeLocalBuilder(0, typeof(string), false));
+    createMethodIL.VerifyLocals(_ => _
+      .OfType(typeof(string)));
 
     createMethodIL.VerifyIL(_ => _
       .Ldarg_2()

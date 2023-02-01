@@ -16,7 +16,7 @@ internal class ILVerifier
   public void VerifyComplete()
   {
     if (_index != _instructions.Count)
-      throw new Exception($"Remaining {_instructions.Count - _index} were not verified.");
+      throw new Exception($"Remaining {_instructions.Count - _index} instructions were not verified.");
   }
 
   public ILVerifier Brtrue_S(int position)

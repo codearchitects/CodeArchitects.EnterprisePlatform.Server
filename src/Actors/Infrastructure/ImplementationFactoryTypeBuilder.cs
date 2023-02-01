@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Common.Collections;
 using CodeArchitects.Platform.Emit;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;

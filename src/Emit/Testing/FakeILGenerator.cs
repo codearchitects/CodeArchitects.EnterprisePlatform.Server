@@ -19,17 +19,30 @@ internal class FakeILGenerator : IILGenerator
     _labels = new();
   }
 
-  public IReadOnlyList<FakeLabel> Labels => _labels;
-
-  public void VerifyLocals(IEnumerable<FakeLocalBuilder> locals)
+  public void VerifyLabels(Action<LabelVerifier> verify)
   {
-    if (!_locals.SequenceEqual(locals))
-      throw new Exception("Invalid locals.");
+    LabelVerifier verifier = new(_labels);
+    verify(verifier);
+    verifier.VerifyComplete();
   }
 
-  public void VerifyLocals(params FakeLocalBuilder[] locals)
+  public void VerifyNoLabels()
   {
-    VerifyLocals(locals as IEnumerable<FakeLocalBuilder>);
+    LabelVerifier verifier = new(_labels);
+    verifier.VerifyComplete();
+  }
+
+  public void VerifyLocals(Action<LocalVerifier> verify)
+  {
+    LocalVerifier verifier = new(_locals);
+    verify(verifier);
+    verifier.VerifyComplete();
+  }
+
+  public void VerifyNoLocals()
+  {
+    LocalVerifier verifier = new(_locals);
+    verifier.VerifyComplete();
   }
 
   public void VerifyIL(Action<ILVerifier> verify)
