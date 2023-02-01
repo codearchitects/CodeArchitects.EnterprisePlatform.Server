@@ -102,7 +102,7 @@ internal interface IPolymorphicActorFactory
 internal class PolymorphicActorState
 {
   public int _state { get; set; }
-  public string _discriminator { get; set; } = default!;
+  public int _discriminator { get; set; } = default!;
 }
 
 internal static class PolymorphicActorFixture
