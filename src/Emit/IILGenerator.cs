@@ -23,6 +23,7 @@ internal interface IILGenerator
   void Emit(OpCode opcode, byte arg);
   void Emit(OpCode opcode);
   void Emit(OpCode opcode, ILabel label);
+  void Emit(OpCode opcode, params ILabel[] labels);
   void MarkLabel(ILabel loc);
   void ThrowException(Type excType);
 }

@@ -117,16 +117,6 @@ internal class ImplementationFactoryTypeBuilder
       bindingAttr: BindingFlags.Static | BindingFlags.Public,
       types: new[] { typeof(IServiceProvider) });
 
-    private static readonly MethodInfo s_opEqualityMethod = typeof(string).GetRequiredMethod(
-      name: "op_Equality",
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(string) });
-
-    private static readonly MethodInfo s_concatMethod = typeof(string).GetRequiredMethod(
-      name: nameof(string.Concat),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(string), typeof(string), typeof(string) });
-
     private static readonly ConstructorInfo s_invalidOperationExceptionConstructor = typeof(InvalidOperationException).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
@@ -187,41 +177,27 @@ internal class ImplementationFactoryTypeBuilder
       FieldInfo? discriminatorField = actor.State.DiscriminatorField;
       Debug.Assert(discriminatorField is not null, "A polymorphic actor's state must have the discriminator field.");
 
-      il.DeclareLocal(typeof(string));
-      ILabel[] labels = Enumerable
-        .Range(0, implementations.Count + 1)
+      ILabel invalidDiscriminatorLabel = il.DefineLabel();
+      ILabel[] implementationLabels = Enumerable
+        .Range(0, implementations.Count)
         .Select(_ => il.DefineLabel())
         .ToArray();
 
-      il.Emit(OpCodes.Ldarg_2);                    // Push $state                                 | Stack: $state
-      il.Emit(OpCodes.Ldfld, discriminatorField!); // Load $discriminator := $state.discriminator | Stack: $discriminator
-      il.Emit(OpCodes.Stloc_0);                    // Store $discriminator in local variable      | Stack: -
+      il.Emit(OpCodes.Ldarg_2);                       // Push $state                                 | Stack: $state
+      il.Emit(OpCodes.Ldfld, discriminatorField!);    // Load $discriminator := $state.discriminator | Stack: $discriminator
+      il.Emit(OpCodes.Switch, implementationLabels);  // Store $discriminator in local variable      | Stack: -
+      il.Emit(OpCodes.Br, invalidDiscriminatorLabel); // Jump to *INVALID_DISCRIMINATOR* | Stack: -
 
       for (int i = 0; i < implementations.Count; i++)
       {
-        IImplementationDescriptor implementation = implementations[i];
-
-        il.Emit(OpCodes.Ldloc_0);                             // Load $discriminator                                   | Stack: $discriminator
-        il.Emit(OpCodes.Ldstr, implementation.Type.FullName); // Push $fullName := the implementation type's full name | Stack: $discriminator, $fullName
-        il.Emit(OpCodes.Call, s_opEqualityMethod);            // Compare $areEqual := $discriminator == $fullName      | Stack: $areEqual
-        il.Emit(OpCodes.Brtrue_S, labels[i]);                 // If $areEqual, jump to *CREATE_IMPLEMENTATION[i]*      | Stack: -
+        il.MarkLabel(implementationLabels[i]); // *IMPLEMENTATION[i]*                        | Stack: -
+        Implement(implementations[i]);         // Return the created implementation instance | Stack: -
       }
 
-      il.Emit(OpCodes.Br, labels[^1]); // Jump to *INVALID_DISCRIMINATOR* | Stack: -
-
-      for (int i = 0; i < implementations.Count; i++)
-      {
-        il.MarkLabel(labels[i]);       // *CREATE_IMPLEMENTATION[i]*                 | Stack: -
-        Implement(implementations[i]); // Return the created implementation instance | Stack: -
-      }
-
-      il.MarkLabel(labels[^1]);                                        // *INVALID_DISCRIMINATOR*                                     | Stack: -
-      il.Emit(OpCodes.Ldstr, "Invalid actor discriminator: '");        // Push $str1 := the first part of the error message           | Stack: $str1
-      il.Emit(OpCodes.Ldloc_0);                                        // Load $discriminator                                         | Stack: $str1, $discriminator
-      il.Emit(OpCodes.Ldstr, "'.");                                    // Push $str2 := the second part of the error message          | Stack: $str1, $discriminator, $str2
-      il.Emit(OpCodes.Call, s_concatMethod);                           // Call $message = string.Concat($str1, $discriminator, $str2) | Stack: $message
+      il.MarkLabel(invalidDiscriminatorLabel);                         // *INVALID_DISCRIMINATOR*                                     | Stack: -
+      il.Emit(OpCodes.Ldstr, "Invalid actor discriminator.");          // Push $message := the the error message                      | Stack: $message
       il.Emit(OpCodes.Newobj, s_invalidOperationExceptionConstructor); // Create $exception = new InvalidOperationException($message) | Stack: $exception
-      il.Emit(OpCodes.Throw);                                          // Throw                                                       | Stack: -
+      il.Emit(OpCodes.Throw);                                          // Throw $exception                                            | Stack: -
 
       void Implement(IImplementationDescriptor implementation)
       {

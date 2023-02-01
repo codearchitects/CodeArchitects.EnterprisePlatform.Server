@@ -1,459 +1,87 @@
 ﻿using System.Reflection;
-using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Emit.Testing;
 
-internal class ILVerifier
+internal abstract class ILVerifier
 {
-  private readonly IReadOnlyList<FakeInstruction> _instructions;
-  private int _index;
-
-  public ILVerifier(IReadOnlyList<FakeInstruction> instructions)
+  protected ILVerifier MoveNext()
   {
-    _instructions = instructions;
-  }
-
-  public void VerifyComplete()
-  {
-    if (_index != _instructions.Count)
-      throw new Exception($"Remaining {_instructions.Count - _index} instructions were not verified.");
-  }
-
-  public ILVerifier Brtrue_S(int position)
-  {
-    return VerifyLabel(OpCodes.Brtrue_S, position);
-  }
-
-  public ILVerifier Br(int position)
-  {
-    return VerifyLabel(OpCodes.Br, position);
-  }
-
-  public ILVerifier Br_S(int position)
-  {
-    return VerifyLabel(OpCodes.Br_S, position);
-  }
-
-  public ILVerifier Call(Predicate<MethodBase>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Call)
-      : Verify(OpCodes.Call, predicate);
-  }
-
-  public ILVerifier Call(MethodBase methodBase)
-  {
-    return Verify(OpCodes.Call, (MethodBase method) => method.Equals(methodBase));
-  }
-
-  public ILVerifier Call(Type declaringType, string methodName, Type[] parameterTypes)
-  {
-    return Call(declaringType, methodName, Type.EmptyTypes, parameterTypes);
-  }
-
-  public ILVerifier Call(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes)
-  {
-    return Verify(OpCodes.Call, (MethodBase method) =>
-    {
-      if (method.DeclaringType != declaringType)
-        return false;
-      if (method.Name != methodName)
-        return false;
-      
-      if (method.IsGenericMethod)
-      {
-        if (!method.GetGenericArguments().SequenceEqual(typeArguments))
-          return false;
-      }
-      else
-      {
-        if (typeArguments.Length != 0)
-          return false;
-      }
-
-      ParameterInfo[] parameters = method.GetParameters();
-      if (parameters.Length != parameterTypes.Length)
-        return false;
-
-      for (int i = 0; i < parameters.Length; i++)
-      {
-        if (parameters[i].ParameterType != parameterTypes[i])
-          return false;
-      }
-
-      return true;
-    });
-  }
-
-  public ILVerifier Callvirt(Predicate<MethodBase>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Callvirt)
-      : Verify(OpCodes.Callvirt, predicate);
-  }
-
-  public ILVerifier Callvirt(Type declaringType, string methodName, Type[] parameterTypes)
-  {
-    return Callvirt(declaringType, methodName, Type.EmptyTypes, parameterTypes);
-  }
-
-  public ILVerifier Callvirt(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes)
-  {
-    return Verify(OpCodes.Callvirt, (MethodBase method) =>
-    {
-      if (method.DeclaringType != declaringType)
-        return false;
-      if (method.Name != methodName)
-        return false;
-
-      if (method.IsGenericMethod)
-      {
-        if (!method.GetGenericArguments().SequenceEqual(typeArguments))
-          return false;
-      }
-      else
-      {
-        if (typeArguments.Length != 0)
-          return false;
-      }
-
-      ParameterInfo[] parameters = method.GetParameters();
-      if (parameters.Length != parameterTypes.Length)
-        return false;
-
-      for (int i = 0; i < parameters.Length; i++)
-      {
-        if (parameters[i].ParameterType != parameterTypes[i])
-          return false;
-      }
-
-      return true;
-    });
-  }
-
-  public ILVerifier Dup()
-  {
-    return Verify(OpCodes.Dup);
-  }
-
-  public ILVerifier Ldarg_0()
-  {
-    return Verify(OpCodes.Ldarg_0);
-  }
-
-  public ILVerifier Ldarg_1()
-  {
-    return Verify(OpCodes.Ldarg_1);
-  }
-
-  public ILVerifier Ldarg_2()
-  {
-    return Verify(OpCodes.Ldarg_2);
-  }
-
-  public ILVerifier Ldarg_3()
-  {
-    return Verify(OpCodes.Ldarg_3);
-  }
-
-  public ILVerifier Ldarg_S(int value)
-  {
-    return Verify(OpCodes.Ldarg_S, value);
-  }
-
-  public ILVerifier Ldfld(Predicate<FieldInfo>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Ldfld)
-      : Verify(OpCodes.Ldfld, predicate);
-  }
-
-  public ILVerifier Ldfld(string fieldName)
-  {
-    return Verify(OpCodes.Ldfld, (FieldInfo field) => field.Name == fieldName);
-  }
-
-  public ILVerifier Ldsfld(Predicate<FieldInfo>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Ldsfld)
-      : Verify(OpCodes.Ldsfld, predicate);
-  }
-
-  public ILVerifier Ldsfld(string fieldName)
-  {
-    return Verify(OpCodes.Ldsfld, (FieldInfo field) => field.Name == fieldName);
-  }
-
-  public ILVerifier Ldloc_0()
-  {
-    return Verify(OpCodes.Ldloc_0);
-  }
-
-  public ILVerifier Ldstr()
-  {
-    return Verify(OpCodes.Ldstr);
-  }
-
-  public ILVerifier Ldstr(string str)
-  {
-    return Verify(OpCodes.Ldstr, str);
-  }
-
-  public ILVerifier Newobj(Predicate<ConstructorInfo>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Newobj)
-      : Verify(OpCodes.Newobj, predicate);
-  }
-
-  public ILVerifier Newobj(Type declaringType, Type[] parameterTypes)
-  {
-    return Verify(OpCodes.Newobj, (ConstructorInfo ctor) =>
-    {
-      if (ctor.DeclaringType != declaringType)
-        return false;
-
-      ParameterInfo[] parameters = ctor.GetParameters();
-      if (parameters.Length != parameterTypes.Length)
-        return false;
-
-      for (int i = 0; i < parameters.Length; i++)
-      {
-        if (parameters[i].ParameterType != parameterTypes[i])
-          return false;
-      }
-
-      return true;
-    });
-  }
-
-  public ILVerifier Ret()
-  {
-    return Verify(OpCodes.Ret);
-  }
-
-  public ILVerifier Stfld(Predicate<FieldInfo>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Stfld)
-      : Verify(OpCodes.Stfld, predicate);
-  }
-
-  public ILVerifier Stfld(string fieldName)
-  {
-    return Verify(OpCodes.Stfld, (FieldInfo field) => field.Name == fieldName);
-  }
-
-  public ILVerifier Stsfld(Predicate<FieldInfo>? predicate = null)
-  {
-    return predicate is null
-      ? Verify(OpCodes.Stsfld)
-      : Verify(OpCodes.Stsfld, predicate);
-  }
-
-  public ILVerifier Stsfld(string fieldName)
-  {
-    return Verify(OpCodes.Stsfld, (FieldInfo field) => field.Name == fieldName);
-  }
-
-  public ILVerifier Stloc_0()
-  {
-    return Verify(OpCodes.Stloc_0);
-  }
-
-  public ILVerifier Throw()
-  {
-    return Verify(OpCodes.Throw);
-  }
-
-  private ILVerifier Verify(OpCode opcode)
-  {
-    FakeInstruction instruction = _instructions[_index++];
-
-    VerifyOpCode(instruction, opcode);
-
-    if (instruction.Argument.HasValue)
-      throw Error(instruction.Position, $"Expected the instruction to not have an argument but found '{instruction.Argument.Value}'.");
-
+    Index++;
     return this;
   }
 
-  private ILVerifier Verify(OpCode opcode, Predicate<FieldInfo> predicate)
+  protected int Index { get; private set; }
+
+  protected Exception Error(string message)
   {
-    FakeInstruction instruction = _instructions[_index++];
-
-    VerifyOpCode(instruction, opcode);
-
-    VerifyHasArgument(instruction);
-
-    object? value = instruction.Argument.Value;
-    if (value is not FieldInfo field)
-      throw Error(instruction.Position, $"Expected the instruction to have a FieldInfo argument but found '{value ?? "<null>"}'.");
-
-    if (!predicate(field))
-      throw Error(instruction.Position, "The FieldInfo argument does not match the provided predicate.");
-
-    return this;
+    return new Exception($"Error at instruction #{Index}: {message}");
   }
 
-  private ILVerifier Verify(OpCode opcode, Predicate<MethodBase> predicate)
-  {
-    FakeInstruction instruction = _instructions[_index++];
+  public abstract ILVerifier Br(string label);
 
-    VerifyOpCode(instruction, opcode);
+  public abstract ILVerifier Brtrue_S(string label);
 
-    VerifyHasArgument(instruction);
+  public abstract ILVerifier Br_S(string label);
 
-    object? value = instruction.Argument.Value;
-    if (value is not MethodBase method)
-      throw Error(instruction.Position, $"Expected the instruction to have a MethodInfo argument but found '{value ?? "<null>"}'.");
+  public abstract ILVerifier Call(Predicate<MethodBase> predicate);
 
-    if (!predicate(method))
-      throw Error(instruction.Position, "The MethodInfo argument does not match the provided predicate.");
+  public abstract ILVerifier Call(MethodBase methodBase);
 
-    return this;
-  }
+  public abstract ILVerifier Call(Type declaringType, string methodName, Type[] parameterTypes);
 
-  private ILVerifier Verify(OpCode opcode, Predicate<ConstructorInfo> predicate)
-  {
-    FakeInstruction instruction = _instructions[_index++];
+  public abstract ILVerifier Call(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes);
 
-    VerifyOpCode(instruction, opcode);
+  public abstract ILVerifier Callvirt(Predicate<MethodBase> predicate);
 
-    VerifyHasArgument(instruction);
+  public abstract ILVerifier Callvirt(Type declaringType, string methodName, Type[] parameterTypes);
 
-    object? value = instruction.Argument.Value;
-    if (value is not ConstructorInfo constructor)
-      throw Error(instruction.Position, $"Expected the instruction to have a ConstructorInfo argument but found '{value ?? "<null>"}'.");
+  public abstract ILVerifier Callvirt(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes);
 
-    if (!predicate(constructor))
-      throw Error(instruction.Position, "The ConstructorInfo argument does not match the provided predicate.");
+  public abstract ILVerifier Dup();
 
-    return this;
-  }
+  public abstract ILVerifier Ldarg_0();
 
-  private ILVerifier Verify(OpCode opcode, Predicate<Type> predicate)
-  {
-    FakeInstruction instruction = _instructions[_index++];
+  public abstract ILVerifier Ldarg_1();
 
-    VerifyOpCode(instruction, opcode);
+  public abstract ILVerifier Ldarg_2();
 
-    VerifyHasArgument(instruction);
+  public abstract ILVerifier Ldarg_3();
 
-    object? value = instruction.Argument.Value;
-    if (value is not Type type)
-      throw Error(instruction.Position, $"Expected the instruction to have a Type argument but found '{value ?? "<null>"}'.");
+  public abstract ILVerifier Ldarg_S(int value);
 
-    if (!predicate(type))
-      throw Error(instruction.Position, "The Type argument does not match the provided predicate.");
+  public abstract ILVerifier Ldfld(Predicate<FieldInfo> predicate);
 
-    return this;
-  }
+  public abstract ILVerifier Ldfld(string fieldName);
 
-  private ILVerifier VerifyLabel(OpCode opcode, int labelPosition)
-  {
-    FakeInstruction instruction = _instructions[_index++];
+  public abstract ILVerifier Ldsfld(Predicate<FieldInfo> predicate);
 
-    VerifyOpCode(instruction, opcode);
+  public abstract ILVerifier Ldsfld(string fieldName);
 
-    VerifyHasArgument(instruction);
+  public abstract ILVerifier Ldloc_0();
 
-    object? value = instruction.Argument.Value;
-    if (value is not FakeLabel label)
-      throw Error(instruction.Position, $"Expected the instruction to have a FakeLabel argument but found '{value ?? "<null>"}'.");
+  public abstract ILVerifier Ldstr();
 
-    if (label.Position != labelPosition)
-      throw Error(instruction.Position, $"Expected the label to have position {labelPosition} but found {label.Position}.");
+  public abstract ILVerifier Ldstr(string str);
 
-    return this;
-  }
+  public abstract ILVerifier MarkLabel(string name);
 
-  private ILVerifier Verify(OpCode opcode, Predicate<FakeLocalBuilder> predicate)
-  {
-    FakeInstruction instruction = _instructions[_index++];
+  public abstract ILVerifier Newobj(Predicate<ConstructorInfo> predicate);
 
-    VerifyOpCode(instruction, opcode);
+  public abstract ILVerifier Newobj(Type declaringType, Type[] parameterTypes);
 
-    VerifyHasArgument(instruction);
+  public abstract ILVerifier Ret();
 
-    object? value = instruction.Argument.Value;
-    if (value is not FakeLocalBuilder localBuilder)
-      throw Error(instruction.Position, $"Expected the instruction to have a FakeLocalBuilder argument but found '{value ?? "<null>"}'.");
+  public abstract ILVerifier Stfld(Predicate<FieldInfo> predicate);
 
-    if (!predicate(localBuilder))
-      throw Error(instruction.Position, "The FakeLocalBuilder argument does not match the provided predicate.");
+  public abstract ILVerifier Stfld(string fieldName);
 
-    return this;
-  }
+  public abstract ILVerifier Stsfld(Predicate<FieldInfo> predicate);
 
-  private ILVerifier Verify(OpCode opcode, int expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
+  public abstract ILVerifier Stsfld(string fieldName);
 
-  private ILVerifier Verify(OpCode opcode, short expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
+  public abstract ILVerifier Stloc_0();
 
-  private ILVerifier Verify(OpCode opcode, long expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
+  public abstract ILVerifier Switch(params string[] labels);
 
-  private ILVerifier Verify(OpCode opcode, float expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
-
-  private ILVerifier Verify(OpCode opcode, double expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
-
-  private ILVerifier Verify(OpCode opcode, byte expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
-
-  private ILVerifier Verify(OpCode opcode, sbyte expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
-
-  private ILVerifier Verify(OpCode opcode, string expected)
-  {
-    return VerifyValue(opcode, expected);
-  }
-
-  private ILVerifier VerifyValue<T>(OpCode opcode, T expected)
-    where T : IEquatable<T>
-  {
-    FakeInstruction instruction = _instructions[_index++];
-
-    VerifyOpCode(instruction, opcode);
-
-    VerifyHasArgument(instruction);
-
-    object? value = instruction.Argument.Value;
-    if (value is not T actual || !expected.Equals(actual))
-      throw Error(instruction.Position, $"Expected '{expected}' as argument, but got '{value ?? "<null>"}'.");
-
-    return this;
-  }
-
-  private void VerifyOpCode(FakeInstruction instruction, OpCode opcode)
-  {
-    if (instruction.OpCode != opcode)
-      throw Error(instruction.Position, $"Expected opcode '{opcode}' but found '{instruction.OpCode}'.");
-  }
-
-  private void VerifyHasArgument(FakeInstruction instruction)
-  {
-    if (!instruction.Argument.HasValue)
-      throw Error(instruction.Position, "Expected the instruction to have an argument but found none.");
-  }
-
-  private Exception Error(int position, string message) => new Exception($"Error at IL_{position:x4}: {message}");
+  public abstract ILVerifier Throw();
 }

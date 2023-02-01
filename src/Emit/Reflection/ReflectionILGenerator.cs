@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Common.Collections;
+using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Emit.Reflection;
@@ -100,6 +101,11 @@ internal class ReflectionILGenerator : IILGenerator
   public void Emit(OpCode opcode, ILabel label)
   {
     _il.Emit(opcode, ((ReflectionLabel)label).Label);
+  }
+
+  public void Emit(OpCode opcode, params ILabel[] labels)
+  {
+    _il.Emit(opcode, labels.Map(label => ((ReflectionLabel)label).Label));
   }
 
   public void MarkLabel(ILabel loc)
