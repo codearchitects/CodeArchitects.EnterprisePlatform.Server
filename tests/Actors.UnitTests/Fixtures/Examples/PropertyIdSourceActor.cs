@@ -1,8 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Actors.Metadata;
-using CodeArchitects.Platform.Actors.Metadata.FluentMock;
-using CodeArchitects.Platform.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
@@ -44,7 +41,6 @@ internal class PropertyIdSourceActorState
 internal static class PropertyIdSourceActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
-  public static readonly IActorMetadata Metadata;
 
   private static readonly FieldInfo s_stateField;
   private static readonly ConstructorInfo s_constructor;
@@ -119,59 +115,5 @@ internal static class PropertyIdSourceActorFixture
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
         .SetGetMethod(factoryGetMethod)));
-
-
-    IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
-      .SetIsDefault(false)
-      .SetImplementationType(typeof(PropertyIdSourceActor))
-      .SetConstructor(null)
-      .SetHasStateFields(true));
-
-    PropertyInfo? stateProperty = s_idProperty;
-    Metadata = ActorMetadataBuilder.Build(_ => _
-      .SetInterfaceType(typeof(IPropertyIdSourceActor))
-      .SetActorType(typeof(PropertyIdSourceActor))
-      .SetIsExplicitVirtual(false)
-      .SetFactoryType(typeof(IPropertyIdSourceActorFactory))
-      .SetStateFields(_ => _
-        .Add(_ => _
-          .SetField(s_stateField)
-          .SetDefaultValue(Optional<object?>.None)
-          .Setup(mock => mock
-            .Setup(x => x.IsActorIdSource(out stateProperty))
-            .Returns(true))))
-      .SetBaseImplementation(baseImplementationMetadata)
-      .SetImplementations());
-  }
-
-  public static void AssertValidMetadata(IActorMetadata metadata, bool hasConstructor)
-  {
-    PropertyInfo? actorIdProperty = null;
-
-    metadata.InterfaceType.Should().BeNull();
-    metadata.ActorType.Should().Be<PropertyIdSourceActor>();
-    metadata.IsExplicitVirtual.Should().BeFalse();
-    metadata.FactoryType.Should().Be<IPropertyIdSourceActorFactory>();
-    metadata.StateFields.Should().HaveCount(1);
-
-    IStateFieldMetadata stateField = metadata.StateFields.ElementAt(0);
-    stateField.Field.Should().Be(s_stateField);
-    stateField.DefaultValue.Should().Be(Optional<object?>.None);
-    stateField.IsActorIdSource(out actorIdProperty).Should().BeTrue();
-    actorIdProperty.Should().BeSameAs(s_idProperty);
-
-    metadata.BaseImplementation.IsDefault.Should().BeFalse();
-    metadata.BaseImplementation.ImplementationType.Should().Be<PropertyIdSourceActor>();
-    metadata.BaseImplementation.HasStateFields.Should().BeTrue();
-    if (hasConstructor)
-    {
-      metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
-    }
-    else
-    {
-      metadata.BaseImplementation.Constructor.Should().BeNull();
-    }
-
-    metadata.Implementations.Should().BeEmpty();
   }
 }

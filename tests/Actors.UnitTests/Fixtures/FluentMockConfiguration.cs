@@ -18,8 +18,3 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IContextDependencyDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IServiceDependencyDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IStateDependencyDescriptor))]
-
-[assembly: GenerateFluentMockFor(typeof(IActorMetadata))]
-[assembly: GenerateFluentMockFor(typeof(IStateFieldMetadata))]
-[assembly: GenerateFluentMockFor(typeof(IImplementationMetadata))]
-[assembly: GenerateFluentMockFor(typeof(IMethodMetadata))]

@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Actors.Metadata;
-using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 using CodeArchitects.Platform.Common;
 using System.Reflection;
 
@@ -97,7 +95,6 @@ internal class StandardActorState
 internal static class StandardActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
-  public static readonly IActorMetadata Metadata;
 
   private static readonly ConstructorInfo s_constructor;
   private static readonly FieldInfo s_state1Field;
@@ -302,93 +299,5 @@ internal static class StandardActorFixture
         .SetFactoryType(typeof(IStandardActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
         .SetGetMethod(factoryGetMethod)));
-
-
-    IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
-      .SetIsDefault(false)
-      .SetImplementationType(typeof(StandardActor))
-      .SetConstructor(s_constructor)
-      .SetHasStateFields(true)
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationVoidMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationTaskMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationTaskTMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationValueTaskMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationValueTaskTMethod).IsStateless)
-        .Returns(true)));
-
-    Metadata = ActorMetadataBuilder.Build(_ => _
-      .SetInterfaceType(typeof(IStandardActor))
-      .SetActorType(typeof(StandardActor))
-      .SetIsExplicitVirtual(false)
-      .SetFactoryType(typeof(IStandardActorFactory))
-      .SetStateFields(_ => _
-        .Add(_ => _
-          .SetField(s_state1Field)
-          .SetDefaultValue(Optional<object?>.None)
-          .Setup(mock => mock
-            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
-            .Returns(false)))
-        .Add(_ => _
-          .SetField(s_state2Field)
-          .SetDefaultValue(Optional<object?>.None)
-          .Setup(mock => mock
-            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
-            .Returns(false))))
-      .SetBaseImplementation(baseImplementationMetadata)
-      .SetImplementations());
-  }
-
-  public static void AssertValidMetadata(IActorMetadata metadata)
-  {
-    PropertyInfo? actorIdProperty;
-
-    metadata.InterfaceType.Should().Be<IStandardActor>();
-    metadata.ActorType.Should().Be<StandardActor>();
-    metadata.IsExplicitVirtual.Should().BeFalse();
-    metadata.FactoryType.Should().Be<IStandardActorFactory>();
-    metadata.StateFields.Should().HaveCount(2);
-
-    IStateFieldMetadata state1Field = metadata.StateFields.ElementAt(0);
-    state1Field.Field.Should().Be(s_state1Field);
-    state1Field.DefaultValue.Should().Be(Optional<object?>.None);
-    state1Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
-    actorIdProperty.Should().BeNull();
-
-    IStateFieldMetadata state2Field = metadata.StateFields.ElementAt(1);
-    state2Field.Field.Should().Be(s_state2Field);
-    state2Field.DefaultValue.Should().Be(Optional<object?>.None);
-    state2Field.IsActorIdSource(out actorIdProperty).Should().BeFalse();
-    actorIdProperty.Should().BeNull();
-
-    metadata.BaseImplementation.IsDefault.Should().BeFalse();
-    metadata.BaseImplementation.ImplementationType.Should().Be<StandardActor>();
-    metadata.BaseImplementation.Constructor.Should().BeSameAs(s_constructor);
-    metadata.BaseImplementation.HasStateFields.Should().BeTrue();
-
-    IMethodMetadata voidMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationVoidMethod);
-    voidMethodMetadata.IsStateless.Should().BeFalse();
-
-    IMethodMetadata taskMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationTaskMethod);
-    taskMethodMetadata.IsStateless.Should().BeFalse();
-
-    IMethodMetadata taskTMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationTaskTMethod);
-    taskTMethodMetadata.IsStateless.Should().BeFalse();
-
-    IMethodMetadata valueTaskMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationValueTaskMethod);
-    valueTaskMethodMetadata.IsStateless.Should().BeFalse();
-
-    IMethodMetadata valueTaskTMethodMetadata = metadata.BaseImplementation.GetMethodMetadata(s_implementationValueTaskTMethod);
-    valueTaskTMethodMetadata.IsStateless.Should().BeTrue();
-
-    metadata.Implementations.Should().BeEmpty();
   }
 }

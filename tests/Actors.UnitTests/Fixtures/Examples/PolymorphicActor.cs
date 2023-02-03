@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Actors.Metadata;
-using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 using CodeArchitects.Platform.Common;
 using System.Reflection;
 
@@ -108,7 +106,6 @@ internal class PolymorphicActorState
 internal static class PolymorphicActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
-  public static readonly IActorMetadata Metadata;
 
   private static readonly ConstructorInfo s_baseConstructor;
   private static readonly ConstructorInfo s_implementation1Constructor;
@@ -428,71 +425,5 @@ internal static class PolymorphicActorFixture
         .SetFactoryType(typeof(IPolymorphicActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
         .SetGetMethod(factoryGetMethod)));
-
-
-    IImplementationMetadata baseImplementationMetadata = ImplementationMetadataBuilder.Build(_ => _
-      .SetIsDefault(false)
-      .SetImplementationType(typeof(PolymorphicActor))
-      .SetConstructor(s_baseConstructor)
-      .SetHasStateFields(true)
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationBaseMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationVirtualMethod).IsStateless)
-        .Returns(true))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementationAbstractMethod).IsStateless)
-        .Returns(false)));
-
-    IImplementationMetadata implementation1Metadata = ImplementationMetadataBuilder.Build(_ => _
-      .SetIsDefault(false)
-      .SetImplementationType(typeof(PolymorphicActorImplementation1))
-      .SetConstructor(s_implementation1Constructor)
-      .SetHasStateFields(false)
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation1BaseMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation1VirtualMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation1AbstractMethod).IsStateless)
-        .Returns(false)));
-
-    IImplementationMetadata implementation2Metadata = ImplementationMetadataBuilder.Build(_ => _
-      .SetIsDefault(true)
-      .SetImplementationType(typeof(PolymorphicActorImplementation2))
-      .SetConstructor(s_implementation2Constructor)
-      .SetHasStateFields(false)
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation2BaseMethod).IsStateless)
-        .Returns(false))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation2VirtualMethod).IsStateless)
-        .Returns(true))
-      .Setup(mock => mock
-        .Setup(x => x.GetMethodMetadata(s_implementation2AbstractMethod).IsStateless)
-        .Returns(true)));
-
-    Metadata = ActorMetadataBuilder.Build(_ => _
-      .SetInterfaceType(typeof(IPolymorphicActor))
-      .SetActorType(typeof(PolymorphicActor))
-      .SetIsExplicitVirtual(false)
-      .SetFactoryType(typeof(IPolymorphicActorFactory))
-      .SetStateFields(_ => _
-        .Add(_ => _
-          .SetField(s_stateField)
-          .SetDefaultValue(Optional<object?>.None)
-          .Setup(mock => mock
-            .Setup(x => x.IsActorIdSource(out It.Ref<PropertyInfo?>.IsAny))
-            .Returns(false))))
-      .SetBaseImplementation(baseImplementationMetadata)
-      .SetImplementations(implementation1Metadata, implementation2Metadata));
-  }
-
-  public static void AssertValidMetadata(IActorMetadata metadata)
-  {
-    PropertyInfo? actorIdProperty;
   }
 }
