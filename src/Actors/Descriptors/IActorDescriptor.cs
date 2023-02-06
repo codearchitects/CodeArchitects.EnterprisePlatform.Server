@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Actors.Descriptors;
+﻿using System.Reflection;
+
+namespace CodeArchitects.Platform.Actors.Descriptors;
 
 internal interface IActorDescriptor
 {
@@ -6,13 +8,23 @@ internal interface IActorDescriptor
 
   Type ActorType { get; }
 
+  Type ActivityPayloadType { get; }
+
   bool IsPolymorphic { get; }
+
+  bool IsStateless { get; }
+
+  bool IsVirtual { get; }
+
+  IReadOnlyList<FieldInfo> StateFields { get; }
 
   IImplementationDescriptor BaseImplementation { get; }
 
   IImplementationDescriptor DefaultImplementation { get; }
 
   IReadOnlyList<IImplementationDescriptor> Implementations { get; }
+
+  IReadOnlyList<IActivityDescriptor> Activities { get; }
 
   IActorIdDescriptor Id { get; }
 

@@ -2,8 +2,6 @@
 
 internal interface IMethodDescriptorVisitor
 {
-  void VisitVoidMethod(IVoidMethodDescriptor descriptor);
-
   void VisitTaskMethod(ITaskMethodDescriptor descriptor);
 
   void VisitTaskTMethod(ITaskTMethodDescriptor descriptor);

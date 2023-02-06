@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
@@ -40,7 +39,6 @@ internal abstract class PolymorphicActor : IPolymorphicActor
     throw new NotImplementedException();
   }
 
-  [Stateless]
   public virtual Task VirtualMethod()
   {
     throw new NotImplementedException();
@@ -83,7 +81,6 @@ internal class PolymorphicActorImplementation2 : PolymorphicActor
     _service2 = service2;
   }
 
-  [Stateless]
   public override Task AbstractMethod()
   {
     throw new NotImplementedException();
@@ -314,7 +311,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceBaseMethod)
           .SetImplementationMethod(s_implementationBaseMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -322,7 +318,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceVirtualMethod)
           .SetImplementationMethod(s_implementationVirtualMethod)
           .SetParameterTypes()
-          .SetIsStateless(true)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -330,7 +325,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceAbstractMethod)
           .SetImplementationMethod(s_implementationAbstractMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))));
 
@@ -348,7 +342,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceBaseMethod)
           .SetImplementationMethod(s_implementation1BaseMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -356,7 +349,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceVirtualMethod)
           .SetImplementationMethod(s_implementation1VirtualMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -364,7 +356,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceAbstractMethod)
           .SetImplementationMethod(s_implementation1AbstractMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))));
 
@@ -382,7 +373,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceBaseMethod)
           .SetImplementationMethod(s_implementation2BaseMethod)
           .SetParameterTypes()
-          .SetIsStateless(false)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -390,7 +380,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceVirtualMethod)
           .SetImplementationMethod(s_implementation2VirtualMethod)
           .SetParameterTypes()
-          .SetIsStateless(true)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
         .Add<TaskMethodDescriptorBuilder>(_ => _
@@ -398,7 +387,6 @@ internal static class PolymorphicActorFixture
           .SetInterfaceMethod(interfaceAbstractMethod)
           .SetImplementationMethod(s_implementation2AbstractMethod)
           .SetParameterTypes()
-          .SetIsStateless(true)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))));
 
@@ -409,18 +397,18 @@ internal static class PolymorphicActorFixture
       .SetDefaultImplementation(implementation2)
       .SetImplementations(implementation1, implementation2)
       .SetIsPolymorphic(true)
+      .SetIsStateless(false)
+      .SetIsVirtual(false)
       .SetId(_ => _
         .SetIdType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
         .SetStateProperty(null))
       .SetState(_ => _
-        .SetStateType(new StateTypeDelegator(typeof(PolymorphicActorState), nameof(PolymorphicActorState._discriminator)))
-        .SetIsStateless(false)
-        .SetIsVirtual(false)
-        .SetFields(s_stateField)
+        .SetType(new StateTypeDelegator(typeof(PolymorphicActorState), nameof(PolymorphicActorState._discriminator)))
+        .SetStateFields(s_stateField)
         .SetDiscriminatorField(discriminatorField)
-        .SetDefaultValues(null as IReadOnlyList<object>))
+        .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPolymorphicActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

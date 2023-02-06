@@ -89,18 +89,18 @@ internal static class ComponentIdSourceActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
+      .SetIsStateless(false)
+      .SetIsVirtual(false)
       .SetId(_ => _
         .SetIdType(typeof(int))
         .SetHasIdSource(true)
         .SetStateDependency(stateDependency)
         .SetStateProperty(null))
       .SetState(_ => _
-        .SetStateType(typeof(ComponentIdSourceActorState))
-        .SetIsStateless(false)
-        .SetIsVirtual(false)
-        .SetFields(s_stateField)
+        .SetType(typeof(ComponentIdSourceActorState))
+        .SetStateFields(s_stateField)
         .SetDiscriminatorField(null)
-        .SetDefaultValues(null as IReadOnlyList<object?>))
+        .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IComponentIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

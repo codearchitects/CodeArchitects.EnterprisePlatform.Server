@@ -9,10 +9,12 @@ internal class ActorContext<TActor, TImplementation> : IActorContext<TActor, TIm
   where TActor : class
   where TImplementation : class, TActor
 {
+  private readonly IActivityManager _activityManager;
   private readonly IActorHost<TActor> _host;
 
-  public ActorContext(IActorHost<TActor> host)
+  public ActorContext(IActivityManager activityManager, IActorHost<TActor> host)
   {
+    _activityManager = activityManager;
     _host = host;
   }
 
@@ -21,7 +23,7 @@ internal class ActorContext<TActor, TImplementation> : IActorContext<TActor, TIm
   public void Become<TOther>()
     where TOther : TActor
   {
-    _host.Become(typeof(TOther).FullName);
+    throw new NotImplementedException();
   }
 
   public Task<ScheduleId> ScheduleAsync(Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -29,7 +31,7 @@ internal class ActorContext<TActor, TImplementation> : IActorContext<TActor, TIm
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    return ScheduleAsync<TImplementation>(activity, options, cancellationToken);
   }
 
   public Task<ScheduleId> ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -37,7 +39,7 @@ internal class ActorContext<TActor, TImplementation> : IActorContext<TActor, TIm
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    return ScheduleAsync<TActor>(activity, options, cancellationToken);
   }
 
   public Task<ScheduleId> ScheduleAsync(string activityName, IReadOnlyList<object?>? arguments = null, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -45,33 +47,42 @@ internal class ActorContext<TActor, TImplementation> : IActorContext<TActor, TIm
     if (activityName is null)
       throw new ArgumentNullException(nameof(activityName));
 
-    return ScheduleCoreAsync(activityName, arguments ?? Array.Empty<object?>(), options, cancellationToken);
+    ActivityPayload payload = _activityManager.CreatePayload(activityName, arguments ?? Array.Empty<object?>());
+    return ScheduleCoreAsync(payload, options, cancellationToken);
   }
 
-  private Task<ScheduleId> ScheduleCoreAsync<T>(Expression<Func<T, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public async Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken = default)
+  {
+    await _host.UnscheduleAsync(id, cancellationToken);
+  }
+
+  private Task<ScheduleId> ScheduleAsync<T>(Expression<Func<T, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
     where T : class
   {
     ParameterExpression actorParam = activity.Parameters[0];
 
     if (activity.Body is not MethodCallExpression methodCall || methodCall.Object != actorParam)
-      throw new ArgumentException("The 'activity' expression should represent a call to an instance method of the current actor.", nameof(activity));
+      throw new ArgumentException($"The '{nameof(activity)}' expression should represent a call to an instance method of the current actor.", nameof(activity));
 
-    string activityName = methodCall.Method.Name;
-    object?[] arguments = methodCall.Arguments.Map(
-      (parameters: activity.Parameters, arguments: new[] { _host.Actor }),
-      static (state, argument) => ExpressionEvaluator.Evaluate(argument, state.parameters, state.arguments));
+    object?[] arguments = methodCall.Arguments.Map(argument => ExpressionEvaluator.Evaluate(argument));
+    ActivityPayload payload = _activityManager.CreatePayload(methodCall.Method, arguments);
 
-    return ScheduleCoreAsync(activityName, arguments, options, cancellationToken);
+    return ScheduleCoreAsync(payload, options, cancellationToken);
   }
 
-  private async Task<ScheduleId> ScheduleCoreAsync(string activityName, IReadOnlyList<object?> arguments, SchedulingOptions? options, CancellationToken cancellationToken = default)
+  private async Task<ScheduleId> ScheduleCoreAsync(ActivityPayload payload, SchedulingOptions? options, CancellationToken cancellationToken = default)
   {
-    options ??= SchedulingOptions.Now;
-    await _host.ScheduleAsync(activityName, arguments, options, cancellationToken);
+    if (options is null)
+    {
+      options = new(ScheduleId.New(), TimeSpan.Zero, Timeout.InfiniteTimeSpan, true);
+    }
+    else if (options.ScheduleId == default)
+    {
+      options = options with { ScheduleId = ScheduleId.New() };
+    }
 
-    if (options.Id != default)
-      return options.Id;
+    await _host.ScheduleAsync(payload, options, cancellationToken);
 
-    return new ScheduleId(Guid.NewGuid().ToString());
+    return options.ScheduleId;
   }
 }

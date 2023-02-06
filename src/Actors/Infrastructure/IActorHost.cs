@@ -9,7 +9,7 @@ internal interface IActorHost<TActor>
 
   string ActorId { get; }
 
-  Task ScheduleAsync(string activityName, IReadOnlyList<object?> arguments, SchedulingOptions options, CancellationToken cancellationToken = default);
+  Task ScheduleAsync(ActivityPayload payload, SchedulingOptions options, CancellationToken cancellationToken);
 
-  void Become(string discriminator);
+  Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken);
 }

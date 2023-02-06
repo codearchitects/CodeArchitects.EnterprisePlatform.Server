@@ -99,18 +99,18 @@ internal static class PropertyIdSourceActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
+      .SetIsStateless(false)
+      .SetIsVirtual(false)
       .SetId(_ => _
         .SetIdType(typeof(int))
         .SetHasIdSource(true)
         .SetStateDependency(stateDependency)
         .SetStateProperty(s_idProperty))
       .SetState(_ => _
-        .SetStateType(typeof(PropertyIdSourceActorState))
-        .SetIsStateless(false)
-        .SetIsVirtual(false)
-        .SetFields(s_stateField)
+        .SetType(typeof(PropertyIdSourceActorState))
+        .SetStateFields(s_stateField)
         .SetDiscriminatorField(null)
-        .SetDefaultValues(null as IReadOnlyList<object?>))
+        .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

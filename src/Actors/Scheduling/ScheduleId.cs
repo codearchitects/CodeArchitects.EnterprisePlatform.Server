@@ -31,6 +31,10 @@ public readonly struct ScheduleId : IEquatable<ScheduleId>
     return Id;
   }
 
+  public static ScheduleId New() => new(Guid.NewGuid().ToString());
+
+  public static implicit operator string(ScheduleId id) => id.Id;
+
   public static bool operator ==(ScheduleId left, ScheduleId right) => left.Equals(right);
 
   public static bool operator !=(ScheduleId left, ScheduleId right) => !(left == right);

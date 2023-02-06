@@ -25,7 +25,7 @@ public class StateTypeBuilderTests
     FakeILGenerator state1GetterIL = ilProvider.AddGenerator();
     FakeILGenerator state1SetterIL = ilProvider.AddGenerator();
 
-    IReadOnlyList<FieldInfo> fields = StandardActorFixture.Descriptor.State.Fields;
+    IReadOnlyList<FieldInfo> fields = StandardActorFixture.Descriptor.State.StateFields;
     string state1FieldName = fields[0].Name;
     Type state1FieldType = fields[0].FieldType;
     string state2FieldName = fields[1].Name;
@@ -89,7 +89,7 @@ public class StateTypeBuilderTests
     FakeILGenerator discriminatorGetterIL = ilProvider.AddGenerator();
     FakeILGenerator discriminatorSetterIL = ilProvider.AddGenerator();
 
-    IReadOnlyList<FieldInfo> fields = PolymorphicActorFixture.Descriptor.State.Fields;
+    IReadOnlyList<FieldInfo> fields = PolymorphicActorFixture.Descriptor.State.StateFields;
     string stateFieldName = fields[0].Name;
     Type stateFieldType = fields[0].FieldType;
     string discriminatorFieldName = "$discriminator";

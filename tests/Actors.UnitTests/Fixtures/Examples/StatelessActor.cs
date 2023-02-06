@@ -70,18 +70,18 @@ internal static class StatelessActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
+      .SetIsStateless(true)
+      .SetIsVirtual(true)
       .SetId(_ => _
         .SetIdType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
         .SetStateProperty(null))
       .SetState(_ => _
-        .SetStateType(typeof(NoState))
-        .SetIsStateless(true)
-        .SetIsVirtual(true)
-        .SetFields()
+        .SetType(typeof(NoState))
+        .SetStateFields()
         .SetDiscriminatorField(null)
-        .SetDefaultValues())
+        .SetDefaultValue(NoState.Instance))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)

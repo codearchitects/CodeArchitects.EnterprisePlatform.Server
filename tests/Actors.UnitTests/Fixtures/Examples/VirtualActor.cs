@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Common;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
@@ -142,18 +141,23 @@ internal static class VirtualActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
+      .SetIsStateless(false)
+      .SetIsVirtual(true)
       .SetId(_ => _
         .SetIdType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
         .SetStateProperty(null))
       .SetState(_ => _
-        .SetStateType(typeof(VirtualActorState))
-        .SetIsStateless(false)
-        .SetIsVirtual(true)
-        .SetFields(s_objField, s_state1Field, s_state2Field)
+        .SetType(typeof(VirtualActorState))
+        .SetStateFields(s_objField, s_state1Field, s_state2Field)
         .SetDiscriminatorField(null)
-        .SetDefaultValues(new ComplexObject(), State1Default, 0))
+        .SetDefaultValue(new VirtualActorState
+        {
+          _obj = new ComplexObject(),
+          _state1 = State1Default,
+          _state2 = 0
+        }))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))
         .SetCreateAsyncMethod(null)

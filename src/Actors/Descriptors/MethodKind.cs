@@ -2,7 +2,6 @@
 
 internal enum MethodKind
 {
-  Void,
   Task,
   TaskT,
   ValueTask,
