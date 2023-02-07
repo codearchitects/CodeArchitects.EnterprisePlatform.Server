@@ -8,7 +8,8 @@ internal class InstructionVerifier : ILVerifier
   private readonly IReadOnlyList<FakeInstruction> _instructions;
   private readonly IReadOnlyDictionary<int, string> _markedLabels;
 
-  public InstructionVerifier(IReadOnlyList<FakeInstruction> instructions, IReadOnlyDictionary<int, string> markedLabels)
+  public InstructionVerifier(string methodName, IReadOnlyList<FakeInstruction> instructions, IReadOnlyDictionary<int, string> markedLabels)
+    : base(methodName)
   {
     _instructions = instructions;
     _markedLabels = markedLabels;
@@ -72,6 +73,11 @@ internal class InstructionVerifier : ILVerifier
     return Verify(OpCodes.Callvirt, predicate);
   }
 
+  public override ILVerifier Callvirt(MethodBase methodBase)
+  {
+    return Verify(OpCodes.Callvirt, (MethodBase method) => method.Equals(methodBase));
+  }
+
   public override ILVerifier Callvirt(Type declaringType, string methodName, Type[] parameterTypes)
   {
     return VerifyInvocation(OpCodes.Callvirt, declaringType, methodName, Type.EmptyTypes, parameterTypes);
@@ -80,6 +86,11 @@ internal class InstructionVerifier : ILVerifier
   public override ILVerifier Callvirt(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes)
   {
     return VerifyInvocation(OpCodes.Callvirt, declaringType, methodName, typeArguments, parameterTypes);
+  }
+
+  public override ILVerifier CastClass(Type type)
+  {
+    return VerifyValue(OpCodes.Castclass, type);
   }
 
   public override ILVerifier Dup()
@@ -122,6 +133,41 @@ internal class InstructionVerifier : ILVerifier
     return Verify(OpCodes.Ldarg_S, value);
   }
 
+  public override ILVerifier Ldc_I4_1()
+  {
+    VerifyOpCode(OpCodes.Ldc_I4_1);
+
+    return MoveNext();
+  }
+
+  public override ILVerifier Ldc_I4_2()
+  {
+    VerifyOpCode(OpCodes.Ldc_I4_2);
+
+    return MoveNext();
+  }
+
+  public override ILVerifier Ldc_I4_3()
+  {
+    VerifyOpCode(OpCodes.Ldc_I4_3);
+
+    return MoveNext();
+  }
+
+  public override ILVerifier Ldc_I4_4()
+  {
+    VerifyOpCode(OpCodes.Ldc_I4_4);
+
+    return MoveNext();
+  }
+
+  public override ILVerifier Ldc_I4_5()
+  {
+    VerifyOpCode(OpCodes.Ldc_I4_5);
+
+    return MoveNext();
+  }
+
   public override ILVerifier Ldfld(Predicate<FieldInfo> predicate)
   {
     return Verify(OpCodes.Ldfld, predicate);
@@ -147,6 +193,11 @@ internal class InstructionVerifier : ILVerifier
     VerifyOpCode(OpCodes.Ldloc_0);
 
     return MoveNext();
+  }
+
+  public override ILVerifier Ldloca_S(int index)
+  {
+    return Verify(OpCodes.Ldloca_S, index);
   }
 
   public override ILVerifier Ldstr()
@@ -315,7 +366,7 @@ internal class InstructionVerifier : ILVerifier
   }
 
   private ILVerifier VerifyValue<T>(OpCode opcode, T expected)
-    where T : IEquatable<T>
+    where T : notnull
   {
     VerifyOpCode(opcode, out T value);
 

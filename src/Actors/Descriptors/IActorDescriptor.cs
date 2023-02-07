@@ -8,7 +8,7 @@ internal interface IActorDescriptor
 
   Type ActorType { get; }
 
-  Type ActivityPayloadType { get; }
+  Type ActivityBaseType { get; }
 
   bool IsPolymorphic { get; }
 
@@ -24,7 +24,7 @@ internal interface IActorDescriptor
 
   IReadOnlyList<IImplementationDescriptor> Implementations { get; }
 
-  IReadOnlyList<IActivityDescriptor> Activities { get; }
+  IReadOnlyList<IMethodDescriptor> Activities { get; }
 
   IActorIdDescriptor Id { get; }
 

@@ -2,6 +2,8 @@
 
 internal interface IImplementationDescriptor
 {
+  int Id { get; }
+
   Type Type { get; }
 
   IConstructorDescriptor Constructor { get; }

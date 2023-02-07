@@ -7,7 +7,8 @@ internal class FakeLabelMarker : ILVerifier
   private readonly List<FakeLabel> _labels;
   private readonly Dictionary<int, string> _markedLabels;
 
-  public FakeLabelMarker(List<FakeLabel> labels)
+  public FakeLabelMarker(string methodName, List<FakeLabel> labels)
+    : base(methodName)
   {
     _labels = labels;
     _markedLabels = new();
@@ -43,9 +44,13 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier Callvirt(Predicate<MethodBase> predicate) => MoveNext();
 
+  public override ILVerifier Callvirt(MethodBase methodBase) => MoveNext();
+
   public override ILVerifier Callvirt(Type declaringType, string methodName, Type[] parameterTypes) => MoveNext();
 
   public override ILVerifier Callvirt(Type declaringType, string methodName, Type[] typeArguments, Type[] parameterTypes) => MoveNext();
+
+  public override ILVerifier CastClass(Type type) => MoveNext();
 
   public override ILVerifier Dup() => MoveNext();
 
@@ -59,11 +64,23 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier Ldarg_S(int value) => MoveNext();
 
+  public override ILVerifier Ldc_I4_1() => MoveNext();
+
+  public override ILVerifier Ldc_I4_2() => MoveNext();
+
+  public override ILVerifier Ldc_I4_3() => MoveNext();
+
+  public override ILVerifier Ldc_I4_4() => MoveNext();
+
+  public override ILVerifier Ldc_I4_5() => MoveNext();
+
   public override ILVerifier Ldfld(Predicate<FieldInfo> predicate) => MoveNext();
 
   public override ILVerifier Ldfld(string fieldName) => MoveNext();
 
   public override ILVerifier Ldloc_0() => MoveNext();
+
+  public override ILVerifier Ldloca_S(int index) => MoveNext();
 
   public override ILVerifier Ldsfld(Predicate<FieldInfo> predicate) => MoveNext();
 

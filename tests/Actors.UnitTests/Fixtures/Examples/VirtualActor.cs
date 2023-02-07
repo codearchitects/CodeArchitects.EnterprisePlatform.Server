@@ -125,6 +125,7 @@ internal static class VirtualActorFixture
       .SetField(s_state2Field));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
+      .SetId(0)
       .SetType(typeof(VirtualActor))
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)

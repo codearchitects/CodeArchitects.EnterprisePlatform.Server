@@ -2,14 +2,17 @@
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
-internal interface IActorHost<TActor>
+internal interface IActorHost<TActor, TState>
   where TActor : class
+  where TState : ActorState
 {
   TActor Actor { get; }
 
+  TState State { get; }
+
   string ActorId { get; }
 
-  Task ScheduleAsync(ActivityPayload payload, SchedulingOptions options, CancellationToken cancellationToken);
+  Task ScheduleAsync(Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken);
 
   Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken);
 }

@@ -6,130 +6,154 @@ namespace CodeArchitects.Platform.Actors.Scheduling;
 public class ActivityManagerTests
 {
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithMethodInfoNoOverloads()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithMethodInfoNoOverloads()
   {
     // Arrange
+    const int implementationId = 42;
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[0].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
 
     // Assert
-    payload.Should().BeOfType<TaskMethodPayload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity1 typedActivity = activity.Should().BeOfType<StandardActorActivity1>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithMethodInfoCancellationToken()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithMethodInfoCancellationToken()
   {
     // Arrange
+    const int implementationId = 42;
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[1].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method, new object?[] { arg, CancellationToken.None });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg, CancellationToken.None });
 
     // Assert
-    payload.Should().BeOfType<TaskTMethodPayload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity2 typedActivity = activity.Should().BeOfType<StandardActorActivity2>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithMethodInfoOverload1()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithMethodInfoOverload1()
   {
     // Arrange
+    const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
-
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[4].ImplementationMethod;
-
-    // Act
-    ActivityPayload payload = sut.CreatePayload(method, new object?[] { arg });
-
-    // Assert
-    payload.Should().BeOfType<ActivityOverload1Payload>().Which.Arg.Should().Be(arg);
-  }
-
-  [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithMethodInfoOverload2()
-  {
-    // Arrange
-    const string arg = "12";
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[5].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
 
     // Assert
-    payload.Should().BeOfType<ActivityOverload2Payload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity6 typedActivity = activity.Should().BeOfType<StandardActorActivity6>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithActivityNameNoOverloads()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithMethodInfoOverload2()
   {
     // Arrange
+    const int implementationId = 42;
+    const string arg = "12";
+    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+
+    MethodInfo method = StandardActorFixture.Descriptor.Activities[6].ImplementationMethod;
+
+    // Act
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
+
+    // Assert
+    StandardActorActivity7 typedActivity = activity.Should().BeOfType<StandardActorActivity7>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
+  }
+
+  [Fact]
+  public void CreateActivity_ShouldReturnCorrectActivity_WithActivityNameNoOverloads()
+  {
+    // Arrange
+    const int implementationId = 42;
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[0].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method.Name, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
 
     // Assert
-    payload.Should().BeOfType<TaskMethodPayload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity1 typedActivity = activity.Should().BeOfType<StandardActorActivity1>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithActivityNameCancellationToken()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithActivityNameCancellationToken()
   {
     // Arrange
+    const int implementationId = 42;
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[1].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method.Name, new object?[] { arg, CancellationToken.None });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg, CancellationToken.None });
 
     // Assert
-    payload.Should().BeOfType<TaskTMethodPayload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity2 typedActivity = activity.Should().BeOfType<StandardActorActivity2>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 
   [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithActivityNameOverload1()
+  public void CreateActivity_ShouldReturnCorrectActivity_WithActivityNameOverload1()
   {
     // Arrange
+    const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
-
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[4].ImplementationMethod;
-
-    // Act
-    ActivityPayload payload = sut.CreatePayload(method.Name, new object?[] { arg });
-
-    // Assert
-    payload.Should().BeOfType<ActivityOverload1Payload>().Which.Arg.Should().Be(arg);
-  }
-
-  [Fact]
-  public void CreatePayload_ShouldReturnCorrectPayload_WithActivityNameOverload2()
-  {
-    // Arrange
-    const string arg = "12";
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities[5].ImplementationMethod;
 
     // Act
-    ActivityPayload payload = sut.CreatePayload(method.Name, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
 
     // Assert
-    payload.Should().BeOfType<ActivityOverload2Payload>().Which.Arg.Should().Be(arg);
+    StandardActorActivity6 typedActivity = activity.Should().BeOfType<StandardActorActivity6>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
+  }
+
+  [Fact]
+  public void CreateActivity_ShouldReturnCorrectActivity_WithActivityNameOverload2()
+  {
+    // Arrange
+    const int implementationId = 42;
+    const string arg = "12";
+    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+
+    MethodInfo method = StandardActorFixture.Descriptor.Activities[6].ImplementationMethod;
+
+    // Act
+    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
+
+    // Assert
+    StandardActorActivity7 typedActivity = activity.Should().BeOfType<StandardActorActivity7>().Subject;
+    typedActivity.ImplementationId.Should().Be(implementationId);
+    typedActivity.arg.Should().Be(arg);
   }
 }

@@ -73,6 +73,7 @@ internal static class ComponentIdSourceActorFixture
       .SetField(s_stateField));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
+      .SetId(0)
       .SetType(typeof(ComponentIdSourceActor))
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)

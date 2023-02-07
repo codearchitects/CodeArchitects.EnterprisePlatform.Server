@@ -22,12 +22,16 @@ internal class FakeILGeneratorProvider : IILGeneratorProvider
   public IILGenerator GetILGenerator(MethodBuilder methodBuilder)
   {
     methodBuilder.GetILGenerator().Emit(OpCodes.Ret);
-    return _generators[_index++];
+    FakeILGenerator result = _generators[_index++];
+    result.MethodName = methodBuilder.Name;
+    return result;
   }
 
   public IILGenerator GetILGenerator(ConstructorBuilder constructorBuilder)
   {
     constructorBuilder.GetILGenerator().Emit(OpCodes.Ret);
-    return _generators[_index++];
+    FakeILGenerator result = _generators[_index++];
+    result.MethodName = constructorBuilder.Name;
+    return result;
   }
 }

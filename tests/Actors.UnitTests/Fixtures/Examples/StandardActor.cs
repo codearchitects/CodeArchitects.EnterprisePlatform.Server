@@ -72,6 +72,9 @@ internal class StandardActor : IStandardActor, IDisposable
   public void Dispose()
     => throw new NotImplementedException();
 
+  public void VoidActivity()
+    => throw new NotImplementedException();
+
   public Task ActivityOverload(int arg)
     => throw new NotImplementedException();
 
@@ -92,42 +95,72 @@ internal class StandardActorState
   public StandardActorStateComponent _state2 { get; set; } = default!;
 }
 
-internal class TaskMethodPayload : ActivityPayload
+internal abstract class StandardActorActivity : Activity<StandardActor>
 {
-  public override int ActivityId => 1;
-
-  public int Arg { get; set; }
 }
 
-internal class TaskTMethodPayload : ActivityPayload
+internal class StandardActorActivity1 : StandardActorActivity
 {
-  public override int ActivityId => 2;
+  public override int Id => 1;
 
-  public int Arg { get; set; }
+  public int arg { get; set; }
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
 }
 
-internal class ValueTaskMethodPayload : ActivityPayload
+internal class StandardActorActivity2 : StandardActorActivity
 {
-  public override int ActivityId => 3;
+  public override int Id => 2;
+
+  public int arg { get; set; }
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
 }
 
-internal class ValueTaskTMethodPayload : ActivityPayload
+internal class StandardActorActivity3 : StandardActorActivity
 {
-  public override int ActivityId => 4;
+  public override int Id => 3;
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
 }
 
-internal class ActivityOverload1Payload : ActivityPayload
+internal class StandardActorActivity4 : StandardActorActivity
 {
-  public override int ActivityId => 5;
+  public override int Id => 4;
 
-  public int Arg { get; set; }
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
 }
 
-internal class ActivityOverload2Payload : ActivityPayload
+internal class StandardActorActivity5 : StandardActorActivity
 {
-  public override int ActivityId => 6;
+  public override int Id => 5;
 
-  public string Arg { get; set; }
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
+}
+
+internal class StandardActorActivity6 : StandardActorActivity
+{
+  public override int Id => 6;
+
+  public int arg { get; set; }
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
+}
+
+internal class StandardActorActivity7 : StandardActorActivity
+{
+  public override int Id => 7;
+
+  public string arg { get; set; }
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => throw new NotImplementedException();
 }
 
 internal static class StandardActorFixture
@@ -148,43 +181,28 @@ internal static class StandardActorFixture
       name: "_state2",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    MethodInfo interfaceTaskMethod = typeof(IStandardActor).GetRequiredMethod(
-      name: nameof(IStandardActor.TaskMethod),
-      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(int) });
-
     MethodInfo implementationTaskMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.TaskMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
-
-    MethodInfo interfaceTaskTMethod = typeof(IStandardActor).GetRequiredMethod(
-      name: nameof(IStandardActor.TaskTMethod),
-      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(int), typeof(CancellationToken) });
 
     MethodInfo implementationTaskTMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.TaskTMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(CancellationToken) });
 
-    MethodInfo interfaceValueTaskMethod = typeof(IStandardActor).GetRequiredMethod(
-      name: nameof(IStandardActor.ValueTaskMethod),
-      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(CancellationToken) });
-
     MethodInfo implementationValueTaskMethod = typeof(StandardActor).GetRequiredMethod(
       name: nameof(StandardActor.ValueTaskMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(CancellationToken) });
 
-    MethodInfo interfaceValueTaskTMethod = typeof(IStandardActor).GetRequiredMethod(
-      name: nameof(IStandardActor.ValueTaskTMethod),
+    MethodInfo implementationValueTaskTMethod = typeof(StandardActor).GetRequiredMethod(
+      name: nameof(StandardActor.ValueTaskTMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
-    MethodInfo implementationValueTaskTMethod = typeof(StandardActor).GetRequiredMethod(
-      name: nameof(StandardActor.ValueTaskTMethod),
+    MethodInfo voidActivityMethod = typeof(StandardActor).GetRequiredMethod(
+      name: nameof(StandardActor.VoidActivity),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
@@ -214,17 +232,19 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
 
-    FieldInfo[] taskMethodPayloadFields = typeof(TaskMethodPayload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity1Fields = typeof(StandardActorActivity1).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo[] taskTMethodPayloadFields = typeof(TaskTMethodPayload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity2Fields = typeof(StandardActorActivity2).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo[] valueTaskMethodPayloadFields = typeof(ValueTaskMethodPayload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity3Fields = typeof(StandardActorActivity3).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo[] valueTaskTMethodPayloadFields = typeof(ValueTaskTMethodPayload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity4Fields = typeof(StandardActorActivity4).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo[] activityOverload1PayloadFields = typeof(ActivityOverload1Payload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity5Fields = typeof(StandardActorActivity5).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo[] activityOverload2PayloadFields = typeof(ActivityOverload2Payload).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] activity6Fields = typeof(StandardActorActivity6).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+    FieldInfo[] activity7Fields = typeof(StandardActorActivity7).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
 
     IStateDependencyDescriptor state1Dependency = StateDependencyDescriptorBuilder.Build(_ => _
@@ -272,50 +292,45 @@ internal static class StandardActorFixture
     ITaskMethodDescriptor taskMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(1)
-      .SetInterfaceMethod(interfaceTaskMethod)
       .SetImplementationMethod(implementationTaskMethod)
       .SetParameterTypes(typeof(int))
-      .SetPayloadType(typeof(TaskMethodPayload))
-      .SetPayloadFields(taskMethodPayloadFields)
+      .SetActivityType(typeof(StandardActorActivity1))
+      .SetActivityFields(activity1Fields)
       .SetHasCancellationTokenParameter(false)
       .SetCancellationTokenParameterPosition(-1));
 
     ITaskTMethodDescriptor taskTMethod = TaskTMethodDescriptorBuilder.Build(_ => _
-      .InitDefaults()
+      .InitDefaults(typeof(int))
       .SetId(2)
-      .SetInterfaceMethod(interfaceTaskTMethod)
       .SetImplementationMethod(implementationTaskTMethod)
       .SetParameterTypes(typeof(int), typeof(CancellationToken))
-      .SetPayloadType(typeof(TaskTMethodPayload))
-      .SetPayloadFields(taskTMethodPayloadFields)
+      .SetActivityType(typeof(StandardActorActivity2))
+      .SetActivityFields(activity2Fields)
       .SetHasCancellationTokenParameter(true)
-      .SetCancellationTokenParameterPosition(1)
-      .SetResultType(typeof(int)));
+      .SetCancellationTokenParameterPosition(1));
 
     IValueTaskMethodDescriptor valueTaskMethod = ValueTaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(3)
-      .SetInterfaceMethod(interfaceValueTaskMethod)
       .SetImplementationMethod(implementationValueTaskMethod)
       .SetParameterTypes(typeof(CancellationToken))
-      .SetPayloadType(typeof(ValueTaskMethodPayload))
-      .SetPayloadFields(valueTaskMethodPayloadFields)
+      .SetActivityType(typeof(StandardActorActivity3))
+      .SetActivityFields(activity3Fields)
       .SetHasCancellationTokenParameter(true)
       .SetCancellationTokenParameterPosition(0));
 
     IValueTaskTMethodDescriptor valueTaskTMethod = ValueTaskTMethodDescriptorBuilder.Build(_ => _
-      .InitDefaults()
+      .InitDefaults(typeof(string))
       .SetId(4)
-      .SetInterfaceMethod(interfaceValueTaskTMethod)
       .SetImplementationMethod(implementationValueTaskTMethod)
       .SetParameterTypes()
-      .SetPayloadType(typeof(ValueTaskTMethodPayload))
-      .SetPayloadFields(valueTaskTMethodPayloadFields)
+      .SetActivityType(typeof(StandardActorActivity4))
+      .SetActivityFields(activity4Fields)
       .SetHasCancellationTokenParameter(false)
-      .SetCancellationTokenParameterPosition(-1)
-      .SetResultType(typeof(string)));
+      .SetCancellationTokenParameterPosition(-1));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
+      .SetId(0)
       .SetType(typeof(StandardActor))
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)
@@ -339,20 +354,31 @@ internal static class StandardActorFixture
         .Add(taskTMethod)
         .Add(valueTaskMethod)
         .Add(valueTaskTMethod)
-        .Add<ActivityDescriptorBuilder>(_ => _
+        .Add<VoidMethodDescriptorBuilder>(_ => _
+          .InitDefaults()
           .SetId(5)
-          .SetImplementationMethod(activityOverload1Method)
-          .SetParameterTypes(typeof(int))
-          .SetPayloadType(typeof(ActivityOverload1Payload))
-          .SetPayloadFields(activityOverload1PayloadFields)
+          .SetImplementationMethod(voidActivityMethod)
+          .SetParameterTypes()
+          .SetActivityType(typeof(StandardActorActivity5))
+          .SetActivityFields(activity1Fields)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1))
-        .Add<ActivityDescriptorBuilder>(_ => _
+        .Add<TaskMethodDescriptorBuilder>(_ => _
+          .InitDefaults()
           .SetId(6)
+          .SetImplementationMethod(activityOverload1Method)
+          .SetParameterTypes(typeof(int))
+          .SetActivityType(typeof(StandardActorActivity6))
+          .SetActivityFields(activity6Fields)
+          .SetHasCancellationTokenParameter(false)
+          .SetCancellationTokenParameterPosition(-1))
+        .Add<TaskMethodDescriptorBuilder>(_ => _
+          .InitDefaults()
+          .SetId(7)
           .SetImplementationMethod(activityOverload2Method)
           .SetParameterTypes(typeof(string))
-          .SetPayloadType(typeof(ActivityOverload2Payload))
-          .SetPayloadFields(activityOverload2PayloadFields)
+          .SetActivityType(typeof(StandardActorActivity7))
+          .SetActivityFields(activity7Fields)
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1)))
       .SetId(_ => _

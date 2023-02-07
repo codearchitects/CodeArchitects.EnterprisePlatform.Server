@@ -54,6 +54,7 @@ internal static class StatelessActorFixture
       .SetIsOptional(false));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
+      .SetId(0)
       .SetType(typeof(StatelessActor))
       .SetConstructor(_ => _
         .SetConstructor(s_constructor)

@@ -10,65 +10,85 @@ namespace CodeArchitects.Platform.Actors.Scheduling;
 
 internal class ActivityManager : IActivityManager
 {
-  private delegate ActivityPayload PayloadFactory(IReadOnlyList<object?> arguments);
+  private delegate Activity ActivityFactory(int implementationId, IReadOnlyList<object?> arguments);
 
   private static readonly MethodInfo s_listAccessMethod = typeof(IReadOnlyList<object>).GetRequiredMethod(
     name: "get_Item",
     bindingAttr: BindingFlags.Instance | BindingFlags.Public,
     types: new[] { typeof(int) });
+  private static readonly PropertyInfo s_implementationIdProperty = typeof(Activity).GetRequiredProperty(
+    name: nameof(Activity.ImplementationId),
+    bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
   private readonly IReadOnlyDictionary<string, ActivityDescriptorBatch> _activityBatches;
-  private readonly ConcurrentDictionary<IActivityDescriptor, PayloadFactory> _payloadFactories;
+  private readonly ConcurrentDictionary<IMethodDescriptor, ActivityFactory> _activityFactories;
 
   private ActivityManager(IReadOnlyDictionary<string, ActivityDescriptorBatch> activityBatches)
   {
     _activityBatches = activityBatches;
-    _payloadFactories = new(ActivityDescriptorEqualityComparer.Instance);
+    _activityFactories = new(MethodDescriptorEqualityComparer.Instance);
   }
 
-  public ActivityPayload CreatePayload(MethodInfo method, IReadOnlyList<object?> arguments)
+  public Activity<TActor> CreateActivity<TActor>(int implementationId, MethodInfo method, IReadOnlyList<object?> arguments)
+    where TActor : class
   {
-    IActivityDescriptor activity = _activityBatches[method.Name].ResolveActivity(method);
+    IMethodDescriptor activity = _activityBatches[method.Name].ResolveActivity(method);
 
-    return _payloadFactories.GetOrAdd(activity, GetPayloadFactory).Invoke(arguments);
+    return (Activity<TActor>)_activityFactories.GetOrAdd(activity, CreateActivityFactory).Invoke(implementationId, arguments);
   }
 
-  public ActivityPayload CreatePayload(string activityName, IReadOnlyList<object?> arguments)
+  public Activity<TActor> CreateActivity<TActor>(int implementationId, string activityName, IReadOnlyList<object?> arguments)
+    where TActor : class
   {
-    if (!_activityBatches.TryGetValue(activityName, out ActivityDescriptorBatch batch) || !batch.TryResolveActivity(arguments, out IActivityDescriptor? activity))
+    if (!_activityBatches.TryGetValue(activityName, out ActivityDescriptorBatch batch) || !batch.TryResolveActivity(arguments, out IMethodDescriptor? activity))
       throw new InvalidOperationException($"Could not find a method with name '{activityName}' and provided parameter types.");
 
-    return _payloadFactories.GetOrAdd(activity, GetPayloadFactory).Invoke(arguments);
+    return (Activity<TActor>)_activityFactories.GetOrAdd(activity, CreateActivityFactory).Invoke(implementationId, arguments);
   }
 
-  private static PayloadFactory GetPayloadFactory(IActivityDescriptor activity)
+  private static ActivityFactory CreateActivityFactory(IMethodDescriptor activity)
   {
+    IReadOnlyList<FieldInfo> activityFields = activity.ActivityFields;
+
+    ParameterExpression implementationIdParam = Expression.Parameter(typeof(int), "implementationId");
     ParameterExpression argumentsParam = Expression.Parameter(typeof(IReadOnlyList<object>), "arguments");
 
-    Expression<PayloadFactory> expression = Expression.Lambda<PayloadFactory>(
+    List<MemberAssignment> bindings = new()
+    {
+      Expression.Bind(s_implementationIdProperty, implementationIdParam)
+    };
+
+    for (int i = 0; i < activityFields.Count; i++)
+    {
+      FieldInfo activityField = activityFields[i];
+
+      bindings.Add(Expression.Bind(
+        member: activityField,
+        expression: Expression.Convert(
+          expression: Expression.Call(
+            instance: argumentsParam,
+            method: s_listAccessMethod,
+            arguments: Expression.Constant(i)),
+          type: activityField.FieldType)));
+    }
+
+    Expression<ActivityFactory> expression = Expression.Lambda<ActivityFactory>(
       body: Expression.MemberInit(
-        newExpression: Expression.New(activity.PayloadType),
-        bindings: activity.PayloadFields.Select((field, index) => Expression.Bind(
-          member: field,
-          expression: Expression.Convert(
-            expression: Expression.Call(
-              instance: argumentsParam,
-              method: s_listAccessMethod,
-              arguments: Expression.Constant(index)),
-            type: field.FieldType)))),
-      parameters: argumentsParam);
+        newExpression: Expression.New(activity.ActivityType),
+        bindings: bindings),
+      parameters: new[] { implementationIdParam, argumentsParam });
 
     return expression.Compile();
   }
 
   public static ActivityManager Create(IActorDescriptor actor)
   {
-    Dictionary<string, List<IActivityDescriptor>> activityBatches = new();
+    Dictionary<string, List<IMethodDescriptor>> activityBatches = new();
 
-    foreach (IActivityDescriptor activity in actor.Activities)
+    foreach (IMethodDescriptor activity in actor.Activities)
     {
       string activityName = activity.ImplementationMethod.Name;
-      if (!activityBatches.TryGetValue(activityName, out List<IActivityDescriptor>? batch))
+      if (!activityBatches.TryGetValue(activityName, out List<IMethodDescriptor>? batch))
       {
         batch = new();
         activityBatches.Add(activityName, batch);
@@ -84,18 +104,18 @@ internal class ActivityManager : IActivityManager
 
   private readonly struct ActivityDescriptorBatch
   {
-    private readonly IReadOnlyList<IActivityDescriptor> _activities;
+    private readonly IReadOnlyList<IMethodDescriptor> _activities;
 
-    public ActivityDescriptorBatch(IReadOnlyList<IActivityDescriptor> activities)
+    public ActivityDescriptorBatch(IReadOnlyList<IMethodDescriptor> activities)
     {
       _activities = activities;
     }
 
-    public IActivityDescriptor ResolveActivity(MethodInfo method)
+    public IMethodDescriptor ResolveActivity(MethodInfo method)
     {
       for (int i = 0; i < _activities.Count; i++)
       {
-        IActivityDescriptor activity = _activities[i];
+        IMethodDescriptor activity = _activities[i];
         if (activity.ImplementationMethod == method)
           return activity;
       }
@@ -104,14 +124,14 @@ internal class ActivityManager : IActivityManager
       throw Errors.Unreachable;
     }
 
-    public bool TryResolveActivity(IReadOnlyList<object?> arguments, [NotNullWhen(true)] out IActivityDescriptor? activity)
+    public bool TryResolveActivity(IReadOnlyList<object?> arguments, [NotNullWhen(true)] out IMethodDescriptor? activity)
     {
       bool found = false;
       activity = null;
 
       for (int i = 0; i < _activities.Count; i++)
       {
-        IActivityDescriptor currentActivity = _activities[i];
+        IMethodDescriptor currentActivity = _activities[i];
 
         if (ArgumentsMatch(currentActivity.ParameterTypes, arguments))
         {
@@ -152,18 +172,18 @@ internal class ActivityManager : IActivityManager
     }
   }
 
-  private class ActivityDescriptorEqualityComparer : EqualityComparer<IActivityDescriptor>
+  private class MethodDescriptorEqualityComparer : EqualityComparer<IMethodDescriptor>
   {
-    public static readonly ActivityDescriptorEqualityComparer Instance = new();
+    public static readonly MethodDescriptorEqualityComparer Instance = new();
 
-    private ActivityDescriptorEqualityComparer() { }
+    private MethodDescriptorEqualityComparer() { }
 
-    public override bool Equals(IActivityDescriptor x, IActivityDescriptor y)
+    public override bool Equals(IMethodDescriptor x, IMethodDescriptor y)
     {
       return x.Id == y.Id;
     }
 
-    public override int GetHashCode(IActivityDescriptor obj)
+    public override int GetHashCode(IMethodDescriptor obj)
     {
       return obj.Id.GetHashCode();
     }

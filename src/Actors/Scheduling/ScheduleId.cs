@@ -2,7 +2,7 @@
 
 public readonly struct ScheduleId : IEquatable<ScheduleId>
 {
-  public ScheduleId(string id)
+  private ScheduleId(string id)
   {
     Id = id;
   }
@@ -32,6 +32,8 @@ public readonly struct ScheduleId : IEquatable<ScheduleId>
   }
 
   public static ScheduleId New() => new(Guid.NewGuid().ToString());
+
+  public static ScheduleId New(string id) => new(id);
 
   public static implicit operator string(ScheduleId id) => id.Id;
 

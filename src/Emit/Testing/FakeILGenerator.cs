@@ -1,20 +1,30 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Emit.Testing;
 
+[DebuggerDisplay($$"""{{{nameof(MethodName)}},nq}""")]
 internal class FakeILGenerator : IILGenerator
 {
   private readonly List<FakeInstruction> _instructions;
   private readonly List<FakeLocalBuilder> _locals;
   private readonly List<FakeLabel> _labels;
+  private string? _methodName;
 
   public FakeILGenerator()
   {
     _instructions = new();
     _locals = new();
     _labels = new();
+  }
+
+  [AllowNull]
+  public string MethodName
+  {
+    private get => _methodName ?? "<unmarked>";
+    set => _methodName = value;
   }
 
   public void VerifyLocals(Action<LocalVerifier> verify)
@@ -32,10 +42,10 @@ internal class FakeILGenerator : IILGenerator
 
   public void VerifyIL(Action<ILVerifier> verify)
   {
-    FakeLabelMarker marker = new(_labels);
+    FakeLabelMarker marker = new(MethodName, _labels);
     verify(marker);
 
-    InstructionVerifier verifier = new(_instructions, marker.MarkedLabels);
+    InstructionVerifier verifier = new(MethodName, _instructions, marker.MarkedLabels);
     verify(verifier);
     verifier.VerifyComplete();
   }
