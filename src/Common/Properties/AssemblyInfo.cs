@@ -3,6 +3,8 @@
 [assembly: CLSCompliant(true)]
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.AspNetCore")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Application")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore")]

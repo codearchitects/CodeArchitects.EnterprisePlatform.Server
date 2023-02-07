@@ -9,4 +9,12 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Dapr.Actors" Version="1.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Actors\CodeArchitects.Platform.Actors.csproj" />
+  </ItemGroup>
+
 </Project>

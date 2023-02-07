@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Scheduling;
-using CodeArchitects.Platform.Common.Collections;
 using CodeArchitects.Platform.Common.Expressions;
+using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
@@ -69,7 +70,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>
     if (activityExpression.Body is not MethodCallExpression methodCallExpression || methodCallExpression.Object != actorParam)
       throw new ArgumentException($"The '{nameof(activityExpression)}' expression should represent a call to an instance method of the current actor.", nameof(activityExpression));
 
-    object?[] arguments = methodCallExpression.Arguments.Map(argument => ExpressionEvaluator.Evaluate(argument));
+    DynamicArgumentList arguments = new(methodCallExpression.Arguments); // Avoids allocating an array
     Activity<TActor> activity = _activityManager.CreateActivity<TActor>(_implementationId, methodCallExpression.Method, arguments);
 
     return ScheduleCoreAsync(activity, options, cancellationToken);
@@ -89,5 +90,23 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>
     await _host.ScheduleAsync(activity, options, cancellationToken);
 
     return options.ScheduleId;
+  }
+
+  private class DynamicArgumentList : IReadOnlyList<object?>
+  {
+    private readonly ReadOnlyCollection<Expression> _arguments;
+
+    public DynamicArgumentList(ReadOnlyCollection<Expression> arguments)
+    {
+      _arguments = arguments;
+    }
+
+    public object? this[int index] => ExpressionEvaluator.Evaluate(_arguments[index]);
+
+    public int Count => _arguments.Count;
+
+    public IEnumerator<object?> GetEnumerator() => throw new NotImplementedException();
+
+    IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
   }
 }
