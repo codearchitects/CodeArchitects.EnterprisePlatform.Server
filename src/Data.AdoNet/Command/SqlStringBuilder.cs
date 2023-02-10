@@ -9,7 +9,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 internal delegate void AppendAction<in T>(in SqlStringBuilder stringBuilder, T current);
 internal delegate void AppendAction<TState, in T>(in SqlStringBuilder stringBuilder, TState state, T current);
 
-internal struct SqlStringBuilder
+internal readonly struct SqlStringBuilder
 {
   private const string s_tableAlias = "t";
 
