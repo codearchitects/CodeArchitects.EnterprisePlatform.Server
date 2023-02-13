@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Descriptors;
 
@@ -13,6 +14,8 @@ internal interface IActorDescriptor
   bool IsPolymorphic { get; }
 
   bool IsVirtual { get; }
+
+  JsonSerializerOptions JsonSerializerOptions { get; }
 
   IReadOnlyList<FieldInfo> StateFields { get; }
 
@@ -29,4 +32,6 @@ internal interface IActorDescriptor
   IStateDescriptor State { get; }
 
   IActorFactoryDescriptor Factory { get; }
+
+  int GetImplementationId(Type implementationType);
 }

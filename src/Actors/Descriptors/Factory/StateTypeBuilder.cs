@@ -34,9 +34,11 @@ internal class StateTypeBuilder : TypeBuilderBase, IStateTypeBuilder
       attr: TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Class,
       parent: baseType);
 
+    int index = 0;
     foreach (FieldInfo stateField in stateFields)
     {
-      BuildAutoProperty(type, stateField.Name, stateField.FieldType);
+      BuildAutoProperty(type, index.ToString(), stateField.FieldType);
+      index++;
     }
 
     return type.CreateTypeInfo()!;

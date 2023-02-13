@@ -15,8 +15,8 @@ internal interface IVirtualActorHost : IActor
 
 internal class VirtualActorHost : DaprActorHost<VirtualActor, VirtualActorState>, IVirtualActorHost
 {
-  public VirtualActorHost(ActorHost host, IActorManager<VirtualActor, VirtualActorState> manager, IImplementationFactory<VirtualActor, VirtualActorState> factory)
-    : base(host, manager, factory)
+  public VirtualActorHost(ActorHost host, IManagerFactory<VirtualActor, VirtualActorState> factory)
+    : base(host, factory)
   {
   }
 }

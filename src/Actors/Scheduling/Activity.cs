@@ -4,9 +4,10 @@ namespace CodeArchitects.Platform.Actors.Scheduling;
 
 internal abstract class Activity
 {
+  [JsonIgnore]
   public abstract int Id { get; }
 
-  [JsonPropertyName(":impl")]
+  [JsonPropertyName("impl")]
   [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
   public int ImplementationId { get; set; }
 }

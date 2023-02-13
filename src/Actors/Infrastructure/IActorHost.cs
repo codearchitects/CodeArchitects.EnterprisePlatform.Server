@@ -6,8 +6,6 @@ internal interface IActorHost<TActor, TState>
   where TActor : class
   where TState : ActorState
 {
-  TState State { get; }
-
   string ActorId { get; }
 
   Task ScheduleAsync(Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken);

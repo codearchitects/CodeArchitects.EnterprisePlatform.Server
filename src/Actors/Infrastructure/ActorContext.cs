@@ -1,34 +1,98 @@
-﻿using CodeArchitects.Platform.Actors.Scheduling;
+﻿using CodeArchitects.Platform.Actors.Bindings;
+using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Expressions;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
-internal class ActorContext<TActor, TState> : IActorContext<TActor>
+internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManager<TActor, TState>
   where TActor : class
   where TState : ActorState
 {
-  private readonly IActorManager<TActor, TState> _actorManager;
+  private readonly IActorDescriptor<TActor, TState> _descriptor;
   private readonly IActivityManager _activityManager;
   private readonly IActorHost<TActor, TState> _host;
   private readonly int _implementationId;
+  private readonly List<ActorBinding<TActor>> _bindings;
+  private ExecutionSection _section;
 
-  public ActorContext(IActorManager<TActor, TState> actorManager, IActivityManager activityManager, IActorHost<TActor, TState> host, int implementationId)
+  public ActorContext(
+    TState state,
+    IActorDescriptor<TActor, TState> descriptor,
+    IActivityManager activityManager,
+    IActorHost<TActor, TState> host,
+    int implementationId)
   {
-    _actorManager = actorManager;
+    State = state;
+    _descriptor = descriptor;
     _activityManager = activityManager;
     _host = host;
     _implementationId = implementationId;
+    _bindings = new();
+    _section = ExecutionSection.Constructor;
   }
 
+  public TActor Actor { get; set; } = default!;
+
+  public TState State { get; }
+
   public string ActorId => _host.ActorId;
+
+  public int DefaultImplementationId => _descriptor.DefaultImplementation.Id;
+
+  public JsonSerializerOptions JsonSerializerOptions => _descriptor.JsonSerializerOptions;
+
+  public Type ActivityType => _descriptor.ActivityBaseType;
+
+  public TState DefaultState
+  {
+    get
+    {
+      if (!_descriptor.IsVirtual)
+        throw new UninitializedActorException(typeof(TActor));
+
+      return _descriptor.State.DefaultValue!;
+    }
+  }
 
   public void Become<TImplementation>()
     where TImplementation : class, TActor
   {
-    _host.State.ImplementationId = _actorManager.GetImplementationId(typeof(TImplementation));
+    State.ImplementationId = _descriptor.GetImplementationId(typeof(TImplementation));
+  }
+
+  public BindingId RegisterBinding(Func<IBindingBuilder<TActor>, IBindingResult> configure)
+  {
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+    if (_section is not ExecutionSection.Constructor)
+      throw new InvalidOperationException("Bindings may be only registered inside the actor's constructor.");
+    
+    int index = _bindings.Count;
+    if (index >= 32)
+      throw new InvalidOperationException("Exceeded the maximum number of bindings.");
+
+    ActorBinding<TActor> binding = new();
+    configure(binding);
+
+    BindingId id = new(_bindings.Count);
+    _bindings.Add(binding);
+
+    return id;
+  }
+
+  public void EnableBinding(BindingId id)
+  {
+    State.EnabledBindings |= (1 << id._index);
+  }
+
+  public void DisableBinding(BindingId id)
+  {
+    State.EnabledBindings &= ~(1 << id._index);
   }
 
   public Task<ScheduleId> ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -90,6 +154,35 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>
     await _host.ScheduleAsync(activity, options, cancellationToken);
 
     return options.ScheduleId;
+  }
+
+  public void OnActivityBegin()
+  {
+    _section = ExecutionSection.Activity;
+  }
+
+  public void OnMethodBegin()
+  {
+    _section = ExecutionSection.Method;
+  }
+
+  public async Task OnExecutionEndAsync(CancellationToken cancellationToken)
+  {
+    _section = ExecutionSection.Binding;
+
+    for (int i = 0; i < _bindings.Count; i++)
+    {
+      ActorBinding<TActor> binding = _bindings[i];
+      bool isEnabled = (State.EnabledBindings & (1 << i)) != 0;
+
+      if (!isEnabled && !binding.IsEnabled)
+        continue;
+
+      await binding.ExecuteAsync(Actor, cancellationToken);
+    }
+
+    _section = ExecutionSection.None;
+    _descriptor.UpdateState(Actor, State);
   }
 
   private class DynamicArgumentList : IReadOnlyList<object?>

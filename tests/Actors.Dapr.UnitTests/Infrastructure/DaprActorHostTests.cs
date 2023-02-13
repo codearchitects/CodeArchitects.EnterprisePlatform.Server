@@ -2,8 +2,6 @@
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Actors.TestModel;
 using Dapr.Actors.Runtime;
-using FluentAssertions;
-using Moq;
 using System.Text;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
@@ -16,7 +14,7 @@ public partial class DaprActorHostTests
     Mock<ActorTimerManager> timerManagerMock,
     Mock<IActorStateManager> stateManagerMock,
     Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
     DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
@@ -34,7 +32,7 @@ public partial class DaprActorHostTests
     Mock<ActorTimerManager> timerManagerMock,
     Mock<IActorStateManager> stateManagerMock,
     Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
     DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
@@ -73,7 +71,7 @@ public partial class DaprActorHostTests
     Mock<ActorTimerManager> timerManagerMock,
     Mock<IActorStateManager> stateManagerMock,
     Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
     DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
@@ -97,7 +95,7 @@ public partial class DaprActorHostTests
     Mock<ActorTimerManager> timerManagerMock,
     Mock<IActorStateManager> stateManagerMock,
     Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
     DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
@@ -116,10 +114,15 @@ public partial class DaprActorHostTests
     managerMock
       .Setup(x => x.JsonSerializerOptions)
       .Returns(StandardActorFixture.JsonSerializerOptions);
-
     factoryMock
       .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor, StandardActorState>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
+      .Returns(managerMock.Object);
+
+    managerMock
+      .Setup(x => x.Actor)
       .Returns(actorMock.Object);
+    managerMock
+      .Setup(x => x.OnActivityBegin());
 
     // Act
     await sut.ReceiveReminderAsync("", payload, TimeSpan.Zero, TimeSpan.Zero);

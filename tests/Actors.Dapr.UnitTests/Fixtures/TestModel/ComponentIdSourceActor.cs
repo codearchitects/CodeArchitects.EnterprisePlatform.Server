@@ -16,8 +16,8 @@ internal interface IComponentIdSourceActorHost : IActor
 
 internal class ComponentIdSourceActorHost : DaprActorHost<ComponentIdSourceActor, ComponentIdSourceActorState>, IComponentIdSourceActorHost
 {
-  public ComponentIdSourceActorHost(ActorHost host, IActorManager<ComponentIdSourceActor, ComponentIdSourceActorState> manager, IImplementationFactory<ComponentIdSourceActor, ComponentIdSourceActorState> factory)
-    : base(host, manager, factory)
+  public ComponentIdSourceActorHost(ActorHost host, IManagerFactory<ComponentIdSourceActor, ComponentIdSourceActorState> factory)
+    : base(host, factory)
   {
   }
 

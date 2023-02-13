@@ -25,29 +25,29 @@ internal interface IStandardActorHost : IActor
 
 internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorState>, IStandardActorHost
 {
-  public StandardActorHost(ActorHost host, IActorManager<StandardActor, StandardActorState> manager, IImplementationFactory<StandardActor, StandardActorState> factory)
-    : base(host, manager, factory)
+  public StandardActorHost(ActorHost host, IManagerFactory<StandardActor, StandardActorState> factory)
+    : base(host, factory)
   {
   }
 
   public Task TaskMethod_1(int arg)
   {
-    return Actor.TaskMethod(arg);
+    return Manager.Actor.TaskMethod(arg);
   }
 
   public Task<int> TaskMethod_2(int arg, CancellationToken cancellationToken)
   {
-    return Actor.TaskMethod(arg, cancellationToken);
+    return Manager.Actor.TaskMethod(arg, cancellationToken);
   }
 
   public Task ValueTaskMethod(CancellationToken cancellationToken)
   {
-    return Actor.ValueTaskMethod(cancellationToken).AsTask();
+    return Manager.Actor.ValueTaskMethod(cancellationToken).AsTask();
   }
 
   public Task<string> ValueTaskTMethod()
   {
-    return Actor.ValueTaskTMethod().AsTask();
+    return Manager.Actor.ValueTaskTMethod().AsTask();
   }
 
   public Task _InitAsync(StandardActorState state, CancellationToken cancellationToken)

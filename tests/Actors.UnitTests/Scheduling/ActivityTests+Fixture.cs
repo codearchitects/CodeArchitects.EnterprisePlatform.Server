@@ -23,7 +23,7 @@ public partial class ActivityTests
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
       Type activityType = typeBuilder.Build(descriptor.Activities[0], descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
-        name: "arg",
+        name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
       object sut2 = Activator.CreateInstance(activityType)!;
@@ -46,7 +46,7 @@ public partial class ActivityTests
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
       Type activityType = typeBuilder.Build(descriptor.Activities[1], descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
-        name: "arg",
+        name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
       object sut2 = Activator.CreateInstance(activityType)!;
@@ -120,7 +120,7 @@ public partial class ActivityTests
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
       Type activityType = typeBuilder.Build(descriptor.Activities[5], descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
-        name: "arg",
+        name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
       object sut2 = Activator.CreateInstance(activityType)!;
@@ -143,7 +143,7 @@ public partial class ActivityTests
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
       Type activityType = typeBuilder.Build(descriptor.Activities[6], descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
-        name: "arg",
+        name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
       object sut2 = Activator.CreateInstance(activityType)!;

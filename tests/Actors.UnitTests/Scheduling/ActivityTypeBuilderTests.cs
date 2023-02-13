@@ -41,7 +41,7 @@ public class ActivityTypeBuilderTests
     IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[0];
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
-    string argPropertyName = parameters[0].Name!;
+    string argPropertyName = "0";
     string argFieldName = $"<{argPropertyName}>k__BackingField";
     Type argType = parameters[0].ParameterType;
 
@@ -97,7 +97,7 @@ public class ActivityTypeBuilderTests
     IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[1];
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
-    string argPropertyName = parameters[0].Name!;
+    string argPropertyName = "0";
     string argFieldName = $"<{argPropertyName}>k__BackingField";
     Type argType = parameters[0].ParameterType;
 

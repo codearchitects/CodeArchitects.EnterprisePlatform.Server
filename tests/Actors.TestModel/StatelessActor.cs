@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+using CodeArchitects.Platform.Actors.Infrastructure;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
@@ -17,6 +18,10 @@ internal class StatelessActor : IStatelessActor
   {
     _service1 = service1;
   }
+}
+
+internal class StatelessActorState : OrdinaryActorState
+{
 }
 
 [ActorFactory(typeof(StatelessActor))]
@@ -78,9 +83,9 @@ internal static class StatelessActorFixture
         .SetStateDependency(null as IStateDependencyDescriptor)
         .SetIdProperty(null))
       .SetState(_ => _
-        .SetType(typeof(NoState))
+        .SetType(typeof(StatelessActorState))
         .SetFields()
-        .SetDefaultValue(NoState.Instance))
+        .SetDefaultValue(new StatelessActorState()))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)

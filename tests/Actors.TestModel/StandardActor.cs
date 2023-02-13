@@ -416,6 +416,7 @@ internal static class StandardActorFixture
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
       .SetIsVirtual(false)
+      .SetStateFields(state1Field, state2Field)
       .SetActivities(_ => _
         .Add(taskMethod)
         .Add(taskTMethod)

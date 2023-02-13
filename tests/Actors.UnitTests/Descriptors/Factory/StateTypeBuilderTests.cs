@@ -26,7 +26,6 @@ public class StateTypeBuilderTests
     FakeILGenerator state1SetterIL = ilProvider.AddGenerator();
 
     IReadOnlyList<FieldInfo> fields = StandardActorFixture.Descriptor.StateFields;
-    IReadOnlyList<FieldInfo> stateFields = StandardActorFixture.Descriptor.State.Fields;
 
     IActorDescriptor actor = StandardActorFixture.Descriptor;
     Type actorType = actor.ActorType;
@@ -41,36 +40,36 @@ public class StateTypeBuilderTests
     stateType.Name.Should().Be($"<{actorType.Name}>{StateTypeBuilder.ComponentName}");
     stateType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Should().HaveCount(2)
       .And.ContainSingle(property =>
-        property.Name == fields[0].Name &&
+        property.Name == "0" &&
         property.PropertyType == fields[0].FieldType &&
         property.CanRead &&
         property.CanWrite)
       .And.ContainSingle(property =>
-        property.Name == fields[1].Name &&
+        property.Name == "1" &&
         property.PropertyType == fields[1].FieldType &&
         property.CanRead &&
         property.CanWrite);
 
     state0GetterIL.VerifyIL(_ => _
       .Ldarg_0()
-      .Ldfld(stateFields[0])
+      .Ldfld("<0>k__BackingField")
       .Ret());
 
     state0SetterIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Stfld(stateFields[0])
+      .Stfld("<0>k__BackingField")
       .Ret());
 
     state1GetterIL.VerifyIL(_ => _
       .Ldarg_0()
-      .Ldfld(stateFields[1])
+      .Ldfld("<1>k__BackingField")
       .Ret());
 
     state1SetterIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Stfld(stateFields[1])
+      .Stfld("<1>k__BackingField")
       .Ret());
   }
 }

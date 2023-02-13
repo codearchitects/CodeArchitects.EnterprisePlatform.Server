@@ -96,15 +96,11 @@ internal class ActorHostTypeBuilder
 
   private void BuildConstructor(TypeBuilder hostType, IActorDescriptor actor)
   {
-    Type actorManagerType = typeof(IActorManager<,>).MakeGenericType(
+    Type managerFactoryType = typeof(IManagerFactory<,>).MakeGenericType(
       actor.ActorType.UnderlyingSystemType,
       actor.State.Type.UnderlyingSystemType);
 
-    Type implementationFactoryType = typeof(IImplementationFactory<,>).MakeGenericType(
-      actor.ActorType.UnderlyingSystemType,
-      actor.State.Type.UnderlyingSystemType);
-
-    Type[] parameterTypes = new[] { typeof(ActorHost), actorManagerType, implementationFactoryType };
+    Type[] parameterTypes = new[] { typeof(ActorHost), managerFactoryType };
 
     ConstructorInfo baseConstructor = hostType.BaseType!.GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
@@ -125,9 +121,8 @@ internal class ActorHostTypeBuilder
     IILGenerator il = _ilProvider.GetILGenerator(constructor);
 
     il.Emit(OpCodes.Ldarg_0);               // Push $this                           | Stack: $this
-    il.Emit(OpCodes.Ldarg_1);               // Push $host                           | Stack: $this, $host 
-    il.Emit(OpCodes.Ldarg_2);               // Push $manage                         | Stack: $this, $host, $manager 
-    il.Emit(OpCodes.Ldarg_3);               // Push $factor                         | Stack: $this, $host, $manager, $factory 
+    il.Emit(OpCodes.Ldarg_1);               // Push $host                           | Stack: $this, $host
+    il.Emit(OpCodes.Ldarg_2);               // Push $factory                        | Stack: $this, $host, $factory 
     il.Emit(OpCodes.Call, baseConstructor); // Call base($host, $manager, $factory) | Stack: -
     il.Emit(OpCodes.Ret);                   // Return                               | Stack: -
   }

@@ -52,7 +52,7 @@ internal class ActivityTypeBuilder : TypeBuilderBase
       if (parameter.ParameterType == typeof(CancellationToken))
         continue;
 
-      AutoPropertyInfo autoProperty = BuildAutoProperty(type, parameter.Name, parameter.ParameterType);
+      AutoPropertyInfo autoProperty = BuildAutoProperty(type, parameter.Position.ToString(), parameter.ParameterType);
       argumentFields.Add(autoProperty.BackingField);
     }
 
