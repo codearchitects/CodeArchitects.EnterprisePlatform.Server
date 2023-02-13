@@ -87,7 +87,7 @@ internal class ActivityManager : IActivityManager
 
     foreach (IMethodDescriptor activity in actor.Activities)
     {
-      string activityName = activity.ImplementationMethod.Name;
+      string activityName = activity.Name;
       if (!activityBatches.TryGetValue(activityName, out List<IMethodDescriptor>? batch))
       {
         batch = new();

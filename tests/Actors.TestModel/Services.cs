@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+﻿namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal interface IService1 { }
 

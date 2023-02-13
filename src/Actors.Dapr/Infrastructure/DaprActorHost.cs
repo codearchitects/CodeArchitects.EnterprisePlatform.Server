@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
 using Dapr.Actors.Runtime;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
@@ -14,22 +15,38 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
   private TActor? _actor;
   private TState? _state;
 
-  public DaprActorHost(ActorHost host, IActorManager<TActor, TState> manager, IImplementationFactory<TActor, TState> factory)
+  protected DaprActorHost(ActorHost host, IActorManager<TActor, TState> manager, IImplementationFactory<TActor, TState> factory)
     : base(host)
   {
     _manager = manager;
     _factory = factory;
   }
 
-  public TActor Actor => _actor ?? throw new InvalidOperationException("Host was not initialized.");
-
-  public TState State => _state ?? throw new InvalidOperationException("Host was not initialized.");
-
   public string ActorId => Id.GetId();
+
+  public TState State
+  {
+    get
+    {
+      Debug.Assert(_state is not null, "Host was not initialized.");
+      return _state;
+    }
+  }
+
+  protected TActor Actor
+  {
+    get
+    {
+      Debug.Assert(_actor is not null, "Host was not initialized.");
+      return _actor;
+    }
+  }
 
   protected override async Task OnPreActorMethodAsync(ActorMethodContext actorMethodContext)
   {
     if (actorMethodContext.CallType is not ActorCallType.ActorInterfaceMethod)
+      return;
+    if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
       return;
 
     _state = await GetStateAsync(CancellationToken.None);
@@ -39,6 +56,12 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
   protected override Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
   {
     return SaveStateAsync(CancellationToken.None);
+  }
+
+  protected Task InitAsync(TState state, CancellationToken cancellationToken)
+  {
+    state.ImplementationId = _manager.DefaultImplementationId;
+    return StateManager.AddStateAsync(Constants.ActorStateName, state, cancellationToken);
   }
 
   public Task ScheduleAsync(Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken)

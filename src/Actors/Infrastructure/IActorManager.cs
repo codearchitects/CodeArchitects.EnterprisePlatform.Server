@@ -7,6 +7,8 @@ internal interface IActorManager<TActor, TState>
   where TState : ActorState
 {
   TState DefaultState { get; }
+
+  int DefaultImplementationId { get; }
   
   Type ActivityType { get; }
 

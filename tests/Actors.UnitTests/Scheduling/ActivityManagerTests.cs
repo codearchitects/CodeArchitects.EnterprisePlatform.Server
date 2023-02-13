@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Fixtures.Examples;
+﻿using CodeArchitects.Platform.Actors.TestModel;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Scheduling;

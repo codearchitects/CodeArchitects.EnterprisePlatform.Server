@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Actors.Dapr\CodeArchitects.Platform.Actors.Dapr.csproj" />
+    <ProjectReference Include="..\Actors.TestModel\CodeArchitects.Platform.Actors.TestModel.csproj" />
   </ItemGroup>
 
 </Project>

@@ -61,21 +61,17 @@ internal class ActivityTypeBuilder : TypeBuilderBase
     return type.CreateTypeInfo()!;
   }
 
-  private MethodInfo ImplementIdProperty(TypeBuilder type, int id)
+  private void ImplementIdProperty(TypeBuilder type, int id)
   {
-    MethodBuilder method = type.DefineMethodOverrideFromDeclaration(
-      declaration: s_idGetter,
-      attributes: MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
+    MethodBuilder method = type.DefineMethodOverrideFromDeclaration(s_idGetter, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
 
     IILGenerator il = _ilProvider.GetILGenerator(method);
 
     il.LoadInt(id);       // Push id | Stack: id
     il.Emit(OpCodes.Ret); // Return  | Stack: id
-
-    return method;
   }
 
-  private MethodInfo ImplementExecuteAsyncMethod(TypeBuilder type, Type actorType, IMethodDescriptor descriptor, IReadOnlyList<FieldInfo> argumentFields)
+  private void ImplementExecuteAsyncMethod(TypeBuilder type, Type actorType, IMethodDescriptor descriptor, IReadOnlyList<FieldInfo> argumentFields)
   {
     MethodInfo implementationMethod = descriptor.ImplementationMethod;
     Type implementationType = implementationMethod.DeclaringType;
@@ -103,13 +99,11 @@ internal class ActivityTypeBuilder : TypeBuilderBase
                                                         //                                    |
     if (descriptor.HasCancellationTokenParameter)       //                                    |
     {                                                   //                                    |
-      il.Emit(OpCodes.Ldarg_2);                         // Push $cancellationToken            | Stack: $actor, ...$args, $cancellationToken
+      il.Emit(OpCodes.Ldarg_2);                         // Push $ct                           | Stack: $actor, ...$args, $ct
     }                                                   //                                    |
                                                         //                                    |
     descriptor.Accept(new ExecuteCallImplementor(il));  // Call implementationMethod          | Stack: $task
     il.Emit(OpCodes.Ret);                               // Return                             | Stack: $task
-
-    return method;
   }
 
   private class ExecuteCallImplementor : IMethodDescriptorVisitor
@@ -161,7 +155,7 @@ internal class ActivityTypeBuilder : TypeBuilderBase
     {
       Type returnType = descriptor.ReturnType;
       MethodInfo asTaskMethod = returnType.GetRequiredMethod(
-        name: nameof(ValueTask<object>.AsTask),
+        name: nameof(ValueTask.AsTask),
         bindingAttr: BindingFlags.Instance | BindingFlags.Public,
         types: Type.EmptyTypes);
 

@@ -18,7 +18,7 @@ internal static class TypeBuilderExtensions
       returnType: declaration.ReturnType,
       returnTypeRequiredCustomModifiers: declaration.ReturnParameter.GetRequiredCustomModifiers(),
       returnTypeOptionalCustomModifiers: declaration.ReturnParameter.GetOptionalCustomModifiers(),
-    parameterTypes: parameters.Map(parameter => parameter.ParameterType),
+      parameterTypes: parameters.Map(parameter => parameter.ParameterType),
       parameterTypeRequiredCustomModifiers: parameters.Map(parameter => parameter.GetRequiredCustomModifiers()),
       parameterTypeOptionalCustomModifiers: parameters.Map(parameter => parameter.GetOptionalCustomModifiers()));
 

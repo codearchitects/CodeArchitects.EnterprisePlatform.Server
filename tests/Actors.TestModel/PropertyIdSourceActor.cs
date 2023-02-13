@@ -1,8 +1,9 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+using CodeArchitects.Platform.Actors.Infrastructure;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal interface IPropertyIdSourceActor
 {
@@ -33,7 +34,7 @@ internal interface IPropertyIdSourceActorFactory
   IPropertyIdSourceActor Get(int id);
 }
 
-internal class PropertyIdSourceActorState
+internal class PropertyIdSourceActorState : OrdinaryActorState
 {
   public PropertyIdSourceActorStateComponent _state { get; set; } = default!;
 }
@@ -42,25 +43,21 @@ internal static class PropertyIdSourceActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
 
-  private static readonly FieldInfo s_stateField;
-  private static readonly ConstructorInfo s_constructor;
-  private static readonly PropertyInfo s_idProperty;
-
   static PropertyIdSourceActorFixture()
   {
-    s_stateField = typeof(PropertyIdSourceActor).GetRequiredField(
+    FieldInfo stateField = typeof(PropertyIdSourceActor).GetRequiredField(
       name: "_state",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    s_idProperty = typeof(PropertyIdSourceActorStateComponent).GetRequiredProperty(
+    PropertyInfo idProperty = typeof(PropertyIdSourceActorStateComponent).GetRequiredProperty(
       name: nameof(PropertyIdSourceActorStateComponent.Id),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
-    s_constructor = typeof(PropertyIdSourceActor).GetRequiredConstructor(
+    ConstructorInfo constructor = typeof(PropertyIdSourceActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(PropertyIdSourceActorStateComponent) });
 
-    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
 
     MethodInfo factoryCreateAsyncMethod = typeof(IPropertyIdSourceActorFactory).GetRequiredMethod(
       name: nameof(IPropertyIdSourceActorFactory.CreateAsync),
@@ -72,6 +69,8 @@ internal static class PropertyIdSourceActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
 
+    FieldInfo[] stateFields = typeof(PropertyIdSourceActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
 
     IStateDependencyDescriptor stateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -80,13 +79,13 @@ internal static class PropertyIdSourceActorFixture
       .SetType(typeof(PropertyIdSourceActorStateComponent))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_stateField));
+      .SetField(stateField));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
       .SetType(typeof(PropertyIdSourceActor))
       .SetConstructor(_ => _
-        .SetConstructor(s_constructor)
+        .SetConstructor(constructor)
         .SetDependencies(stateDependency)
         .SetContextDependencies()
         .SetServiceDependencies()
@@ -100,17 +99,15 @@ internal static class PropertyIdSourceActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
-      .SetIsStateless(false)
       .SetIsVirtual(false)
       .SetId(_ => _
-        .SetIdType(typeof(int))
+        .SetType(typeof(int))
         .SetHasIdSource(true)
         .SetStateDependency(stateDependency)
-        .SetStateProperty(s_idProperty))
+        .SetIdProperty(idProperty))
       .SetState(_ => _
         .SetType(typeof(PropertyIdSourceActorState))
-        .SetStateFields(s_stateField)
-        .SetDiscriminatorField(null)
+        .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))

@@ -1,19 +1,20 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Actors.Fixtures;
-using CodeArchitects.Platform.Actors.Fixtures.Examples;
+using CodeArchitects.Platform.Actors.TestModel;
+using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
 using System.Reflection;
-using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Scheduling;
 
 public class ActivityTypeBuilderTests
 {
-  private readonly ModuleBuilder _module;
+  private readonly FakeILGeneratorProvider _ilProvider;
+  private readonly ActivityTypeBuilder _sut;
 
   public ActivityTypeBuilderTests()
   {
-    _module = DynamicAssembly.CreateModule();
+    _ilProvider = new();
+    _sut = new(DynamicAssembly.NewModule(), _ilProvider);
   }
 
   [Fact]
@@ -22,11 +23,8 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
 
-    FakeILGeneratorProvider ilProvider = new();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
-
     // Act
-    Type activityBaseType = sut.BuildBase(actorType);
+    Type activityBaseType = _sut.BuildBase(actorType);
 
     // Assert
     activityBaseType.Namespace.Should().Be(actorType.Namespace);
@@ -47,15 +45,13 @@ public class ActivityTypeBuilderTests
     string argFieldName = $"<{argPropertyName}>k__BackingField";
     Type argType = parameters[0].ParameterType;
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator argGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator argSetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator argGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator argSetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);
@@ -105,15 +101,13 @@ public class ActivityTypeBuilderTests
     string argFieldName = $"<{argPropertyName}>k__BackingField";
     Type argType = parameters[0].ParameterType;
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator argGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator argSetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator argGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator argSetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);
@@ -160,13 +154,11 @@ public class ActivityTypeBuilderTests
     IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[2];
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);
@@ -198,13 +190,11 @@ public class ActivityTypeBuilderTests
     Type baseType = typeof(StandardActorActivity);
     IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[3];
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);
@@ -235,13 +225,11 @@ public class ActivityTypeBuilderTests
     Type baseType = typeof(StandardActorActivity);
     IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[4];
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);
@@ -269,13 +257,11 @@ public class ActivityTypeBuilderTests
     Type baseType = typeof(PolymorphicActorActivity);
     IMethodDescriptor descriptor = PolymorphicActorFixture.Descriptor.Activities[3];
 
-    FakeILGeneratorProvider ilProvider = new();
-    FakeILGenerator idGetterIL = ilProvider.AddGenerator();
-    FakeILGenerator executeAsyncMethodIL = ilProvider.AddGenerator();
-    ActivityTypeBuilder sut = new(_module, ilProvider);
+    FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
+    FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type activityType = sut.Build(descriptor, actorType, baseType);
+    Type activityType = _sut.Build(descriptor, actorType, baseType);
 
     // Assert
     activityType.Namespace.Should().Be(actorType.Namespace);

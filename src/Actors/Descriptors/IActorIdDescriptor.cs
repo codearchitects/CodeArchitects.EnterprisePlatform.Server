@@ -5,12 +5,12 @@ namespace CodeArchitects.Platform.Actors.Descriptors;
 
 internal interface IActorIdDescriptor
 {
-  Type IdType { get; }
+  Type Type { get; }
 
   [MemberNotNullWhen(true, nameof(StateDependency))]
   bool HasIdSource { get; }
   
   IStateDependencyDescriptor? StateDependency { get; }
 
-  PropertyInfo? StateProperty { get; }
+  PropertyInfo? IdProperty { get; }
 }

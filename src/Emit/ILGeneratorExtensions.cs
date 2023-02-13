@@ -18,6 +18,8 @@ internal static class ILGeneratorExtensions
   {
     switch (index)
     {
+      case 0:
+        throw new ArgumentException("Index must not be 0.");
       case 1:
         il.Emit(OpCodes.Ldarg_1);
         break;

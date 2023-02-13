@@ -6,9 +6,7 @@ internal interface IStateDescriptor
 {
   Type Type { get; }
 
-  FieldInfo? DiscriminatorField { get; }
-
-  IReadOnlyList<FieldInfo> StateFields { get; }
+  IReadOnlyList<FieldInfo> Fields { get; }
 
   object? DefaultValue { get; }
 }

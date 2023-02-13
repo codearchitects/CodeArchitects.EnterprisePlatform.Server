@@ -4,5 +4,6 @@ namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
 internal interface IStateTypeBuilder
 {
-  Type Build(Type actorType, IEnumerable<FieldInfo> stateFields, bool isPolymorphic);
+  Type BuildOrdinary(Type actorType, IEnumerable<FieldInfo> stateFields);
+  Type BuildPolymorphic(Type actorType, IEnumerable<FieldInfo> stateFields);
 }

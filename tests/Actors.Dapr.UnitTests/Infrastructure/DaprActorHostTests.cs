@@ -1,54 +1,45 @@
-﻿using CodeArchitects.Platform.Actors.Dapr.Fixtures;
-using CodeArchitects.Platform.Actors.Infrastructure;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Actors.TestModel;
 using Dapr.Actors.Runtime;
 using FluentAssertions;
 using Moq;
-using System.Text.Json;
+using System.Text;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 
-public class DaprActorHostTests
+public partial class DaprActorHostTests
 {
-  [Fact]
-  public void ActorId_ShouldReturnCorrectId()
+  [Theory]
+  [HostData]
+  internal void ActorId_ShouldReturnCorrectId(
+    Mock<ActorTimerManager> timerManagerMock,
+    Mock<IActorStateManager> stateManagerMock,
+    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
+    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
-    string id = "myId";
-    Mock<IActorManager<TestActor, TestActorState>> managerMock = new(MockBehavior.Strict);
-    Mock<IImplementationFactory<TestActor, TestActorState>> factoryMock = new(MockBehavior.Strict);
-
-    ActorHost host = ActorHost.CreateForTest<TestActorHost>(new ActorTestOptions
-    {
-      ActorId = new(id)
-    });
-
-    TestActorHost sut = new(host, managerMock.Object, factoryMock.Object);
 
     // Act
     string actorId = sut.ActorId;
-
+    
     // Assert
-    actorId.Should().Be(id);
+    actorId.Should().Be(HostDataAttribute.Id);
   }
 
-  [Fact]
-  public async Task ScheduleAsync_ShouldCallRegisterReminderAsync()
+  [Theory]
+  [HostData]
+  internal async Task ScheduleAsync_ShouldCallRegisterReminderAsync(
+    Mock<ActorTimerManager> timerManagerMock,
+    Mock<IActorStateManager> stateManagerMock,
+    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
+    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
     int arg = 12;
-    string id = "myId";
-    byte[] payload = """{"$activity":1,"arg":12}"""u8.ToArray();
-
-    JsonSerializerOptions jsonSerializerOptions = new()
-    {
-      TypeInfoResolver = new TestActorActivityTypeResolver(),
-      IgnoreReadOnlyProperties = true
-    };
-
-    Mock<ActorTimerManager> timerManagerMock = new(MockBehavior.Strict);
-    Mock<IActorManager<TestActor, TestActorState>> managerMock = new(MockBehavior.Strict);
-    Mock<IImplementationFactory<TestActor, TestActorState>> factoryMock = new(MockBehavior.Strict);
+    byte[] payload = Encoding.UTF8.GetBytes($$"""{":id":1,"arg":{{arg}}}""");
 
     timerManagerMock
       .Setup(x => x.RegisterReminderAsync(It.IsAny<ActorReminder>()))
@@ -56,25 +47,17 @@ public class DaprActorHostTests
 
     managerMock
       .Setup(x => x.ActivityType)
-      .Returns(typeof(TestActorActivity));
+      .Returns(typeof(StandardActorActivity));
     managerMock
       .Setup(x => x.JsonSerializerOptions)
-      .Returns(jsonSerializerOptions);
+      .Returns(StandardActorFixture.JsonSerializerOptions);
 
     ScheduleId scheduleId = ScheduleId.New();
     TimeSpan timer = TimeSpan.FromSeconds(1);
     TimeSpan period = TimeSpan.FromSeconds(2);
 
-    ActorHost host = ActorHost.CreateForTest<TestActorHost>(new ActorTestOptions
-    {
-      ActorId = new(id),
-      TimerManager = timerManagerMock.Object
-    });
-
-    TestActorHost sut = new(host, managerMock.Object, factoryMock.Object);
-
     // Act
-    await sut.ScheduleAsync(new TestActorActivity1 { arg = arg }, new SchedulingOptions(scheduleId, timer, period), CancellationToken.None);
+    await sut.ScheduleAsync(new StandardActorActivity1 { arg = arg }, new SchedulingOptions(scheduleId, timer, period), CancellationToken.None);
 
     // Assert
     timerManagerMock.Verify(x => x.RegisterReminderAsync(It.Is<ActorReminder>(reminder =>
@@ -84,29 +67,22 @@ public class DaprActorHostTests
       reminder.State.SequenceEqual(payload))));
   }
 
-  [Fact]
-  public async Task UnscheduleAsync_ShouldCallUnregisterReminderAsync()
+  [Theory]
+  [HostData]
+  internal async Task UnscheduleAsync_ShouldCallUnregisterReminderAsync(
+    Mock<ActorTimerManager> timerManagerMock,
+    Mock<IActorStateManager> stateManagerMock,
+    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
+    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
-    string id = "myId";
-
-    Mock<ActorTimerManager> timerManagerMock = new(MockBehavior.Strict);
-    Mock<IActorManager<TestActor, TestActorState>> managerMock = new(MockBehavior.Strict);
-    Mock<IImplementationFactory<TestActor, TestActorState>> factoryMock = new(MockBehavior.Strict);
 
     timerManagerMock
       .Setup(x => x.UnregisterReminderAsync(It.IsAny<ActorReminderToken>()))
       .Returns(Task.CompletedTask);
 
     ScheduleId scheduleId = ScheduleId.New();
-
-    ActorHost host = ActorHost.CreateForTest<TestActorHost>(new ActorTestOptions
-    {
-      ActorId = new(id),
-      TimerManager = timerManagerMock.Object
-    });
-
-    TestActorHost sut = new(host, managerMock.Object, factoryMock.Object);
 
     // Act
     await sut.UnscheduleAsync(scheduleId, CancellationToken.None);
@@ -115,52 +91,40 @@ public class DaprActorHostTests
     timerManagerMock.Verify(x => x.UnregisterReminderAsync(It.Is<ActorReminderToken>(reminder => reminder.Name == scheduleId.Id)));
   }
 
-  [Fact]
-  public async Task ReceiveReminderAsync_ShouldInvokeActivity()
+  [Theory]
+  [HostData]
+  internal async Task ReceiveReminderAsync_ShouldInvokeActivity(
+    Mock<ActorTimerManager> timerManagerMock,
+    Mock<IActorStateManager> stateManagerMock,
+    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
+    Mock<IImplementationFactory<StandardActor, StandardActorState>> factoryMock,
+    DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
     int arg = 12;
-    string id = "myId";
-    byte[] payload = """{"$activity":1,"arg":12}"""u8.ToArray();
+    byte[] payload = Encoding.UTF8.GetBytes($$"""{":id":2,"arg":{{arg}}}""");
 
-    JsonSerializerOptions jsonSerializerOptions = new()
-    {
-      TypeInfoResolver = new TestActorActivityTypeResolver(),
-      IgnoreReadOnlyProperties = true
-    };
-
-    Mock<IActorStateManager> stateManagerMock = new(MockBehavior.Strict);
-    Mock<IActorManager<TestActor, TestActorState>> managerMock = new(MockBehavior.Strict);
-    Mock<IImplementationFactory<TestActor, TestActorState>> factoryMock = new(MockBehavior.Strict);
-    Mock<TestActor> actorMock = new(MockBehavior.Loose);
+    Mock<StandardActor> actorMock = new(MockBehavior.Loose);
 
     stateManagerMock
-      .Setup(x => x.TryGetStateAsync<TestActorState>(Constants.ActorStateName, It.IsAny<CancellationToken>()))
-      .ReturnsAsync(new ConditionalValue<TestActorState>(true, new TestActorState()));
+      .Setup(x => x.TryGetStateAsync<StandardActorState>(Constants.ActorStateName, It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new ConditionalValue<StandardActorState>(true, new StandardActorState()));
 
     managerMock
       .Setup(x => x.ActivityType)
-      .Returns(typeof(TestActorActivity));
+      .Returns(typeof(StandardActorActivity));
     managerMock
       .Setup(x => x.JsonSerializerOptions)
-      .Returns(jsonSerializerOptions);
+      .Returns(StandardActorFixture.JsonSerializerOptions);
 
     factoryMock
-      .Setup(x => x.Create(It.IsAny<IActorHost<TestActor, TestActorState>>(), It.IsAny<TestActorState>(), It.IsAny<int>()))
+      .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor, StandardActorState>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
       .Returns(actorMock.Object);
-
-    ActorHost host = ActorHost.CreateForTest<TestActorHost>(new ActorTestOptions
-    {
-      ActorId = new(id)
-    });
-
-    TestActorHost sut = new(host, managerMock.Object, factoryMock.Object);
-    sut.SetStateManager(stateManagerMock.Object);
 
     // Act
     await sut.ReceiveReminderAsync("", payload, TimeSpan.Zero, TimeSpan.Zero);
 
     // Assert
-    actorMock.Verify(x => x.Activity(arg, It.IsAny<CancellationToken>()));
+    actorMock.Verify(x => x.TaskMethod(arg, It.IsAny<CancellationToken>()));
   }
 }

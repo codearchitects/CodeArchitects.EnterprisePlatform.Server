@@ -1,8 +1,9 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+using CodeArchitects.Platform.Actors.Infrastructure;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+namespace CodeArchitects.Platform.Actors.TestModel;
 
 public interface IVirtualActor
 {
@@ -47,7 +48,7 @@ public class ComplexObject
   }
 }
 
-internal class VirtualActorState
+internal class VirtualActorState : OrdinaryActorState
 {
   public ComplexObject _obj { get; set; } = default!;
   public string _state1 { get; set; } = default!;
@@ -66,28 +67,23 @@ internal static class VirtualActorFixture
 
   public static IActorDescriptor Descriptor;
 
-  private static readonly ConstructorInfo s_constructor;
-  private static readonly FieldInfo s_objField;
-  private static readonly FieldInfo s_state1Field;
-  private static readonly FieldInfo s_state2Field;
-
   static VirtualActorFixture()
   {
-    s_constructor = typeof(VirtualActor).GetRequiredConstructor(
+    ConstructorInfo constructor = typeof(VirtualActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
       types: new[] { typeof(ComplexObject), typeof(string), typeof(int) });
 
-    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
 
-    s_objField = typeof(VirtualActor).GetRequiredField(
+    FieldInfo objField = typeof(VirtualActor).GetRequiredField(
       name: "_obj",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    s_state1Field = typeof(VirtualActor).GetRequiredField(
+    FieldInfo state1Field = typeof(VirtualActor).GetRequiredField(
       name: "_state1",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    s_state2Field = typeof(VirtualActor).GetRequiredField(
+    FieldInfo state2Field = typeof(VirtualActor).GetRequiredField(
       name: "_state2",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -95,6 +91,8 @@ internal static class VirtualActorFixture
       name: nameof(IVirtualActorFactory.Get),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
       types: new[] { typeof(string) });
+
+    FieldInfo[] stateFields = typeof(VirtualActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
 
     IStateDependencyDescriptor objDependency = StateDependencyDescriptorBuilder.Build(_ => _
@@ -104,7 +102,7 @@ internal static class VirtualActorFixture
       .SetType(typeof(ComplexObject))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_objField));
+      .SetField(objField));
 
     IStateDependencyDescriptor state1Dependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -113,7 +111,7 @@ internal static class VirtualActorFixture
       .SetType(typeof(string))
       .SetIndex(1)
       .SetFieldIndex(1)
-      .SetField(s_state1Field));
+      .SetField(state1Field));
 
     IStateDependencyDescriptor state2Dependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -122,13 +120,13 @@ internal static class VirtualActorFixture
       .SetType(typeof(int))
       .SetIndex(2)
       .SetFieldIndex(2)
-      .SetField(s_state2Field));
+      .SetField(state2Field));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
       .SetType(typeof(VirtualActor))
       .SetConstructor(_ => _
-        .SetConstructor(s_constructor)
+        .SetConstructor(constructor)
         .SetDependencies(objDependency, state1Dependency, state2Dependency)
         .SetContextDependencies()
         .SetServiceDependencies()
@@ -142,17 +140,15 @@ internal static class VirtualActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
-      .SetIsStateless(false)
       .SetIsVirtual(true)
       .SetId(_ => _
-        .SetIdType(typeof(string))
+        .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
-        .SetStateProperty(null))
+        .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(VirtualActorState))
-        .SetStateFields(s_objField, s_state1Field, s_state2Field)
-        .SetDiscriminatorField(null)
+        .SetFields(stateFields)
         .SetDefaultValue(new VirtualActorState
         {
           _obj = new ComplexObject(),

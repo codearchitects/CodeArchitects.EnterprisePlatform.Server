@@ -76,6 +76,8 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier Ldfld(Predicate<FieldInfo> predicate) => MoveNext();
 
+  public override ILVerifier Ldfld(FieldInfo field) => MoveNext();
+
   public override ILVerifier Ldfld(string fieldName) => MoveNext();
 
   public override ILVerifier Ldloc_0() => MoveNext();
@@ -83,6 +85,8 @@ internal class FakeLabelMarker : ILVerifier
   public override ILVerifier Ldloca_S(int index) => MoveNext();
 
   public override ILVerifier Ldsfld(Predicate<FieldInfo> predicate) => MoveNext();
+
+  public override ILVerifier Ldsfld(FieldInfo field) => MoveNext();
 
   public override ILVerifier Ldsfld(string fieldName) => MoveNext();
 
@@ -98,11 +102,15 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier Stfld(Predicate<FieldInfo> predicate) => MoveNext();
 
+  public override ILVerifier Stfld(FieldInfo field) => MoveNext();
+
   public override ILVerifier Stfld(string fieldName) => MoveNext();
 
   public override ILVerifier Stloc_0() => MoveNext();
 
   public override ILVerifier Stsfld(Predicate<FieldInfo> predicate) => MoveNext();
+
+  public override ILVerifier Stsfld(FieldInfo field) => MoveNext();
 
   public override ILVerifier Stsfld(string fieldName) => MoveNext();
 

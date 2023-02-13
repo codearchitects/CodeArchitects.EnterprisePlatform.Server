@@ -16,6 +16,12 @@ internal class DynamicAssembly
     Module = Assembly.DefineDynamicModule(AssemblyName);
   }
 
+  public static ModuleBuilder NewModule()
+  {
+    AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(AssemblyName), AssemblyBuilderAccess.RunAndCollect);
+    return assembly.DefineDynamicModule(AssemblyName);
+  }
+
   public static void IgnoreAccessCheckTo(string assemblyName)
   {
     Module.IgnoreAccessChecksTo(assemblyName);

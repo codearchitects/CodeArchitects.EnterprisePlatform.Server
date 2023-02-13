@@ -6,8 +6,6 @@ internal interface IActorHost<TActor, TState>
   where TActor : class
   where TState : ActorState
 {
-  TActor Actor { get; }
-
   TState State { get; }
 
   string ActorId { get; }

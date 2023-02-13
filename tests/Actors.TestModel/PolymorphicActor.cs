@@ -3,7 +3,7 @@ using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal interface IPolymorphicActor
 {
@@ -62,7 +62,7 @@ internal class PolymorphicActorImplementation1 : PolymorphicActor
   public override Task VirtualMethod()
     => throw new NotImplementedException();
 
-  public Task Activity()
+  public virtual Task Activity()
     => throw new NotImplementedException();
 }
 
@@ -88,10 +88,9 @@ internal interface IPolymorphicActorFactory
   IPolymorphicActor Get(string id);
 }
 
-internal class PolymorphicActorState
+internal class PolymorphicActorState : Infrastructure.PolymorphicActorState
 {
   public int _state { get; set; }
-  public int _discriminator { get; set; } = default!;
 }
 
 internal abstract class PolymorphicActorActivity : Activity<PolymorphicActor>
@@ -103,7 +102,9 @@ internal class PolymorphicActorActivity1 : PolymorphicActorActivity
   public override int Id => 1;
 
   public override Task ExecuteAsync(PolymorphicActor actor, CancellationToken cancellationToken)
-    => throw new NotImplementedException();
+  {
+    return actor.BaseMethod();
+  }
 }
 
 internal class PolymorphicActorActivity2 : PolymorphicActorActivity
@@ -111,7 +112,7 @@ internal class PolymorphicActorActivity2 : PolymorphicActorActivity
   public override int Id => 2;
 
   public override Task ExecuteAsync(PolymorphicActor actor, CancellationToken cancellationToken)
-    => throw new NotImplementedException();
+    => actor.VirtualMethod();
 }
 
 internal class PolymorphicActorActivity3 : PolymorphicActorActivity
@@ -119,7 +120,7 @@ internal class PolymorphicActorActivity3 : PolymorphicActorActivity
   public override int Id => 3;
 
   public override Task ExecuteAsync(PolymorphicActor actor, CancellationToken cancellationToken)
-    => throw new NotImplementedException();
+    => actor.AbstractMethod();
 }
 
 internal class PolymorphicActorActivity4 : PolymorphicActorActivity
@@ -127,17 +128,12 @@ internal class PolymorphicActorActivity4 : PolymorphicActorActivity
   public override int Id => 4;
 
   public override Task ExecuteAsync(PolymorphicActor actor, CancellationToken cancellationToken)
-    => throw new NotImplementedException();
+    => ((PolymorphicActorImplementation1)actor).Activity();
 }
 
 internal static class PolymorphicActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
-
-  private static readonly ConstructorInfo s_baseConstructor;
-  private static readonly ConstructorInfo s_implementation1Constructor;
-  private static readonly ConstructorInfo s_implementation2Constructor;
-  private static readonly FieldInfo s_stateField;
 
   static PolymorphicActorFixture()
   {
@@ -150,6 +146,11 @@ internal static class PolymorphicActorFixture
       name: nameof(IPolymorphicActorFactory.Get),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
+
+    MethodInfo interfaceBaseMethod = typeof(IPolymorphicActor).GetRequiredMethod(
+      name: nameof(IPolymorphicActor.BaseMethod),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
 
     MethodInfo implementationBaseMethod = typeof(PolymorphicActor).GetRequiredMethod(
       name: nameof(PolymorphicActor.BaseMethod),
@@ -166,6 +167,11 @@ internal static class PolymorphicActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
+    MethodInfo interfaceVirtualMethod = typeof(IPolymorphicActor).GetRequiredMethod(
+      name: nameof(IPolymorphicActor.VirtualMethod),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
+
     MethodInfo implementationVirtualMethod = typeof(PolymorphicActor).GetRequiredMethod(
       name: nameof(PolymorphicActor.VirtualMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
@@ -178,6 +184,11 @@ internal static class PolymorphicActorFixture
 
     MethodInfo implementation2VirtualMethod = typeof(PolymorphicActorImplementation2).GetRequiredMethod(
       name: nameof(PolymorphicActorImplementation2.VirtualMethod),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
+
+    MethodInfo interfaceAbstractMethod = typeof(IPolymorphicActor).GetRequiredMethod(
+      name: nameof(IPolymorphicActor.AbstractMethod),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
@@ -201,29 +212,28 @@ internal static class PolymorphicActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: Type.EmptyTypes);
 
-    s_baseConstructor = typeof(PolymorphicActor).GetRequiredConstructor(
+    ConstructorInfo baseConstructor = typeof(PolymorphicActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor>) });
 
-    s_implementation1Constructor = typeof(PolymorphicActorImplementation1).GetRequiredConstructor(
+    ConstructorInfo implementation1Constructor = typeof(PolymorphicActorImplementation1).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor>) });
 
-    s_implementation2Constructor = typeof(PolymorphicActorImplementation2).GetRequiredConstructor(
+    ConstructorInfo implementation2Constructor = typeof(PolymorphicActorImplementation2).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int), typeof(IService1), typeof(IActorContext<PolymorphicActor>), typeof(IService2) });
 
-    ParameterInfo[] baseConstructorParameters = s_baseConstructor.GetParameters();
-    ParameterInfo[] implementation1ConstructorParameters = s_implementation1Constructor.GetParameters();
-    ParameterInfo[] implementation2ConstructorParameters = s_implementation2Constructor.GetParameters();
+    ParameterInfo[] baseConstructorParameters = baseConstructor.GetParameters();
+    ParameterInfo[] implementation1ConstructorParameters = implementation1Constructor.GetParameters();
+    ParameterInfo[] implementation2ConstructorParameters = implementation2Constructor.GetParameters();
 
-    s_stateField = typeof(PolymorphicActor).GetRequiredField(
+    FieldInfo stateField = typeof(PolymorphicActor).GetRequiredField(
       name: "_state",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    FieldInfo discriminatorField = typeof(PolymorphicActorState).GetRequiredField(
-      name: $"<{nameof(PolymorphicActorState._discriminator)}>k__BackingField",
-      bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
+    FieldInfo[] stateFields = typeof(PolymorphicActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
 
     IStateDependencyDescriptor baseStateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -232,7 +242,7 @@ internal static class PolymorphicActorFixture
       .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_stateField));
+      .SetField(stateField));
 
     IServiceDependencyDescriptor baseService1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -257,7 +267,7 @@ internal static class PolymorphicActorFixture
       .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_stateField));
+      .SetField(stateField));
 
     IServiceDependencyDescriptor implementation1Service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -282,7 +292,7 @@ internal static class PolymorphicActorFixture
       .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_stateField));
+      .SetField(stateField));
 
     IServiceDependencyDescriptor implementation2Service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -311,8 +321,10 @@ internal static class PolymorphicActorFixture
     ITaskMethodDescriptor baseImplementationBaseMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(1)
+      .SetName(nameof(IPolymorphicActor.BaseMethod))
+      .SetInterfaceMethod(interfaceBaseMethod)
       .SetImplementationMethod(implementationBaseMethod)
-      .SetParameterTypes()
+      .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity1))
       .SetActivityFields()
       .SetHasCancellationTokenParameter(false)
@@ -321,8 +333,10 @@ internal static class PolymorphicActorFixture
     ITaskMethodDescriptor baseImplementationVirtualMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(2)
+      .SetName(nameof(IPolymorphicActor.VirtualMethod))
+      .SetInterfaceMethod(interfaceVirtualMethod)
       .SetImplementationMethod(implementationVirtualMethod)
-      .SetParameterTypes()
+      .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity2))
       .SetActivityFields()
       .SetHasCancellationTokenParameter(false)
@@ -331,8 +345,10 @@ internal static class PolymorphicActorFixture
     ITaskMethodDescriptor baseImplementationAbstractMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(3)
+      .SetInterfaceMethod(interfaceAbstractMethod)
+      .SetName(nameof(IPolymorphicActor.AbstractMethod))
       .SetImplementationMethod(implementationAbstractMethod)
-      .SetParameterTypes()
+      .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity3))
       .SetActivityFields()
       .SetHasCancellationTokenParameter(false)
@@ -342,7 +358,7 @@ internal static class PolymorphicActorFixture
       .SetId(0)
       .SetType(typeof(PolymorphicActor))
       .SetConstructor(_ => _
-        .SetConstructor(s_baseConstructor)
+        .SetConstructor(baseConstructor)
         .SetDependencies(baseStateDependency, baseService1Dependency, baseContextDependency)
         .SetContextDependencies(baseContextDependency)
         .SetServiceDependencies(baseService1Dependency)
@@ -353,7 +369,7 @@ internal static class PolymorphicActorFixture
       .SetId(1)
       .SetType(typeof(PolymorphicActorImplementation1))
       .SetConstructor(_ => _
-        .SetConstructor(s_implementation1Constructor)
+        .SetConstructor(implementation1Constructor)
         .SetDependencies(implementation1StateDependency, implementation1Service1Dependency, implementation1ContextDependency)
         .SetContextDependencies(implementation1ContextDependency)
         .SetServiceDependencies(implementation1Service1Dependency)
@@ -362,8 +378,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(1)
+          .SetName(nameof(IPolymorphicActor.BaseMethod))
+          .SetInterfaceMethod(interfaceBaseMethod)
           .SetImplementationMethod(implementation1BaseMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity1))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -371,8 +389,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(2)
+          .SetName(nameof(IPolymorphicActor.VirtualMethod))
+          .SetInterfaceMethod(interfaceVirtualMethod)
           .SetImplementationMethod(implementation1VirtualMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity2))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -380,8 +400,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(3)
+          .SetName(nameof(IPolymorphicActor.AbstractMethod))
+          .SetInterfaceMethod(interfaceAbstractMethod)
           .SetImplementationMethod(implementation1AbstractMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity3))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -391,7 +413,7 @@ internal static class PolymorphicActorFixture
       .SetId(2)
       .SetType(typeof(PolymorphicActorImplementation2))
       .SetConstructor(_ => _
-        .SetConstructor(s_implementation2Constructor)
+        .SetConstructor(implementation2Constructor)
         .SetDependencies(implementation2StateDependency, implementation2Service1Dependency, implementation2ContextDependency, implementation2Service2Dependency)
         .SetContextDependencies(implementation2ContextDependency)
         .SetServiceDependencies(implementation2Service1Dependency, implementation2Service2Dependency)
@@ -400,8 +422,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(1)
+          .SetName(nameof(IPolymorphicActor.BaseMethod))
+          .SetInterfaceMethod(interfaceBaseMethod)
           .SetImplementationMethod(implementation2BaseMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity1))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -409,8 +433,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(2)
+          .SetName(nameof(IPolymorphicActor.VirtualMethod))
+          .SetInterfaceMethod(interfaceVirtualMethod)
           .SetImplementationMethod(implementation2VirtualMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity2))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -418,8 +444,10 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(3)
+          .SetName(nameof(IPolymorphicActor.AbstractMethod))
+          .SetInterfaceMethod(interfaceAbstractMethod)
           .SetImplementationMethod(implementation2AbstractMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity3))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
@@ -432,7 +460,6 @@ internal static class PolymorphicActorFixture
       .SetDefaultImplementation(implementation2)
       .SetImplementations(implementation1, implementation2)
       .SetIsPolymorphic(true)
-      .SetIsStateless(false)
       .SetIsVirtual(false)
       .SetActivities(_ => _
         .Add(baseImplementationBaseMethod)
@@ -441,21 +468,21 @@ internal static class PolymorphicActorFixture
         .Add<TaskMethodDescriptorBuilder>(_ => _
           .InitDefaults()
           .SetId(4)
+          .SetName(nameof(PolymorphicActorImplementation1.Activity))
           .SetImplementationMethod(implementation1ActivityMethod)
-          .SetParameterTypes()
+          .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity4))
           .SetActivityFields()
           .SetHasCancellationTokenParameter(false)
           .SetCancellationTokenParameterPosition(-1)))
       .SetId(_ => _
-        .SetIdType(typeof(string))
+        .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
-        .SetStateProperty(null))
+        .SetIdProperty(null))
       .SetState(_ => _
-        .SetType(new StateTypeDelegator(typeof(PolymorphicActorState), nameof(PolymorphicActorState._discriminator)))
-        .SetStateFields(s_stateField)
-        .SetDiscriminatorField(discriminatorField)
+        .SetType(typeof(PolymorphicActorState))
+        .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPolymorphicActorFactory))

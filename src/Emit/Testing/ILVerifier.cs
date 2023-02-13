@@ -21,7 +21,7 @@ internal abstract class ILVerifier
 
   protected Exception Error(string message)
   {
-    return new Exception($"Error at instruction #{Index} of method {_methodName}: {message}");
+    return new Exception($"Error at instruction #{Index + 1} of method {_methodName}: {message}");
   }
 
   public abstract ILVerifier Br(string label);
@@ -72,9 +72,13 @@ internal abstract class ILVerifier
 
   public abstract ILVerifier Ldfld(Predicate<FieldInfo> predicate);
 
+  public abstract ILVerifier Ldfld(FieldInfo field);
+
   public abstract ILVerifier Ldfld(string fieldName);
 
   public abstract ILVerifier Ldsfld(Predicate<FieldInfo> predicate);
+
+  public abstract ILVerifier Ldsfld(FieldInfo field);
 
   public abstract ILVerifier Ldsfld(string fieldName);
 
@@ -96,9 +100,13 @@ internal abstract class ILVerifier
 
   public abstract ILVerifier Stfld(Predicate<FieldInfo> predicate);
 
+  public abstract ILVerifier Stfld(FieldInfo field);
+
   public abstract ILVerifier Stfld(string fieldName);
 
   public abstract ILVerifier Stsfld(Predicate<FieldInfo> predicate);
+
+  public abstract ILVerifier Stsfld(FieldInfo field);
 
   public abstract ILVerifier Stsfld(string fieldName);
 

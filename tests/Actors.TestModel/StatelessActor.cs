@@ -2,7 +2,7 @@
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal interface IStatelessActor
 {
@@ -71,17 +71,15 @@ internal static class StatelessActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
-      .SetIsStateless(true)
       .SetIsVirtual(true)
       .SetId(_ => _
-        .SetIdType(typeof(string))
+        .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateDependency(null as IStateDependencyDescriptor)
-        .SetStateProperty(null))
+        .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(NoState))
-        .SetStateFields()
-        .SetDiscriminatorField(null)
+        .SetFields()
         .SetDefaultValue(NoState.Instance))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))

@@ -1,9 +1,9 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using CodeArchitects.Platform.Common;
+using CodeArchitects.Platform.Actors.Infrastructure;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Fixtures.Examples;
+namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal interface IComponentIdSourceActor
 {
@@ -28,7 +28,7 @@ internal interface IComponentIdSourceActorFactory
   IComponentIdSourceActor Get(int id);
 }
 
-internal class ComponentIdSourceActorState
+internal class ComponentIdSourceActorState : OrdinaryActorState
 {
   public int _state { get; set; }
 }
@@ -37,20 +37,17 @@ internal static class ComponentIdSourceActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
 
-  private static readonly FieldInfo s_stateField;
-  private static readonly ConstructorInfo s_constructor;
-
   static ComponentIdSourceActorFixture()
   {
-    s_stateField = typeof(ComponentIdSourceActor).GetRequiredField(
+    FieldInfo stateField = typeof(ComponentIdSourceActor).GetRequiredField(
       name: "_state",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    s_constructor = typeof(ComponentIdSourceActor).GetRequiredConstructor(
+    ConstructorInfo constructor = typeof(ComponentIdSourceActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
 
-    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
 
     MethodInfo factoryCreateAsyncMethod = typeof(IComponentIdSourceActorFactory).GetRequiredMethod(
       name: nameof(IComponentIdSourceActorFactory.CreateAsync),
@@ -62,6 +59,7 @@ internal static class ComponentIdSourceActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(int) });
 
+    FieldInfo[] stateFields = typeof(ComponentIdSourceActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
     IStateDependencyDescriptor stateDependency = StateDependencyDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -70,13 +68,13 @@ internal static class ComponentIdSourceActorFixture
       .SetType(typeof(int))
       .SetIndex(0)
       .SetFieldIndex(0)
-      .SetField(s_stateField));
+      .SetField(stateField));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
       .SetType(typeof(ComponentIdSourceActor))
       .SetConstructor(_ => _
-        .SetConstructor(s_constructor)
+        .SetConstructor(constructor)
         .SetDependencies(stateDependency)
         .SetContextDependencies()
         .SetServiceDependencies()
@@ -90,17 +88,15 @@ internal static class ComponentIdSourceActorFixture
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
-      .SetIsStateless(false)
       .SetIsVirtual(false)
       .SetId(_ => _
-        .SetIdType(typeof(int))
+        .SetType(typeof(int))
         .SetHasIdSource(true)
         .SetStateDependency(stateDependency)
-        .SetStateProperty(null))
+        .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(ComponentIdSourceActorState))
-        .SetStateFields(s_stateField)
-        .SetDiscriminatorField(null)
+        .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IComponentIdSourceActorFactory))

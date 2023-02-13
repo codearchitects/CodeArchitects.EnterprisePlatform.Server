@@ -8,11 +8,15 @@ internal interface IMethodDescriptor
 
   MethodKind Kind { get; }
 
+  string Name { get; }
+
+  MethodInfo? InterfaceMethod { get; }
+
   MethodInfo ImplementationMethod { get; }
 
   Type ReturnType { get; }
 
-  IReadOnlyList<Type> ParameterTypes { get; }
+  Type[] ParameterTypes { get; }
 
   Type ActivityType { get; }
 

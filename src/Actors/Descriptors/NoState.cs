@@ -1,6 +1,8 @@
-﻿namespace CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
 
-internal class NoState
+namespace CodeArchitects.Platform.Actors.Descriptors;
+
+internal class NoState : OrdinaryActorState
 {
   public static readonly NoState Instance = new NoState();
 

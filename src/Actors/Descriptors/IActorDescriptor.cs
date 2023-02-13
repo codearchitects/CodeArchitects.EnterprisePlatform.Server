@@ -12,8 +12,6 @@ internal interface IActorDescriptor
 
   bool IsPolymorphic { get; }
 
-  bool IsStateless { get; }
-
   bool IsVirtual { get; }
 
   IReadOnlyList<FieldInfo> StateFields { get; }

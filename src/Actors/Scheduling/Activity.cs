@@ -6,7 +6,7 @@ internal abstract class Activity
 {
   public abstract int Id { get; }
 
-  [JsonPropertyName("$impl")]
+  [JsonPropertyName(":impl")]
   [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
   public int ImplementationId { get; set; }
 }

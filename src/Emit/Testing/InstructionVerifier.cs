@@ -173,6 +173,11 @@ internal class InstructionVerifier : ILVerifier
     return Verify(OpCodes.Ldfld, predicate);
   }
 
+  public override ILVerifier Ldfld(FieldInfo field)
+  {
+    return Verify(OpCodes.Ldfld, (FieldInfo f) => f.Equals(field));
+  }
+
   public override ILVerifier Ldfld(string fieldName)
   {
     return Verify(OpCodes.Ldfld, (FieldInfo field) => field.Name == fieldName);
@@ -181,6 +186,11 @@ internal class InstructionVerifier : ILVerifier
   public override ILVerifier Ldsfld(Predicate<FieldInfo> predicate)
   {
     return Verify(OpCodes.Ldsfld, predicate);
+  }
+
+  public override ILVerifier Ldsfld(FieldInfo field)
+  {
+    return Verify(OpCodes.Ldsfld, (FieldInfo f) => f.Equals(field));
   }
 
   public override ILVerifier Ldsfld(string fieldName)
@@ -239,6 +249,11 @@ internal class InstructionVerifier : ILVerifier
     return Verify(OpCodes.Stfld, predicate);
   }
 
+  public override ILVerifier Stfld(FieldInfo field)
+  {
+    return Verify(OpCodes.Stfld, (FieldInfo f) => f.Equals(field));
+  }
+
   public override ILVerifier Stfld(string fieldName)
   {
     return Verify(OpCodes.Stfld, (FieldInfo field) => field.Name == fieldName);
@@ -247,6 +262,11 @@ internal class InstructionVerifier : ILVerifier
   public override ILVerifier Stsfld(Predicate<FieldInfo> predicate)
   {
     return Verify(OpCodes.Stsfld, predicate);
+  }
+
+  public override ILVerifier Stsfld(FieldInfo field)
+  {
+    return Verify(OpCodes.Stfld, (FieldInfo f) => f.Equals(field));
   }
 
   public override ILVerifier Stsfld(string fieldName)
