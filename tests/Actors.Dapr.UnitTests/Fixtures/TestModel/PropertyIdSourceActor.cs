@@ -48,7 +48,7 @@ internal class PropertyIdSourceActorProxyFactory : ProxyFactory<IPropertyIdSourc
 
   public Task<IPropertyIdSourceActor> CreateAsync(PropertyIdSourceActorStateComponent state, CancellationToken cancellationToken = default)
   {
-    return CreateCoreAsync(state.Id, new PropertyIdSourceActorState { _state = state }, cancellationToken);
+    return CreateCoreAsync(state.Id, new PropertyIdSourceActorState { _0 = state }, cancellationToken);
   }
 
   public IPropertyIdSourceActor Get(int id)

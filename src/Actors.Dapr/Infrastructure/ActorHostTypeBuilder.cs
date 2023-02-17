@@ -50,7 +50,7 @@ internal class ActorHostTypeBuilder
     BuildActorAttribute(hostType, actorName ?? actor.BaseImplementation.Type.Name);
     BuildConstructor(hostType, actor);
 
-    IReadOnlyList<IMethodDescriptor> methods = actor.BaseImplementation.Methods;
+    IReadOnlyCollection<IMethodDescriptor> methods = actor.Methods;
 
     Dictionary<IMethodDescriptor, int> overloadSuffixes = new();
     IEnumerable<IGrouping<string, IMethodDescriptor>> groups = methods.GroupBy(method => method.Name);

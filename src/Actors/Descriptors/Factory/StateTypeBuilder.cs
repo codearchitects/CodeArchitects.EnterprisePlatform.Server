@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Emit;
-using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -15,30 +14,18 @@ internal class StateTypeBuilder : TypeBuilderBase, IStateTypeBuilder
   {
   }
 
-  public Type BuildOrdinary(Type actorType, IEnumerable<FieldInfo> stateFields)
+  public Type Build(Type actorType, IEnumerable<IStateComponentMetadata> components, bool isPolymorphic)
   {
-    return Build(actorType, typeof(OrdinaryActorState), stateFields);
-  }
-
-  public Type BuildPolymorphic(Type actorType, IEnumerable<FieldInfo> stateFields)
-  {
-    return Build(actorType, typeof(PolymorphicActorState), stateFields);
-  }
-
-  private Type Build(Type actorType, Type baseType, IEnumerable<FieldInfo> stateFields)
-  {
-    Debug.Assert(stateFields.Count() > 0, "Expected at least one state component or a polymorphic actor.");
+    Type baseType = isPolymorphic ? typeof(PolymorphicActorState) : typeof(OrdinaryActorState);
 
     TypeBuilder type = _module.DefineType(
       name: actorType.GetComponentTypeName(ComponentName),
       attr: TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Class,
       parent: baseType);
 
-    int index = 0;
-    foreach (FieldInfo stateField in stateFields)
+    foreach (IStateComponentMetadata component in components)
     {
-      BuildAutoProperty(type, index.ToString(), stateField.FieldType);
-      index++;
+      BuildAutoProperty(type, component.Index.ToString(), component.Type);
     }
 
     return type.CreateTypeInfo()!;

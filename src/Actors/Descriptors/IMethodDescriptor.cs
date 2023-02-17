@@ -24,7 +24,5 @@ internal interface IMethodDescriptor
 
   bool HasCancellationTokenParameter { get; }
 
-  int CancellationTokenParameterPosition { get; }
-
   void Accept(IMethodDescriptorVisitor visitor);
 }

@@ -6,33 +6,6 @@ namespace CodeArchitects.Platform.Actors.TestModel;
 
 internal static class DescriptorBuilderExtensions
 {
-  public static ContextDependencyDescriptorBuilder InitDefaults(this ContextDependencyDescriptorBuilder builder)
-  {
-    return builder
-      .SetKind(DependencyKind.Context)
-      .Setup(mock => mock
-        .Setup(x => x.Accept(It.IsAny<IDependencyDescriptorVisitor>()))
-        .Callback<IDependencyDescriptorVisitor>(visitor => visitor.VisitContextDependency(mock.Object)));
-  }
-
-  public static ServiceDependencyDescriptorBuilder InitDefaults(this ServiceDependencyDescriptorBuilder builder)
-  {
-    return builder
-      .SetKind(DependencyKind.Service)
-      .Setup(mock => mock
-        .Setup(x => x.Accept(It.IsAny<IDependencyDescriptorVisitor>()))
-        .Callback<IDependencyDescriptorVisitor>(visitor => visitor.VisitServiceDependency(mock.Object)));
-  }
-
-  public static StateDependencyDescriptorBuilder InitDefaults(this StateDependencyDescriptorBuilder builder)
-  {
-    return builder
-      .SetKind(DependencyKind.State)
-      .Setup(mock => mock
-        .Setup(x => x.Accept(It.IsAny<IDependencyDescriptorVisitor>()))
-        .Callback<IDependencyDescriptorVisitor>(visitor => visitor.VisitStateDependency(mock.Object)));
-  }
-
   public static VoidMethodDescriptorBuilder InitDefaults(this VoidMethodDescriptorBuilder builder)
   {
     return builder

@@ -13,7 +13,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[0].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(0).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
@@ -32,7 +32,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[1].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(1).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg, CancellationToken.None });
@@ -51,7 +51,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[5].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(5).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
@@ -70,7 +70,7 @@ public class ActivityManagerTests
     const string arg = "12";
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[6].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(6).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
@@ -89,7 +89,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[0].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(0).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
@@ -108,7 +108,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[1].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(1).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg, CancellationToken.None });
@@ -127,7 +127,7 @@ public class ActivityManagerTests
     const int arg = 12;
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[5].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(5).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
@@ -146,7 +146,7 @@ public class ActivityManagerTests
     const string arg = "12";
     ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
 
-    MethodInfo method = StandardActorFixture.Descriptor.Activities[6].ImplementationMethod;
+    MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(6).ImplementationMethod;
 
     // Act
     Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });

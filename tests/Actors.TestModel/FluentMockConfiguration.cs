@@ -2,7 +2,6 @@
 using FluentMock;
 
 [assembly: GenerateFluentMockFor(typeof(IActorDescriptor))]
-[assembly: GenerateFluentMockFor(typeof(IConstructorDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IImplementationDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IActorIdDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IStateDescriptor))]
@@ -13,7 +12,3 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(ITaskTMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IValueTaskMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IValueTaskTMethodDescriptor))]
-[assembly: GenerateFluentMockFor(typeof(IDependencyDescriptor))]
-[assembly: GenerateFluentMockFor(typeof(IContextDependencyDescriptor))]
-[assembly: GenerateFluentMockFor(typeof(IServiceDependencyDescriptor))]
-[assembly: GenerateFluentMockFor(typeof(IStateDependencyDescriptor))]

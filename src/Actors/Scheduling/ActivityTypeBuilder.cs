@@ -5,7 +5,7 @@ using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Scheduling;
 
-internal class ActivityTypeBuilder : TypeBuilderBase
+internal class ActivityTypeBuilder : TypeBuilderBase, IActivityTypeBuilder
 {
   public const string ComponentName = "Activity";
 
@@ -38,7 +38,7 @@ internal class ActivityTypeBuilder : TypeBuilderBase
   public Type Build(IMethodDescriptor descriptor, Type actorType, Type baseType)
   {
     MethodInfo implementationMethod = descriptor.ImplementationMethod;
-    
+
     TypeBuilder type = _module.DefineType(
       name: actorType.GetComponentTypeName($"{ComponentName}{descriptor.Id}"),
       attr: TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.Class,

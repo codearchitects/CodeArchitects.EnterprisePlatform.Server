@@ -4,7 +4,9 @@ namespace CodeArchitects.Platform.Actors.Descriptors;
 
 internal interface IActorModel
 {
-  IActorDescriptor<TActor, TState> GetDescriptor<TActor, TState>()
+  IReadOnlyCollection<IActorDescriptor> Actors { get; }
+
+  IActorDescriptor<TActor, TState> GetActor<TActor, TState>()
     where TActor : class
     where TState : ActorState;
 }

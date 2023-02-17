@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
@@ -44,6 +45,7 @@ internal abstract class PolymorphicActor : IPolymorphicActor
   public abstract Task AbstractMethod();
 }
 
+[ActorImplementation<PolymorphicActor>]
 internal class PolymorphicActorImplementation1 : PolymorphicActor
 {
   [ActorConstructor]
@@ -66,7 +68,7 @@ internal class PolymorphicActorImplementation1 : PolymorphicActor
     => throw new NotImplementedException();
 }
 
-[ActorImplementation(IsDefault = true)]
+[ActorImplementation(typeof(PolymorphicActor), IsDefault = true)]
 internal class PolymorphicActorImplementation2 : PolymorphicActor
 {
   private readonly IService2 _service2;
@@ -81,16 +83,16 @@ internal class PolymorphicActorImplementation2 : PolymorphicActor
     => throw new NotImplementedException();
 }
 
+internal class PolymorphicActorState : Infrastructure.PolymorphicActorState
+{
+  public int _0 { get; set; }
+}
+
 [ActorFactory<PolymorphicActor>]
 internal interface IPolymorphicActorFactory
 {
   Task<IPolymorphicActor> CreateAsync(string id, int state, CancellationToken cancellationToken = default);
   IPolymorphicActor Get(string id);
-}
-
-internal class PolymorphicActorState : Infrastructure.PolymorphicActorState
-{
-  public int _state { get; set; }
 }
 
 internal abstract class PolymorphicActorActivity : Activity<PolymorphicActor>
@@ -235,89 +237,6 @@ internal static class PolymorphicActorFixture
     FieldInfo[] stateFields = typeof(PolymorphicActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
 
-    IStateDependencyDescriptor baseStateDependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(baseConstructorParameters[0])
-      .SetName("state")
-      .SetType(typeof(int))
-      .SetIndex(0)
-      .SetFieldIndex(0)
-      .SetField(stateField));
-
-    IServiceDependencyDescriptor baseService1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(baseConstructorParameters[1])
-      .SetName("service1")
-      .SetType(typeof(IService1))
-      .SetIndex(1)
-      .SetIsOptional(false));
-
-    IContextDependencyDescriptor baseContextDependency = ContextDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(baseConstructorParameters[2])
-      .SetName("context")
-      .SetType(typeof(IActorContext<PolymorphicActor>))
-      .SetImplementationType(typeof(PolymorphicActor))
-      .SetIndex(2));
-
-    IStateDependencyDescriptor implementation1StateDependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation1ConstructorParameters[0])
-      .SetName("state")
-      .SetType(typeof(int))
-      .SetIndex(0)
-      .SetFieldIndex(0)
-      .SetField(stateField));
-
-    IServiceDependencyDescriptor implementation1Service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation1ConstructorParameters[1])
-      .SetName("service1")
-      .SetType(typeof(IService1))
-      .SetIndex(1)
-      .SetIsOptional(false));
-
-    IContextDependencyDescriptor implementation1ContextDependency = ContextDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation1ConstructorParameters[2])
-      .SetName("context")
-      .SetType(typeof(IActorContext<PolymorphicActor>))
-      .SetImplementationType(typeof(PolymorphicActorImplementation1))
-      .SetIndex(2));
-
-    IStateDependencyDescriptor implementation2StateDependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation2ConstructorParameters[0])
-      .SetName("state")
-      .SetType(typeof(int))
-      .SetIndex(0)
-      .SetFieldIndex(0)
-      .SetField(stateField));
-
-    IServiceDependencyDescriptor implementation2Service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation2ConstructorParameters[1])
-      .SetName("service1")
-      .SetType(typeof(IService1))
-      .SetIndex(1)
-      .SetIsOptional(false));
-
-    IContextDependencyDescriptor implementation2ContextDependency = ContextDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation2ConstructorParameters[2])
-      .SetName("context")
-      .SetType(typeof(IActorContext<PolymorphicActor>))
-      .SetImplementationType(typeof(PolymorphicActor))
-      .SetIndex(2));
-
-    IServiceDependencyDescriptor implementation2Service2Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(implementation2ConstructorParameters[3])
-      .SetName("service2")
-      .SetType(typeof(IService2))
-      .SetIndex(3)
-      .SetIsOptional(false));
-
     ITaskMethodDescriptor baseImplementationBaseMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(1)
@@ -327,8 +246,7 @@ internal static class PolymorphicActorFixture
       .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity1))
       .SetActivityFields()
-      .SetHasCancellationTokenParameter(false)
-      .SetCancellationTokenParameterPosition(-1));
+      .SetHasCancellationTokenParameter(false));
 
     ITaskMethodDescriptor baseImplementationVirtualMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
@@ -339,119 +257,30 @@ internal static class PolymorphicActorFixture
       .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity2))
       .SetActivityFields()
-      .SetHasCancellationTokenParameter(false)
-      .SetCancellationTokenParameterPosition(-1));
+      .SetHasCancellationTokenParameter(false));
 
     ITaskMethodDescriptor baseImplementationAbstractMethod = TaskMethodDescriptorBuilder.Build(_ => _
       .InitDefaults()
       .SetId(3)
-      .SetInterfaceMethod(interfaceAbstractMethod)
       .SetName(nameof(IPolymorphicActor.AbstractMethod))
+      .SetInterfaceMethod(interfaceAbstractMethod)
       .SetImplementationMethod(implementationAbstractMethod)
       .SetParameterTypes(Type.EmptyTypes)
       .SetActivityType(typeof(PolymorphicActorActivity3))
       .SetActivityFields()
-      .SetHasCancellationTokenParameter(false)
-      .SetCancellationTokenParameterPosition(-1));
+      .SetHasCancellationTokenParameter(false));
 
     IImplementationDescriptor baseImplementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
-      .SetType(typeof(PolymorphicActor))
-      .SetConstructor(_ => _
-        .SetConstructor(baseConstructor)
-        .SetDependencies(baseStateDependency, baseService1Dependency, baseContextDependency)
-        .SetContextDependencies(baseContextDependency)
-        .SetServiceDependencies(baseService1Dependency)
-        .SetStateDependencies(baseStateDependency))
-      .SetMethods(baseImplementationBaseMethod, baseImplementationVirtualMethod, baseImplementationAbstractMethod));
+      .SetType(typeof(PolymorphicActor)));
 
     IImplementationDescriptor implementation1 = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(1)
-      .SetType(typeof(PolymorphicActorImplementation1))
-      .SetConstructor(_ => _
-        .SetConstructor(implementation1Constructor)
-        .SetDependencies(implementation1StateDependency, implementation1Service1Dependency, implementation1ContextDependency)
-        .SetContextDependencies(implementation1ContextDependency)
-        .SetServiceDependencies(implementation1Service1Dependency)
-        .SetStateDependencies(implementation1StateDependency))
-      .SetMethods(_ => _
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(1)
-          .SetName(nameof(IPolymorphicActor.BaseMethod))
-          .SetInterfaceMethod(interfaceBaseMethod)
-          .SetImplementationMethod(implementation1BaseMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity1))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(2)
-          .SetName(nameof(IPolymorphicActor.VirtualMethod))
-          .SetInterfaceMethod(interfaceVirtualMethod)
-          .SetImplementationMethod(implementation1VirtualMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity2))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(3)
-          .SetName(nameof(IPolymorphicActor.AbstractMethod))
-          .SetInterfaceMethod(interfaceAbstractMethod)
-          .SetImplementationMethod(implementation1AbstractMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity3))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))));
+      .SetType(typeof(PolymorphicActorImplementation1)));
 
     IImplementationDescriptor implementation2 = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(2)
-      .SetType(typeof(PolymorphicActorImplementation2))
-      .SetConstructor(_ => _
-        .SetConstructor(implementation2Constructor)
-        .SetDependencies(implementation2StateDependency, implementation2Service1Dependency, implementation2ContextDependency, implementation2Service2Dependency)
-        .SetContextDependencies(implementation2ContextDependency)
-        .SetServiceDependencies(implementation2Service1Dependency, implementation2Service2Dependency)
-        .SetStateDependencies(implementation2StateDependency))
-      .SetMethods(_ => _
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(1)
-          .SetName(nameof(IPolymorphicActor.BaseMethod))
-          .SetInterfaceMethod(interfaceBaseMethod)
-          .SetImplementationMethod(implementation2BaseMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity1))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(2)
-          .SetName(nameof(IPolymorphicActor.VirtualMethod))
-          .SetInterfaceMethod(interfaceVirtualMethod)
-          .SetImplementationMethod(implementation2VirtualMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity2))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))
-        .Add<TaskMethodDescriptorBuilder>(_ => _
-          .InitDefaults()
-          .SetId(3)
-          .SetName(nameof(IPolymorphicActor.AbstractMethod))
-          .SetInterfaceMethod(interfaceAbstractMethod)
-          .SetImplementationMethod(implementation2AbstractMethod)
-          .SetParameterTypes(Type.EmptyTypes)
-          .SetActivityType(typeof(PolymorphicActorActivity3))
-          .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1))));
+      .SetType(typeof(PolymorphicActorImplementation2)));
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IPolymorphicActor))
@@ -461,6 +290,8 @@ internal static class PolymorphicActorFixture
       .SetImplementations(implementation1, implementation2)
       .SetIsPolymorphic(true)
       .SetIsVirtual(false)
+      .SetActivityBaseType(typeof(PolymorphicActorActivity))
+      .SetMethods(baseImplementationBaseMethod, baseImplementationVirtualMethod, baseImplementationAbstractMethod)
       .SetActivities(_ => _
         .Add(baseImplementationBaseMethod)
         .Add(baseImplementationVirtualMethod)
@@ -469,16 +300,16 @@ internal static class PolymorphicActorFixture
           .InitDefaults()
           .SetId(4)
           .SetName(nameof(PolymorphicActorImplementation1.Activity))
+          .SetInterfaceMethod(null)
           .SetImplementationMethod(implementation1ActivityMethod)
           .SetParameterTypes(Type.EmptyTypes)
           .SetActivityType(typeof(PolymorphicActorActivity4))
           .SetActivityFields()
-          .SetHasCancellationTokenParameter(false)
-          .SetCancellationTokenParameterPosition(-1)))
+          .SetHasCancellationTokenParameter(false)))
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateDependency(null as IStateDependencyDescriptor)
+        .SetStateIndex(-1)
         .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(PolymorphicActorState))
@@ -488,5 +319,43 @@ internal static class PolymorphicActorFixture
         .SetFactoryType(typeof(IPolymorphicActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
         .SetGetMethod(factoryGetMethod)));
+  }
+
+  public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
+  {
+    Type actorType = typeof(PolymorphicActor);
+    Type activityBaseType = typeof(PolymorphicActorActivity);
+
+    stateTypeBuilderMock
+      .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), true))
+      .Returns(typeof(PolymorphicActorState));
+
+    activityTypeBuilderMock
+      .Setup(x => x.BuildBase(actorType))
+      .Returns(activityBaseType);
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 1), actorType, activityBaseType))
+      .Returns(typeof(PolymorphicActorActivity1));
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 2), actorType, activityBaseType))
+      .Returns(typeof(PolymorphicActorActivity2));
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 3), actorType, activityBaseType))
+      .Returns(typeof(PolymorphicActorActivity3));
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 4), actorType, activityBaseType))
+      .Returns(typeof(PolymorphicActorActivity4));
+  }
+
+  public static void AssertValidDescriptor(IActorDescriptor descriptor)
+  {
+    descriptor.Should().BeAssignableTo<IActorDescriptor<PolymorphicActor, PolymorphicActorState>>();
+    descriptor.Should().BeEquivalentTo(Descriptor, opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
+    descriptor.GetImplementation(typeof(PolymorphicActorImplementation1)).Should().BeEquivalentTo(Descriptor.Implementations.ElementAt(0), opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
+    descriptor.GetImplementation(typeof(PolymorphicActorImplementation2)).Should().BeEquivalentTo(Descriptor.Implementations.ElementAt(1), opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
   }
 }

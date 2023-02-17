@@ -1,7 +1,10 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
+using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 
@@ -22,6 +25,9 @@ internal class StatelessActor : IStatelessActor
 
 internal class StatelessActorState : OrdinaryActorState
 {
+  public override bool Equals(object? obj) => obj is StatelessActorState;
+
+  public override int GetHashCode() => 0;
 }
 
 [ActorFactory(typeof(StatelessActor))]
@@ -30,44 +36,30 @@ internal interface IStatelessActorFactory
   IStatelessActor Get(string id);
 }
 
+internal abstract class StatelessActorActivity : Activity<StatelessActor>
+{
+}
+
 internal static class StatelessActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
 
-  private static readonly ConstructorInfo s_constructor;
-
   static StatelessActorFixture()
   {
-    s_constructor = typeof(StatelessActor).GetRequiredConstructor(
+    ConstructorInfo constructor = typeof(StatelessActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(IService1) });
 
-    ParameterInfo[] constructorParameters = s_constructor.GetParameters();
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
 
     MethodInfo factoryGetMethod = typeof(IStatelessActorFactory).GetRequiredMethod(
       name: nameof(IStatelessActorFactory.Get),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
 
-
-    IServiceDependencyDescriptor service1Dependency = ServiceDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(constructorParameters[0])
-      .SetName("service1")
-      .SetType(typeof(IService1))
-      .SetIndex(0)
-      .SetIsOptional(false));
-
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
-      .SetType(typeof(StatelessActor))
-      .SetConstructor(_ => _
-        .SetConstructor(s_constructor)
-        .SetDependencies(service1Dependency)
-        .SetContextDependencies()
-        .SetServiceDependencies(service1Dependency)
-        .SetStateDependencies())
-      .SetMethods());
+      .SetType(typeof(StatelessActor)));
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IStatelessActor))
@@ -75,12 +67,15 @@ internal static class StatelessActorFixture
       .SetBaseImplementation(implementation)
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
+      .SetActivityBaseType(typeof(StatelessActorActivity))
       .SetIsPolymorphic(false)
       .SetIsVirtual(true)
+      .SetMethods()
+      .SetActivities()
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateDependency(null as IStateDependencyDescriptor)
+        .SetStateIndex(-1)
         .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(StatelessActorState))
@@ -90,5 +85,25 @@ internal static class StatelessActorFixture
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)
         .SetGetMethod(factoryGetMethod)));
+  }
+
+  public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
+  {
+    Type actorType = typeof(StatelessActor);
+    Type activityBaseType = typeof(StatelessActorActivity);
+
+    stateTypeBuilderMock
+      .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
+      .Returns(typeof(StatelessActorState));
+
+    activityTypeBuilderMock
+      .Setup(x => x.BuildBase(actorType))
+      .Returns(activityBaseType);
+  }
+
+  public static void AssertValidDescriptor(IActorDescriptor descriptor)
+  {
+    descriptor.Should().BeAssignableTo<IActorDescriptor<StatelessActor, StatelessActorState>>();
+    descriptor.Should().BeEquivalentTo(Descriptor, opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
   }
 }

@@ -1,9 +1,6 @@
-﻿using System.Reflection;
-
-namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
+﻿namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
 internal interface IStateTypeBuilder
 {
-  Type BuildOrdinary(Type actorType, IEnumerable<FieldInfo> stateFields);
-  Type BuildPolymorphic(Type actorType, IEnumerable<FieldInfo> stateFields);
+  Type Build(Type actorType, IEnumerable<IStateComponentMetadata> components, bool isPolymorphic);
 }

@@ -21,22 +21,22 @@ internal class ActorProxyTypeBuilder
     _ilProvider = ilProvider;
   }
 
-  public Type Build(IActorDescriptor descriptor, IActorHostEmitResult hostEmitResult)
+  public Type Build(IActorDescriptor actor, IActorHostEmitResult hostEmitResult)
   {
     Type hostInterfaceType = hostEmitResult.InterfaceType;
 
     TypeBuilder type = _module.DefineType(
-      name: descriptor.ActorType.GetComponentTypeName(ComponentName),
+      name: actor.ActorType.GetComponentTypeName(ComponentName),
       attr: TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Class,
       parent: null,
-      interfaces: new[] { descriptor.InterfaceType.UnderlyingSystemType });
+      interfaces: new[] { actor.InterfaceType.UnderlyingSystemType });
 
     FieldInfo actorHostField = DefineActorHostField(type, hostInterfaceType.UnderlyingSystemType);
 
     BuildConstructor(type, actorHostField);
 
     ProxyMethodBuilder methodBuilder = new ProxyMethodBuilder(_ilProvider, type, hostEmitResult, actorHostField);
-    foreach (IMethodDescriptor method in descriptor.BaseImplementation.Methods)
+    foreach (IMethodDescriptor method in actor.Methods)
     {
       method.Accept(methodBuilder);
     }

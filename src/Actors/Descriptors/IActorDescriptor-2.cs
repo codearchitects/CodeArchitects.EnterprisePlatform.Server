@@ -8,7 +8,15 @@ internal interface IActorDescriptor<TActor, TState> : IActorDescriptor
 {
   new IStateDescriptor<TState> State { get; }
 
+  new IImplementationDescriptor<TActor, TState> BaseImplementation { get; }
+
+  new IImplementationDescriptor<TActor, TState> DefaultImplementation { get; }
+
+  new IReadOnlyCollection<IImplementationDescriptor<TActor, TState>> Implementations { get; }
+
   TActor CreateInstance(int implementationId, IServiceProvider services, TState state, IActorContext<TActor> context);
+
+  new IImplementationDescriptor<TActor, TState> GetImplementation(Type implementationType);
 
   void UpdateState(TActor actor, TState state);
 }

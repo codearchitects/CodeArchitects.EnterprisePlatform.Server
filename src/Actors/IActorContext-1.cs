@@ -12,7 +12,12 @@ public interface IActorContext<TActor> : IActorContext
 
   Task<ScheduleId> ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
 
+  Task<ScheduleId> ScheduleAsync(Expression<Action<TActor>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
+
   Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+    where TImplementation : class, TActor;
+
+  Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Action<TImplementation>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
     where TImplementation : class, TActor;
 
   BindingId RegisterBinding(Func<IBindingBuilder<TActor>, IBindingResult> configure);

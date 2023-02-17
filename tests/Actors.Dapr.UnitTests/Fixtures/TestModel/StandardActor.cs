@@ -97,7 +97,7 @@ internal class StandardActorProxyFactory : ProxyFactory<IStandardActorHost, ISta
 
   public Task<IStandardActor> CreateAsync(string id, string state1, StandardActorStateComponent state2, CancellationToken cancellationToken = default)
   {
-    return CreateCoreAsync(id, new StandardActorState { _state1 = state1, _state2 = state2 }, cancellationToken);
+    return CreateCoreAsync(id, new StandardActorState { _0 = state1, _1 = state2 }, cancellationToken);
   }
 
   public IStandardActor Get(string id)
@@ -143,16 +143,16 @@ internal class StandardActorDaprFixture
       .Setup(x => x.ClassType)
       .Returns(typeof(StandardActorHost));
     hostEmitResultMock
-      .Setup(x => x.GetHostMethod(descriptor.BaseImplementation.Methods[0]))
+      .Setup(x => x.GetHostMethod(descriptor.Methods.ElementAt(0)))
       .Returns(HostTaskMethod);
     hostEmitResultMock
-      .Setup(x => x.GetHostMethod(descriptor.BaseImplementation.Methods[1]))
+      .Setup(x => x.GetHostMethod(descriptor.Methods.ElementAt(1)))
       .Returns(HostTaskTMethod);
     hostEmitResultMock
-      .Setup(x => x.GetHostMethod(descriptor.BaseImplementation.Methods[2]))
+      .Setup(x => x.GetHostMethod(descriptor.Methods.ElementAt(2)))
       .Returns(HostValueTaskMethod);
     hostEmitResultMock
-      .Setup(x => x.GetHostMethod(descriptor.BaseImplementation.Methods[3]))
+      .Setup(x => x.GetHostMethod(descriptor.Methods.ElementAt(3)))
       .Returns(HostValueTaskTMethod);
 
     HostEmitResult = hostEmitResultMock.Object;

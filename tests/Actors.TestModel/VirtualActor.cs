@@ -1,6 +1,8 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
@@ -50,13 +52,30 @@ public class ComplexObject
 
 internal class VirtualActorState : OrdinaryActorState
 {
-  public ComplexObject _obj { get; set; } = default!;
-  public string _state1 { get; set; } = default!;
-  public int _state2 { get; set; }
+  public ComplexObject _0 { get; set; } = default!;
+  public string _1 { get; set; } = default!;
+  public int _2 { get; set; }
+
+  public override bool Equals(object? obj)
+  {
+    if (obj is not VirtualActorState other)
+      return false;
+
+    return (_0, _1, _2).Equals((other._0, other._1, other._2));
+  }
+
+  public override int GetHashCode()
+  {
+    return HashCode.Combine(_0, _1, _2);
+  }
+}
+
+internal abstract class VirtualActorActivity : Activity<VirtualActor>
+{
 }
 
 [ActorFactory(typeof(VirtualActor))]
-public interface IVirtualActorFactory
+internal interface IVirtualActorFactory
 {
   IVirtualActor Get(string id);
 }
@@ -95,43 +114,9 @@ internal static class VirtualActorFixture
     FieldInfo[] stateFields = typeof(VirtualActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
 
-    IStateDependencyDescriptor objDependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(constructorParameters[0])
-      .SetName("obj")
-      .SetType(typeof(ComplexObject))
-      .SetIndex(0)
-      .SetFieldIndex(0)
-      .SetField(objField));
-
-    IStateDependencyDescriptor state1Dependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(constructorParameters[1])
-      .SetName("state1")
-      .SetType(typeof(string))
-      .SetIndex(1)
-      .SetFieldIndex(1)
-      .SetField(state1Field));
-
-    IStateDependencyDescriptor state2Dependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(constructorParameters[2])
-      .SetName("state2")
-      .SetType(typeof(int))
-      .SetIndex(2)
-      .SetFieldIndex(2)
-      .SetField(state2Field));
-
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
-      .SetType(typeof(VirtualActor))
-      .SetConstructor(_ => _
-        .SetConstructor(constructor)
-        .SetDependencies(objDependency, state1Dependency, state2Dependency)
-        .SetContextDependencies()
-        .SetServiceDependencies()
-        .SetStateDependencies(objDependency, state1Dependency, state2Dependency))
-      .SetMethods());
+      .SetType(typeof(VirtualActor)));
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IVirtualActor))
@@ -141,23 +126,46 @@ internal static class VirtualActorFixture
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
       .SetIsVirtual(true)
+      .SetActivityBaseType(typeof(VirtualActorActivity))
+      .SetMethods()
+      .SetActivities()
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateDependency(null as IStateDependencyDescriptor)
+        .SetStateIndex(-1)
         .SetIdProperty(null))
       .SetState(_ => _
         .SetType(typeof(VirtualActorState))
         .SetFields(stateFields)
         .SetDefaultValue(new VirtualActorState
         {
-          _obj = new ComplexObject(),
-          _state1 = State1Default,
-          _state2 = 0
+          _0 = new ComplexObject(),
+          _1 = State1Default,
+          _2 = 0
         }))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))
         .SetCreateAsyncMethod(null)
         .SetGetMethod(factoryGetMethod)));
+  }
+
+  public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
+  {
+    Type actorType = typeof(VirtualActor);
+    Type activityBaseType = typeof(VirtualActorActivity);
+
+    stateTypeBuilderMock
+      .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
+      .Returns(typeof(VirtualActorState));
+
+    activityTypeBuilderMock
+      .Setup(x => x.BuildBase(actorType))
+      .Returns(activityBaseType);
+  }
+
+  public static void AssertValidDescriptor(IActorDescriptor descriptor)
+  {
+    descriptor.Should().BeAssignableTo<IActorDescriptor<VirtualActor, VirtualActorState>>();
+    descriptor.Should().BeEquivalentTo(Descriptor, opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
   }
 }

@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Actors.TestModel;
+﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
 using System.Reflection;
@@ -25,7 +26,11 @@ public class StateTypeBuilderTests
     FakeILGenerator state1GetterIL = ilProvider.AddGenerator();
     FakeILGenerator state1SetterIL = ilProvider.AddGenerator();
 
-    IReadOnlyList<FieldInfo> fields = StandardActorFixture.Descriptor.StateFields;
+    FieldInfo[] stateFields = StandardActorFixture.StateFields;
+    IEnumerable<IStateComponentMetadata> stateComponents = stateFields.Select((field, index) => Mock.Of<IStateComponentMetadata>(metadata =>
+      metadata.Member == field &&
+      metadata.Type == field.FieldType &&
+      metadata.Index == index));
 
     IActorDescriptor actor = StandardActorFixture.Descriptor;
     Type actorType = actor.ActorType;
@@ -33,7 +38,7 @@ public class StateTypeBuilderTests
     StateTypeBuilder sut = new StateTypeBuilder(_module, ilProvider);
 
     // Act
-    Type stateType = sut.BuildOrdinary(actorType, fields);
+    Type stateType = sut.Build(actorType, stateComponents, false);
 
     // Assert
     stateType.Namespace.Should().Be(actorType.Namespace);
@@ -41,12 +46,12 @@ public class StateTypeBuilderTests
     stateType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Should().HaveCount(2)
       .And.ContainSingle(property =>
         property.Name == "0" &&
-        property.PropertyType == fields[0].FieldType &&
+        property.PropertyType == stateFields[0].FieldType &&
         property.CanRead &&
         property.CanWrite)
       .And.ContainSingle(property =>
         property.Name == "1" &&
-        property.PropertyType == fields[1].FieldType &&
+        property.PropertyType == stateFields[1].FieldType &&
         property.CanRead &&
         property.CanWrite);
 

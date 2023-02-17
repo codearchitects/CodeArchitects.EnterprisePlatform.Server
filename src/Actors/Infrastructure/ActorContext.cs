@@ -21,22 +21,24 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   private ExecutionSection _section;
 
   public ActorContext(
-    TState state,
+    IServiceProvider services,
     IActorDescriptor<TActor, TState> descriptor,
     IActivityManager activityManager,
     IActorHost<TActor, TState> host,
+    TState state,
     int implementationId)
   {
-    State = state;
+    Actor = descriptor.CreateInstance(implementationId, services, state, this);
     _descriptor = descriptor;
     _activityManager = activityManager;
     _host = host;
+    State = state;
     _implementationId = implementationId;
     _bindings = new();
     _section = ExecutionSection.Constructor;
   }
 
-  public TActor Actor { get; set; } = default!;
+  public TActor Actor { get; }
 
   public TState State { get; }
 
@@ -62,7 +64,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   public void Become<TImplementation>()
     where TImplementation : class, TActor
   {
-    State.ImplementationId = _descriptor.GetImplementationId(typeof(TImplementation));
+    State.ImplementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
   }
 
   public BindingId RegisterBinding(Func<IBindingBuilder<TActor>, IBindingResult> configure)
@@ -100,7 +102,15 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleAsyncCore(activity, options, cancellationToken);
+    return ScheduleCoreAsync(activity, options, cancellationToken);
+  }
+
+  public Task<ScheduleId> ScheduleAsync(Expression<Action<TActor>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  {
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
+
+    return ScheduleCoreAsync(activity, options, cancellationToken);
   }
 
   public Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -109,7 +119,16 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleAsyncCore(activity, options, cancellationToken);
+    return ScheduleCoreAsync(activity, options, cancellationToken);
+  }
+
+  public Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Action<TImplementation>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+    where TImplementation : class, TActor
+  {
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
+
+    return ScheduleCoreAsync(activity, options, cancellationToken);
   }
 
   public Task<ScheduleId> ScheduleAsync(string activityName, IReadOnlyList<object?>? arguments = null, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -126,8 +145,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     await _host.UnscheduleAsync(id, cancellationToken);
   }
 
-  private Task<ScheduleId> ScheduleAsyncCore<T>(Expression<Func<T, Task>> activityExpression, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
-    where T : class
+  private Task<ScheduleId> ScheduleCoreAsync(LambdaExpression activityExpression, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
     ParameterExpression actorParam = activityExpression.Parameters[0];
 

@@ -75,9 +75,9 @@ internal abstract class ProxyFactoryTypeBuilder
         return;
       }
 
-      IStateDependencyDescriptor idDependency = id.StateDependency;
+      int stateDependencyIndex = id.StateIndex;
 
-      il.LoadArg(idDependency.Index + 1); // Push $idDependency
+      il.LoadArg(stateDependencyIndex + 1); // Push $idDependency
       if (id.IdProperty is { } property)
       {
         Debug.Assert(property.GetMethod is not null, "Expected the id property to have a getter.");

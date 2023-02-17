@@ -21,7 +21,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[0], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(0), descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
         name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
@@ -44,7 +44,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[1], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(1), descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
         name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
@@ -65,7 +65,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[2], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(2), descriptor.ActorType, baseType);
 
       object sut2 = Activator.CreateInstance(activityType)!;
       yield return new object?[] { sut2 };
@@ -82,7 +82,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[3], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(3), descriptor.ActorType, baseType);
 
       object sut2 = Activator.CreateInstance(activityType)!;
       yield return new object?[] { sut2 };
@@ -99,7 +99,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[4], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(4), descriptor.ActorType, baseType);
 
       object sut2 = Activator.CreateInstance(activityType)!;
       yield return new object?[] { sut2 };
@@ -118,7 +118,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[5], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(5), descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
         name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
@@ -141,7 +141,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = StandardActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[6], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(6), descriptor.ActorType, baseType);
       PropertyInfo argProperty = activityType.GetRequiredProperty(
         name: "0",
         bindingAttr: BindingFlags.Instance | BindingFlags.Public);
@@ -162,7 +162,7 @@ public partial class ActivityTests
       IActorDescriptor descriptor = PolymorphicActorFixture.Descriptor;
       ActivityTypeBuilder typeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       Type baseType = typeBuilder.BuildBase(descriptor.ActorType);
-      Type activityType = typeBuilder.Build(descriptor.Activities[3], descriptor.ActorType, baseType);
+      Type activityType = typeBuilder.Build(descriptor.Activities.ElementAt(3), descriptor.ActorType, baseType);
 
       object sut2 = Activator.CreateInstance(activityType)!;
       yield return new object?[] { sut2 };

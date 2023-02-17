@@ -1,6 +1,8 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
@@ -27,16 +29,20 @@ internal class PropertyIdSourceActor : IPropertyIdSourceActor
   }
 }
 
+internal class PropertyIdSourceActorState : OrdinaryActorState
+{
+  public PropertyIdSourceActorStateComponent _0 { get; set; } = default!;
+}
+
+internal abstract class PropertyIdSourceActorActivity : Activity<PropertyIdSourceActor>
+{
+}
+
 [ActorFactory(typeof(PropertyIdSourceActor))]
 internal interface IPropertyIdSourceActorFactory
 {
   Task<IPropertyIdSourceActor> CreateAsync(PropertyIdSourceActorStateComponent state, CancellationToken cancellationToken = default);
   IPropertyIdSourceActor Get(int id);
-}
-
-internal class PropertyIdSourceActorState : OrdinaryActorState
-{
-  public PropertyIdSourceActorStateComponent _state { get; set; } = default!;
 }
 
 internal static class PropertyIdSourceActorFixture
@@ -72,25 +78,9 @@ internal static class PropertyIdSourceActorFixture
     FieldInfo[] stateFields = typeof(PropertyIdSourceActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
 
-    IStateDependencyDescriptor stateDependency = StateDependencyDescriptorBuilder.Build(_ => _
-      .InitDefaults()
-      .SetParameter(constructorParameters[0])
-      .SetName("state")
-      .SetType(typeof(PropertyIdSourceActorStateComponent))
-      .SetIndex(0)
-      .SetFieldIndex(0)
-      .SetField(stateField));
-
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
-      .SetType(typeof(PropertyIdSourceActor))
-      .SetConstructor(_ => _
-        .SetConstructor(constructor)
-        .SetDependencies(stateDependency)
-        .SetContextDependencies()
-        .SetServiceDependencies()
-        .SetStateDependencies(stateDependency))
-      .SetMethods());
+      .SetType(typeof(PropertyIdSourceActor)));
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
       .SetInterfaceType(typeof(IPropertyIdSourceActor))
@@ -100,10 +90,13 @@ internal static class PropertyIdSourceActorFixture
       .SetImplementations(implementation)
       .SetIsPolymorphic(false)
       .SetIsVirtual(false)
+      .SetActivityBaseType(typeof(PropertyIdSourceActorActivity))
+      .SetMethods()
+      .SetActivities()
       .SetId(_ => _
         .SetType(typeof(int))
         .SetHasIdSource(true)
-        .SetStateDependency(stateDependency)
+        .SetStateIndex(0)
         .SetIdProperty(idProperty))
       .SetState(_ => _
         .SetType(typeof(PropertyIdSourceActorState))
@@ -113,5 +106,25 @@ internal static class PropertyIdSourceActorFixture
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
         .SetGetMethod(factoryGetMethod)));
+  }
+
+  public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
+  {
+    Type actorType = typeof(PropertyIdSourceActor);
+    Type activityBaseType = typeof(PropertyIdSourceActorActivity);
+
+    stateTypeBuilderMock
+      .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
+      .Returns(typeof(PropertyIdSourceActorState));
+
+    activityTypeBuilderMock
+      .Setup(x => x.BuildBase(actorType))
+      .Returns(activityBaseType);
+  }
+
+  public static void AssertValidDescriptor(IActorDescriptor descriptor)
+  {
+    descriptor.Should().BeAssignableTo<IActorDescriptor<PropertyIdSourceActor, PropertyIdSourceActorState>>();
+    descriptor.Should().BeEquivalentTo(Descriptor, opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
   }
 }

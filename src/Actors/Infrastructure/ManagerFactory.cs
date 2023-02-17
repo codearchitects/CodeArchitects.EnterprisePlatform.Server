@@ -14,7 +14,7 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
   public ManagerFactory(IServiceProvider services, IActorModel model, IActivityManager activityManager)
   {
     _services = services;
-    _descriptor = model.GetDescriptor<TActor, TState>();
+    _descriptor = model.GetActor<TActor, TState>();
     _activityManager = activityManager;
   }
 
@@ -25,9 +25,6 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
 
   public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState state, int implementationId)
   {
-    ActorContext<TActor, TState> context = new(state, _descriptor, _activityManager, host, implementationId);
-    context.Actor = _descriptor.CreateInstance(implementationId, _services, state, context);
-
-    return context;
+    return new ActorContext<TActor, TState>(_services, _descriptor, _activityManager, host, state, implementationId);
   }
 }

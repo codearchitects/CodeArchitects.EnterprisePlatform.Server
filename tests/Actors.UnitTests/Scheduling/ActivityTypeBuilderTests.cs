@@ -38,7 +38,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
     Type baseType = typeof(StandardActorActivity);
-    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[0];
+    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities.ElementAt(0);
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
     string argPropertyName = "0";
@@ -94,7 +94,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
     Type baseType = typeof(StandardActorActivity);
-    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[1];
+    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities.ElementAt(1);
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
     string argPropertyName = "0";
@@ -151,7 +151,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
     Type baseType = typeof(StandardActorActivity);
-    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[2];
+    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities.ElementAt(2);
     ParameterInfo[] parameters = descriptor.ImplementationMethod.GetParameters();
 
     FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
@@ -188,7 +188,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
     Type baseType = typeof(StandardActorActivity);
-    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[3];
+    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities.ElementAt(3);
 
     FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
     FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
@@ -223,7 +223,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(StandardActor);
     Type baseType = typeof(StandardActorActivity);
-    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities[4];
+    IMethodDescriptor descriptor = StandardActorFixture.Descriptor.Activities.ElementAt(4);
 
     FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
     FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();
@@ -255,7 +255,7 @@ public class ActivityTypeBuilderTests
     // Arrange
     Type actorType = typeof(PolymorphicActor);
     Type baseType = typeof(PolymorphicActorActivity);
-    IMethodDescriptor descriptor = PolymorphicActorFixture.Descriptor.Activities[3];
+    IMethodDescriptor descriptor = PolymorphicActorFixture.Descriptor.Activities.ElementAt(3);
 
     FakeILGenerator idGetterIL = _ilProvider.AddGenerator();
     FakeILGenerator executeAsyncMethodIL = _ilProvider.AddGenerator();

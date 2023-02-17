@@ -48,7 +48,7 @@ public partial class DaprActorHostTests
       .Returns(typeof(StandardActorActivity));
     managerMock
       .Setup(x => x.JsonSerializerOptions)
-      .Returns(StandardActorFixture.JsonSerializerOptions);
+      .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
 
     ScheduleId scheduleId = ScheduleId.New();
     TimeSpan timer = TimeSpan.FromSeconds(1);
@@ -113,7 +113,7 @@ public partial class DaprActorHostTests
       .Returns(typeof(StandardActorActivity));
     managerMock
       .Setup(x => x.JsonSerializerOptions)
-      .Returns(StandardActorFixture.JsonSerializerOptions);
+      .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
     factoryMock
       .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor, StandardActorState>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
       .Returns(managerMock.Object);
