@@ -3,11 +3,11 @@
 namespace ActorApp.Domain;
 
 [ActorImplementation<TrafficLight>(IsDefault = true)]
-public class OffTrafficLight : TrafficLight
+public class InactiveTrafficLight : TrafficLight
 {
-  private readonly ILogger<OffTrafficLight> _logger;
+  private readonly ILogger<InactiveTrafficLight> _logger;
 
-  public OffTrafficLight(TrafficLightState state, IActorContext<TrafficLight> context, ILogger<OffTrafficLight> logger)
+  public InactiveTrafficLight(TrafficLightState state, IActorContext<TrafficLight> context, ILogger<InactiveTrafficLight> logger)
     : base(state, context)
   {
     _logger = logger;
@@ -27,7 +27,7 @@ public class OffTrafficLight : TrafficLight
 
   public override async Task StartAsync(CancellationToken cancellationToken = default)
   {
-    await TurnGreenAsync();
+    await TurnGreenAsync("Traffic light is starting", 0);
   }
 
   public override Task StopAsync(CancellationToken cancellationToken = default)

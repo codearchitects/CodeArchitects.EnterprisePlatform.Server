@@ -6,7 +6,9 @@ namespace ActorApp.Domain;
 [Actor, Virtual]
 public abstract class TrafficLight : ITrafficLight
 {
-  protected static readonly ScheduleId _turnYellowSchedule = ScheduleId.New();
+  protected static readonly ScheduleId _yellowToRedSchedule = ScheduleId.New();
+  protected static readonly ScheduleId _greenToYellowSchedule = ScheduleId.New();
+  protected static readonly ScheduleId _redToGreenSchedule = ScheduleId.New();
 
   [State] protected readonly TrafficLightState _state;
   protected readonly IActorContext<TrafficLight> _context;
@@ -23,46 +25,40 @@ public abstract class TrafficLight : ITrafficLight
 
   public abstract ValueTask<LightColor> GetLightColorAsync(CancellationToken cancellationToken = default);
 
-  public virtual Task StartAsync(CancellationToken cancellationToken = default)
-  {
-    return Task.FromException(new InvalidOperationException("I was already started!"));
-  }
+  public abstract Task StartAsync(CancellationToken cancellationToken = default);
 
-  public virtual Task StopAsync(CancellationToken cancellationToken = default)
-  {
-    _context.Become<OffTrafficLight>();
-    return Task.CompletedTask;
-  }
+  public abstract Task StopAsync(CancellationToken cancellationToken = default);
 
-  protected virtual async Task TurnRedAsync()
+  protected virtual async Task TurnRedAsync(string reason)
   {
-    Logger.LogInformation("Turning red...");
+    Logger.LogInformation("Turning red. Reason: {reason}.", reason);
 
     _context.Become<RedTrafficLight>();
 
-    TimeSpan timer = 1.Minutes();
+    TimeSpan timer = TimeSpan.FromSeconds(30);
     _state.TurnsGreenAt = DateTime.Now + timer;
 
-    await _context.ScheduleAsync(self => self.TurnGreenAsync(), SchedulingOptions.In(timer));
+    await _context.ScheduleAsync(_redToGreenSchedule, self => self.TurnGreenAsync("Regular schedule", -2), SchedulingOptions.In(timer));
   }
 
-  protected virtual async Task TurnYellowAsync()
+  protected virtual async Task TurnYellowAsync(string reason)
   {
-    Logger.LogInformation("Turning yellow...");
+    Logger.LogInformation("Turning yellow. Reason: {reason}.", reason);
 
     _context.Become<YellowTrafficLight>();
 
-    await _context.ScheduleAsync(self => self.TurnRedAsync(), SchedulingOptions.In(10.Seconds()));
+    await _context.ScheduleAsync(_yellowToRedSchedule, self => self.TurnRedAsync("Regular schedule"), SchedulingOptions.In(10.Seconds()));
   }
 
-  protected virtual async Task TurnGreenAsync()
+  protected virtual async Task TurnGreenAsync(string reason, int maxCarsIncrement)
   {
-    Logger.LogInformation("Turning green...");
+    _state.MaxCarsBeforeYellow = Math.Max(5, _state.MaxCarsBeforeYellow + maxCarsIncrement);
+    _state.CarsBeforeYellow = 0;
 
-    _state.CarCount = 5;
+    Logger.LogInformation("Turning green. Reason: {reason}. Max cars before yellow: {maxCars}.", reason, _state.MaxCarsBeforeYellow);
 
     _context.Become<GreenTrafficLight>();
 
-    await _context.ScheduleAsync(_turnYellowSchedule, self => self.TurnYellowAsync(), SchedulingOptions.In(30.Seconds()));
+    await _context.ScheduleAsync(_greenToYellowSchedule, self => self.TurnYellowAsync("Regular schedule"), SchedulingOptions.In(30.Seconds()));
   }
 }

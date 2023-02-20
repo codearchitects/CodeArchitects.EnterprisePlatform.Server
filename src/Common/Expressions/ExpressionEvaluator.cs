@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Common.Exceptions;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -10,7 +11,7 @@ namespace CodeArchitects.Platform.Common.Expressions;
 internal partial class ExpressionEvaluator : ExpressionVisitor
 {
   [ThreadStatic]
-  private static readonly ExpressionEvaluator t_instance = new();
+  private static ExpressionEvaluator? t_instance;
 
   private ReadOnlyCollection<ParameterExpression>? _parameters;
   private object?[]? _arguments;
@@ -238,6 +239,8 @@ internal partial class ExpressionEvaluator : ExpressionVisitor
 
   public static T Evaluate<T>(Expression expression, ReadOnlyCollection<ParameterExpression>? parameters = null, object?[]? arguments = null)
   {
+    EnsureInitialized();
+
     try
     {
       t_instance.Init(parameters, arguments);
@@ -260,6 +263,12 @@ internal partial class ExpressionEvaluator : ExpressionVisitor
 
   private static Exception NotSupported(Type type)
     => new NotSupportedException($"Expression node of type '{type.FullName}' is not supported.");
+
+  [MemberNotNull(nameof(t_instance))]
+  private static void EnsureInitialized()
+  {
+    t_instance ??= new();
+  }
 
   #region Not supported
 

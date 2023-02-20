@@ -1,9 +1,10 @@
 ﻿using CodeArchitects.Platform.Actors;
+using CodeArchitects.Platform.Actors.Scheduling;
 
 namespace ActorApp.Domain;
 
 [ActorImplementation<TrafficLight>]
-public class YellowTrafficLight : TrafficLight
+public class YellowTrafficLight : ActiveTrafficLight
 {
   private readonly ILogger<YellowTrafficLight> _logger;
 
@@ -14,6 +15,8 @@ public class YellowTrafficLight : TrafficLight
   }
 
   protected override ILogger<TrafficLight> Logger => _logger;
+
+  protected override ScheduleId ChangeColorSchedule => _yellowToRedSchedule;
 
   public override Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)
   {
@@ -28,7 +31,7 @@ public class YellowTrafficLight : TrafficLight
     return ValueTask.FromResult(LightColor.Yellow);
   }
 
-  protected override Task TurnYellowAsync()
+  protected override Task TurnYellowAsync(string reason)
   {
     return Task.FromException(new InvalidOperationException("I am already yellow!"));
   }
