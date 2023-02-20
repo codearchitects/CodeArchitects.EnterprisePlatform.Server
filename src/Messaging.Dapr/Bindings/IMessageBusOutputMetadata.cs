@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.Messaging.Dapr.Bindings;
 
-internal interface IMessageBusOutputMetadata : ITypedOutputMetadata
+public interface IMessageBusOutputMetadata : ITypedOutputMetadata
 {
   string? Bus { get; }
 
