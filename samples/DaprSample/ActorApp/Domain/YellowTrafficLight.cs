@@ -16,7 +16,7 @@ public class YellowTrafficLight : ActiveTrafficLight
 
   protected override ILogger<TrafficLight> Logger => _logger;
 
-  protected override ScheduleId ChangeColorSchedule => _yellowToRedSchedule;
+  protected override ScheduleId ChangeColorSchedule => _turnRedSchedule;
 
   public override Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)
   {
@@ -26,9 +26,9 @@ public class YellowTrafficLight : ActiveTrafficLight
     });
   }
 
-  public override ValueTask<LightColor> GetLightColorAsync(CancellationToken cancellationToken = default)
+  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
   {
-    return ValueTask.FromResult(LightColor.Yellow);
+    return ValueTask.FromResult("yellow");
   }
 
   protected override Task TurnYellowAsync(string reason)

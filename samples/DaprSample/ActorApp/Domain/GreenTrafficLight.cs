@@ -22,7 +22,7 @@ public class GreenTrafficLight : ActiveTrafficLight
 
   protected override ILogger<TrafficLight> Logger => _logger;
 
-  protected override ScheduleId ChangeColorSchedule => _greenToYellowSchedule;
+  protected override ScheduleId ChangeColorSchedule => _turnYellowSchedule;
 
   public override Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)
   {
@@ -34,9 +34,9 @@ public class GreenTrafficLight : ActiveTrafficLight
     });
   }
 
-  public override ValueTask<LightColor> GetLightColorAsync(CancellationToken cancellationToken = default)
+  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
   {
-    return ValueTask.FromResult(LightColor.Green);
+    return ValueTask.FromResult("green");
   }
 
   protected override Task TurnGreenAsync(string reason, int maxCarsIncrement)
@@ -48,8 +48,8 @@ public class GreenTrafficLight : ActiveTrafficLight
   {
     _state.MaxCarsBeforeYellow += 3;
 
-    await _context.UnscheduleAsync(_greenToYellowSchedule);
+    await _context.UnscheduleAsync(_turnYellowSchedule);
 
-    await TurnYellowAsync("Too many cars have passed");
+    await TurnYellowAsync("too many cars have passed");
   }
 }

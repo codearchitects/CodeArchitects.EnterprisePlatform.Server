@@ -46,11 +46,11 @@ public class IntersectionController : ControllerBase
   {
     ITrafficLight trafficLight = _trafficLightFactory.Get(id);
 
-    LightColor color = await trafficLight.GetLightColorAsync();
+    string color = await trafficLight.GetLightColorAsync();
 
     return Ok(new
     {
-      Message = $"The light is currently {color.ToString().ToLower()}"
+      Message = $"The light is currently {color}"
     });
   }
 

@@ -20,14 +20,14 @@ public class InactiveTrafficLight : TrafficLight
     return Task.FromException<TrafficLightResponse>(new InvalidOperationException("I was not started!"));
   }
 
-  public override ValueTask<LightColor> GetLightColorAsync(CancellationToken cancellationToken = default)
+  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
   {
-    return ValueTask.FromException<LightColor>(new InvalidOperationException("I was not started!"));
+    return ValueTask.FromException<string>(new InvalidOperationException("I was not started!"));
   }
 
   public override async Task StartAsync(CancellationToken cancellationToken = default)
   {
-    await TurnGreenAsync("Traffic light is starting", 0);
+    await TurnGreenAsync("traffic light is starting", 0);
   }
 
   public override Task StopAsync(CancellationToken cancellationToken = default)

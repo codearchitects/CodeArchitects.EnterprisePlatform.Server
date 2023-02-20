@@ -1,4 +1,5 @@
 using ActorApp.Domain;
+using ActorApp.OldSkool;
 using CodeArchitects.Platform.Actors.Dapr.Factory;
 using CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 using CodeArchitects.Platform.Actors.Dapr.Proxy;
@@ -33,6 +34,7 @@ builder.Services.AddDaprClient();
 builder.Services.AddActors(options =>
 {
   options.Actors.Add(new ActorRegistration(ActorTypeInformation.Get(hostEmitResult.ClassType, nameof(TrafficLight))));
+  options.Actors.RegisterActor<TrafficLightActor>();
 });
 builder.Services.AddSingleton(typeof(ITrafficLightFactory), actorFactoryType);
 builder.Services.AddSingleton(model);
