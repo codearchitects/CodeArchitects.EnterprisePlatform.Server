@@ -14,28 +14,26 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   where TState : ActorState
 {
   private readonly IActorDescriptor<TActor, TState> _descriptor;
-  private readonly IActivityManager _activityManager;
+  private readonly IActivityManager<TActor> _activityManager;
   private readonly IActorHost<TActor, TState> _host;
-  private readonly int _implementationId;
-  private readonly List<ActorBinding<TActor>> _bindings;
+  private readonly List<IActorBinding<TActor>> _bindings;
   private ExecutionSection _section;
 
   public ActorContext(
     IServiceProvider services,
     IActorDescriptor<TActor, TState> descriptor,
-    IActivityManager activityManager,
+    IActivityManager<TActor> activityManager,
     IActorHost<TActor, TState> host,
     TState state,
     int implementationId)
   {
-    Actor = descriptor.CreateInstance(implementationId, services, state, this);
     _descriptor = descriptor;
     _activityManager = activityManager;
     _host = host;
     State = state;
-    _implementationId = implementationId;
     _bindings = new();
-    _section = ExecutionSection.Constructor;
+
+    Actor = CreateInstance(services, descriptor, state, implementationId);
   }
 
   public TActor Actor { get; }
@@ -50,15 +48,13 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 
   public Type ActivityType => _descriptor.ActivityBaseType;
 
-  public TState DefaultState
+  private TActor CreateInstance(IServiceProvider services, IActorDescriptor<TActor, TState> descriptor, TState state, int implementationId)
   {
-    get
-    {
-      if (!_descriptor.IsVirtual)
-        throw new UninitializedActorException(typeof(TActor));
+    _section = ExecutionSection.Constructor;
+    TActor instance = descriptor.CreateInstance(implementationId, services, state, this);
+    _section = ExecutionSection.None;
 
-      return _descriptor.State.DefaultValue!;
-    }
+    return instance;
   }
 
   public void Become<TImplementation>()
@@ -73,18 +69,19 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
       throw new ArgumentNullException(nameof(configure));
     if (_section is not ExecutionSection.Constructor)
       throw new InvalidOperationException("Bindings may be only registered inside the actor's constructor.");
-    
-    int index = _bindings.Count;
-    if (index >= 32)
-      throw new InvalidOperationException("Exceeded the maximum number of bindings.");
 
-    ActorBinding<TActor> binding = new();
-    configure(binding);
+    return RegisterBindingCore(new ActorBinding<TActor>(), configure);
+  }
 
-    BindingId id = new(_bindings.Count);
-    _bindings.Add(binding);
+  public BindingId RegisterBinding<TImplementation>(Func<IBindingBuilder<TImplementation>, IBindingResult> configure)
+    where TImplementation : class, TActor
+  {
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+    if (_section is not ExecutionSection.Constructor)
+      throw new InvalidOperationException("Bindings may be only registered inside the actor's constructor.");
 
-    return id;
+    return RegisterBindingCore(new ActorBinding<TActor, TImplementation>(), configure);
   }
 
   public void EnableBinding(BindingId id)
@@ -97,110 +94,188 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     State.EnabledBindings &= ~(1 << id._index);
   }
 
-  public Task<ScheduleId> ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    return ScheduleCoreAsync(ScheduleId.New(), 0, activity, options, cancellationToken);
   }
 
-  public Task<ScheduleId> ScheduleAsync(Expression<Action<TActor>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync(Expression<Action<TActor>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    return ScheduleCoreAsync(ScheduleId.New(), 0, activity, options, cancellationToken);
   }
 
-  public Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync<TImplementation>(Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
     where TImplementation : class, TActor
   {
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    int implementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    return ScheduleCoreAsync(ScheduleId.New(), implementationId, activity, options, cancellationToken);
   }
 
-  public Task<ScheduleId> ScheduleAsync<TImplementation>(Expression<Action<TImplementation>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync<TImplementation>(Expression<Action<TImplementation>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
     where TImplementation : class, TActor
   {
     if (activity is null)
       throw new ArgumentNullException(nameof(activity));
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    int implementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    return ScheduleCoreAsync(ScheduleId.New(), implementationId, activity, options, cancellationToken);
   }
 
-  public Task<ScheduleId> ScheduleAsync(string activityName, IReadOnlyList<object?>? arguments = null, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync(ScheduleId id, Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
-    if (activityName is null)
-      throw new ArgumentNullException(nameof(activityName));
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
 
-    Activity<TActor> activity = _activityManager.CreateActivity<TActor>(_implementationId, activityName, arguments ?? Array.Empty<object?>());
-    return ScheduleCoreAsync(activity, options, cancellationToken);
+    return ScheduleCoreAsync(id, 0, activity, options, cancellationToken);
   }
 
-  public async Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync(ScheduleId id, Expression<Action<TActor>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
-    await _host.UnscheduleAsync(id, cancellationToken);
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
+
+    return ScheduleCoreAsync(id, 0, activity, options, cancellationToken);
   }
 
-  private Task<ScheduleId> ScheduleCoreAsync(LambdaExpression activityExpression, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  public Task ScheduleAsync<TImplementation>(ScheduleId id, Expression<Func<TImplementation, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+    where TImplementation : class, TActor
+  {
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
+
+    int implementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    return ScheduleCoreAsync(id, implementationId, activity, options, cancellationToken);
+  }
+
+  public Task ScheduleAsync<TImplementation>(ScheduleId id, Expression<Action<TImplementation>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+    where TImplementation : class, TActor
+  {
+    if (activity is null)
+      throw new ArgumentNullException(nameof(activity));
+
+    int implementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    return ScheduleCoreAsync(id, implementationId, activity, options, cancellationToken);
+  }
+
+  public Task ScheduleAsync(ActivitySpec activitySpec, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  {
+    if (activitySpec.Name is null)
+      throw new ArgumentException("The activity name was null.", nameof(activitySpec));
+    if (activitySpec.Arguments is null)
+      throw new ArgumentException("The activity argument list was null.", nameof(activitySpec));
+
+    Activity<TActor> activity = CreateActivity(in activitySpec);
+    return _host.ScheduleAsync(ScheduleId.New(), activity, options ?? SchedulingOptions.Now, cancellationToken);
+  }
+
+  public Task ScheduleAsync(ScheduleId id, ActivitySpec activitySpec, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
+  {
+    if (activitySpec.Name is null)
+      throw new ArgumentException("The activity name was null.", nameof(activitySpec));
+    if (activitySpec.Arguments is null)
+      throw new ArgumentException("The activity argument list was null.", nameof(activitySpec));
+
+    Activity<TActor> activity = CreateActivity(in activitySpec);
+    return _host.ScheduleAsync(id, activity, options ?? SchedulingOptions.Now, cancellationToken);
+  }
+
+  public Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken = default)
+  {
+    return _host.UnscheduleAsync(id, cancellationToken);
+  }
+
+  private Activity<TActor> CreateActivity(in ActivitySpec activitySpec)
+  {
+    int implementationId = activitySpec.ImplementationType is { } implementationType
+      ? _descriptor.GetImplementation(implementationType).Id
+      : 0;
+
+    return _activityManager.CreateActivity(implementationId, activitySpec.Name, activitySpec.Arguments);
+  }
+
+  private Task ScheduleCoreAsync(ScheduleId id, int implementationId, LambdaExpression activityExpression, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
   {
     ParameterExpression actorParam = activityExpression.Parameters[0];
 
     if (activityExpression.Body is not MethodCallExpression methodCallExpression || methodCallExpression.Object != actorParam)
       throw new ArgumentException($"The '{nameof(activityExpression)}' expression should represent a call to an instance method of the current actor.", nameof(activityExpression));
 
-    DynamicArgumentList arguments = new(methodCallExpression.Arguments); // Avoids allocating an array
-    Activity<TActor> activity = _activityManager.CreateActivity<TActor>(_implementationId, methodCallExpression.Method, arguments);
+    DynamicArgumentList arguments = new(methodCallExpression.Arguments);
+    Activity<TActor> activity = _activityManager.CreateActivity(implementationId, methodCallExpression.Method, arguments);
 
-    return ScheduleCoreAsync(activity, options, cancellationToken);
-  }
-
-  private async Task<ScheduleId> ScheduleCoreAsync(Activity<TActor> activity, SchedulingOptions? options, CancellationToken cancellationToken = default)
-  {
-    if (options is null)
-    {
-      options = new(ScheduleId.New(), TimeSpan.Zero, Timeout.InfiniteTimeSpan);
-    }
-    else if (options.ScheduleId == default)
-    {
-      options = options with { ScheduleId = ScheduleId.New() };
-    }
-
-    await _host.ScheduleAsync(activity, options, cancellationToken);
-
-    return options.ScheduleId;
+    return _host.ScheduleAsync(id, activity, options ?? SchedulingOptions.Now, cancellationToken);
   }
 
   public void OnActivityBegin()
   {
+    VerifyBindingPreconditions();
     _section = ExecutionSection.Activity;
   }
 
   public void OnMethodBegin()
   {
+    VerifyBindingPreconditions();
     _section = ExecutionSection.Method;
   }
 
-  public async Task OnExecutionEndAsync(CancellationToken cancellationToken)
+  public void OnExecutionEnd()
   {
-    _section = ExecutionSection.Binding;
+    _section = ExecutionSection.None;
+    _descriptor.UpdateState(Actor, State);
+  }
 
-    for (int i = 0; i < _bindings.Count; i++)
+  public async Task ExecuteBindingsAsync(CancellationToken cancellationToken)
+  {
+    _section = ExecutionSection.Bindings;
+
+    for (int index = 0; index < _bindings.Count; index++)
     {
-      ActorBinding<TActor> binding = _bindings[i];
-      bool isEnabled = (State.EnabledBindings & (1 << i)) != 0;
+      IActorBinding<TActor> binding = _bindings[index];
 
-      if (!isEnabled && !binding.IsEnabled)
+      if (!State.IsBindingEnabled(index))
         continue;
 
       await binding.ExecuteAsync(Actor, cancellationToken);
     }
 
     _section = ExecutionSection.None;
-    _descriptor.UpdateState(Actor, State);
+  }
+
+  public BindingId RegisterBindingCore<TImplementation>(ActorBinding<TActor, TImplementation> binding, Func<IBindingBuilder<TImplementation>, IBindingResult> configure)
+    where TImplementation : class, TActor
+  {
+    int index = _bindings.Count;
+    if (index >= 32)
+      throw new InvalidOperationException("Exceeded the maximum number of bindings.");
+
+    configure(binding);
+
+    BindingId id = new(index);
+    _bindings.Add(binding);
+    
+    if (binding.IsEnabled)
+    {
+      EnableBinding(id);
+    }
+
+    return id;
+  }
+
+  private void VerifyBindingPreconditions()
+  {
+    foreach (IActorBinding<TActor> binding in _bindings)
+    {
+      binding.VerifyPreCondition(Actor);
+    }
   }
 
   private class DynamicArgumentList : IReadOnlyList<object?>

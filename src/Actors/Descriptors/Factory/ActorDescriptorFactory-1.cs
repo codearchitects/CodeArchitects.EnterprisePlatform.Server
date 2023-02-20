@@ -87,7 +87,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     bool isStateless = StateComponents.Count == 0;
     IStateDescriptor<TState> state = CreateState<TState>(isStateless);
     Action<TActor, TState> updateState = CreateUpdateStateFunc<TState>(state.Fields);
-    IActorIdDescriptor id = CreateId();
+    IActorIdDescriptor<TState> id = CreateId<TState>(state.Fields);
     bool isVirtual = IsExplicitVirtual || isStateless;
     IActorFactoryDescriptor factory = CreateFactory(interfaceType, id, isVirtual);
     Type activityBaseType = _activityTypeBuilder.BuildBase(ActorType);
@@ -232,24 +232,98 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     return state;
   }
 
-  public IActorIdDescriptor CreateId()
+  public IActorIdDescriptor<TState> CreateId<TState>(IReadOnlyList<FieldInfo> stateFields)
+    where TState : ActorState
   {
-    IActorIdDescriptor? id = null;
+    IActorIdDescriptor<TState>? id = null;
+
+    ParameterExpression stateParam = Expression.Parameter(typeof(TState), "state");
+    ParameterExpression idParam = Expression.Parameter(typeof(string), "id");
 
     foreach (StateComponentMetadata<TActor> component in StateComponents)
     {
-      if (!component.IsActorIdSource(out PropertyInfo? actorIdProperty))
-        continue;
+      int stateIndex = component.Index;
 
-      if (id is not null)
-        throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+      if (component.IsActorIdSource(out Type? idType))
+      {
+        if (id is not null)
+          throw InvalidActorException.AmbiguousActorIdSource(ActorType);
 
-      id = actorIdProperty is null
-        ? new ComponentActorIdDescriptor(component.Type, component.Index)
-        : new PropertyActorIdDescriptor(actorIdProperty, component.Index);
+        Type actorIdSourceType = typeof(IActorIdSource<>).MakeGenericType(idType.UnderlyingSystemType);
+        InterfaceMapping mapping = component.Type.GetInterfaceMap(actorIdSourceType);
+
+        MethodInfo getActorIdMethod = mapping.TargetMethods.Single(method => method.Name.Contains(nameof(IActorIdSource<object>.GetActorId)));
+        MethodInfo setActorIdMethod = mapping.TargetMethods.Single(method => method.Name.Contains(nameof(IActorIdSource<object>.SetActorId)));
+
+        Expression parseIdExpression = GetParseIdExpression(idParam, idType);
+        
+        Action<TState, string> setId = Expression.Lambda<Action<TState, string>>(
+          body: Expression.Call(
+            instance: Expression.Field(
+              expression: stateParam,
+              field: stateFields[stateIndex]),
+            method: setActorIdMethod,
+            arguments: parseIdExpression),
+          parameters: new[] { stateParam, idParam })
+          .Compile();
+
+        return new SourceActorIdDescriptor<TState>(getActorIdMethod, stateIndex, setId);
+      }
+      else if (component.IsActorId)
+      {
+        if (id is not null)
+          throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+
+        Expression parseIdExpression = GetParseIdExpression(idParam, component.Type);
+
+        Action<TState, string> setId = Expression.Lambda<Action<TState, string>>(
+          body: Expression.Assign(
+            left: Expression.Field(
+              expression: stateParam,
+              field: stateFields[stateIndex]),
+            right: parseIdExpression),
+          parameters: new[] { stateParam, idParam })
+          .Compile();
+
+        return new ComponentActorIdDescriptor<TState>(component.Type, stateIndex, setId);
+      }
     }
 
-    return id ?? DefaultActorIdDescriptor.Instance;
+    return id ?? DefaultActorIdDescriptor<TState>.Instance;
+  }
+
+  private Expression GetParseIdExpression(ParameterExpression idParam, Type idType)
+  {
+    MethodInfo? parseMethod = idType.GetMethod(
+      name: "Parse",
+      bindingAttr: BindingFlags.Static | BindingFlags.Public,
+      binder: null,
+      types: new[] { typeof(string) },
+      modifiers: null);
+
+    if (parseMethod is not null && parseMethod.ReturnType == idType)
+    {
+      return Expression.Call(
+        method: parseMethod,
+        arg0: idParam);
+    }
+
+    parseMethod = idType.GetMethod(
+      name: "Parse",
+      bindingAttr: BindingFlags.Static | BindingFlags.Public,
+      binder: null,
+      types: new[] { typeof(string), typeof(IFormatProvider) },
+      modifiers: null);
+
+    if (parseMethod is not null && parseMethod.ReturnType == idType)
+    {
+      return Expression.Call(
+        method: parseMethod,
+        arg0: idParam,
+        arg1: Expression.Constant(null, typeof(IFormatProvider)));
+    }
+
+    throw InvalidActorException.InvalidIdType(ActorType, idType);
   }
 
   private ActorFactoryDescriptor CreateFactory(Type interfaceType, IActorIdDescriptor id, bool isVirtual)
@@ -296,7 +370,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       name: "Get",
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       binder: null,
-      types: new[] { id.Type },
+      types: new[] { id.Type.UnderlyingSystemType },
       modifiers: null);
 
     if (getMethod is null || getMethod.ReturnType != interfaceType)

@@ -229,7 +229,7 @@ public class DaprProxyFactoryTypeBuilderTests
     createAsyncMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Callvirt(typeof(PropertyIdSourceActorStateComponent), "get_Id", Type.EmptyTypes)
+      .Callvirt(typeof(PropertyIdSourceActorStateComponent), nameof(IActorIdSource<object>.GetActorId), Type.EmptyTypes)
       .Newobj(typeof(PropertyIdSourceActorState), Type.EmptyTypes)
       .Dup()
       .Ldarg_1()

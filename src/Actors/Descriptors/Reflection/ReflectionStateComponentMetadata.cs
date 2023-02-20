@@ -12,6 +12,8 @@ internal class ReflectionStateComponentMetadata<TActor> : StateComponentMetadata
   {
   }
 
+  public override bool IsActorId => Member.IsDefined(typeof(ActorIdAttribute));
+
   public override bool HasDefaultValue(out object? defaultComponentValue)
   {
     Optional<object?> defaultValue = Member.GetCustomAttribute<StateAttribute>().DefaultValue;
@@ -24,27 +26,5 @@ internal class ReflectionStateComponentMetadata<TActor> : StateComponentMetadata
 
     defaultComponentValue = null;
     return false;
-  }
-
-  public override bool IsActorIdSource(out PropertyInfo? actorIdProperty)
-  {
-    actorIdProperty = GetActorIdProperty();
-
-    return Member.IsDefined(typeof(ActorIdAttribute)) || actorIdProperty is not null;
-  }
-
-  private PropertyInfo? GetActorIdProperty()
-  {
-    try
-    {
-      return Type
-        .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-        .Where(property => property.IsDefined(typeof(ActorIdAttribute)))
-        .SingleOrDefault();
-    }
-    catch (InvalidOperationException)
-    {
-      throw InvalidActorException.AmbiguousActorIdSource(Member.DeclaringType);
-    }
   }
 }

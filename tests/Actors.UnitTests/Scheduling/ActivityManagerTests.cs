@@ -11,12 +11,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(0).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method, new object?[] { arg });
 
     // Assert
     StandardActorActivity1 typedActivity = activity.Should().BeOfType<StandardActorActivity1>().Subject;
@@ -30,12 +30,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(1).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg, CancellationToken.None });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method, new object?[] { arg, CancellationToken.None });
 
     // Assert
     StandardActorActivity2 typedActivity = activity.Should().BeOfType<StandardActorActivity2>().Subject;
@@ -49,12 +49,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(5).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method, new object?[] { arg });
 
     // Assert
     StandardActorActivity6 typedActivity = activity.Should().BeOfType<StandardActorActivity6>().Subject;
@@ -68,12 +68,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const string arg = "12";
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(6).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method, new object?[] { arg });
 
     // Assert
     StandardActorActivity7 typedActivity = activity.Should().BeOfType<StandardActorActivity7>().Subject;
@@ -87,12 +87,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(0).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method.Name, new object?[] { arg });
 
     // Assert
     StandardActorActivity1 typedActivity = activity.Should().BeOfType<StandardActorActivity1>().Subject;
@@ -106,12 +106,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(1).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg, CancellationToken.None });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method.Name, new object?[] { arg, CancellationToken.None });
 
     // Assert
     StandardActorActivity2 typedActivity = activity.Should().BeOfType<StandardActorActivity2>().Subject;
@@ -125,12 +125,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const int arg = 12;
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(5).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method.Name, new object?[] { arg });
 
     // Assert
     StandardActorActivity6 typedActivity = activity.Should().BeOfType<StandardActorActivity6>().Subject;
@@ -144,12 +144,12 @@ public class ActivityManagerTests
     // Arrange
     const int implementationId = 42;
     const string arg = "12";
-    ActivityManager sut = ActivityManager.Create(StandardActorFixture.Descriptor);
+    ActivityManager<StandardActor> sut = ActivityManager<StandardActor>.Create(StandardActorFixture.Descriptor);
 
     MethodInfo method = StandardActorFixture.Descriptor.Activities.ElementAt(6).ImplementationMethod;
 
     // Act
-    Activity<StandardActor> activity = sut.CreateActivity<StandardActor>(implementationId, method.Name, new object?[] { arg });
+    Activity<StandardActor> activity = sut.CreateActivity(implementationId, method.Name, new object?[] { arg });
 
     // Assert
     StandardActorActivity7 typedActivity = activity.Should().BeOfType<StandardActorActivity7>().Subject;

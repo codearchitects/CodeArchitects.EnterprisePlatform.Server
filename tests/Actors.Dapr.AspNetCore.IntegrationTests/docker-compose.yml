@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  actorapp:
+    image: ${DOCKER_REGISTRY-}actorapp
+    build:
+      context: ../..
+      dockerfile: tests/Actors.Dapr.AspNetCore.IntegrationTests/ActorApp/Dockerfile
+    ports:
+      - 20100:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - redis
+
+  actorapp-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:actorapp
+    depends_on:
+      - actorapp
+    command: ["./daprd",
+      "-app-id", "actorapp",
+      "-app-port", "80",
+      "-placement-host-address", "dapr-placement:50000",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+    
+  redis:
+    image: redis:alpine
+    ports:
+      - 5379:6379
+      
+  dapr-placement:
+    image: "daprio/dapr:latest"
+    command: ["./placement", "-port", "50000", "-log-level", "debug"]

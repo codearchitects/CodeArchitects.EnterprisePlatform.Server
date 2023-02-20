@@ -10,5 +10,5 @@ internal interface IActorIdDescriptor
   
   int StateIndex { get; }
 
-  PropertyInfo? IdProperty { get; }
+  MethodInfo? GetActorIdMethod { get; }
 }

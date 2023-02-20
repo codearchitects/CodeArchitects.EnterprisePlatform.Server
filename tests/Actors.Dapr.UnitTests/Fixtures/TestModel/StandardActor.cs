@@ -32,22 +32,22 @@ internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorSta
 
   public Task TaskMethod_1(int arg)
   {
-    return Manager.Actor.TaskMethod(arg);
+    return Actor.TaskMethod(arg);
   }
 
   public Task<int> TaskMethod_2(int arg, CancellationToken cancellationToken)
   {
-    return Manager.Actor.TaskMethod(arg, cancellationToken);
+    return Actor.TaskMethod(arg, cancellationToken);
   }
 
   public Task ValueTaskMethod(CancellationToken cancellationToken)
   {
-    return Manager.Actor.ValueTaskMethod(cancellationToken).AsTask();
+    return Actor.ValueTaskMethod(cancellationToken).AsTask();
   }
 
   public Task<string> ValueTaskTMethod()
   {
-    return Manager.Actor.ValueTaskTMethod().AsTask();
+    return Actor.ValueTaskTMethod().AsTask();
   }
 
   public Task _InitAsync(StandardActorState state, CancellationToken cancellationToken)

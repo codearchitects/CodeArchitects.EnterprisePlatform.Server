@@ -13,8 +13,8 @@ internal class ReflectionImplementationDescriptorFactory<TActor> : Implementatio
   }
 
   public override bool IsDefault =>
-    ImplementationType.GetCustomAttribute<ActorImplementationAttribute>()?.IsDefault ??
-    ImplementationType.GetCustomAttribute<ActorImplementationAttribute<TActor>>()!.IsDefault;
+    ImplementationType.GetCustomAttribute<ActorImplementationAttribute>(inherit: false)?.IsDefault ??
+    ImplementationType.GetCustomAttribute<ActorImplementationAttribute<TActor>>(inherit: false)!.IsDefault;
 
   public override Type ImplementationType { get; }
 

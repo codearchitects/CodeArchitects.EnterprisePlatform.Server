@@ -15,7 +15,7 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
     Type activityBaseType,
     Action<TActor, TState> updateState,
     IStateDescriptor<TState> state,
-    IActorIdDescriptor id,
+    IActorIdDescriptor<TState> id,
     IActorFactoryDescriptor factory,
     IImplementationDescriptor<TActor, TState> baseImplementation,
     IReadOnlyCollection<IMethodDescriptor> methods,
@@ -55,7 +55,7 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
 
   public IReadOnlyCollection<IMethodDescriptor> Activities { get; }
 
-  public IActorIdDescriptor Id { get; }
+  public IActorIdDescriptor<TState> Id { get; }
 
   public IActorFactoryDescriptor Factory { get; }
 
@@ -74,6 +74,8 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
   IReadOnlyCollection<IImplementationDescriptor> IActorDescriptor.Implementations => Implementations;
 
   IStateDescriptor IActorDescriptor.State => State;
+
+  IActorIdDescriptor IActorDescriptor.Id => Id;
 
   public abstract TActor CreateInstance(int implementationId, IServiceProvider services, TState state, IActorContext<TActor> context);
 

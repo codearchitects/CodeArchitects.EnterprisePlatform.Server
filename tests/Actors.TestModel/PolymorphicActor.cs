@@ -310,9 +310,9 @@ internal static class PolymorphicActorFixture
         .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateIndex(-1)
-        .SetIdProperty(null))
+        .SetGetActorIdMethod(null))
       .SetState(_ => _
-        .SetType(typeof(PolymorphicActorState))
+        .SetType(new StateTypeDelegator(typeof(PolymorphicActorState)))
         .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
@@ -328,7 +328,7 @@ internal static class PolymorphicActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), true))
-      .Returns(typeof(PolymorphicActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

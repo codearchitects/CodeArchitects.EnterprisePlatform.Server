@@ -25,8 +25,8 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
 
   public IEnumerable<Type> GetImplementationTypes(Type actorType)
   {
-    _ = _implementationTypes.TryGetValue(actorType, out HashSet<Type> implementationTypes);
-    return implementationTypes;
+    _ = _implementationTypes.TryGetValue(actorType, out HashSet<Type>? implementationTypes);
+    return implementationTypes ?? Enumerable.Empty<Type>();
   }
 
   public void AddAssembly(Assembly assembly)
@@ -81,7 +81,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
   {
     actorAttribute = null;
 
-    foreach (object attribute in type.GetCustomAttributes())
+    foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
       if (typeof(IActorAttribute).IsInstanceOfType(attribute))
       {
@@ -99,7 +99,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
   {
     actorFactoryAttribute = null;
 
-    foreach (object attribute in type.GetCustomAttributes())
+    foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
       if (typeof(IActorFactoryAttribute).IsInstanceOfType(attribute))
       {
@@ -117,7 +117,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
   {
     actorImplementationAttribute = null;
 
-    foreach (object attribute in type.GetCustomAttributes())
+    foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
       if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
       {

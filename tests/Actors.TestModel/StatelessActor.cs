@@ -4,7 +4,6 @@ using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
-using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 
@@ -76,9 +75,9 @@ internal static class StatelessActorFixture
         .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateIndex(-1)
-        .SetIdProperty(null))
+        .SetGetActorIdMethod(null))
       .SetState(_ => _
-        .SetType(typeof(StatelessActorState))
+        .SetType(new StateTypeDelegator(typeof(StatelessActorState)))
         .SetFields()
         .SetDefaultValue(new StatelessActorState()))
       .SetFactory(_ => _
@@ -94,7 +93,7 @@ internal static class StatelessActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
-      .Returns(typeof(StatelessActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

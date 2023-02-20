@@ -11,10 +11,19 @@ internal interface IPropertyIdSourceActor
 {
 }
 
-internal class PropertyIdSourceActorStateComponent
+internal class PropertyIdSourceActorStateComponent : IActorIdSource<int>
 {
-  [ActorId]
-  public int Id { get; }
+  public int Id { get; private set; }
+
+  public int GetActorId()
+  {
+    return Id;
+  }
+
+  public void SetActorId(int actorId)
+  {
+    Id = actorId;
+  }
 }
 
 [Actor]
@@ -55,8 +64,8 @@ internal static class PropertyIdSourceActorFixture
       name: "_state",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
-    PropertyInfo idProperty = typeof(PropertyIdSourceActorStateComponent).GetRequiredProperty(
-      name: nameof(PropertyIdSourceActorStateComponent.Id),
+    MethodInfo getActorIdMethod = typeof(PropertyIdSourceActorStateComponent).GetRequiredMethod(
+      name: nameof(PropertyIdSourceActorStateComponent.GetActorId),
       bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
     ConstructorInfo constructor = typeof(PropertyIdSourceActor).GetRequiredConstructor(
@@ -97,9 +106,9 @@ internal static class PropertyIdSourceActorFixture
         .SetType(typeof(int))
         .SetHasIdSource(true)
         .SetStateIndex(0)
-        .SetIdProperty(idProperty))
+        .SetGetActorIdMethod(getActorIdMethod))
       .SetState(_ => _
-        .SetType(typeof(PropertyIdSourceActorState))
+        .SetType(new StateTypeDelegator(typeof(PropertyIdSourceActorState)))
         .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
@@ -115,7 +124,7 @@ internal static class PropertyIdSourceActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
-      .Returns(typeof(PropertyIdSourceActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

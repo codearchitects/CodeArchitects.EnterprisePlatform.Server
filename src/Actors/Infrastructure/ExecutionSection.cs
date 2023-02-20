@@ -6,5 +6,5 @@ internal enum ExecutionSection
   Constructor,
   Method,
   Activity,
-  Binding
+  Bindings
 }

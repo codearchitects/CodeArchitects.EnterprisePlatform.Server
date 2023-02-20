@@ -50,6 +50,8 @@ internal abstract class ImplementationDescriptorFactory<TActor>
   {
     if (_id != 0 && HasStateFields)
       throw InvalidActorException.StateMustBeDefinedInBaseActor(ActorType, ImplementationType);
+    if (ImplementationType.IsAbstract)
+      throw InvalidActorException.AbstractImplementation(ImplementationType);
 
     ConstructorInfo constructor = GetConstructor();
     ImplementationFactory<TActor, TState> implementationFactory = CreateImplementationFactory<TState>(constructor, stateFields);

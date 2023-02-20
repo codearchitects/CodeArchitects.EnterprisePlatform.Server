@@ -1,20 +1,18 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
-internal class ComponentActorIdDescriptor : IActorIdDescriptor
+internal class ComponentActorIdDescriptor<TState> : ActorIdDescriptor<TState>
+  where TState : ActorState
 {
-  public ComponentActorIdDescriptor(Type type, int stateIndex)
+  public ComponentActorIdDescriptor(Type type, int stateIndex, Action<TState, string> setId)
+    : base(stateIndex, setId)
   {
     Type = type;
-    StateIndex = stateIndex;
   }
 
-  public Type Type { get; }
+  public override Type Type { get; }
 
-  public bool HasIdSource => true;
-
-  public int StateIndex { get; }
-
-  public PropertyInfo? IdProperty => null;
+  public override MethodInfo? GetActorIdMethod => null;
 }

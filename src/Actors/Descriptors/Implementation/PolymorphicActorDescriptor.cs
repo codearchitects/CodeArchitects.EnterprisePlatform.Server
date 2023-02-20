@@ -14,7 +14,7 @@ internal class PolymorphicActorDescriptor<TActor, TState> : ActorDescriptor<TAct
     Type activityBaseType,
     Action<TActor, TState> updateState,
     IStateDescriptor<TState> state,
-    IActorIdDescriptor id,
+    IActorIdDescriptor<TState> id,
     IActorFactoryDescriptor factory,
     IImplementationDescriptor<TActor, TState> baseImplementation,
     IReadOnlyCollection<IMethodDescriptor> methods,
@@ -32,7 +32,7 @@ internal class PolymorphicActorDescriptor<TActor, TState> : ActorDescriptor<TAct
 
   public override TActor CreateInstance(int implementationId, IServiceProvider services, TState state, IActorContext<TActor> context)
   {
-    return _implementations[implementationId].CreateInstance(services, state, context);
+    return _implementations[implementationId - 1].CreateInstance(services, state, context);
   }
 
   public override IImplementationDescriptor<TActor, TState> GetImplementation(Type implementationType)

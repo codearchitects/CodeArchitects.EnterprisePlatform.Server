@@ -7,7 +7,11 @@ public interface IActorContext
 {
   string ActorId { get; }
 
-  Task<ScheduleId> ScheduleAsync(string activityName, IReadOnlyList<object?>? arguments = null, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
+  Task ScheduleAsync(ActivitySpec activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
+
+  Task ScheduleAsync(ScheduleId id, ActivitySpec activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default);
+
+  Task UnscheduleAsync(ScheduleId scheduleId, CancellationToken cancellationToken = default);
 
   void EnableBinding(BindingId id);
 

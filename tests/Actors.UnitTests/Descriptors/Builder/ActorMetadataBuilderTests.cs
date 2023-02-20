@@ -141,8 +141,7 @@ public class ActorMetadataBuilderTests
 
     sut
       .HasFactoryType<IPropertyIdSourceActorFactory>()
-      .HasState<PropertyIdSourceActorStateComponent>("_state", state => state
-        .IsActorIdSource(component => component.Id));
+      .HasState("_state");
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();

@@ -9,22 +9,46 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
 {
   private readonly IServiceProvider _services;
   private readonly IActorDescriptor<TActor, TState> _descriptor;
-  private readonly IActivityManager _activityManager;
+  private readonly IActivityManager<TActor> _activityManager;
 
-  public ManagerFactory(IServiceProvider services, IActorModel model, IActivityManager activityManager)
+  public ManagerFactory(IServiceProvider services, IActorModel model, IActivityManager<TActor> activityManager)
   {
     _services = services;
     _descriptor = model.GetActor<TActor, TState>();
     _activityManager = activityManager;
   }
 
-  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState state)
+  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState? state)
   {
-    return Create(host, state, state.ImplementationId);
+    state ??= GetDefaultState(host.ActorId);
+    return CreateCore(host, state, state.ImplementationId);
   }
 
-  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState state, int implementationId)
+  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState? state, int implementationId)
+  {
+    state ??= GetDefaultState(host.ActorId);
+    if (implementationId == 0)
+    {
+      implementationId = state.ImplementationId;
+    }
+
+    return CreateCore(host, state, implementationId);
+  }
+
+  private IActorManager<TActor, TState> CreateCore(IActorHost<TActor, TState> host, TState state, int implementationId)
   {
     return new ActorContext<TActor, TState>(_services, _descriptor, _activityManager, host, state, implementationId);
+  }
+
+  private TState GetDefaultState(string id)
+  {
+    if (!_descriptor.IsVirtual)
+      throw new UninitializedActorException(typeof(TActor));
+
+    TState defaultValue = _descriptor.State.DefaultValue!;
+    defaultValue.ImplementationId = _descriptor.DefaultImplementation.Id;
+    _descriptor.Id.SetId(defaultValue, id);
+
+    return defaultValue;
   }
 }

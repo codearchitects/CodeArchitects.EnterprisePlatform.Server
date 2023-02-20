@@ -8,6 +8,8 @@ internal interface IActorDescriptor<TActor, TState> : IActorDescriptor
 {
   new IStateDescriptor<TState> State { get; }
 
+  new IActorIdDescriptor<TState> Id { get; }
+
   new IImplementationDescriptor<TActor, TState> BaseImplementation { get; }
 
   new IImplementationDescriptor<TActor, TState> DefaultImplementation { get; }

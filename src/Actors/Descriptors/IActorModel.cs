@@ -6,6 +6,8 @@ internal interface IActorModel
 {
   IReadOnlyCollection<IActorDescriptor> Actors { get; }
 
+  IActorDescriptor GetActor(Type actorType);
+
   IActorDescriptor<TActor, TState> GetActor<TActor, TState>()
     where TActor : class
     where TState : ActorState;

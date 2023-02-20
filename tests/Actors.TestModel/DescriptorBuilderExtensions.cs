@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
-using Moq;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 

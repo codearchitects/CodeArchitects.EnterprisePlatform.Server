@@ -2,11 +2,10 @@
 
 namespace CodeArchitects.Platform.Actors.Scheduling;
 
-internal interface IActivityManager
+internal interface IActivityManager<TActor>
+  where TActor : class
 {
-  Activity<TActor> CreateActivity<TActor>(int implementationId, MethodInfo method, IReadOnlyList<object?> arguments)
-    where TActor : class;
+  Activity<TActor> CreateActivity(int implementationId, MethodInfo method, IReadOnlyList<object?> arguments);
 
-  Activity<TActor> CreateActivity<TActor>(int implementationId, string activityName, IReadOnlyList<object?> arguments)
-    where TActor : class;
+  Activity<TActor> CreateActivity(int implementationId, string activityName, IReadOnlyList<object?> arguments);
 }

@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Emit;
-using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -47,7 +46,7 @@ internal abstract class ProxyFactoryTypeBuilder
     MethodInfo createCoreAsyncMethod = type.BaseType!.GetRequiredMethod(
       name: "CreateCoreAsync",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic)
-      .MakeGenericMethod(id.Type);
+      .MakeGenericMethod(id.Type.UnderlyingSystemType);
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
     IILGenerator il = _ilProvider.GetILGenerator(method);
@@ -77,12 +76,22 @@ internal abstract class ProxyFactoryTypeBuilder
 
       int stateDependencyIndex = id.StateIndex;
 
-      il.LoadArg(stateDependencyIndex + 1); // Push $idDependency
-      if (id.IdProperty is { } property)
+      if (id.GetActorIdMethod is { } getActorIdMethod)
       {
-        Debug.Assert(property.GetMethod is not null, "Expected the id property to have a getter.");
-
-        il.Emit(OpCodes.Callvirt, property.GetMethod!); // Get $id := $idDependency.idProperty
+        if (getActorIdMethod.DeclaringType.IsValueType)
+        {
+          il.Emit(OpCodes.Ldarga_S, stateDependencyIndex + 1); // Push $idDependency
+          il.Emit(OpCodes.Call, getActorIdMethod);             // Get $id := $idDependency.GetActorId()
+        }
+        else
+        {
+          il.LoadArg(stateDependencyIndex + 1);        // Push $idDependency
+          il.Emit(OpCodes.Callvirt, getActorIdMethod); // Get $id := $idDependency.GetActorId()
+        }
+      }
+      else
+      {
+        il.LoadArg(stateDependencyIndex + 1); // Push $idDependency
       }
 
       argOffset = 1;

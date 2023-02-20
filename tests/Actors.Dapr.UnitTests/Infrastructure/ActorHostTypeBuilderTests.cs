@@ -1,12 +1,10 @@
-﻿using CodeArchitects.Platform.Actors.Dapr.Proxy;
-using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
 using Dapr.Actors;
 using Dapr.Actors.Runtime;
-using FluentAssertions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
@@ -53,8 +51,8 @@ public class ActorHostTypeBuilderTests
     interfaceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Should().HaveCount(5);
     interfaceType.Should().HaveMethod($"{nameof(IStandardActor.TaskMethod)}-1", new[] { typeof(int) }).Which.Should().Return<Task>();
     interfaceType.Should().HaveMethod($"{nameof(IStandardActor.TaskMethod)}-2", new[] { typeof(int), typeof(CancellationToken) }).Which.Should().Return<Task<int>>();
-    interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskMethod), new[] { typeof(CancellationToken) }).Which.Should().Return<ValueTask>();
-    interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskTMethod), Type.EmptyTypes).Which.Should().Return<ValueTask<string>>();
+    interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskMethod), new[] { typeof(CancellationToken) }).Which.Should().Return<Task>();
+    interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskTMethod), Type.EmptyTypes).Which.Should().Return<Task<string>>();
     interfaceType.Should().HaveMethod(Constants.InitAsyncMethodName, new[] { typeof(StandardActorState), typeof(CancellationToken) }).Which.Should().Return<Task>();
 
     classType.Namespace.Should().Be(actorType.Namespace);

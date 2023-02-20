@@ -7,4 +7,5 @@ public interface IBindingBuilder<TActor>
   IBindingBuilder<TActor> WithPostCondition(Func<TActor, bool> postCondition);
   IBindingBuilder<TActor> IsEnabled(bool enabled = true);
   IBindingResult BindTo(Func<TActor, CancellationToken, Task> activity);
+  IBindingResult BindTo(Action<TActor> activity);
 }

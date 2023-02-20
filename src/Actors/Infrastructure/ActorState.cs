@@ -9,4 +9,9 @@ internal abstract class ActorState
   [JsonPropertyName("bdgs")]
   [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
   public int EnabledBindings { get; set; }
+
+  public bool IsBindingEnabled(int index)
+  {
+    return (EnabledBindings & (1 << index)) != 0;
+  }
 }

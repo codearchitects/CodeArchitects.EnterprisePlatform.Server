@@ -133,9 +133,9 @@ internal static class VirtualActorFixture
         .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateIndex(-1)
-        .SetIdProperty(null))
+        .SetGetActorIdMethod(null))
       .SetState(_ => _
-        .SetType(typeof(VirtualActorState))
+        .SetType(new StateTypeDelegator(typeof(VirtualActorState)))
         .SetFields(stateFields)
         .SetDefaultValue(new VirtualActorState
         {
@@ -156,7 +156,7 @@ internal static class VirtualActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
-      .Returns(typeof(VirtualActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

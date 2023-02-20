@@ -30,14 +30,15 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
     if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
       return;
 
-    TState state = await GetStateAsync(CancellationToken.None);
+    TState? state = await GetStateAsync(CancellationToken.None);
     Manager = _factory.Create(this, state);
     Manager.OnMethodBegin();
   }
 
   protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
   {
-    await Manager.OnExecutionEndAsync(CancellationToken.None);
+    await Manager.ExecuteBindingsAsync(CancellationToken.None);
+    Manager.OnExecutionEnd();
     await StateManager.SetStateAsync(Constants.ActorStateName, Manager.State, CancellationToken.None);
   }
 
@@ -47,11 +48,11 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
     return StateManager.AddStateAsync(Constants.ActorStateName, state, cancellationToken);
   }
 
-  public Task ScheduleAsync(Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken)
+  public Task ScheduleAsync(ScheduleId id, Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken)
   {
     byte[] payload = JsonSerializer.SerializeToUtf8Bytes(activity, Manager.ActivityType, Manager.JsonSerializerOptions);
 
-    return RegisterReminderAsync(options.ScheduleId, payload, options.Timer, options.Period);
+    return RegisterReminderAsync(id, payload, options.Timer, options.Period);
   }
 
   public Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken)
@@ -63,20 +64,20 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
   {
     Activity<TActor> activity = (Activity<TActor>)JsonSerializer.Deserialize(payload, Manager.ActivityType, Manager.JsonSerializerOptions)!;
 
-    TState state = await GetStateAsync(CancellationToken.None);
+    TState? state = await GetStateAsync(CancellationToken.None);
     Manager = _factory.Create(this, state, activity.ImplementationId);
     Manager.OnActivityBegin();
 
     await activity.ExecuteAsync(Manager.Actor, CancellationToken.None);
   }
 
-  private async Task<TState> GetStateAsync(CancellationToken cancellationToken)
+  private async Task<TState?> GetStateAsync(CancellationToken cancellationToken)
   {
     ConditionalValue<TState> state = await StateManager.TryGetStateAsync<TState>(Constants.ActorStateName, cancellationToken);
 
     if (state.HasValue)
       return state.Value;
 
-    return Manager.DefaultState;
+    return null;
   }
 }

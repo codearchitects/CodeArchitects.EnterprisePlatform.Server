@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Builder;
 
-internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IActorMetadataBuilder<TActor>
+internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IActorMetadataBuilder<TActor> // TODO: Implement explicitly
   where TActor : class
 {
   private readonly Dictionary<MemberInfo, StateComponentMetadata<TActor>> _stateComponents;

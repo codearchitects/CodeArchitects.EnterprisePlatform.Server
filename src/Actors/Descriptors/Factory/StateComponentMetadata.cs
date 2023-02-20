@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Common.Reflection;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
@@ -22,7 +24,27 @@ internal abstract class StateComponentMetadata<TActor> : IStateComponentMetadata
 
   public abstract bool HasDefaultValue(out object? defaultComponentValue);
 
-  public abstract bool IsActorIdSource(out PropertyInfo? actorIdProperty);
+  public abstract bool IsActorId { get; }
+
+  public bool IsActorIdSource([NotNullWhen(true)] out Type? idType)
+  {
+    try
+    {
+      Type? interfaceType = Type.GetGenericInterfaces(typeof(IActorIdSource<>)).SingleOrDefault();
+      if (interfaceType is null)
+      {
+        idType = null;
+        return false;
+      }
+
+      idType = interfaceType.GetGenericArguments()[0];
+      return true;
+    }
+    catch (InvalidOperationException)
+    {
+      throw InvalidActorException.MultipleIdSourceInterfaces(typeof(TActor), Type);
+    }
+  }
 
   private void CheckStateType()
   {

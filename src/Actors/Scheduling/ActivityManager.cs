@@ -8,7 +8,8 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Scheduling;
 
-internal class ActivityManager : IActivityManager
+internal class ActivityManager<TActor> : IActivityManager<TActor>
+  where TActor : class
 {
   private delegate Activity ActivityFactory(int implementationId, IReadOnlyList<object?> arguments);
 
@@ -29,16 +30,14 @@ internal class ActivityManager : IActivityManager
     _activityFactories = new(MethodDescriptorEqualityComparer.Instance);
   }
 
-  public Activity<TActor> CreateActivity<TActor>(int implementationId, MethodInfo method, IReadOnlyList<object?> arguments)
-    where TActor : class
+  public Activity<TActor> CreateActivity(int implementationId, MethodInfo method, IReadOnlyList<object?> arguments)
   {
     IMethodDescriptor activity = _activityBatches[method.Name].ResolveActivity(method);
 
     return (Activity<TActor>)_activityFactories.GetOrAdd(activity, CreateActivityFactory).Invoke(implementationId, arguments);
   }
 
-  public Activity<TActor> CreateActivity<TActor>(int implementationId, string activityName, IReadOnlyList<object?> arguments)
-    where TActor : class
+  public Activity<TActor> CreateActivity(int implementationId, string activityName, IReadOnlyList<object?> arguments)
   {
     if (!_activityBatches.TryGetValue(activityName, out ActivityDescriptorBatch batch) || !batch.TryResolveActivity(arguments, out IMethodDescriptor? activity))
       throw new InvalidOperationException($"Could not find a method with name '{activityName}' and provided parameter types.");
@@ -81,7 +80,7 @@ internal class ActivityManager : IActivityManager
     return expression.Compile();
   }
 
-  public static ActivityManager Create(IActorDescriptor actor)
+  public static ActivityManager<TActor> Create(IActorDescriptor actor)
   {
     Dictionary<string, List<IMethodDescriptor>> activityBatches = new();
 

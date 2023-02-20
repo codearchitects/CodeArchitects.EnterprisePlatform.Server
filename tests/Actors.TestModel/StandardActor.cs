@@ -1,12 +1,12 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
-using System.Text.Json.Serialization.Metadata;
-using System.Text.Json.Serialization;
 using System.Text.Json;
-using CodeArchitects.Platform.Actors.Descriptors.Factory;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 
@@ -408,9 +408,9 @@ internal static class StandardActorFixture
         .SetType(typeof(string))
         .SetHasIdSource(false)
         .SetStateIndex(-1)
-        .SetIdProperty(null))
+        .SetGetActorIdMethod(null))
       .SetState(_ => _
-        .SetType(typeof(StandardActorState))
+        .SetType(new StateTypeDelegator(typeof(StandardActorState)))
         .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
@@ -426,7 +426,7 @@ internal static class StandardActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
-      .Returns(typeof(StandardActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

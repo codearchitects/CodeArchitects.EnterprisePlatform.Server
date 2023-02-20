@@ -4,6 +4,7 @@ namespace CodeArchitects.Platform.Actors.Infrastructure;
 
 internal interface IActorManager<TActor, TState>
   where TActor : class
+  where TState : ActorState
 {
   TActor Actor { get; }
   
@@ -14,12 +15,12 @@ internal interface IActorManager<TActor, TState>
   JsonSerializerOptions JsonSerializerOptions { get; }
   
   Type ActivityType { get; }
-  
-  TState DefaultState { get; }
 
   void OnActivityBegin();
 
   void OnMethodBegin();
 
-  Task OnExecutionEndAsync(CancellationToken cancellationToken);
+  void OnExecutionEnd();
+
+  Task ExecuteBindingsAsync(CancellationToken cancellationToken);
 }

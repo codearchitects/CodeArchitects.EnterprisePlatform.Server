@@ -1,0 +1,18 @@
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
+using System.Reflection;
+
+namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
+
+internal class SourceActorIdDescriptor<TState> : ActorIdDescriptor<TState>
+  where TState : ActorState
+{
+  public SourceActorIdDescriptor(MethodInfo getActorIdMethod, int stateIndex, Action<TState, string> setId)
+    : base(stateIndex, setId)
+  {
+    GetActorIdMethod = getActorIdMethod;
+  }
+
+  public override Type Type => GetActorIdMethod.ReturnType;
+
+  public override MethodInfo GetActorIdMethod { get; }
+}

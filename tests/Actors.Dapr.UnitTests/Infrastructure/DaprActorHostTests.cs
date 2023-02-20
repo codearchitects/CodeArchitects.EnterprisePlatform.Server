@@ -55,7 +55,7 @@ public partial class DaprActorHostTests
     TimeSpan period = TimeSpan.FromSeconds(2);
 
     // Act
-    await sut.ScheduleAsync(new StandardActorActivity1 { arg = arg }, new SchedulingOptions(scheduleId, timer, period), CancellationToken.None);
+    await sut.ScheduleAsync(scheduleId, new StandardActorActivity1 { arg = arg }, new SchedulingOptions(timer, period), CancellationToken.None);
 
     // Assert
     timerManagerMock.Verify(x => x.RegisterReminderAsync(It.Is<ActorReminder>(reminder =>

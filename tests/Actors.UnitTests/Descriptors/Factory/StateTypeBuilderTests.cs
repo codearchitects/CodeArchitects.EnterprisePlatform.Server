@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Actors.TestModel;
+﻿using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
 using System.Reflection;

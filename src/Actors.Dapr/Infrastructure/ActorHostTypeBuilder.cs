@@ -200,12 +200,12 @@ internal class ActorHostTypeBuilder
 
     public void VisitValueTaskMethod(IValueTaskMethodDescriptor descriptor)
     {
-      VisitValueTaskMethodCore(descriptor);
+      VisitValueTaskMethodCore(descriptor, typeof(Task));
     }
 
     public void VisitValueTaskTMethod(IValueTaskTMethodDescriptor descriptor)
     {
-      VisitValueTaskMethodCore(descriptor);
+      VisitValueTaskMethodCore(descriptor, typeof(Task<>).MakeGenericType(descriptor.ResultType.UnderlyingSystemType));
     }
 
     public void VisitVoidMethod(IVoidMethodDescriptor descriptor)
@@ -218,7 +218,7 @@ internal class ActorHostTypeBuilder
     {
       int parameterCount = descriptor.ParameterTypes.Length;
       MethodInfo implementationMethod = descriptor.ImplementationMethod;
-      MethodBuilder method = DefineStandardMethod(descriptor);
+      MethodBuilder method = DefineStandardMethod(descriptor, descriptor.ReturnType);
       IILGenerator il = _ilProvider.GetILGenerator(method);
 
       il.Emit(OpCodes.Ldarg_0);                        // Push $this                           | Stack: $this
@@ -228,20 +228,20 @@ internal class ActorHostTypeBuilder
       il.Emit(OpCodes.Ret);                            // Return                               | Stack: $task
     }
 
-    private void VisitValueTaskMethodCore(IMethodDescriptor descriptor)
+    private void VisitValueTaskMethodCore(IMethodDescriptor descriptor, Type returnType)
     {
-      Type returnType = descriptor.ReturnType;
-      MethodInfo asTaskMethod = returnType.GetRequiredMethod(
+      Type valueTaskType = descriptor.ReturnType;
+      MethodInfo asTaskMethod = valueTaskType.GetRequiredMethod(
         name: nameof(ValueTask<object>.AsTask),
         bindingAttr: BindingFlags.Instance | BindingFlags.Public,
         types: Type.EmptyTypes);
 
       int parameterCount = descriptor.ParameterTypes.Length;
       MethodInfo implementationMethod = descriptor.ImplementationMethod;
-      MethodBuilder method = DefineStandardMethod(descriptor);
+      MethodBuilder method = DefineStandardMethod(descriptor, returnType);
       IILGenerator il = _ilProvider.GetILGenerator(method);
 
-      il.DeclareLocal(returnType);
+      il.DeclareLocal(valueTaskType);
 
       il.Emit(OpCodes.Ldarg_0);                        // Push $this                                | Stack: $this
       il.Emit(OpCodes.Call, _actorGetter);             // Load $actor := $this.Actor                | Stack: $actor
@@ -253,7 +253,7 @@ internal class ActorHostTypeBuilder
       il.Emit(OpCodes.Ret);                            // Return                                    | Stack: $task
     }
 
-    private MethodBuilder DefineStandardMethod(IMethodDescriptor descriptor)
+    private MethodBuilder DefineStandardMethod(IMethodDescriptor descriptor, Type returnType)
     {
       string methodName = _overloadSuffixes.TryGetValue(descriptor, out int suffix)
         ? $"{descriptor.Name}-{suffix}"
@@ -263,14 +263,14 @@ internal class ActorHostTypeBuilder
         name: methodName,
         attributes: MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Abstract,
         callingConvention: CallingConventions.HasThis,
-        returnType: descriptor.ReturnType,
+        returnType: returnType,
         parameterTypes: descriptor.ParameterTypes);
 
       MethodBuilder method = _hostType.DefineMethod(
         name: methodName,
         attributes: MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final,
         callingConvention: CallingConventions.HasThis,
-        returnType: descriptor.ReturnType,
+        returnType: returnType,
         parameterTypes: descriptor.ParameterTypes);
 
       foreach (ParameterInfo parameter in descriptor.ImplementationMethod.GetParameters())

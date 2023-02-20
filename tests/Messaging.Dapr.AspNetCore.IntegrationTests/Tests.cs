@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests;
+namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
 public class Tests : IClassFixture<TestFixture>
 {

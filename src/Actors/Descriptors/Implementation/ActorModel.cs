@@ -14,6 +14,11 @@ internal class ActorModel : IActorModel
 
   public IReadOnlyCollection<IActorDescriptor> Actors => _actors.Values;
 
+  public IActorDescriptor GetActor(Type actorType)
+  {
+    return _actors[actorType];
+  }
+
   public IActorDescriptor<TActor, TState> GetActor<TActor, TState>()
     where TActor : class
     where TState : ActorState

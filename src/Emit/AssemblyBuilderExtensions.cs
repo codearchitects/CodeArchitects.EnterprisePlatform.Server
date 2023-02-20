@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Reflection.Emit;
-using CodeArchitects.Platform.Emit.Reflection;
 
 namespace CodeArchitects.Platform.Emit;
 

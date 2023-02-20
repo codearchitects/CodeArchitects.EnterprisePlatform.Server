@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
-internal class DefaultActorIdDescriptor : IActorIdDescriptor
+internal class DefaultActorIdDescriptor<TState> : IActorIdDescriptor<TState>
+  where TState : ActorState
 {
-  public static readonly DefaultActorIdDescriptor Instance = new();
+  public static readonly DefaultActorIdDescriptor<TState> Instance = new();
 
   private DefaultActorIdDescriptor() { }
 
@@ -14,5 +16,9 @@ internal class DefaultActorIdDescriptor : IActorIdDescriptor
 
   public int StateIndex => -1;
 
-  public PropertyInfo? IdProperty => null;
+  public MethodInfo? GetActorIdMethod => null;
+
+  public void SetId(TState state, string id)
+  {
+  }
 }

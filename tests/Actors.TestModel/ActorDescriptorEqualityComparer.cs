@@ -21,13 +21,13 @@ internal class ActorDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.ActorType != y.ActorType)
+    if (!x.ActorType.Equals(y.ActorType))
       return false;
 
-    if (x.InterfaceType != y.InterfaceType)
+    if (!x.InterfaceType.Equals(y.InterfaceType))
       return false;
 
-    if (x.ActivityBaseType != y.ActivityBaseType)
+    if (!x.ActivityBaseType.Equals(y.ActivityBaseType))
       return false;
 
     if (x.IsPolymorphic != y.IsPolymorphic)
@@ -71,7 +71,7 @@ internal class ActorDescriptorEqualityComparer :
     if (x.Id != y.Id)
       return false;
 
-    if (x.Type != y.Type)
+    if (!x.Type.Equals(y.Type))
       return false;
 
     return true;
@@ -97,13 +97,13 @@ internal class ActorDescriptorEqualityComparer :
     if (x.ImplementationMethod != y.ImplementationMethod)
       return false;
 
-    if (x.ReturnType != y.ReturnType)
+    if (!x.ReturnType.Equals(y.ReturnType))
       return false;
 
     if (!x.ParameterTypes.SequenceEqual(y.ParameterTypes))
       return false;
 
-    if (x.ActivityType != y.ActivityType)
+    if (!x.ActivityType.Equals(y.ActivityType))
       return false;
 
     if (!x.ActivityFields.SequenceEqual(y.ActivityFields))
@@ -125,12 +125,12 @@ internal class ActorDescriptorEqualityComparer :
 
   private static bool Equals(ITaskTMethodDescriptor x, ITaskTMethodDescriptor y)
   {
-    return x.ResultType == y.ResultType;
+    return x.ResultType.Equals(y.ResultType);
   }
 
   private static bool Equals(IValueTaskTMethodDescriptor x, IValueTaskTMethodDescriptor y)
   {
-    return x.ResultType == y.ResultType;
+    return x.ResultType.Equals(y.ResultType);
   }
 
   public bool Equals(IActorIdDescriptor? x, IActorIdDescriptor? y)
@@ -141,7 +141,7 @@ internal class ActorDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.Type != y.Type)
+    if (!x.Type.Equals(y.Type))
       return false;
 
     if (x.HasIdSource != y.HasIdSource)
@@ -150,7 +150,7 @@ internal class ActorDescriptorEqualityComparer :
     if (x.StateIndex != y.StateIndex)
       return false;
 
-    if (x.IdProperty != y.IdProperty)
+    if (x.GetActorIdMethod != y.GetActorIdMethod)
       return false;
 
     return true;
@@ -164,7 +164,7 @@ internal class ActorDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.Type != y.Type)
+    if (!x.Type.Equals(y.Type))
       return false;
 
     if (!x.Fields.SequenceEqual(y.Fields))
@@ -192,7 +192,7 @@ internal class ActorDescriptorEqualityComparer :
     if (y is null)
       return false;
 
-    if (x.FactoryType != y.FactoryType)
+    if (!x.FactoryType.Equals(y.FactoryType))
       return false;
 
     if (x.CreateAsyncMethod != y.CreateAsyncMethod)

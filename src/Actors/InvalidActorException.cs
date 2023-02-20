@@ -41,8 +41,11 @@ public class InvalidActorException : Exception
   internal static InvalidActorException MultipleDefaultImplementations(Type actorType)
     => Create(actorType, ErrorMessages.MultipleDefaultImplementations, actorType.Name);
 
-  internal static InvalidActorException InvalidImplementation(Type actorType)
-    => Create(actorType, ErrorMessages.InvalidImplementation, actorType.Name);
+  internal static InvalidActorException InvalidImplementation(Type implementationType)
+    => Create(implementationType, ErrorMessages.InvalidImplementation, implementationType.Name);
+
+  internal static InvalidActorException AbstractImplementation(Type implementationType)
+    => Create(implementationType, ErrorMessages.AbstractImplementation, implementationType.Name);
 
 
   // State errors
@@ -58,6 +61,12 @@ public class InvalidActorException : Exception
 
   internal static InvalidActorException InvalidDefaultValue(Type actorType, MemberInfo member)
     => Create(actorType, ErrorMessages.InvalidDefaultValue, actorType.Name, member.Name);
+
+  internal static InvalidActorException InvalidIdType(Type actorType, Type idType)
+    => Create(actorType, ErrorMessages.InvalidIdType, actorType.Name, idType.Name);
+
+  internal static InvalidActorException MultipleIdSourceInterfaces(Type actorType, Type componentType)
+    => Create(actorType, ErrorMessages.MultipleIdSourceInterfaces, actorType.Name, componentType.Name);
 
 
   // Constructor errors
@@ -127,13 +136,16 @@ public class InvalidActorException : Exception
     public const string ActorCannotBeVirtual = "'{0}' cannot be a virtual actor because a default value for its state could not be computed. For simple state types, either configure the its default value or provide a default parameter value. For complex state types, provide a parameterless constructor for the class.";
     public const string MultipleDefaultImplementations = "Multiple default implementations found for actor '{0}'.";
     public const string InvalidImplementation = "Type '{0}' does not inherit from the actor type it specifies.";
+    public const string AbstractImplementation = "Type '{0}' cannot be an actor implementation since it is abstract.";
 
     // State errors
     public const string AmbiguousActorIdSource = "Multiple actor id sources were set. Only one state component or one state component property can be configured to be the actor id";
     public const string StateMustBeDefinedInBaseActor = "Each component of the actor's state must be defined in the actor's base class, while implementation '{1}' defines state members.";
     public const string InvalidStateType = "The type of member '{1}' cannot be used as an actor state.";
     public const string InvalidDefaultValue = "The provided default value for state component '{1}' is of the wrong type.";
-
+    public const string InvalidIdType = "Type '{1}' cannot be used as id type because it does not define a public static method Parse(string) or Parse(string, IFormatProvider) returning the id type.";
+    public const string MultipleIdSourceInterfaces = $"Type '{{1}}' implements {nameof(IActorIdSource<object>)} multiple times.";
+    
     // Constructor errors
     public const string StateComponentsMismatch = "Could not find a one-to-one correspondence between state members and state constructor parameters.";
     public const string AmbiguousActorConstructor = "Could not infer the actor constructor.";

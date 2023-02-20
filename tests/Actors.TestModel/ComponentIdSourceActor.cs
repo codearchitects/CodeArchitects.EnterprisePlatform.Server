@@ -87,9 +87,9 @@ internal static class ComponentIdSourceActorFixture
         .SetType(typeof(int))
         .SetHasIdSource(true)
         .SetStateIndex(0)
-        .SetIdProperty(null))
+        .SetGetActorIdMethod(null))
       .SetState(_ => _
-        .SetType(typeof(ComponentIdSourceActorState))
+        .SetType(new StateTypeDelegator(typeof(ComponentIdSourceActorState)))
         .SetFields(stateFields)
         .SetDefaultValue(null))
       .SetFactory(_ => _
@@ -105,7 +105,7 @@ internal static class ComponentIdSourceActorFixture
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
-      .Returns(typeof(ComponentIdSourceActorState));
+      .Returns(Descriptor.State.Type);
 
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))

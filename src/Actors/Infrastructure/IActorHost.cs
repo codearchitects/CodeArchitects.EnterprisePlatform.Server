@@ -8,7 +8,7 @@ internal interface IActorHost<TActor, TState>
 {
   string ActorId { get; }
 
-  Task ScheduleAsync(Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken);
+  Task ScheduleAsync(ScheduleId id, Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken);
 
   Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken);
 }

@@ -1,5 +1,5 @@
-﻿using Dapr.Actors.Client;
-using Dapr.Actors;
+﻿using Dapr.Actors;
+using Dapr.Actors.Client;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Factory;
 
