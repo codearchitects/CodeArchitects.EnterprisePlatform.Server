@@ -21,13 +21,13 @@ public abstract class TrafficLight : ITrafficLight
 
   protected abstract ILogger<TrafficLight> Logger { get; }
 
-  public abstract Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default);
+  public abstract Task TurnOnAsync(CancellationToken cancellationToken = default);
+
+  public abstract Task TurnOffAsync(CancellationToken cancellationToken = default);
 
   public abstract ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default);
 
-  public abstract Task StartAsync(CancellationToken cancellationToken = default);
-
-  public abstract Task StopAsync(CancellationToken cancellationToken = default);
+  public abstract Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default);
 
   protected virtual async Task TurnRedAsync(string reason)
   {

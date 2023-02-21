@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 DynamicAssembly.IgnoreAccessCheckTo("ActorApp");
 ReflectionMetadataContext context = new();
 context.AddAssembly(typeof(TestActor).Assembly);
-IActorModel model = context.CreateModel();
+IActorModel model = context.CreateModel(DynamicAssembly.Module);
 IActorDescriptor descriptor = model.GetActor(typeof(TestActor));
 
 ActorHostTypeBuilder actorHostTypeBuilder = new(DynamicAssembly.Module, new ReflectionILGeneratorProvider());

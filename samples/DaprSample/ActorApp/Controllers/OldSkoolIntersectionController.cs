@@ -22,7 +22,7 @@ public class OldSkoolIntersectionController : ControllerBase
     Guid id = Guid.NewGuid();
     ITrafficLightActor actor = _actorFactory.CreateActorProxy<ITrafficLightActor>(new ActorId(id.ToString()), nameof(TrafficLightActor));
 
-    await actor.StartAsync();
+    await actor.TurnOnAsync();
 
     return Ok(new
     {
@@ -35,7 +35,7 @@ public class OldSkoolIntersectionController : ControllerBase
   {
     ITrafficLightActor actor = _actorFactory.CreateActorProxy<ITrafficLightActor>(new ActorId(id.ToString()), nameof(TrafficLightActor));
 
-    await actor.StopAsync();
+    await actor.TurnOffAsync();
 
     return Ok(new
     {

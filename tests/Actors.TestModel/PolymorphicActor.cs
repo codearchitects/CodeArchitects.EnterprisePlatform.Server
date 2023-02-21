@@ -15,6 +15,7 @@ internal interface IPolymorphicActor
   Task AbstractMethod();
 }
 
+[Actor]
 internal abstract class PolymorphicActor : IPolymorphicActor
 {
   [State] private readonly int _state;

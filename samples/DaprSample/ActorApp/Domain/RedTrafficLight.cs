@@ -18,6 +18,11 @@ public class RedTrafficLight : ActiveTrafficLight
 
   protected override ScheduleId ChangeColorSchedule => _turnGreenSchedule;
 
+  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
+  {
+    return ValueTask.FromResult("red");
+  }
+
   public override Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)
   {
     return Task.FromResult(new TrafficLightResponse
@@ -25,11 +30,6 @@ public class RedTrafficLight : ActiveTrafficLight
       CanCross = false,
       TurnsGreenAt = _state.TurnsGreenAt
     });
-  }
-
-  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
-  {
-    return ValueTask.FromResult("red");
   }
 
   protected override Task TurnRedAsync(string reason)

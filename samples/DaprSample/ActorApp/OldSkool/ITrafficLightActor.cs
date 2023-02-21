@@ -4,9 +4,9 @@ namespace ActorApp.OldSkool;
 
 public interface ITrafficLightActor : IActor
 {
-  Task StartAsync(CancellationToken cancellationToken = default);
+  Task TurnOnAsync(CancellationToken cancellationToken = default);
 
-  Task StopAsync(CancellationToken cancellationToken = default);
+  Task TurnOffAsync(CancellationToken cancellationToken = default);
 
   Task<string> GetLightColorAsync(CancellationToken cancellationToken = default);
 

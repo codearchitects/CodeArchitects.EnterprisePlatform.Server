@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Factory;
+using CodeArchitects.Platform.Actors.Scheduling;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -40,12 +41,11 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     {
       if (IsActor(type, out IActorAttribute? actorAttribute))
       {
-        if (_actorDescriptorFactories.ContainsKey(type))
-          continue;
-
-        Type factoryType = typeof(ReflectionActorDescriptorFactory<>).MakeGenericType(type);
-        ActorDescriptorFactory actorDescriptorFactory = (ActorDescriptorFactory)Activator.CreateInstance(factoryType, new object?[] { _stateTypeBuilder, _activityTypeBuilder, this, actorAttribute })!;
-        _actorDescriptorFactories.Add(type, actorDescriptorFactory);
+        _factories[type] = delegate (IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
+        {
+          Type descriptorFactoryType = typeof(ReflectionActorDescriptorFactory<>).MakeGenericType(type);
+          return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute })!;
+        };
       }
 
       if (IsActorFactory(type, out IActorFactoryAttribute? actorFactoryAttribute))

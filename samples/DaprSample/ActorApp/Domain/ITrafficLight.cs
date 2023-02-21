@@ -2,9 +2,9 @@
 
 public interface ITrafficLight
 {
-  Task StartAsync(CancellationToken cancellationToken = default);
+  Task TurnOnAsync(CancellationToken cancellationToken = default);
 
-  Task StopAsync(CancellationToken cancellationToken = default);
+  Task TurnOffAsync(CancellationToken cancellationToken = default);
 
   ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default);
 

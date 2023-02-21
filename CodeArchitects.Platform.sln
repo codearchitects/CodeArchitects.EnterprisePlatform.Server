@@ -127,6 +127,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Act
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActorApp", "tests\Actors.Dapr.AspNetCore.IntegrationTests\ActorApp\ActorApp.csproj", "{CC5F477F-362B-4504-999F-42D3143A76C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Actors.FunctionalTests", "tests\Actors.FunctionalTests\CodeArchitects.Platform.Actors.FunctionalTests.csproj", "{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -349,6 +351,10 @@ Global
 		{CC5F477F-362B-4504-999F-42D3143A76C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC5F477F-362B-4504-999F-42D3143A76C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC5F477F-362B-4504-999F-42D3143A76C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -402,6 +408,7 @@ Global
 		{8859050C-899A-4330-ADD4-B23A5904FE5D} = {AE6B4AEB-0C5A-404B-A5BE-6BAED09F6A3C}
 		{6C5C6E7F-65BB-4DC0-9E65-A071C0AB30E9} = {8859050C-899A-4330-ADD4-B23A5904FE5D}
 		{CC5F477F-362B-4504-999F-42D3143A76C4} = {8859050C-899A-4330-ADD4-B23A5904FE5D}
+		{DC192911-6AB2-412E-AE5C-8922BAD4E8B6} = {6FFB7182-83ED-44D9-BE34-6D86E215D501}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

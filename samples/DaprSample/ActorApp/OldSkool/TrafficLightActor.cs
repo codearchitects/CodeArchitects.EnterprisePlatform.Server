@@ -1,5 +1,4 @@
 ﻿using Dapr.Actors.Runtime;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -16,7 +15,7 @@ public class TrafficLightActor : Actor, ITrafficLightActor, IRemindable
   {
   }
 
-  public async Task StartAsync(CancellationToken cancellationToken = default)
+  public async Task TurnOnAsync(CancellationToken cancellationToken = default)
   {
     TrafficLightState state = await GetStateAsync(cancellationToken);
 
@@ -24,23 +23,9 @@ public class TrafficLightActor : Actor, ITrafficLightActor, IRemindable
       throw new InvalidOperationException("I was already started!");
 
     await TurnGreenAsync("traffic light is starting", 0);
-    await StateManager.SaveStateAsync(cancellationToken);
   }
 
-  public async Task<string> GetLightColorAsync(CancellationToken cancellationToken = default)
-  {
-    TrafficLightState state = await GetStateAsync(cancellationToken);
-
-    return state.Color switch
-    {
-      LightColor.Red => "red",
-      LightColor.Yellow => "yellow",
-      LightColor.Green => "green",
-      _ => throw new InvalidOperationException("I was not started!")
-    };
-  }
-
-  public async Task StopAsync(CancellationToken cancellationToken = default)
+  public async Task TurnOffAsync(CancellationToken cancellationToken = default)
   {
     TrafficLightState state = await GetStateAsync(cancellationToken);
 
@@ -58,6 +43,19 @@ public class TrafficLightActor : Actor, ITrafficLightActor, IRemindable
 
     state.Color = LightColor.Off;
     await StateManager.SaveStateAsync(cancellationToken);
+  }
+
+  public async Task<string> GetLightColorAsync(CancellationToken cancellationToken = default)
+  {
+    TrafficLightState state = await GetStateAsync(cancellationToken);
+
+    return state.Color switch
+    {
+      LightColor.Red => "red",
+      LightColor.Yellow => "yellow",
+      LightColor.Green => "green",
+      _ => throw new InvalidOperationException("I was not started!")
+    };
   }
 
   public async Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)

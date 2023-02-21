@@ -1,38 +1,34 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Implementation;
 using CodeArchitects.Platform.Actors.Scheduling;
-using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Reflection;
+using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
-internal class ActorModelFactory
+public class ActorModelFactory
 {
-  protected readonly StateTypeBuilder _stateTypeBuilder;
-  protected readonly ActivityTypeBuilder _activityTypeBuilder;
-  protected readonly Dictionary<Type, ActorDescriptorFactory> _actorDescriptorFactories;
-  private IActorModel? _actorModel;
+  private protected delegate ActorDescriptorFactory ActorDescriptorFactoryFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder);
 
-  protected ActorModelFactory()
+  private protected readonly Dictionary<Type, ActorDescriptorFactoryFactory> _factories;
+
+  private protected ActorModelFactory()
   {
-    _stateTypeBuilder = new(DynamicAssembly.Module, new ReflectionILGeneratorProvider());
-    _activityTypeBuilder = new(DynamicAssembly.Module, new ReflectionILGeneratorProvider());
-    _actorDescriptorFactories = new();
+    _factories = new();
   }
 
-  public virtual IActorModel CreateModel()
+  internal virtual IActorModel CreateModel(ModuleBuilder module)
   {
-    if (_actorModel is null)
-    {
-      ActorModel model = new();
-      foreach (ActorDescriptorFactory factory in _actorDescriptorFactories.Values)
-      {
-        IActorDescriptor actor = factory.CreateDescriptor();
-        model.AddActor(actor);
-      }
+    StateTypeBuilder stateTypeBuilder = new(module, new ReflectionILGeneratorProvider());
+    ActivityTypeBuilder activityTypeBuilder = new(module, new ReflectionILGeneratorProvider());
 
-      _actorModel = model;
+    ActorModel model = new();
+    foreach (ActorDescriptorFactoryFactory factory in _factories.Values)
+    {
+      ActorDescriptorFactory descriptorFactory = factory(stateTypeBuilder, activityTypeBuilder);
+      IActorDescriptor actor = descriptorFactory.CreateDescriptor();
+      model.AddActor(actor);
     }
 
-    return _actorModel;
+    return model;
   }
 }

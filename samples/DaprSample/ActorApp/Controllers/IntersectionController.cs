@@ -20,7 +20,7 @@ public class IntersectionController : ControllerBase
     Guid id = Guid.NewGuid();
     ITrafficLight trafficLight = _trafficLightFactory.Get(id);
 
-    await trafficLight.StartAsync();
+    await trafficLight.TurnOnAsync();
 
     return Ok(new
     {
@@ -33,7 +33,7 @@ public class IntersectionController : ControllerBase
   {
     ITrafficLight trafficLight = _trafficLightFactory.Get(id);
 
-    await trafficLight.StopAsync();
+    await trafficLight.TurnOffAsync();
 
     return Ok(new
     {

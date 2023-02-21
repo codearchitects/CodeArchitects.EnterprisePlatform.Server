@@ -48,15 +48,6 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 
   public Type ActivityType => _descriptor.ActivityBaseType;
 
-  private TActor CreateInstance(IServiceProvider services, IActorDescriptor<TActor, TState> descriptor, TState state, int implementationId)
-  {
-    _section = ExecutionSection.Constructor;
-    TActor instance = descriptor.CreateInstance(implementationId, services, state, this);
-    _section = ExecutionSection.None;
-
-    return instance;
-  }
-
   public void Become<TImplementation>()
     where TImplementation : class, TActor
   {
@@ -268,6 +259,15 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     }
 
     return id;
+  }
+
+  private TActor CreateInstance(IServiceProvider services, IActorDescriptor<TActor, TState> descriptor, TState state, int implementationId)
+  {
+    _section = ExecutionSection.Constructor;
+    TActor instance = descriptor.CreateInstance(implementationId, services, state, this);
+    _section = ExecutionSection.None;
+
+    return instance;
   }
 
   private void VerifyBindingPreconditions()

@@ -18,17 +18,17 @@ public class YellowTrafficLight : ActiveTrafficLight
 
   protected override ScheduleId ChangeColorSchedule => _turnRedSchedule;
 
+  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
+  {
+    return ValueTask.FromResult("yellow");
+  }
+
   public override Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default)
   {
     return Task.FromResult(new TrafficLightResponse
     {
       CanCross = true
     });
-  }
-
-  public override ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default)
-  {
-    return ValueTask.FromResult("yellow");
   }
 
   protected override Task TurnYellowAsync(string reason)

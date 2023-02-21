@@ -1,21 +1,23 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Factory;
+using CodeArchitects.Platform.Actors.Scheduling;
+using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Builder;
 
-internal abstract class ActorConfiguration : ActorModelFactory
+public abstract class ActorConfiguration : ActorModelFactory
 {
   private bool _isConfigured;
 
   protected abstract void Configure();
 
-  public override IActorModel CreateModel()
+  internal override IActorModel CreateModel(ModuleBuilder module)
   {
     if (!_isConfigured)
     {
       _isConfigured = true;
       Configure();
     }
-    return base.CreateModel();
+    return base.CreateModel(module);
   }
 
   protected void Actor<TActor>(Action<IActorMetadataBuilder<TActor>> configure)
@@ -24,17 +26,12 @@ internal abstract class ActorConfiguration : ActorModelFactory
     if (configure is null)
       throw new ArgumentNullException(nameof(configure));
 
-    ActorMetadataBuilder<TActor> builder;
-    if (_actorDescriptorFactories.TryGetValue(typeof(TActor), out var obj))
+    _factories[typeof(TActor)] = delegate (IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
     {
-      builder = (ActorMetadataBuilder<TActor>)obj;
-    }
-    else
-    {
-      builder = new(_stateTypeBuilder, _activityTypeBuilder);
-      _actorDescriptorFactories.Add(typeof(TActor), builder);
-    }
+      ActorMetadataBuilder<TActor> builder = new(stateTypeBuilder, activityTypeBuilder);
+      configure(builder);
 
-    configure(builder);
+      return builder;
+    };
   }
 }
