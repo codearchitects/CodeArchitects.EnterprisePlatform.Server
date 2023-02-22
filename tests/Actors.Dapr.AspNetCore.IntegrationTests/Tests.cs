@@ -13,9 +13,10 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
   }
 
   [Theory]
-  [InlineData(1)]
-  [InlineData(2)]
-  public async Task PolymorphicMethod_ShouldReturnCorrectResult(int implementation)
+  [InlineData(0, 2)]
+  [InlineData(1, 1)]
+  [InlineData(2, 2)]
+  public async Task PolymorphicMethod_ShouldReturnCorrectResult(int implementation, int expectedImplementation)
   {
     // Arrange
 
@@ -23,7 +24,7 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     PolymorphicResult? result = await _http.GetFromJsonAsync<PolymorphicResult>($"http://localhost:20100/actor/polymorphic-method?implementation={implementation}");
 
     // Assert
-    result!.Implementation.Should().Be(implementation);
+    result!.Implementation.Should().Be(expectedImplementation);
   }
 
   [Fact]

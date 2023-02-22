@@ -2,7 +2,7 @@
 
 namespace ActorApp.Domain;
 
-[ActorImplementation<TestActor>]
+[ActorImplementation<TestActor>(IsDefault = true)]
 public class TestActor2 : TestActor
 {
   public TestActor2(TestActorState state, IActorContext<TestActor> context, ActorOutput output)

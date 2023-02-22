@@ -10,6 +10,7 @@ public class ActorConfigurationTests
   {
     // Arrange
     TestActorConfiguration sut = new();
+    sut.Configure();
 
     // Act
     IActorModel model = sut.CreateModel(DynamicAssembly.NewModule());
@@ -26,7 +27,7 @@ public class ActorConfigurationTests
 
   private class TestActorConfiguration : ActorConfiguration
   {
-    protected override void Configure()
+    protected internal override void Configure()
     {
       Actor<StandardActor>(actor => actor
         .HasInterfaceType<IStandardActor>()

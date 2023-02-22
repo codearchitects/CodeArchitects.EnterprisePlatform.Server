@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Scheduling;
-using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Builder;
 
@@ -8,17 +7,7 @@ public abstract class ActorConfiguration : ActorModelFactory
 {
   private bool _isConfigured;
 
-  protected abstract void Configure();
-
-  internal override IActorModel CreateModel(ModuleBuilder module)
-  {
-    if (!_isConfigured)
-    {
-      _isConfigured = true;
-      Configure();
-    }
-    return base.CreateModel(module);
-  }
+  protected internal abstract void Configure();
 
   protected void Actor<TActor>(Action<IActorMetadataBuilder<TActor>> configure)
     where TActor : class

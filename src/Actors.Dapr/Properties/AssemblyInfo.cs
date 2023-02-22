@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.AspNetCore")]
+
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.UnitTests")]
 [assembly: InternalsVisibleTo("ActorApp")] // TODO: Remove
 

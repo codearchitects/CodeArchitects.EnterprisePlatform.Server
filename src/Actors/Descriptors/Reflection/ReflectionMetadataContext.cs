@@ -30,6 +30,50 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     return implementationTypes ?? Enumerable.Empty<Type>();
   }
 
+  public void AddActor(Type actorType)
+  {
+    if (!actorType.IsClass)
+      throw new ArgumentException("An actor type must be a class.");
+
+    if (IsActor(actorType, out IActorAttribute? actorAttribute) && _scannedAssemblies.Contains(actorType.Assembly))
+      return;
+
+    actorAttribute ??= new ActorAttribute();
+
+    _factories[actorType] = delegate (IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
+    {
+      Type descriptorFactoryType = typeof(ReflectionActorDescriptorFactory<>).MakeGenericType(actorType);
+      return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute })!;
+    };
+
+    foreach (Type type in actorType.Assembly.GetTypes())
+    {
+      if (IsActorFactory(type, out IActorFactoryAttribute? actorFactoryAttribute) && actorFactoryAttribute.ActorType == actorType)
+      {
+        if (_factoryTypes.ContainsKey(actorType))
+          throw InvalidActorException.AmbiguousActorFactoryType(actorType);
+
+        _factoryTypes.Add(actorType, type);
+
+        continue;
+      }
+
+      if (IsActorImplementation(type, out IActorImplementationAttribute? actorImplementationAttribute) && actorImplementationAttribute.ActorType == actorType)
+      {
+        if (!actorType.IsAssignableFrom(type))
+          throw InvalidActorException.InvalidImplementation(type);
+
+        if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type> types))
+        {
+          types = new();
+          _implementationTypes.Add(actorType, types);
+        }
+
+        types.Add(type);
+      }
+    }
+  }
+
   public void AddAssembly(Assembly assembly)
   {
     if (_scannedAssemblies.Contains(assembly))

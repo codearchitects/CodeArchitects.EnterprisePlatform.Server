@@ -2,6 +2,7 @@
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.AspNetCore")]
 [assembly: InternalsVisibleTo("ActorApp")] // TODO: Remove
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.UnitTests")]

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Actors.Dapr\CodeArchitects.Platform.Actors.Dapr.csproj" />
+    <ProjectReference Include="..\..\..\src\Actors.Dapr.AspNetCore\CodeArchitects.Platform.Actors.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

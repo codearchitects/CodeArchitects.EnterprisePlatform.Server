@@ -31,7 +31,10 @@ public class ActorController : ControllerBase
     Guid id = Guid.NewGuid();
     ITestActor actor = _actorFactory.Get(id);
 
-    await actor.BecomeAsync(implementation);
+    if (implementation != 0)
+    {
+      await actor.BecomeAsync(implementation);
+    }
     int result = await actor.PolymorphicMethodAsync();
 
     return Ok(new
