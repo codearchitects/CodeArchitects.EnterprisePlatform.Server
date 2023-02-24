@@ -1,8 +1,11 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+using CodeArchitects.Platform.Actors.Descriptors.Implementation;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Messaging;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -36,8 +39,13 @@ internal interface IStandardActor
 
 internal interface IOtherInterface { }
 
+internal class ActorMessage : IActorMessage<string>
+{
+  public string ActorId { get; set; }
+}
+
 [Actor<IStandardActor>]
-internal class StandardActor : IStandardActor, IOtherInterface
+internal class StandardActor : IStandardActor, IOtherInterface, IMessageHandler<ActorMessage>
 {
   [State] private readonly string _state1;
   private readonly IService1 _service1;
@@ -83,6 +91,10 @@ internal class StandardActor : IStandardActor, IOtherInterface
     => throw new NotImplementedException();
 
   public virtual Task ActivityOverload(string arg)
+    => throw new NotImplementedException();
+
+  [MessageHandler("bus", "topic")]
+  public Task HandleAsync(ActorMessage message, CancellationToken cancellationToken)
     => throw new NotImplementedException();
 }
 
@@ -170,6 +182,16 @@ internal class StandardActorActivity7 : StandardActorActivity
     => actor.ActivityOverload(arg);
 }
 
+internal class StandardActorActivity8 : StandardActorActivity
+{
+  public override int Id => 8;
+
+  public ActorMessage message { get; set; }
+
+  public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
+    => actor.HandleAsync(message, cancellationToken);
+}
+
 internal class StandardActorActivityTypeResolver : DefaultJsonTypeInfoResolver
 {
   public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
@@ -191,7 +213,8 @@ internal class StandardActorActivityTypeResolver : DefaultJsonTypeInfoResolver
           new JsonDerivedType(typeof(StandardActorActivity4), 4),
           new JsonDerivedType(typeof(StandardActorActivity5), 5),
           new JsonDerivedType(typeof(StandardActorActivity6), 6),
-          new JsonDerivedType(typeof(StandardActorActivity7), 7)
+          new JsonDerivedType(typeof(StandardActorActivity7), 7),
+          new JsonDerivedType(typeof(StandardActorActivity8), 8)
         }
       };
     }
@@ -278,6 +301,16 @@ internal static class StandardActorFixture
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
 
+    MethodInfo interfaceHandlerMethod = typeof(IMessageHandler<ActorMessage>).GetRequiredMethod(
+      name: nameof(IMessageHandler<ActorMessage>.HandleAsync),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: new[] { typeof(ActorMessage), typeof(CancellationToken) });
+
+    MethodInfo implementationHandlerMethod = typeof(StandardActor).GetRequiredMethod(
+      name: nameof(StandardActor.HandleAsync),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: new[] { typeof(ActorMessage), typeof(CancellationToken) });
+
     ConstructorInfo constructor = typeof(StandardActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string), typeof(IService1), typeof(StandardActorStateComponent), typeof(IActorContext<StandardActor>), typeof(IService2) });
@@ -307,6 +340,8 @@ internal static class StandardActorFixture
     FieldInfo[] activity6Fields = typeof(StandardActorActivity6).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
     FieldInfo[] activity7Fields = typeof(StandardActorActivity7).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+    FieldInfo[] activity8Fields = typeof(StandardActorActivity8).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
     FieldInfo[] stateFields = typeof(StandardActorState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -353,6 +388,17 @@ internal static class StandardActorFixture
       .SetActivityType(typeof(StandardActorActivity4))
       .SetActivityFields(activity4Fields)
       .SetHasCancellationTokenParameter(false));
+
+    ITaskMethodDescriptor handlerMethod = TaskMethodDescriptorBuilder.Build(_ => _
+      .InitDefaults()
+      .SetId(8)
+      .SetName(nameof(StandardActor.HandleAsync))
+      .SetInterfaceMethod(null)
+      .SetImplementationMethod(implementationHandlerMethod)
+      .SetParameterTypes(new[] { typeof(ActorMessage), typeof(CancellationToken) })
+      .SetActivityType(typeof(StandardActorActivity8))
+      .SetActivityFields(activity8Fields)
+      .SetHasCancellationTokenParameter(true));
 
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
@@ -403,7 +449,8 @@ internal static class StandardActorFixture
           .SetParameterTypes(new[] { typeof(string) })
           .SetActivityType(typeof(StandardActorActivity7))
           .SetActivityFields(activity7Fields)
-          .SetHasCancellationTokenParameter(false)))
+          .SetHasCancellationTokenParameter(false))
+        .Add(handlerMethod))
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
@@ -416,7 +463,15 @@ internal static class StandardActorFixture
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStandardActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
-        .SetGetMethod(factoryGetMethod)));
+        .SetGetMethod(factoryGetMethod))
+      .SetMessageHandlers(_ => _
+        .Add(_ => _
+          .SetInterfaceType(typeof(IMessageHandler<ActorMessage>))
+          .SetMessageType(typeof(ActorMessage))
+          .SetResultType(typeof(void))
+          .SetInterfaceMethod(interfaceHandlerMethod)
+          .SetActivity(handlerMethod)
+          .SetHandlerMetadataCollection(new MessageHandlerMetadata("bus", "topic")))));
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
@@ -459,6 +514,10 @@ internal static class StandardActorFixture
     activityTypeBuilderMock
       .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 7), actorType, activityBaseType))
       .Returns(typeof(StandardActorActivity7));
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 8), actorType, activityBaseType))
+      .Returns(typeof(StandardActorActivity8));
   }
 
   public static void AssertValidDescriptor(IActorDescriptor descriptor)

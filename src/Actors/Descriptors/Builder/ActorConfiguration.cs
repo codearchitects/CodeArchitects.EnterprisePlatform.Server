@@ -5,8 +5,6 @@ namespace CodeArchitects.Platform.Actors.Descriptors.Builder;
 
 public abstract class ActorConfiguration : ActorModelFactory
 {
-  private bool _isConfigured;
-
   protected internal abstract void Configure();
 
   protected void Actor<TActor>(Action<IActorMetadataBuilder<TActor>> configure)

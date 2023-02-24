@@ -1,11 +1,13 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Factory;
 using CodeArchitects.Platform.Actors.Dapr.Infrastructure;
+using CodeArchitects.Platform.Actors.Dapr.Messaging;
 using CodeArchitects.Platform.Actors.Dapr.Proxy;
 using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Descriptors.Builder;
 using CodeArchitects.Platform.Actors.Descriptors.Factory;
 using CodeArchitects.Platform.Actors.Descriptors.Reflection;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Reflection;
@@ -89,6 +91,12 @@ internal class DaprActorsOptionsBuilder : IDaprActorsOptionsBuilder
     HashSet<Assembly> actorAssemblies = new();
     List<Action<ActorRuntimeOptions>> actorRegistrations = new();
 
+    ReflectionILGeneratorProvider ilProvider = new();
+    ActorHostTypeBuilder actorHostTypeBuilder = new(DynamicAssembly.Module, ilProvider);
+    ActorProxyTypeBuilder actorProxyTypeBuilder = new(DynamicAssembly.Module, ilProvider);
+    DaprProxyFactoryTypeBuilder proxyFactoryTypeBuilder = new(DynamicAssembly.Module, ilProvider);
+    DaprMessageHandlerTypeBuilder messageHandlerTypeBuilder = new(DynamicAssembly.Module, ilProvider);
+
     foreach (IActorDescriptor actor in model.Actors)
     {
       Assembly actorAssembly = actor.ActorType.Assembly;
@@ -103,11 +111,6 @@ internal class DaprActorsOptionsBuilder : IDaprActorsOptionsBuilder
         actorAssemblies.Add(actorAssembly);
       }
 
-      ReflectionILGeneratorProvider ilProvider = new();
-      ActorHostTypeBuilder actorHostTypeBuilder = new(DynamicAssembly.Module, ilProvider);
-      ActorProxyTypeBuilder actorProxyTypeBuilder = new(DynamicAssembly.Module, ilProvider);
-      DaprProxyFactoryTypeBuilder proxyFactoryTypeBuilder = new(DynamicAssembly.Module, ilProvider);
-
       ActorHostEmitResult hostEmitResult = actorHostTypeBuilder.Build(actor, null);
       Type proxyType = actorProxyTypeBuilder.Build(actor, hostEmitResult);
       Type actorFactoryType = proxyFactoryTypeBuilder.Build(actor, hostEmitResult, proxyType, null);
@@ -117,6 +120,12 @@ internal class DaprActorsOptionsBuilder : IDaprActorsOptionsBuilder
 
       services.AddSingleton(activityManagerType, activityManager);
       services.AddSingleton(actor.Factory.FactoryType, actorFactoryType);
+
+      if (hostEmitResult.HandlerInterfaceType is Type handlerInterfaceType)
+      {
+        Type handlerType = messageHandlerTypeBuilder.Build(actor, handlerInterfaceType, null);
+        ActorMessaging.MessagingAssembly.AddHandlerType(handlerType);
+      }
 
       actorRegistrations.Add(delegate (ActorRuntimeOptions runtimeOptions)
       {

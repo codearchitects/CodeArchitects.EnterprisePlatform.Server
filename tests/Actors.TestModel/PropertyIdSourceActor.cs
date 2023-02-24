@@ -114,7 +114,8 @@ internal static class PropertyIdSourceActorFixture
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPropertyIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
-        .SetGetMethod(factoryGetMethod)));
+        .SetGetMethod(factoryGetMethod))
+      .SetMessageHandlers());
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)

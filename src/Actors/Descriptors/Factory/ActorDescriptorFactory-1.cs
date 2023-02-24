@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Implementation;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Utils;
 using System.Diagnostics.CodeAnalysis;
@@ -40,6 +41,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
   protected abstract IReadOnlyCollection<ImplementationDescriptorFactory<TActor>> ImplementationFactories { get; }
 
   public int StateComponentCount => StateComponents.Count;
+
+  protected abstract IReadOnlyCollection<IMessageHandlerMetadata> GetMessageHandlerMetadataCollection(IMethodDescriptor activity);
 
   public bool TryGetStateComponent(string name, [NotNullWhen(true)] out StateComponentMetadata<TActor>? stateComponent)
   {
@@ -92,6 +95,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     IActorFactoryDescriptor factory = CreateFactory(interfaceType, id, isVirtual);
     Type activityBaseType = _activityTypeBuilder.BuildBase(ActorType);
     MethodDescriptorFactory methodDescriptorFactory = MethodDescriptorFactory.Create(_activityTypeBuilder, ActorType, interfaceType, activityBaseType);
+    IReadOnlyCollection<IMessageHandlerDescriptor> messageHandlers = CreateMessageHandlers(methodDescriptorFactory, id.Type);
 
     if (!isPolymorphic)
     {
@@ -105,7 +109,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
         factory,
         BaseImplementationFactory.CreateDescriptor<TState>(state.Fields),
         methodDescriptorFactory.Methods,
-        methodDescriptorFactory.Activities);
+        methodDescriptorFactory.Activities,
+        messageHandlers);
     }
 
     PolymorphicActorDescriptor<TActor, TState> polymorphicActor = new PolymorphicActorDescriptor<TActor, TState>(
@@ -118,7 +123,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       factory,
       new AbstractBaseImplementationDescriptor<TActor, TState>(),
       methodDescriptorFactory.Methods,
-      methodDescriptorFactory.Activities);
+      methodDescriptorFactory.Activities,
+      messageHandlers);
 
     foreach (ImplementationDescriptorFactory<TActor> implementationFactory in ImplementationFactories)
     {
@@ -139,10 +145,19 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       if (implementedInterfaceTypes.Length == 0)
         throw InvalidActorException.MissingActorInterface(ActorType);
 
-      if (implementedInterfaceTypes.Length != 1)
-        throw InvalidActorException.AmbiguousActorInterface(ActorType);
+      Type? interfaceType = null;
+      foreach (Type implementedInterfaceType in implementedInterfaceTypes)
+      {
+        if (MessagingMetadata.Metadata.IsMessageHandlerType(implementedInterfaceType))
+          continue;
 
-      return implementedInterfaceTypes[0];
+        if (interfaceType is not null)
+          throw InvalidActorException.AmbiguousActorInterface(ActorType);
+
+        interfaceType = implementedInterfaceType;
+      }
+
+      return interfaceType!;
     }
 
     if (!InterfaceType.IsInterface)
@@ -377,5 +392,33 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       throw InvalidActorException.InvalidActorFactoryType(ActorType, factoryType);
 
     return new ActorFactoryDescriptor(factoryType, createAsyncMethod, getMethod);
+  }
+
+  private IReadOnlyCollection<MessageHandlerDescriptor> CreateMessageHandlers(MethodDescriptorFactory methodDescriptorFactory, Type idType)
+  {
+    List<MessageHandlerDescriptor> result = new();
+
+    foreach (Type interfaceType in ActorType.GetInterfaces())
+    {
+      if (MessagingMetadata.Metadata.IsMessageHandlerType(interfaceType))
+      {
+        InterfaceMapping interfaceMapping = ActorType.GetInterfaceMap(interfaceType);
+        MethodInfo implementationMethod = interfaceMapping.TargetMethods[0];
+        IMethodDescriptor activity = methodDescriptorFactory.GetActivity(implementationMethod);
+
+        Type[] typeArguments = interfaceType.GetGenericArguments();
+        Type messageType = typeArguments[0];
+        Type resultType = typeArguments.Length > 1 ? typeArguments[1] : typeof(void);
+
+        if (!typeof(IActorMessage<>).MakeGenericType(idType).IsAssignableFrom(messageType))
+          throw InvalidActorException.InvalidActorMessage(ActorType, messageType);
+
+        IReadOnlyCollection<IMessageHandlerMetadata> handlerMetadataCollection = GetMessageHandlerMetadataCollection(activity);
+
+        result.Add(new MessageHandlerDescriptor(interfaceType, messageType, resultType, activity, handlerMetadataCollection));
+      }
+    }
+
+    return result;
   }
 }

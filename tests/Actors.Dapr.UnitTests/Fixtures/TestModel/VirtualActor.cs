@@ -31,7 +31,7 @@ internal class VirtualActorProxy : IVirtualActor
   }
 }
 
-internal class VirtualActorProxyFactory : ProxyFactory<IVirtualActorHost, IVirtualActor, VirtualActorState>, IVirtualActorFactory
+internal class VirtualActorProxyFactory : ProxyFactory<IVirtualActorHost, string, IVirtualActor, VirtualActorState>, IVirtualActorFactory
 {
   public VirtualActorProxyFactory(IActorProxyFactory actorFactory)
     : base(actorFactory)

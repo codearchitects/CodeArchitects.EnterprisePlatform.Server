@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Common.Exceptions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 
@@ -9,7 +10,9 @@ internal class ActorDescriptorEqualityComparer :
   IEqualityComparer<IMethodDescriptor>,
   IEqualityComparer<IActorIdDescriptor>,
   IEqualityComparer<IStateDescriptor>,
-  IEqualityComparer<IActorFactoryDescriptor>
+  IEqualityComparer<IActorFactoryDescriptor>,
+  IEqualityComparer<IMessageHandlerDescriptor>,
+  IEqualityComparer<IMessageHandlerMetadata>
 {
   public static readonly ActorDescriptorEqualityComparer Instance = new ActorDescriptorEqualityComparer();
 
@@ -55,6 +58,9 @@ internal class ActorDescriptorEqualityComparer :
       return false;
 
     if (!Equals(x.State, y.State))
+      return false;
+
+    if (!x.MessageHandlers.SequenceEqual(y.MessageHandlers, this))
       return false;
 
     return true;
@@ -204,6 +210,46 @@ internal class ActorDescriptorEqualityComparer :
     return true;
   }
 
+  public bool Equals(IMessageHandlerDescriptor? x, IMessageHandlerDescriptor? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (x.InterfaceType != y.InterfaceType)
+      return false;
+
+    if (x.MessageType != y.MessageType)
+      return false;
+
+    if (x.ResultType != y.ResultType)
+      return false;
+
+    if (x.InterfaceMethod != y.InterfaceMethod)
+      return false;
+
+    if (!Equals(x.Activity, y.Activity))
+      return false;
+
+    if (!x.HandlerMetadataCollection.SequenceEqual(y.HandlerMetadataCollection, this))
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IMessageHandlerMetadata? x, IMessageHandlerMetadata? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    return (x.Bus, x.Topic) == (y.Bus, y.Topic);
+  }
+
   public int GetHashCode(IActorDescriptor obj)
   {
     return 0;
@@ -230,6 +276,16 @@ internal class ActorDescriptorEqualityComparer :
   }
 
   public int GetHashCode(IActorFactoryDescriptor obj)
+  {
+    return 0;
+  }
+
+  public int GetHashCode(IMessageHandlerDescriptor obj)
+  {
+    return 0;
+  }
+
+  public int GetHashCode(IMessageHandlerMetadata obj)
   {
     return 0;
   }

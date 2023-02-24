@@ -33,7 +33,10 @@ public class ActorMetadataBuilderTests
         arg.Context(),
         arg.OfType<IService2>()))
       .HasState("_state1")
-      .HasState("_state2");
+      .HasState("_state2")
+      .IsMessageHandler(typeof(ActorMessage), handler => handler
+        .WithBus("bus")
+        .WithTopic("topic"));
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();

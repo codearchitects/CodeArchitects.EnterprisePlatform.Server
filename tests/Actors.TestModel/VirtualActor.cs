@@ -146,7 +146,8 @@ internal static class VirtualActorFixture
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))
         .SetCreateAsyncMethod(null)
-        .SetGetMethod(factoryGetMethod)));
+        .SetGetMethod(factoryGetMethod))
+      .SetMessageHandlers());
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)

@@ -1,10 +1,11 @@
 ﻿using CodeArchitects.Platform.Actors;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Messaging;
 
 namespace ActorApp.Domain;
 
 [Actor, Virtual]
-public abstract class TrafficLight : ITrafficLight
+public abstract class TrafficLight : ITrafficLight, IMessageHandler<TurnOffCommand>
 {
   protected static readonly ScheduleId _turnGreenSchedule = ScheduleId.New("TurnGreen");
   protected static readonly ScheduleId _turnRedSchedule = ScheduleId.New("TurnRed");
@@ -23,11 +24,17 @@ public abstract class TrafficLight : ITrafficLight
 
   public abstract Task TurnOnAsync(CancellationToken cancellationToken = default);
 
-  public abstract Task TurnOffAsync(CancellationToken cancellationToken = default);
-
   public abstract ValueTask<string> GetLightColorAsync(CancellationToken cancellationToken = default);
 
   public abstract Task<TrafficLightResponse> CrossIntersectionAsync(CancellationToken cancellationToken = default);
+
+  protected abstract Task TurnOffAsync(string reason, CancellationToken cancellationToken = default);
+
+  [MessageHandler(Topic = "traffic-light")]
+  public async Task HandleAsync(TurnOffCommand message, CancellationToken cancellationToken)
+  {
+    await TurnOffAsync(message.Reason, cancellationToken);
+  }
 
   protected virtual async Task TurnRedAsync(string reason)
   {

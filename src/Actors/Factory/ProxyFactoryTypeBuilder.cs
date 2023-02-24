@@ -45,8 +45,7 @@ internal abstract class ProxyFactoryTypeBuilder
     ConstructorInfo stateConstructor = state.Type.GetRequiredConstructor();
     MethodInfo createCoreAsyncMethod = type.BaseType!.GetRequiredMethod(
       name: "CreateCoreAsync",
-      bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic)
-      .MakeGenericMethod(id.Type.UnderlyingSystemType);
+      bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
     IILGenerator il = _ilProvider.GetILGenerator(method);
@@ -104,8 +103,7 @@ internal abstract class ProxyFactoryTypeBuilder
 
     MethodInfo coreMethod = type.BaseType!.GetRequiredMethod(
       name: "GetCore",
-      bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance)
-      .MakeGenericMethod(actor.Id.Type.UnderlyingSystemType);
+      bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(factory.GetMethod, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
     IILGenerator il = _ilProvider.GetILGenerator(method);

@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Fixtures.TestModel;
 using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Factory;
 using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
@@ -40,8 +41,8 @@ public class DaprProxyFactoryTypeBuilderTests
 
     // Assert
     proxyFactoryType.Namespace.Should().Be(actorType.Namespace);
-    proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{DaprProxyFactoryTypeBuilder.ComponentName}");
-    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IStandardActorHost, IStandardActor, StandardActorState>>();
+    proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{ProxyFactoryTypeBuilder.ComponentName}");
+    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>>();
     proxyFactoryType.Should().Implement<IStandardActorFactory>();
 
     createAsyncMethodIL.VerifyIL(_ => _
@@ -55,19 +56,19 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_3()
       .Stfld(stateFields[1])
       .Ldarg_S(4)
-      .Call(typeof(ProxyFactory<IStandardActorHost, IStandardActor, StandardActorState>), "CreateCoreAsync", new[] { typeof(string) }, new[] { typeof(string), typeof(StandardActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>), "CreateCoreAsync", new[] { typeof(string), typeof(StandardActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IStandardActorHost, IStandardActor, StandardActorState>), "GetCore", new[] { typeof(string) }, new[] { typeof(string) })
+      .Call(typeof(ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>), "GetCore", new[] { typeof(string) })
       .Ret());
 
     constructorIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IStandardActorHost, IStandardActor, StandardActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
+      .Call(typeof(ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
       .Ret());
 
     actorNameGetterIL.VerifyIL(_ => _
@@ -107,19 +108,19 @@ public class DaprProxyFactoryTypeBuilderTests
     // Assert
     proxyFactoryType.Namespace.Should().Be(actorType.Namespace);
     proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{DaprProxyFactoryTypeBuilder.ComponentName}");
-    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IVirtualActorHost, IVirtualActor, VirtualActorState>>();
+    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IVirtualActorHost, string, IVirtualActor, VirtualActorState>>();
     proxyFactoryType.Should().Implement<IVirtualActorFactory>();
 
     getMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IVirtualActorHost, IVirtualActor, VirtualActorState>), "GetCore", new[] { typeof(string) }, new[] { typeof(string) })
+      .Call(typeof(ProxyFactory<IVirtualActorHost, string, IVirtualActor, VirtualActorState>), "GetCore", new[] { typeof(string) })
       .Ret());
 
     constructorIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IVirtualActorHost, IVirtualActor, VirtualActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
+      .Call(typeof(ProxyFactory<IVirtualActorHost, string, IVirtualActor, VirtualActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
       .Ret());
 
     actorNameGetterIL.VerifyIL(_ => _
@@ -158,7 +159,7 @@ public class DaprProxyFactoryTypeBuilderTests
     // Assert
     proxyFactoryType.Namespace.Should().Be(actorType.Namespace);
     proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{DaprProxyFactoryTypeBuilder.ComponentName}");
-    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IComponentIdSourceActorHost, IComponentIdSourceActor, ComponentIdSourceActorState>>();
+    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>>();
     proxyFactoryType.Should().Implement<IComponentIdSourceActorFactory>();
 
     createAsyncMethodIL.VerifyIL(_ => _
@@ -169,19 +170,19 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Stfld(stateFields[0])
       .Ldarg_2()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, IComponentIdSourceActor, ComponentIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int) }, new[] { typeof(int), typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int), typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, IComponentIdSourceActor, ComponentIdSourceActorState>), "GetCore", new[] { typeof(int) }, new[] { typeof(int) })
+      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "GetCore", new[] { typeof(int) })
       .Ret());
 
     constructorIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, IComponentIdSourceActor, ComponentIdSourceActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
+      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
       .Ret());
 
     actorNameGetterIL.VerifyIL(_ => _
@@ -223,7 +224,7 @@ public class DaprProxyFactoryTypeBuilderTests
     // Assert
     proxyFactoryType.Namespace.Should().Be(actorType.Namespace);
     proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{DaprProxyFactoryTypeBuilder.ComponentName}");
-    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IPropertyIdSourceActorHost, IPropertyIdSourceActor, PropertyIdSourceActorState>>();
+    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>>();
     proxyFactoryType.Should().Implement<IPropertyIdSourceActorFactory>();
 
     createAsyncMethodIL.VerifyIL(_ => _
@@ -235,19 +236,19 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Stfld(stateFields[0])
       .Ldarg_2()
-      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, IPropertyIdSourceActor, PropertyIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int) }, new[] { typeof(int), typeof(PropertyIdSourceActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int), typeof(PropertyIdSourceActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, IPropertyIdSourceActor, PropertyIdSourceActorState>), "GetCore", new[] { typeof(int) }, new[] { typeof(int) })
+      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>), "GetCore", new[] { typeof(int) })
       .Ret());
 
     constructorIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, IPropertyIdSourceActor, PropertyIdSourceActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
+      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
       .Ret());
 
     actorNameGetterIL.VerifyIL(_ => _

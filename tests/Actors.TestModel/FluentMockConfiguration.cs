@@ -12,3 +12,4 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(ITaskTMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IValueTaskMethodDescriptor))]
 [assembly: GenerateFluentMockFor(typeof(IValueTaskTMethodDescriptor))]
+[assembly: GenerateFluentMockFor(typeof(IMessageHandlerDescriptor))]

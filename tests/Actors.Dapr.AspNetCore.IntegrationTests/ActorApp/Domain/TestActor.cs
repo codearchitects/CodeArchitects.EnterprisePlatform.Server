@@ -1,11 +1,12 @@
 ﻿using CodeArchitects.Platform.Actors;
 using CodeArchitects.Platform.Actors.Bindings;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Messaging;
 
 namespace ActorApp.Domain;
 
 [Actor, Virtual]
-public abstract class TestActor : ITestActor
+public abstract class TestActor : ITestActor, IMessageHandler<TestMessage>
 {
   protected readonly BindingId _binding;
 
@@ -58,6 +59,12 @@ public abstract class TestActor : ITestActor
   public async Task ScheduleAsync(string output, CancellationToken cancellationToken = default)
   {
     await _context.ScheduleAsync(self => self.Activity(output), SchedulingOptions.In(5.Seconds()), cancellationToken);
+  }
+
+  public Task HandleAsync(TestMessage message, CancellationToken cancellationToken)
+  {
+    _output.SetOutput(_state.Id, message.Output);
+    return Task.CompletedTask;
   }
 
   private void ExecuteBinding(string output)

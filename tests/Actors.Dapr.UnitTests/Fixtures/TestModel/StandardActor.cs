@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.TestModel;
+using CodeArchitects.Platform.Messaging;
 using Dapr.Actors;
 using Dapr.Actors.Client;
 using Dapr.Actors.Runtime;
@@ -23,7 +24,12 @@ internal interface IStandardActorHost : IActor
   Task _InitAsync(StandardActorState state, CancellationToken cancellationToken);
 }
 
-internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorState>, IStandardActorHost
+internal interface IStandardActorMessageHandler : IActor
+{
+  Task HandleAsync(ActorMessage message, CancellationToken cancellationToken);
+}
+
+internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorState>, IStandardActorHost, IStandardActorMessageHandler
 {
   public StandardActorHost(ActorHost host, IManagerFactory<StandardActor, StandardActorState> factory)
     : base(host, factory)
@@ -53,6 +59,29 @@ internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorSta
   public Task _InitAsync(StandardActorState state, CancellationToken cancellationToken)
   {
     return InitAsync(state, cancellationToken);
+  }
+
+  public Task HandleAsync(ActorMessage message, CancellationToken cancellationToken)
+  {
+    return Actor.HandleAsync(message, cancellationToken);
+  }
+}
+
+[MessageHandler]
+internal class StandardActorMessageHandler : ActorHostFactory<IStandardActorMessageHandler, string>, IMessageHandler<ActorMessage>
+{
+  public StandardActorMessageHandler(IActorProxyFactory hostFactory)
+    : base(hostFactory)
+  {
+  }
+
+  protected override string ActorName => nameof(StandardActor);
+
+  [MessageHandler("bus", "topic")]
+  public Task HandleAsync(ActorMessage message, CancellationToken cancellationToken)
+  {
+    IStandardActorMessageHandler host = CreateHost(message.ActorId);
+    return host.HandleAsync(message, cancellationToken);
   }
 }
 
@@ -86,7 +115,7 @@ internal class StandardActorProxy : IStandardActor
   }
 }
 
-internal class StandardActorProxyFactory : ProxyFactory<IStandardActorHost, IStandardActor, StandardActorState>, IStandardActorFactory
+internal class StandardActorProxyFactory : ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>, IStandardActorFactory
 {
   public StandardActorProxyFactory(IActorProxyFactory actorFactory)
     : base(actorFactory)

@@ -66,6 +66,21 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     result!.Output.Should().Be("no binding");
   }
 
+  [Fact]
+  public async Task Messaging_ShouldReceiveMessage()
+  {
+    // Arrange
+    const string output = "messaging works";
+
+    // Act
+    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"http://localhost:20100/actor/messaging?output={output}");
+    await Task.Delay(1000);
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"http://localhost:20100/actor/{idResult!.Id}/output");
+
+    // Assert
+    result!.Output.Should().Be(output);
+  }
+
   public void Dispose()
   {
     _http.Dispose();

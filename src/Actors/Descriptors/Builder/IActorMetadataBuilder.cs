@@ -37,4 +37,6 @@ public interface IActorMetadataBuilder<TActor>
 
   IActorMetadataBuilder<TActor> HasImplementation<TImplementation>(Action<IImplementationMetadataBuilder<TActor, TImplementation>> configure)
     where TImplementation : TActor;
+
+  IActorMetadataBuilder<TActor> IsMessageHandler(Type messageType, Action<IMessageHandlerMetadataBuilder> configure);
 }

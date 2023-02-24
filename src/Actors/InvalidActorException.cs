@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using CodeArchitects.Platform.Actors.Messaging;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors;
 
@@ -11,6 +12,7 @@ public class InvalidActorException : Exception
   }
 
   public Type ActorType { get; }
+
 
   // Class errors
 
@@ -105,6 +107,12 @@ public class InvalidActorException : Exception
     => Create(actorType, ErrorMessages.AmbiguousActorFactoryType, actorType.Name);
 
 
+  // Messaging errors
+
+  internal static InvalidActorException InvalidActorMessage(Type actorType, Type messageType)
+    => Create(actorType, ErrorMessages.InvalidActorMessage, actorType.Name, messageType.Name);
+
+
   // Reflection-only errors
 
   internal static InvalidActorException DuplicateActorAttribute(Type actorType)
@@ -161,6 +169,9 @@ public class InvalidActorException : Exception
     public const string MissingActorFactoryType = "Could not find a suitable factory interface for '{0}'.";
     public const string InvalidActorFactoryType = "Actor factory '{1}' is not an interface or has the wrong method signatures.";
     public const string AmbiguousActorFactoryType = "Multiple actor factories were specified for '{0}'.";
+
+    // Messaging errors
+    public const string InvalidActorMessage = $"Message type '{{1}}' does not implement the {nameof(IActorMessage<object>)} interface or it has the wrong actor id type.";
 
     // Reflection-only errors
     public const string DuplicateActorAttribute = "Duplicate 'Actor' attribute on type '{0}'.";

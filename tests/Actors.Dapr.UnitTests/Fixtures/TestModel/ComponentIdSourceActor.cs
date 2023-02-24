@@ -37,7 +37,7 @@ internal class ComponentIdSourceActorProxy : IComponentIdSourceActor
   }
 }
 
-internal class ComponentIdSourceActorProxyFactory : ProxyFactory<IComponentIdSourceActorHost, IComponentIdSourceActor, ComponentIdSourceActorState>, IComponentIdSourceActorFactory
+internal class ComponentIdSourceActorProxyFactory : ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>, IComponentIdSourceActorFactory
 {
   public ComponentIdSourceActorProxyFactory(IActorProxyFactory actorFactory)
     : base(actorFactory)

@@ -1,4 +1,5 @@
 ﻿using ActorApp.Domain;
+using CodeArchitects.Platform.Messaging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActorApp.Controllers;
@@ -8,11 +9,13 @@ namespace ActorApp.Controllers;
 public class ActorController : ControllerBase
 {
   private readonly ITestActorFactory _actorFactory;
+  private readonly IMessageBus _bus;
   private readonly ActorOutput _output;
 
-  public ActorController(ITestActorFactory actorFactory, ActorOutput output)
+  public ActorController(ITestActorFactory actorFactory, IMessageBus bus, ActorOutput output)
   {
     _actorFactory = actorFactory;
+    _bus = bus;
     _output = output;
   }
 
@@ -82,6 +85,18 @@ public class ActorController : ControllerBase
     return Ok(new
     {
       Output = _output.GetOutput(id) ?? "no binding"
+    });
+  }
+
+  [HttpGet("messaging")]
+  public async Task<ActionResult> Messaging(string output)
+  {
+    Guid id = Guid.NewGuid();
+    await _bus.SendAsync(new TestMessage { ActorId = id, Output = output });
+
+    return Ok(new
+    {
+      Id = id
     });
   }
 }

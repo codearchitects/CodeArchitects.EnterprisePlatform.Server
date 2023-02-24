@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Emit;
 using Dapr.Actors;
+using Dapr.Actors.Client;
 using Dapr.Actors.Runtime;
 using System.Diagnostics;
 using System.Reflection;
@@ -14,6 +15,7 @@ internal class ActorHostTypeBuilder
 {
   public const string InterfaceComponentName = "IActor";
   public const string HostComponentName = "Host";
+  public const string HandlerInterfaceComponentName = "IMessageHandler";
 
   private readonly ModuleBuilder _module;
   private readonly IILGeneratorProvider _ilProvider;
@@ -68,7 +70,13 @@ internal class ActorHostTypeBuilder
     }
 
     Dictionary<IMethodDescriptor, MethodInfo> methodDictionary = new();
-    ActorMethodBuilder methodBuilder = new(_ilProvider, interfaceType, hostType, actorGetter, overloadSuffixes, methodDictionary);
+    MethodNameProvider methodNameProvider = delegate (IMethodDescriptor descriptor)
+    {
+      return overloadSuffixes.TryGetValue(descriptor, out int suffix)
+        ? $"{descriptor.Name}-{suffix}"
+        : descriptor.Name;
+    };
+    ActorMethodBuilder methodBuilder = new(_ilProvider, interfaceType, hostType, actorGetter, methodNameProvider, methodDictionary);
 
     foreach (IMethodDescriptor method in methods)
     {
@@ -80,7 +88,11 @@ internal class ActorHostTypeBuilder
       BuildInitAsyncMethod(interfaceType, hostType, actor.State.Type);
     }
 
-    return new ActorHostEmitResult(interfaceType.CreateTypeInfo()!, hostType.CreateTypeInfo()!, methodDictionary);
+    Type? handlerInterfaceType = actor.MessageHandlers.Count > 0
+      ? BuildAndAddHandlerInterfaceType(hostType, actorGetter, actor)
+      : null;
+
+    return new ActorHostEmitResult(interfaceType.CreateTypeInfo()!, hostType.CreateTypeInfo()!, handlerInterfaceType, methodDictionary);
   }
 
   private void BuildActorAttribute(TypeBuilder type, string actorName)
@@ -169,22 +181,48 @@ internal class ActorHostTypeBuilder
     il.Emit(OpCodes.Ret);              // Return                                 | Stack: $result
   }
 
+  private Type BuildAndAddHandlerInterfaceType(TypeBuilder hostType, MethodInfo actorGetter, IActorDescriptor actor)
+  {
+    Type actorType = actor.ActorType;
+
+    TypeBuilder handlerInterfaceType = _module.DefineType(
+      name: actorType.GetComponentTypeName(HandlerInterfaceComponentName),
+      attr: TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Interface,
+      parent: null,
+      interfaces: new[] { typeof(IActor) });
+
+    hostType.AddInterfaceImplementation(handlerInterfaceType);
+
+    int handlerIndex = 1;
+    MethodNameProvider methodNameProvider = _ => $"HandleAsync-{handlerIndex++}";
+
+    ActorMethodBuilder methodBuilder = new(_ilProvider, handlerInterfaceType, hostType, actorGetter, methodNameProvider, new());
+    foreach (IMessageHandlerDescriptor messageHandler in actor.MessageHandlers)
+    {
+      messageHandler.Activity.Accept(methodBuilder);
+    }
+
+    return handlerInterfaceType.CreateTypeInfo()!;
+  }
+
+  private delegate string MethodNameProvider(IMethodDescriptor descriptor);
+
   private class ActorMethodBuilder : IMethodDescriptorVisitor
   {
     private readonly IILGeneratorProvider _ilProvider;
     private readonly TypeBuilder _interfaceType;
     private readonly TypeBuilder _hostType;
     private readonly MethodInfo _actorGetter;
-    private readonly IReadOnlyDictionary<IMethodDescriptor, int> _overloadSuffixes;
+    private readonly MethodNameProvider _methodNameProvider;
     private readonly Dictionary<IMethodDescriptor, MethodInfo> _methodDictionary;
 
-    public ActorMethodBuilder(IILGeneratorProvider ilProvider, TypeBuilder interfaceType, TypeBuilder hostType, MethodInfo actorGetter, IReadOnlyDictionary<IMethodDescriptor, int> overloadSuffixes, Dictionary<IMethodDescriptor, MethodInfo> methodDictionary)
+    public ActorMethodBuilder(IILGeneratorProvider ilProvider, TypeBuilder interfaceType, TypeBuilder hostType, MethodInfo actorGetter, MethodNameProvider methodNameProvider, Dictionary<IMethodDescriptor, MethodInfo> methodDictionary)
     {
       _ilProvider = ilProvider;
       _interfaceType = interfaceType;
       _hostType = hostType;
       _actorGetter = actorGetter;
-      _overloadSuffixes = overloadSuffixes;
+      _methodNameProvider = methodNameProvider;
       _methodDictionary = methodDictionary;
     }
 
@@ -255,9 +293,7 @@ internal class ActorHostTypeBuilder
 
     private MethodBuilder DefineStandardMethod(IMethodDescriptor descriptor, Type returnType)
     {
-      string methodName = _overloadSuffixes.TryGetValue(descriptor, out int suffix)
-        ? $"{descriptor.Name}-{suffix}"
-        : descriptor.Name;
+      string methodName = _methodNameProvider(descriptor);
 
       MethodBuilder declaration = _interfaceType.DefineMethod(
         name: methodName,

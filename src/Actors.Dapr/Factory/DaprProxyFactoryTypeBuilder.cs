@@ -17,15 +17,16 @@ internal class DaprProxyFactoryTypeBuilder : ProxyFactoryTypeBuilder
 
   public Type Build(IActorDescriptor actor, IActorHostEmitResult hostEmitResult, Type proxyType, string? actorName)
   {
-    Type baseType = typeof(ProxyFactory<,,>).MakeGenericType(
+    Type baseType = typeof(ProxyFactory<,,,>).MakeGenericType(
       hostEmitResult.InterfaceType.UnderlyingSystemType,
+      actor.Id.Type.UnderlyingSystemType,
       actor.InterfaceType.UnderlyingSystemType,
       actor.State.Type.UnderlyingSystemType);
 
     TypeBuilder type = BuildCore(actor, baseType);
 
     BuildConstructor(type);
-    BuildActorNameProperty(type, actorName ?? actor.BaseImplementation.Type.Name);
+    BuildActorNameProperty(type, actorName ?? actor.ActorType.Name);
     BuildCreateProxyMethod(type, proxyType, hostEmitResult.InterfaceType);
     BuildInitAsyncMethod(type, actor, hostEmitResult.InterfaceType);
 
@@ -55,7 +56,7 @@ internal class DaprProxyFactoryTypeBuilder : ProxyFactoryTypeBuilder
 
   private void BuildActorNameProperty(TypeBuilder type, string actorName)
   {
-    MethodInfo declaration = type.BaseType!.GetRequiredMethod(
+    MethodInfo declaration = type.BaseType!.BaseType!.GetRequiredMethod(
       name: "get_ActorName",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance,
       types: Type.EmptyTypes);

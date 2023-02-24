@@ -1,6 +1,7 @@
 using ActorApp.Domain;
 using ActorApp.OldSkool;
 using CodeArchitects.Platform.Actors.Dapr.AspNetCore;
+using CodeArchitects.Platform.Actors.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,10 @@ builder.Services.AddDaprInfrastructure(options => options
     .ConfigureRuntimeOptions(runtimeOptions =>
     {
       runtimeOptions.Actors.RegisterActor<TrafficLightActor>();
-    }));
+    }))
+  .AddMessaging(messaging => messaging
+    .AddMessage(typeof(TurnOffCommand))
+    .ScanAssembly(ActorMessaging.Assembly));
 
 builder.Services
   .AddEndpointsApiExplorer()
@@ -30,6 +34,8 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 app.MapControllers();
+
+app.MapMessageHandlers();
 
 app.MapActorsHandlers();
 

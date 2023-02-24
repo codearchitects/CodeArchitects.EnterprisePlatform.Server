@@ -17,8 +17,9 @@ internal class OrdinaryActorDescriptor<TActor, TState> : ActorDescriptor<TActor,
     IActorFactoryDescriptor factory,
     IImplementationDescriptor<TActor, TState> baseImplementation,
     IReadOnlyCollection<IMethodDescriptor> methods,
-    IReadOnlyCollection<IMethodDescriptor> activities)
-    : base(interfaceType, isVirtual, activityBaseType, updateState, state, id, factory, baseImplementation, methods, activities)
+    IReadOnlyCollection<IMethodDescriptor> activities,
+    IReadOnlyCollection<IMessageHandlerDescriptor> messageHandlers)
+    : base(interfaceType, isVirtual, activityBaseType, updateState, state, id, factory, baseImplementation, methods, activities, messageHandlers)
   {
   }
 

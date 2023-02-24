@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;
+using CodeArchitects.Platform.Messaging;
 using Dapr.Actors;
 using Dapr.Actors.Runtime;
 using System.Reflection;
@@ -16,7 +17,7 @@ public class ActorHostTypeBuilderTests
 
   public ActorHostTypeBuilderTests()
   {
-    _ilProvider = new();
+    _ilProvider = new();    
     _sut = new(DynamicAssembly.NewModule(), _ilProvider);
   }
 
@@ -36,6 +37,7 @@ public class ActorHostTypeBuilderTests
     FakeILGenerator valueTaskMethodIL = _ilProvider.AddGenerator();
     FakeILGenerator valueTaskTMethodIL = _ilProvider.AddGenerator();
     FakeILGenerator initAsyncMethodIL = _ilProvider.AddGenerator();
+    FakeILGenerator handleAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
     ActorHostEmitResult result = _sut.Build(descriptor, actorName);
@@ -43,6 +45,7 @@ public class ActorHostTypeBuilderTests
     // Assert
     Type interfaceType = result.InterfaceType;
     Type classType = result.ClassType;
+    Type? handlerInterfaceType = result.HandlerInterfaceType;
     var actorAttribute = classType.GetCustomAttribute<global::Dapr.Actors.Runtime.ActorAttribute>();
 
     interfaceType.Namespace.Should().Be(actorType.Namespace);
@@ -54,12 +57,23 @@ public class ActorHostTypeBuilderTests
     interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskMethod), new[] { typeof(CancellationToken) }).Which.Should().Return<Task>();
     interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskTMethod), Type.EmptyTypes).Which.Should().Return<Task<string>>();
     interfaceType.Should().HaveMethod(Constants.InitAsyncMethodName, new[] { typeof(StandardActorState), typeof(CancellationToken) }).Which.Should().Return<Task>();
+    interfaceType.IsPublic.Should().BeTrue();
+
+    handlerInterfaceType.Should().NotBeNull();
+    handlerInterfaceType!.Namespace.Should().Be(actorType.Namespace);
+    handlerInterfaceType.Name.Should().Be($"<{actorType.Name}>{ActorHostTypeBuilder.HandlerInterfaceComponentName}");
+    handlerInterfaceType.Should().Implement<IActor>();
+    handlerInterfaceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Should().HaveCount(1);
+    handlerInterfaceType.Should().HaveMethod($"{nameof(IMessageHandler<ActorMessage>.HandleAsync)}-1", new[] { typeof(ActorMessage), typeof(CancellationToken) }).Which.Should().Return<Task>();
+    handlerInterfaceType.IsPublic.Should().BeTrue();
 
     classType.Namespace.Should().Be(actorType.Namespace);
     classType.Name.Should().Be($"<{actorType.Name}>{ActorHostTypeBuilder.HostComponentName}");
     classType.Should().BeDerivedFrom(baseType);
     classType.Should().NotBeAbstract();
     classType.Should().Implement(interfaceType);
+    classType.Should().Implement(handlerInterfaceType);
+    classType.IsPublic.Should().BeTrue();
     actorAttribute.Should().NotBeNull();
     actorAttribute!.TypeName.Should().Be(actorName);
 

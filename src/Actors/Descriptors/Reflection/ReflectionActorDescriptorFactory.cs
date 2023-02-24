@@ -1,4 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Factory;
+using CodeArchitects.Platform.Actors.Descriptors.Implementation;
+using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
 
@@ -69,5 +71,23 @@ internal class ReflectionActorDescriptorFactory<TActor> : ActorDescriptorFactory
     }
 
     return implementationFactories;
+  }
+
+  protected override IReadOnlyCollection<IMessageHandlerMetadata> GetMessageHandlerMetadataCollection(IMethodDescriptor activity)
+  {
+    List<IMessageHandlerMetadata> result = new();
+
+    foreach (Attribute attribute in activity.ImplementationMethod.GetCustomAttributes())
+    {
+      if (!MessagingMetadata.Metadata.IsMessageHandlerAttribute(attribute))
+        continue;
+
+      string? bus = (string?)MessagingMetadata.Metadata.AttributeBusProperty.GetValue(attribute);
+      string? topic = (string?)MessagingMetadata.Metadata.AttributeTopicProperty.GetValue(attribute);
+
+      result.Add(new MessageHandlerMetadata(bus, topic));
+    }
+
+    return result;
   }
 }

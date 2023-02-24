@@ -37,6 +37,11 @@ internal class MethodDescriptorFactory
     }
   }
 
+  public IMethodDescriptor GetActivity(MethodInfo method)
+  {
+    return _activities[method];
+  }
+
   private void AddMethod(MethodInfo interfaceMethod, MethodInfo implementationMethod)
   {
     if (!TryGetKind(implementationMethod, out MethodKind kind) || kind is MethodKind.Void)

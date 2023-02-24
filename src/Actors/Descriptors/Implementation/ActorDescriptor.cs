@@ -19,7 +19,8 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
     IActorFactoryDescriptor factory,
     IImplementationDescriptor<TActor, TState> baseImplementation,
     IReadOnlyCollection<IMethodDescriptor> methods,
-    IReadOnlyCollection<IMethodDescriptor> activities)
+    IReadOnlyCollection<IMethodDescriptor> activities,
+    IReadOnlyCollection<IMessageHandlerDescriptor> messageHandlers)
   {
     InterfaceType = interfaceType;
     IsVirtual = isVirtual;
@@ -31,6 +32,7 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
     BaseImplementation = baseImplementation;
     Methods = methods;
     Activities = activities;
+    MessageHandlers = messageHandlers;
 
     JsonSerializerOptions = new()
     {
@@ -66,6 +68,8 @@ internal abstract class ActorDescriptor<TActor, TState> : IActorDescriptor<TActo
   public abstract IReadOnlyCollection<IImplementationDescriptor<TActor, TState>> Implementations { get; }
 
   public IStateDescriptor<TState> State { get; }
+
+  public IReadOnlyCollection<IMessageHandlerDescriptor> MessageHandlers { get; }
 
   IImplementationDescriptor IActorDescriptor.BaseImplementation => BaseImplementation;
 

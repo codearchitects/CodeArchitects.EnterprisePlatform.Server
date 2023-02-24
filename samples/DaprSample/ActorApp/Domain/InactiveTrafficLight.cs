@@ -20,7 +20,7 @@ public class InactiveTrafficLight : TrafficLight
     await TurnGreenAsync("traffic light is starting", 0);
   }
 
-  public override Task TurnOffAsync(CancellationToken cancellationToken = default)
+  protected override Task TurnOffAsync(string reason, CancellationToken cancellationToken = default)
   {
     return Task.FromException(new InvalidOperationException("I am already off!"));
   }

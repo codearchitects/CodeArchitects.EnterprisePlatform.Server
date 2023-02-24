@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Actors\CodeArchitects.Platform.Actors.csproj" />
+    <ProjectReference Include="..\..\src\Messaging\CodeArchitects.Platform.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

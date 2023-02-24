@@ -83,7 +83,8 @@ internal static class StatelessActorFixture
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)
-        .SetGetMethod(factoryGetMethod)));
+        .SetGetMethod(factoryGetMethod))
+      .SetMessageHandlers());
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)

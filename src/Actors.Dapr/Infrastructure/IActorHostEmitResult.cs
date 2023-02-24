@@ -9,5 +9,7 @@ internal interface IActorHostEmitResult
   
   Type ClassType { get; }
 
+  Type? HandlerInterfaceType { get; }
+
   MethodInfo GetHostMethod(IMethodDescriptor method);
 }

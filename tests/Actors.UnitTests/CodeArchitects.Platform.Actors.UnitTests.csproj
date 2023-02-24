@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Actors\CodeArchitects.Platform.Actors.csproj" />
     <ProjectReference Include="..\Actors.TestModel\CodeArchitects.Platform.Actors.TestModel.csproj" />
   </ItemGroup>
 

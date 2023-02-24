@@ -12,6 +12,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
   private readonly Dictionary<MemberInfo, StateComponentMetadata<TActor>> _stateComponents;
   private readonly ImplementationMetadataBuilder<TActor, TActor> _baseImplementationBuilder;
   private readonly Dictionary<Type, ImplementationDescriptorFactory<TActor>> _implementations;
+  private readonly Dictionary<Type, List<IMessageHandlerMetadata>> _handlerMetadataDictionary;
   private Type? _interfaceType;
   private Type? _factoryType;
   private bool _isExplicitVirtual;
@@ -22,6 +23,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
     _baseImplementationBuilder = new ImplementationMetadataBuilder<TActor, TActor>(0, this);
     _stateComponents = new();
     _implementations = new();
+    _handlerMetadataDictionary = new();
   }
 
   protected override Type? InterfaceType => _interfaceType;
@@ -210,6 +212,34 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
 
     HasImplementationCore(configure);
     return this;
+  }
+
+  public IActorMetadataBuilder<TActor> IsMessageHandler(Type messageType, Action<IMessageHandlerMetadataBuilder> configure)
+  {
+    if (messageType is null)
+      throw new ArgumentNullException(nameof(messageType));
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
+
+    MessageHandlerMetadataBuilder builder = new();
+    configure(builder);
+
+    if (!_handlerMetadataDictionary.TryGetValue(messageType, out List<IMessageHandlerMetadata>? metadataCollection))
+    {
+      metadataCollection = new();
+      _handlerMetadataDictionary.Add(messageType, metadataCollection);
+    }
+
+    metadataCollection.Add(builder.Build());
+    return this;
+  }
+
+  protected override IReadOnlyCollection<IMessageHandlerMetadata> GetMessageHandlerMetadataCollection(IMethodDescriptor activity)
+  {
+    if (_handlerMetadataDictionary.TryGetValue(activity.ParameterTypes[0], out List<IMessageHandlerMetadata>? metadataCollection))
+      return metadataCollection;
+
+    return Array.Empty<IMessageHandlerMetadata>();
   }
 
   private void HasStateCore<TState>(MemberInfo member, Type type, Action<IStateComponentBuilder<TActor, TState>> configure)

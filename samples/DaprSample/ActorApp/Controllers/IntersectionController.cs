@@ -1,4 +1,5 @@
 ﻿using ActorApp.Domain;
+using CodeArchitects.Platform.Messaging;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActorApp.Controllers;
@@ -8,10 +9,12 @@ namespace ActorApp.Controllers;
 public class IntersectionController : ControllerBase
 {
   private readonly ITrafficLightFactory _trafficLightFactory;
+  private readonly IMessageBus _bus;
 
-  public IntersectionController(ITrafficLightFactory cartActorFactory)
+  public IntersectionController(ITrafficLightFactory cartActorFactory, IMessageBus bus)
   {
     _trafficLightFactory = cartActorFactory;
+    _bus = bus;
   }
 
   [HttpGet("startnew")]
@@ -31,9 +34,7 @@ public class IntersectionController : ControllerBase
   [HttpGet("{id}/stop")]
   public async Task<ActionResult> StopAsync(Guid id)
   {
-    ITrafficLight trafficLight = _trafficLightFactory.Get(id);
-
-    await trafficLight.TurnOffAsync();
+    await _bus.SendAsync("traffic-light", new TurnOffCommand { ActorId = id, Reason = "user request" });
 
     return Ok(new
     {

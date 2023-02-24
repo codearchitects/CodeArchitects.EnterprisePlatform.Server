@@ -17,12 +17,12 @@ public abstract class ActiveTrafficLight : TrafficLight
     return Task.FromException(new InvalidOperationException("I was already started!"));
   }
 
-  public override async Task TurnOffAsync(CancellationToken cancellationToken = default)
+  protected override async Task TurnOffAsync(string reason, CancellationToken cancellationToken = default)
   {
-    Logger.LogInformation("Traffic light is stopping.");
+    Logger.LogInformation("Traffic light is stopping. Reason: {reason}.", reason);
 
     await _context.UnscheduleAsync(ChangeColorSchedule, cancellationToken);
-    
+
     _context.Become<InactiveTrafficLight>();
   }
 }

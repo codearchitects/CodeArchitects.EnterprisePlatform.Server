@@ -12,6 +12,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - redis
+      - rabbitmq
 
   actorapp-dapr:
     image: daprio/daprd:latest
@@ -31,6 +32,12 @@ services:
     image: redis:alpine
     ports:
       - 5379:6379
+    
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
       
   dapr-placement:
     image: "daprio/dapr:latest"

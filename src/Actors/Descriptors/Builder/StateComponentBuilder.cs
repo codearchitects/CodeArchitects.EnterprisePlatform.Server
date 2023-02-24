@@ -35,7 +35,7 @@ internal class StateComponentBuilder<TActor, TState> : StateComponentMetadata<TA
     return this;
   }
 
-  IStateComponentBuilder<TActor, TState> IStateComponentBuilder<TActor, TState>.IsActorId(bool isActorId = true)
+  IStateComponentBuilder<TActor, TState> IStateComponentBuilder<TActor, TState>.IsActorId(bool isActorId)
   {
     _isActorId = isActorId;
     return this;

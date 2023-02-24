@@ -3,40 +3,35 @@ using Dapr.Actors.Client;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Factory;
 
-internal abstract class ProxyFactory<THostInterface, TInterface, TState>
+internal abstract class ProxyFactory<THostInterface, TActorId, TInterface, TState> : ActorHostFactory<THostInterface, TActorId>
   where THostInterface : IActor
+  where TActorId : notnull
 {
-  private readonly IActorProxyFactory _actorFactory;
-
-  protected ProxyFactory(IActorProxyFactory actorFactory)
+  protected ProxyFactory(IActorProxyFactory hostFactory)
+    : base(hostFactory)
   {
-    _actorFactory = actorFactory;
   }
-
-  protected abstract string ActorName { get; }
 
   protected abstract TInterface CreateProxy(THostInterface actorHost);
 
   protected abstract Task InitAsync(THostInterface actorHost, TState state, CancellationToken cancellationToken);
 
-  protected async Task<TInterface> CreateCoreAsync<TActorId>(TActorId actorId, TState state, CancellationToken cancellationToken)
-    where TActorId : notnull
+  protected async Task<TInterface> CreateCoreAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
   {
     if (actorId is null)
       throw new ArgumentNullException(nameof(actorId));
 
-    THostInterface actorHost = _actorFactory.CreateActorProxy<THostInterface>(new ActorId(actorId.ToString()), ActorName);
-    await InitAsync(actorHost, state, cancellationToken);
-    return CreateProxy(actorHost);
+    THostInterface host = CreateHost(actorId);
+    await InitAsync(host, state, cancellationToken);
+    return CreateProxy(host);
   }
 
-  protected TInterface GetCore<TActorId>(TActorId actorId)
-    where TActorId : notnull
+  protected TInterface GetCore(TActorId actorId)
   {
     if (actorId is null)
       throw new ArgumentNullException(nameof(actorId));
 
-    THostInterface actor = _actorFactory.CreateActorProxy<THostInterface>(new ActorId(actorId.ToString()), ActorName);
-    return CreateProxy(actor);
+    THostInterface host = CreateHost(actorId);
+    return CreateProxy(host);
   }
 }

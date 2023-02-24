@@ -31,7 +31,7 @@ internal abstract class MethodDescriptor : IMethodDescriptor
 
   public IReadOnlyList<FieldInfo> ActivityFields => ActivityType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-  public bool HasCancellationTokenParameter => ParameterTypes.Length != 0 && ParameterTypes[^1] == typeof(CancellationToken);
+  public bool HasCancellationTokenParameter => ParameterTypes.Length != 0 && ParameterTypes[ParameterTypes.Length - 1] == typeof(CancellationToken);
 
   public abstract void Accept(IMethodDescriptorVisitor visitor);
 }

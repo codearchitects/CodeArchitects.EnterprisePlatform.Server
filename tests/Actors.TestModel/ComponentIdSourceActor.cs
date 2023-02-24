@@ -95,7 +95,8 @@ internal static class ComponentIdSourceActorFixture
       .SetFactory(_ => _
         .SetFactoryType(typeof(IComponentIdSourceActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)
-        .SetGetMethod(factoryGetMethod)));
+        .SetGetMethod(factoryGetMethod))
+      .SetMessageHandlers());
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)

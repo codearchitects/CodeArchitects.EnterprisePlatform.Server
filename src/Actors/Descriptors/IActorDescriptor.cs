@@ -32,5 +32,7 @@ internal interface IActorDescriptor
 
   IActorFactoryDescriptor Factory { get; }
 
+  IReadOnlyCollection<IMessageHandlerDescriptor> MessageHandlers { get; }
+
   IImplementationDescriptor GetImplementation(Type implementationType);
 }
