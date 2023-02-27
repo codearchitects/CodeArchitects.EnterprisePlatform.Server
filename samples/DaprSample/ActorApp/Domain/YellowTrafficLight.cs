@@ -8,8 +8,8 @@ public class YellowTrafficLight : ActiveTrafficLight
 {
   private readonly ILogger<YellowTrafficLight> _logger;
 
-  public YellowTrafficLight(TrafficLightState state, IActorContext<TrafficLight> context, ILogger<YellowTrafficLight> logger)
-    : base(state, context)
+  public YellowTrafficLight(Guid id, TrafficLightState state, IActorContext<TrafficLight> context, ILogger<YellowTrafficLight> logger)
+    : base(id, state, context)
   {
     _logger = logger;
   }

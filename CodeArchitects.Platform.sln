@@ -127,7 +127,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Act
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActorApp", "tests\Actors.Dapr.AspNetCore.IntegrationTests\ActorApp\ActorApp.csproj", "{CC5F477F-362B-4504-999F-42D3143A76C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Actors.FunctionalTests", "tests\Actors.FunctionalTests\CodeArchitects.Platform.Actors.FunctionalTests.csproj", "{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Actors.FunctionalTests", "tests\Actors.FunctionalTests\CodeArchitects.Platform.Actors.FunctionalTests.csproj", "{DC192911-6AB2-412E-AE5C-8922BAD4E8B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

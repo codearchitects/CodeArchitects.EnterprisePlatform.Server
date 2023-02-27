@@ -1,8 +1,6 @@
-﻿using CodeArchitects.Platform.Common.Collections;
-using CodeArchitects.Platform.Common.Exceptions;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 

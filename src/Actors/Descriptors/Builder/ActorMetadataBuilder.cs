@@ -13,6 +13,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
   private readonly ImplementationMetadataBuilder<TActor, TActor> _baseImplementationBuilder;
   private readonly Dictionary<Type, ImplementationDescriptorFactory<TActor>> _implementations;
   private readonly Dictionary<Type, List<IMessageHandlerMetadata>> _handlerMetadataDictionary;
+  private readonly HashSet<MemberMetadata> _actorIdMembers;
   private Type? _interfaceType;
   private Type? _factoryType;
   private bool _isExplicitVirtual;
@@ -24,6 +25,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
     _stateComponents = new();
     _implementations = new();
     _handlerMetadataDictionary = new();
+    _actorIdMembers = new();
   }
 
   protected override Type? InterfaceType => _interfaceType;
@@ -37,6 +39,9 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
   protected override bool IsExplicitVirtual => _isExplicitVirtual;
 
   protected override IReadOnlyCollection<StateComponentMetadata<TActor>> StateComponents => _stateComponents.Values;
+
+  protected override IEnumerable<MemberMetadata> ActorIdMembers => _actorIdMembers
+    .Where(metadata => !_stateComponents.ContainsKey(metadata.Member));
 
   public IActorMetadataBuilder<TActor> HasInterfaceType(Type interfaceType)
   {
@@ -116,6 +121,9 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
 
   public IActorMetadataBuilder<TActor> HasState(string memberName)
   {
+    if (memberName is null)
+      throw new ArgumentNullException(nameof(memberName));
+
     FieldInfo? field = typeof(TActor).GetField(
       name: memberName,
       bindingAttr: BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -141,6 +149,9 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
 
   public IActorMetadataBuilder<TActor> HasState<TState>(string memberName, Action<IStateComponentBuilder<TActor, TState>> configure)
   {
+    if (memberName is null)
+      throw new ArgumentNullException(nameof(memberName));
+
     FieldInfo? field = typeof(TActor).GetField(
       name: memberName,
       bindingAttr: BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -164,6 +175,45 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
         throw new TypeArgumentException($"'{nameof(TState)}' does not match the member type.", nameof(TState));
 
       HasStateCore(property, property.PropertyType, configure);
+      return this;
+    }
+
+    throw new MissingMemberException(typeof(TActor).Name, memberName);
+  }
+
+  public IActorMetadataBuilder<TActor> HasId<TActorId>(Expression<Func<TActor, TActorId>> memberExpression)
+  {
+    if (memberExpression is null)
+      throw new ArgumentNullException(nameof(memberExpression));
+    if (memberExpression.Body is not MemberExpression body || body.Expression != memberExpression.Parameters[0])
+      throw new ArgumentException("The expression must represent a field or property access.", nameof(memberExpression));
+
+    _actorIdMembers.Add(new MemberMetadata(body.Member, body.Type));
+    return this;
+  }
+
+  public IActorMetadataBuilder<TActor> HasId(string memberName)
+  {
+    if (memberName is null)
+      throw new ArgumentNullException(nameof(memberName));
+
+    FieldInfo? field = typeof(TActor).GetField(
+      name: memberName,
+      bindingAttr: BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+    if (field is not null)
+    {
+      _actorIdMembers.Add(new MemberMetadata(field, field.FieldType));
+      return this;
+    }
+
+    PropertyInfo? property = typeof(TActor).GetProperty(
+      name: memberName,
+      bindingAttr: BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+    if (property is not null)
+    {
+      _actorIdMembers.Add(new MemberMetadata(property, property.PropertyType));
       return this;
     }
 

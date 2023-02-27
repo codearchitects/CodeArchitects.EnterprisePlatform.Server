@@ -7,8 +7,8 @@ public class InactiveTrafficLight : TrafficLight
 {
   private readonly ILogger<InactiveTrafficLight> _logger;
 
-  public InactiveTrafficLight(TrafficLightState state, IActorContext<TrafficLight> context, ILogger<InactiveTrafficLight> logger)
-    : base(state, context)
+  public InactiveTrafficLight(Guid id, TrafficLightState state, IActorContext<TrafficLight> context, ILogger<InactiveTrafficLight> logger)
+    : base(id, state, context)
   {
     _logger = logger;
   }

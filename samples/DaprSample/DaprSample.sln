@@ -51,6 +51,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ActorApp", "ActorApp\ActorA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Actors.Dapr.AspNetCore", "..\..\src\Actors.Dapr.AspNetCore\CodeArchitects.Platform.Actors.Dapr.AspNetCore.csproj", "{62135847-618F-441F-BF30-7A9ABE43D886}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Actors.Analyzer", "..\..\src\Actors.Analyzer\CodeArchitects.Platform.Actors.Analyzer.csproj", "{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{62135847-618F-441F-BF30-7A9ABE43D886}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62135847-618F-441F-BF30-7A9ABE43D886}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62135847-618F-441F-BF30-7A9ABE43D886}.Release|Any CPU.Build.0 = Release|Any CPU
+		{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -154,6 +160,7 @@ Global
 		{6B8E9501-BAB6-4A43-A50D-81F1C71E9669} = {51343710-9B25-4A55-ACD2-37CE0BC7B0D2}
 		{F141901C-1934-4B63-87C5-1A2CD0EB5F7B} = {51343710-9B25-4A55-ACD2-37CE0BC7B0D2}
 		{62135847-618F-441F-BF30-7A9ABE43D886} = {51343710-9B25-4A55-ACD2-37CE0BC7B0D2}
+		{913DEB57-BD80-4A1B-BC7D-2D1182FB2FD0} = {51343710-9B25-4A55-ACD2-37CE0BC7B0D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {475A0563-7A63-439E-BAFD-3ED10521943F}

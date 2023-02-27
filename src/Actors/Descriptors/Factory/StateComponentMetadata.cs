@@ -1,26 +1,20 @@
-﻿using CodeArchitects.Platform.Common.Reflection;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
 
-internal abstract class StateComponentMetadata<TActor> : IStateComponentMetadata
+internal abstract class StateComponentMetadata<TActor> : MemberMetadata, IStateComponentMetadata
   where TActor : class
 {
   protected StateComponentMetadata(int index, MemberInfo member, Type type)
+    : base(member, type)
   {
     Index = index;
-    Member = member;
-    Type = type;
 
     CheckStateType();
   }
 
   public int Index { get; }
-
-  public MemberInfo Member { get; }
-
-  public Type Type { get; }
 
   public abstract bool HasDefaultValue(out object? defaultComponentValue);
 
@@ -50,7 +44,7 @@ internal abstract class StateComponentMetadata<TActor> : IStateComponentMetadata
   {
     Type nestedType = GetNestedType(Type, 0);
     if (nestedType.IsInterface || nestedType.IsAbstract)
-      throw InvalidActorException.InvalidStateType(typeof(TActor), Member);
+      throw InvalidActorException.InvalidStateType(typeof(TActor), Type);
   }
 
   private Type GetNestedType(Type currentType, int genericNesting)
@@ -69,7 +63,7 @@ internal abstract class StateComponentMetadata<TActor> : IStateComponentMetadata
         if (IsSupportedKeyType(firstTypeArgument))
           return GetNestedType(secondTypeArgument, genericNesting + 1);
 
-        throw InvalidActorException.InvalidStateType(typeof(TActor), Member);
+        throw InvalidActorException.InvalidStateType(typeof(TActor), Type);
       }
     }
 

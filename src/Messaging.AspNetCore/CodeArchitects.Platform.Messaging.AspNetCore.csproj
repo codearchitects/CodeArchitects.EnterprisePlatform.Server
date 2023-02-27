@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
     <ProjectReference Include="..\Messaging\CodeArchitects.Platform.Messaging.csproj" />
   </ItemGroup>
 

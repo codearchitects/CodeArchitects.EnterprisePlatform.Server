@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors.Implementation;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Exceptions;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Factory;
@@ -47,6 +48,9 @@ internal class MethodDescriptorFactory
     if (!TryGetKind(implementationMethod, out MethodKind kind) || kind is MethodKind.Void)
       throw InvalidActorException.InvalidMethodReturnType(implementationMethod.DeclaringType, implementationMethod);
 
+    if (implementationMethod.IsGenericMethod)
+      throw InvalidActorException.GenericMethodsAreNotSupported(_actorType, implementationMethod);
+
     MethodDescriptor descriptor = CreateDescriptor(kind, interfaceMethod, implementationMethod);
 
     _methods.Add(implementationMethod, descriptor);
@@ -58,7 +62,7 @@ internal class MethodDescriptorFactory
     if (_activities.ContainsKey(implementationMethod.GetBaseDefinition()))
       return;
 
-    if (!TryGetKind(implementationMethod, out MethodKind kind))
+    if (implementationMethod.IsGenericMethod || !TryGetKind(implementationMethod, out MethodKind kind))
       return;
 
     MethodDescriptor descriptor = CreateDescriptor(kind, null, implementationMethod);
@@ -67,8 +71,7 @@ internal class MethodDescriptorFactory
 
   private MethodDescriptor CreateDescriptor(MethodKind kind, MethodInfo? interfaceMethod, MethodInfo implementationMethod)
   {
-    if (implementationMethod.IsGenericMethod)
-      throw InvalidActorException.GenericMethodsAreNotSupported(_actorType, implementationMethod);
+    Debug.Assert(!implementationMethod.IsGenericMethod, "Cannot create a descriptor for a generic method.");
 
     Type[] parameterTypes = GetParameterTypes(implementationMethod);
     Func<IMethodDescriptor, Type> activityTypeFactory = descriptor => _activityTypeBuilder.Build(descriptor, _actorType, _activityBaseType);

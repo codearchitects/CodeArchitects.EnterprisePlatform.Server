@@ -11,11 +11,13 @@ public abstract class TrafficLight : ITrafficLight, IMessageHandler<TurnOffComma
   protected static readonly ScheduleId _turnRedSchedule = ScheduleId.New("TurnRed");
   protected static readonly ScheduleId _turnYellowSchedule = ScheduleId.New("TurnYellow");
 
+  [ActorId] protected readonly Guid _id;
   [State] protected readonly TrafficLightState _state;
   protected readonly IActorContext<TrafficLight> _context;
   
-  public TrafficLight(TrafficLightState state, IActorContext<TrafficLight> context)
+  public TrafficLight(Guid id, TrafficLightState state, IActorContext<TrafficLight> context)
   {
+    _id = id;
     _state = state;
     _context = context;
   }

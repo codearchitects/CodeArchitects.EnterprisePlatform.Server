@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Common.Collections;
+﻿namespace System.Collections.Generic;
 
 internal static class EnumerableExtensions
 {

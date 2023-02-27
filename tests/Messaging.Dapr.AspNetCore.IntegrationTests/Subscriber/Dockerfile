@@ -8,13 +8,6 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["NuGet.Config", "."]
 COPY ["tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Subscriber.csproj", "tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/"]
-COPY ["src/Messaging.Dapr.AspNetCore/CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj", "src/Messaging.Dapr.AspNetCore/"]
-COPY ["src/Dapr.AspNetCore/CodeArchitects.Platform.Dapr.AspNetCore.csproj", "src/Dapr.AspNetCore/"]
-COPY ["src/Common/CodeArchitects.Platform.Common.csproj", "src/Common/"]
-COPY ["src/Common.Analyzer/CodeArchitects.Platform.Common.Analyzer.csproj", "src/Common.Analyzer/"]
-COPY ["src/Messaging.AspNetCore/CodeArchitects.Platform.Messaging.AspNetCore.csproj", "src/Messaging.AspNetCore/"]
-COPY ["src/Messaging/CodeArchitects.Platform.Messaging.csproj", "src/Messaging/"]
-COPY ["src/Messaging.Dapr/CodeArchitects.Platform.Messaging.Dapr.csproj", "src/Messaging.Dapr/"]
 RUN dotnet restore "tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Subscriber.csproj"
 COPY . .
 WORKDIR "/src/tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber"

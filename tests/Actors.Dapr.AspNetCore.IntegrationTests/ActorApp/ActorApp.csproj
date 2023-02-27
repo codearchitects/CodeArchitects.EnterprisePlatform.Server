@@ -16,9 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Actors.Dapr.AspNetCore\CodeArchitects.Platform.Actors.Dapr.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\..\src\Common\CodeArchitects.Platform.Common.csproj">
-      <SetTargetFramework>TargetFramework=net7.0</SetTargetFramework>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj" />
   </ItemGroup>
 

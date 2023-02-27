@@ -3,27 +3,23 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
-internal abstract class ActorIdDescriptor<TState> : IActorIdDescriptor<TState>
+internal class ActorIdDescriptor<TState> : IActorIdDescriptor<TState>
   where TState : ActorState
 {
-  private readonly Action<TState, string> _setId;
-
-  protected ActorIdDescriptor(int stateIndex, Action<TState, string> setId)
+  public ActorIdDescriptor(Type type)
   {
-    StateIndex = stateIndex;
-    _setId = setId;
+    Type = type;
   }
 
-  public abstract Type Type { get; }
+  public Type Type { get; }
 
-  public abstract MethodInfo? GetActorIdMethod { get; }
+  public bool HasIdSource => false;
 
-  public bool HasIdSource => true;
+  public int StateIndex => throw new InvalidOperationException("The id does not come from the actor's state.");
 
-  public int StateIndex { get; }
+  public MethodInfo? GetActorIdMethod => throw new InvalidOperationException("The id does not come from the actor's state.");
 
   public void SetId(TState state, string id)
   {
-    _setId(state, id);
   }
 }

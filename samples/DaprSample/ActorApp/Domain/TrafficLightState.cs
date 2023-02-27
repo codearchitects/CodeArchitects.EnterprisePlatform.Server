@@ -1,21 +1,8 @@
-﻿using CodeArchitects.Platform.Actors;
+﻿namespace ActorApp.Domain;
 
-namespace ActorApp.Domain;
-
-public class TrafficLightState : IActorIdSource<Guid>
+public class TrafficLightState
 {
-  public Guid Id { get; private set; }
   public int MaxCarsBeforeYellow { get; set; } = 5;
   public int CarsBeforeYellow { get; set; }
   public DateTime TurnsGreenAt { get; set; }
-
-  Guid IActorIdSource<Guid>.GetActorId()
-  {
-    return Id;
-  }
-
-  void IActorIdSource<Guid>.SetActorId(Guid actorId)
-  {
-    Id = actorId;
-  }
 }

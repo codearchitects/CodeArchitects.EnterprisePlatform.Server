@@ -12,6 +12,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
 {
   private static readonly MethodInfo s_getServiceMethod;
   private static readonly MethodInfo s_getRequiredServiceMethod;
+  private static readonly MethodInfo s_getActorIdMethod;
 
   static ImplementationDescriptorFactory()
   {
@@ -24,6 +25,11 @@ internal abstract class ImplementationDescriptorFactory<TActor>
       name: nameof(ServiceProviderServiceExtensions.GetRequiredService),
       bindingAttr: BindingFlags.Static | BindingFlags.Public,
       types: new[] { typeof(IServiceProvider) });
+
+    s_getActorIdMethod = typeof(IActorContext).GetRequiredMethod(
+      name: $"get_{nameof(IActorContext.ActorId)}",
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
   }
 
   private readonly int _id;
@@ -51,7 +57,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
     if (_id != 0 && HasStateFields)
       throw InvalidActorException.StateMustBeDefinedInBaseActor(ActorType, ImplementationType);
     if (ImplementationType.IsAbstract)
-      throw InvalidActorException.AbstractImplementation(ImplementationType);
+      throw InvalidActorException.AbstractImplementation(ActorType, ImplementationType);
 
     ConstructorInfo constructor = GetConstructor();
     ImplementationFactory<TActor, TState> implementationFactory = CreateImplementationFactory<TState>(constructor, stateFields);
@@ -85,11 +91,11 @@ internal abstract class ImplementationDescriptorFactory<TActor>
     {
       string? parameterName = parameter.Name;
       if (parameterName is null)
-        throw InvalidActorException.StateComponentsMismatch(ImplementationType);
+        throw InvalidActorException.StateComponentNameMismatch(ImplementationType);
 
       Type parameterType = parameter.ParameterType;
 
-      if (_actorDescriptorFactory.TryGetStateComponent(parameterName, out StateComponentMetadata<TActor>? component))
+      if (_actorDescriptorFactory.TryGetStateComponent(parameterName, parameterType, out StateComponentMetadata<TActor>? component))
       {
         FieldInfo stateField = stateFields[component.Index];
 
@@ -106,6 +112,14 @@ internal abstract class ImplementationDescriptorFactory<TActor>
         continue;
       }
 
+      if (_actorDescriptorFactory.IsActorId(parameterName, parameterType))
+      {
+        Expression idExpression = Expression.Call(contextParam, s_getActorIdMethod);
+        Expression parseIdExpression = _actorDescriptorFactory.GetParseIdExpression(idExpression, parameterType);
+        arguments.Add(parseIdExpression);
+        continue;
+      }
+
       MethodInfo getServiceMethod = (parameter.HasDefaultValue
         ? s_getServiceMethod
         : s_getRequiredServiceMethod).MakeGenericMethod(parameterType);
@@ -114,7 +128,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
     }
 
     if (stateComponentCount != _actorDescriptorFactory.StateComponentCount)
-      throw InvalidActorException.StateComponentsMismatch(ImplementationType);
+      throw InvalidActorException.StateComponentNameMismatch(ImplementationType);
 
     return Expression.Lambda<ImplementationFactory<TActor, TState>>(
       body: Expression.New(constructor, arguments),

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace CodeArchitects.Platform.Common.Expressions;
 
 [Serializable]
-public class ExpressionEvaluationException : Exception
+internal class ExpressionEvaluationException : Exception
 {
   public ExpressionEvaluationException(Expression expression)
     : base($"Could not evaluate expression '{expression}'.")

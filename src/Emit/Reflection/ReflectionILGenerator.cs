@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Collections;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Emit.Reflection;

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace CodeArchitects.Platform.Common.Reflection;
+namespace System.Reflection;
 
 /// <summary>
 /// Extension methods for the <see cref="Type"/> class.

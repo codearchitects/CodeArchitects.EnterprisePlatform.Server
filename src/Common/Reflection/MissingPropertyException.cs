@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace CodeArchitects.Platform.Common.Reflection;
+namespace System;
 
 [Serializable]
 internal class MissingPropertyException : MissingMemberException

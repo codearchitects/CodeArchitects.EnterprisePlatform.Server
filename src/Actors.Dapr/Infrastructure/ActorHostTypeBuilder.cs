@@ -3,7 +3,6 @@ using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Emit;
 using Dapr.Actors;
-using Dapr.Actors.Client;
 using Dapr.Actors.Runtime;
 using System.Diagnostics;
 using System.Reflection;

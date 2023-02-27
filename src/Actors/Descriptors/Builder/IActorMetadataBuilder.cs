@@ -26,6 +26,10 @@ public interface IActorMetadataBuilder<TActor>
 
   IActorMetadataBuilder<TActor> HasState<TState>(string memberName, Action<IStateComponentBuilder<TActor, TState>> configure);
 
+  IActorMetadataBuilder<TActor> HasId<TActorId>(Expression<Func<TActor, TActorId>> memberExpression);
+
+  IActorMetadataBuilder<TActor> HasId(string memberName);
+
   IActorMetadataBuilder<TActor> HasConstructor(ConstructorInfo constructor);
 
   IActorMetadataBuilder<TActor> HasConstructor(params Type[] parameterTypes);

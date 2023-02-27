@@ -25,7 +25,7 @@ internal class ActorModel : IActorModel
   {
     IActorDescriptor actor = _actors[typeof(TActor)];
 
-    Debug.Assert(actor.State.Type != typeof(TState), "Invalid state type provided.");
+    Debug.Assert(actor.State.Type == typeof(TState), "Invalid state type provided.");
 
     return (IActorDescriptor<TActor, TState>)actor;
   }

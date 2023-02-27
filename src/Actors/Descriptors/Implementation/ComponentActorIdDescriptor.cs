@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Descriptors.Implementation;
 
-internal class ComponentActorIdDescriptor<TState> : ActorIdDescriptor<TState>
+internal class ComponentActorIdDescriptor<TState> : StateActorIdDescriptor<TState>
   where TState : ActorState
 {
   public ComponentActorIdDescriptor(Type type, int stateIndex, Action<TState, string> setId)

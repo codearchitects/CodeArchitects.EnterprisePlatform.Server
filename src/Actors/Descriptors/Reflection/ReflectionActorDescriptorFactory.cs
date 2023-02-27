@@ -30,6 +30,30 @@ internal class ReflectionActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   protected override IReadOnlyCollection<StateComponentMetadata<TActor>> StateComponents => _stateComponents ??= CreateStateComponents();
 
+  protected override IEnumerable<MemberMetadata> ActorIdMembers
+  {
+    get
+    {
+      MemberInfo[] members = ActorType
+        .GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+      foreach (MemberInfo member in members)
+      {
+        if (!member.IsDefined(typeof(ActorIdAttribute)) || member.IsDefined(typeof(StateAttribute)))
+          continue;
+
+        switch (member)
+        {
+          case FieldInfo field:
+            yield return new MemberMetadata(field, field.FieldType);
+            break;
+          case PropertyInfo property:
+            yield return new MemberMetadata(property, property.PropertyType);
+            break;
+        }
+      }
+    }
+  }
+
   protected override ImplementationDescriptorFactory<TActor> BaseImplementationFactory { get; }
 
   protected override IReadOnlyCollection<ImplementationDescriptorFactory<TActor>> ImplementationFactories => _implementationFactories ??= CreateImplementationFactories();

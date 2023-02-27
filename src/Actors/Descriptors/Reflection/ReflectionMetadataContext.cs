@@ -61,7 +61,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       if (IsActorImplementation(type, out IActorImplementationAttribute? actorImplementationAttribute) && actorImplementationAttribute.ActorType == actorType)
       {
         if (!actorType.IsAssignableFrom(type))
-          throw InvalidActorException.InvalidImplementation(type);
+          throw InvalidActorException.InvalidImplementation(actorType, type);
 
         if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type> types))
         {
@@ -108,7 +108,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       {
         Type actorType = actorImplementationAttribute.ActorType;
         if (!actorType.IsAssignableFrom(type))
-          throw InvalidActorException.InvalidImplementation(type);
+          throw InvalidActorException.InvalidImplementation(actorType, type);
 
         if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type> types))
         {

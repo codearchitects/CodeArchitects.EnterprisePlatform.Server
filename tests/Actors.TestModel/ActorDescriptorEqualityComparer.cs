@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Descriptors;
 using CodeArchitects.Platform.Common.Exceptions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 

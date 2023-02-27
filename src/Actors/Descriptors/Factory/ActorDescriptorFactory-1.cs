@@ -36,6 +36,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   protected abstract IReadOnlyCollection<StateComponentMetadata<TActor>> StateComponents { get; }
 
+  protected abstract IEnumerable<MemberMetadata> ActorIdMembers { get; }
+
   protected abstract ImplementationDescriptorFactory<TActor> BaseImplementationFactory { get; }
 
   protected abstract IReadOnlyCollection<ImplementationDescriptorFactory<TActor>> ImplementationFactories { get; }
@@ -44,7 +46,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   protected abstract IReadOnlyCollection<IMessageHandlerMetadata> GetMessageHandlerMetadataCollection(IMethodDescriptor activity);
 
-  public bool TryGetStateComponent(string name, [NotNullWhen(true)] out StateComponentMetadata<TActor>? stateComponent)
+  public bool TryGetStateComponent(string name, Type type, [NotNullWhen(true)] out StateComponentMetadata<TActor>? stateComponent)
   {
     stateComponent = null;
     
@@ -54,20 +56,38 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
       bool isMatch =
         name.MatchesUnderscorePrefixConvention(memberName) || // _name
-        name == memberName                                 || // name
+        name.Equals(memberName)                            || // name
         memberName.MatchesCamelCaseConvention(name)        || // Name
         name.MatchesMemberPrefixConvention(memberName);       // m_name
 
-      if (isMatch)
+      if (isMatch && component.Type == type)
       {
         if (stateComponent is not null)
-          throw InvalidActorException.StateComponentsMismatch(typeof(TActor));
+          throw InvalidActorException.StateComponentNameMismatch(typeof(TActor));
 
         stateComponent = component;
       }
     }
 
     return stateComponent is not null;
+  }
+
+  public bool IsActorId(string name, Type type)
+  {
+    foreach (MemberMetadata metadata in ActorIdMembers)
+    {
+      string memberName = metadata.Member.Name;
+
+      bool isMatch =
+        name.MatchesUnderscorePrefixConvention(memberName) || // _name
+        name.Equals(memberName)                            || // name
+        memberName.MatchesCamelCaseConvention(name)        || // Name
+        name.MatchesMemberPrefixConvention(memberName);       // m_name
+
+      return isMatch && metadata.Type == type;
+    }
+
+    return false;
   }
 
   public override IActorDescriptor CreateDescriptor()
@@ -78,7 +98,48 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     bool isPolymorphic = ImplementationFactories.Count > 0;
     Type stateType = _stateTypeBuilder.Build(ActorType, StateComponents, isPolymorphic);
 
-    return (IActorDescriptor)s_createDescriptorMethod.MakeGenericMethod(stateType.UnderlyingSystemType).Invoke(this, new object?[] { isPolymorphic })!;
+    try
+    {
+      return (IActorDescriptor)s_createDescriptorMethod.MakeGenericMethod(stateType.UnderlyingSystemType).Invoke(this, new object?[] { isPolymorphic })!;
+    }
+    catch (TargetInvocationException ex)
+    {
+      throw ex.InnerException;
+    }
+  }
+
+  public Expression GetParseIdExpression(Expression idExpression, Type idType)
+  {
+    MethodInfo? parseMethod = idType.GetMethod(
+      name: "Parse",
+      bindingAttr: BindingFlags.Static | BindingFlags.Public,
+      binder: null,
+      types: new[] { typeof(string) },
+      modifiers: null);
+
+    if (parseMethod is not null && parseMethod.ReturnType == idType)
+    {
+      return Expression.Call(
+        method: parseMethod,
+        arg0: idExpression);
+    }
+
+    parseMethod = idType.GetMethod(
+      name: "Parse",
+      bindingAttr: BindingFlags.Static | BindingFlags.Public,
+      binder: null,
+      types: new[] { typeof(string), typeof(IFormatProvider) },
+      modifiers: null);
+
+    if (parseMethod is not null && parseMethod.ReturnType == idType)
+    {
+      return Expression.Call(
+        method: parseMethod,
+        arg0: idExpression,
+        arg1: Expression.Constant(null, typeof(IFormatProvider)));
+    }
+
+    throw InvalidActorException.InvalidIdType(ActorType, idType);
   }
 
   private IActorDescriptor<TActor, TState> CreateDescriptor<TState>(bool isPolymorphic)
@@ -174,6 +235,9 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   private void CheckInterfaceType(Type interfaceType)
   {
+    if (interfaceType.IsGenericType)
+      throw InvalidActorException.GenericActorsAreNotSupported(interfaceType);
+
     if (interfaceType.GetProperties(BindingFlags.Instance | BindingFlags.Public).Length != 0)
       throw InvalidActorException.PropertiesAreNotSupported(ActorType, interfaceType);
 
@@ -247,7 +311,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     return state;
   }
 
-  public IActorIdDescriptor<TState> CreateId<TState>(IReadOnlyList<FieldInfo> stateFields)
+  private IActorIdDescriptor<TState> CreateId<TState>(IReadOnlyList<FieldInfo> stateFields)
     where TState : ActorState
   {
     IActorIdDescriptor<TState>? id = null;
@@ -304,47 +368,24 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       }
     }
 
+    foreach (MemberMetadata metadata in ActorIdMembers)
+    {
+      if (id is not null)
+        throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+
+      id = new ActorIdDescriptor<TState>(metadata.Type);
+    }
+
     return id ?? DefaultActorIdDescriptor<TState>.Instance;
-  }
-
-  private Expression GetParseIdExpression(ParameterExpression idParam, Type idType)
-  {
-    MethodInfo? parseMethod = idType.GetMethod(
-      name: "Parse",
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      binder: null,
-      types: new[] { typeof(string) },
-      modifiers: null);
-
-    if (parseMethod is not null && parseMethod.ReturnType == idType)
-    {
-      return Expression.Call(
-        method: parseMethod,
-        arg0: idParam);
-    }
-
-    parseMethod = idType.GetMethod(
-      name: "Parse",
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      binder: null,
-      types: new[] { typeof(string), typeof(IFormatProvider) },
-      modifiers: null);
-
-    if (parseMethod is not null && parseMethod.ReturnType == idType)
-    {
-      return Expression.Call(
-        method: parseMethod,
-        arg0: idParam,
-        arg1: Expression.Constant(null, typeof(IFormatProvider)));
-    }
-
-    throw InvalidActorException.InvalidIdType(ActorType, idType);
   }
 
   private ActorFactoryDescriptor CreateFactory(Type interfaceType, IActorIdDescriptor id, bool isVirtual)
   {
     if (FactoryType is not Type factoryType)
       throw InvalidActorException.MissingActorFactoryType(ActorType);
+
+    if (FactoryType.IsGenericType)
+      throw InvalidActorException.GenericFactoriesAreNotSupported(ActorType, FactoryType);
 
     int expectedMethodCount = isVirtual ? 1 : 2;
 

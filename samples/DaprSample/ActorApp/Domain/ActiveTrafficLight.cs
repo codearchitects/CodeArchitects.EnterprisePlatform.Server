@@ -5,8 +5,8 @@ namespace ActorApp.Domain;
 
 public abstract class ActiveTrafficLight : TrafficLight
 {
-  protected ActiveTrafficLight(TrafficLightState state, IActorContext<TrafficLight> context)
-    : base(state, context)
+  protected ActiveTrafficLight(Guid id, TrafficLightState state, IActorContext<TrafficLight> context)
+    : base(id, state, context)
   {
   }
 

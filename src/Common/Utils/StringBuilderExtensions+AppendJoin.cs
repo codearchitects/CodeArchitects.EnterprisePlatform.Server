@@ -78,7 +78,7 @@ internal static partial class StringBuilderExtensions
   }
 }
 
-#if !NETCOREAPP2_0_OR_GREATER
+#if NETSTANDARD2_0
 
 internal static partial class StringBuilderExtensions
 {

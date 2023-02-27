@@ -9,8 +9,4 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
-  </ItemGroup>
-
 </Project>
