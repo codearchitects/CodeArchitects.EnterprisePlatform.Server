@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Analyzer;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
 namespace CodeArchitects.Platform.Actors.Analyzer;

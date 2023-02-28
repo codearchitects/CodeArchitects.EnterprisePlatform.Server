@@ -1,7 +1,8 @@
-﻿using CodeArchitects.Platform.Dapr.AspNetCore;
+﻿using CodeArchitects.Platform.Actors.Dapr.AspNetCore;
+using CodeArchitects.Platform.Dapr.AspNetCore;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ActorsDaprInfrastructureBuilderExtensions
 {

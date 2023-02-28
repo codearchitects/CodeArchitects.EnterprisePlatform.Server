@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Metadata.Builder;
 
-namespace CodeArchitects.Platform.Actors.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DaprActorsOptionsBuilderExtensions
 {

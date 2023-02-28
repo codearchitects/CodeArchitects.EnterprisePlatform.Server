@@ -1,7 +1,7 @@
 ﻿using Dapr.Actors.Runtime;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.Actors.Dapr.AspNetCore;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public interface IDaprActorsOptionsBuilder
 {

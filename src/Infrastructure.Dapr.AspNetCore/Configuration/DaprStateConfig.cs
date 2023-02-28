@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.State;
+﻿namespace CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 
 /// <summary>
 /// Provides state configuration options.

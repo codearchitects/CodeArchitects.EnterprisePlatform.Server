@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Analyzer;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Actors.Analyzer;
 

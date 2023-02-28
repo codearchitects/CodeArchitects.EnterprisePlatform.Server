@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Common.Analyzer;
+﻿namespace CodeArchitects.Platform.Actors.Analyzer;
 
 internal class DiagnosticIds
 {

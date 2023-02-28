@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Common.Ioc;
 using CodeArchitects.Platform.Dapr.AspNetCore;
 using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore;
+using CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.Configuration;
 using CodeArchitects.Platform.Infrastructure.Dapr.State;
 using CodeArchitects.Platform.Infrastructure.State;
 using Dapr.Client;
