@@ -1,5 +1,5 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+﻿using CodeArchitects.Platform.Actors.Metadata;
+using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 

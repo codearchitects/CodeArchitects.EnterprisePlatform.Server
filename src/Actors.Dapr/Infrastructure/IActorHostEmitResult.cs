@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;

@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Bindings;
-using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Expressions;
 using System.Collections;

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Emit;

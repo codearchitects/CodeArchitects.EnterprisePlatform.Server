@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Infrastructure;
-using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Emit;
 using System.Diagnostics;

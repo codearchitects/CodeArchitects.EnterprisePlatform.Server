@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Emit;
 using System.Reflection;
 using System.Reflection.Emit;

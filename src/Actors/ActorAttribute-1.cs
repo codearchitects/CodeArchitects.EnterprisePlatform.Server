@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors.Reflection;
+﻿using CodeArchitects.Platform.Actors.Metadata.Reflection;
 
 namespace CodeArchitects.Platform.Actors;
 

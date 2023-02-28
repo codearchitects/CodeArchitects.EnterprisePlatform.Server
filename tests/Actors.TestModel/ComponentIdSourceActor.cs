@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
-using CodeArchitects.Platform.Actors.Descriptors.Factory;
-using CodeArchitects.Platform.Actors.Descriptors.FluentMock;
+﻿using CodeArchitects.Platform.Actors.Metadata;
+using CodeArchitects.Platform.Actors.Metadata.Factory;
+using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;

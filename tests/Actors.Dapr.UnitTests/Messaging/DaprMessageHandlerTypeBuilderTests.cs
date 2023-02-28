@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Factory;
 using CodeArchitects.Platform.Actors.Dapr.Fixtures.TestModel;
-using CodeArchitects.Platform.Actors.Descriptors;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit.Testing;
 using CodeArchitects.Platform.Emit;

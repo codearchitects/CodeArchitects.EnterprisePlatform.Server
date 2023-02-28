@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 
 namespace CodeArchitects.Platform.Actors.Scheduling;
 internal interface IActivityTypeBuilder

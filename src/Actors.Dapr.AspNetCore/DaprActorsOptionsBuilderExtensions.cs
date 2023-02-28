@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors.Builder;
+﻿using CodeArchitects.Platform.Actors.Metadata.Builder;
 
 namespace CodeArchitects.Platform.Actors.Dapr.AspNetCore;
 

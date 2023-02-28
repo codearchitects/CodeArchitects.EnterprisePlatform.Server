@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 using FluentMock;
 
 [assembly: GenerateFluentMockFor(typeof(IActorDescriptor))]

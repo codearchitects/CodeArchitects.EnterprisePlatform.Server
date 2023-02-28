@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Descriptors;
+﻿using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Common.Exceptions;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
