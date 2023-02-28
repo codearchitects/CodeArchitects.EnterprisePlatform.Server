@@ -108,7 +108,7 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     CheckInterface(interfaceType, actorType);
 
-    (List<IFieldSymbol> stateFields, ITypeSymbol? idType, bool getsIdFromState, bool canBeVirtual)
+    (List<IFieldSymbol> stateFields, Optional<ITypeSymbol?> idType, bool getsIdFromState, bool canBeVirtual)
       = GetStateAndIdMembers(actorType);
 
     List<StateDependencyDescriptor>? stateDependencies = CheckConstructor(actorType, stateFields);
@@ -118,9 +118,9 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     _ = _actorDataDictionary.TryGetValue(actorType, out ActorDataEntry entry);
     (FactoryData? factory, List<ImplementationData>? implementations) = entry;
-    if (factory is not null)
+    if (factory is not null && idType.HasValue)
     {
-      CheckActorFactory(factory, interfaceType, idType, stateFields);
+      CheckActorFactory(factory, interfaceType, idType.Value, stateFields);
       return;
     }
     else if (_disableFactoryGeneration)
@@ -129,16 +129,17 @@ internal readonly ref partial struct ActorDescriptorFactory
     }
 
     CheckImplementations(actorType, implementations);
-    CheckActorMessages(actorType, idType);
 
-    if (_disableFactoryGeneration || interfaceType is null || stateDependencies is null || interfaceType.IsGenericType)
+    if (_disableFactoryGeneration || !idType.HasValue || interfaceType is null || stateDependencies is null || interfaceType.IsGenericType)
       return;
+
+    CheckActorMessages(actorType, idType.Value);
 
     _descriptors.Add(new ActorDescriptor(
       actorType.ContainingNamespace.ToDisplayString(Format.FullName),
       actorType.Name,
       interfaceType.ToDisplayString(Format.GlobalFullName),
-      idType?.ToDisplayString(Format.GlobalFullName) ?? "string",
+      idType.Value?.ToDisplayString(Format.GlobalFullName) ?? "string",
       isVirtual,
       getsIdFromState,
       new RecordList<StateDependencyDescriptor>(stateDependencies)));
@@ -376,7 +377,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     }
   }
 
-  private (List<IFieldSymbol> StateFields, ITypeSymbol? IdType, bool GetsIdFromState, bool CanBeVirtual) GetStateAndIdMembers(INamedTypeSymbol actorType)
+  private (List<IFieldSymbol> StateFields, Optional<ITypeSymbol?> IdType, bool GetsIdFromState, bool CanBeVirtual) GetStateAndIdMembers(INamedTypeSymbol actorType)
   {
     List<IFieldSymbol> stateFields = new();
     ISymbol? idMember = null;
@@ -489,10 +490,10 @@ internal readonly ref partial struct ActorDescriptorFactory
     if (ambiguousActorIdSource)
     {
       AmbiguousActorIdSource(actorType);
-      return (stateFields, null, getsIdFromState, canBeVirtual);
+      return (stateFields, default, getsIdFromState, canBeVirtual);
     }
 
-    return (stateFields, idType, getsIdFromState, canBeVirtual);
+    return (stateFields, new Optional<ITypeSymbol?>(idType), getsIdFromState, canBeVirtual);
   }
 
   private void CheckStateType(IFieldSymbol stateField, AttributeData stateAttribute)
