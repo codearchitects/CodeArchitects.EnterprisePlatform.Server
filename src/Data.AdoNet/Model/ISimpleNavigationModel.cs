@@ -17,7 +17,7 @@ public interface ISimpleNavigationModel : INavigationModel
   /// Indicates whether this navigation property is on the dependent side of the relationship.
   /// </summary>
   /// <remarks>
-  /// If <c>false</c>, the <see cref="NavigationEntity"/> property is not null.
+  /// If <see langword="false"/>, the <see cref="NavigationEntity"/> property is not null.
   /// </remarks>
   [MemberNotNullWhen(false, nameof(NavigationEntity))]
   new bool IsOnDependent { get; } // TODO: Rename 'IsOnPrincipal' and change value accordingly

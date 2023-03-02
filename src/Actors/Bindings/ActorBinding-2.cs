@@ -4,8 +4,8 @@ internal class ActorBinding<TActor, TImplementation> : IActorBinding<TActor>, IB
   where TActor : class
   where TImplementation : class, TActor
 {
-  private Func<TImplementation, bool>? _preCondition;
-  private Func<TImplementation, bool>? _postCondition;
+  private Predicate<TImplementation>? _preCondition;
+  private Predicate<TImplementation>? _postCondition;
   private BindingActivity<TImplementation> _activity;
   private bool _preConditionMet;
 
@@ -42,13 +42,13 @@ internal class ActorBinding<TActor, TImplementation> : IActorBinding<TActor>, IB
     return _activity.ExecuteAsync(implementation, cancellationToken);
   }
 
-  IBindingBuilder<TImplementation> IBindingBuilder<TImplementation>.WithPreCondition(Func<TImplementation, bool> preCondition)
+  IBindingBuilder<TImplementation> IBindingBuilder<TImplementation>.WithPreCondition(Predicate<TImplementation> preCondition)
   {
     _preCondition = preCondition;
     return this;
   }
 
-  IBindingBuilder<TImplementation> IBindingBuilder<TImplementation>.WithPostCondition(Func<TImplementation, bool> postCondition)
+  IBindingBuilder<TImplementation> IBindingBuilder<TImplementation>.WithPostCondition(Predicate<TImplementation> postCondition)
   {
     _postCondition = postCondition;
     return this;

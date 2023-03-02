@@ -8,17 +8,16 @@ namespace CodeArchitects.Platform.Actors;
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 public sealed class StateAttribute : Attribute
 {
+  /// <summary>
+  /// Creates a new <see cref="StateAttribute"/> instance.
+  /// </summary>
   public StateAttribute()
   {
   }
 
-  public StateAttribute(string memberName)
-  {
-    MemberName = memberName;
-  }
-
-  public string? MemberName { get; set; }
-
+  /// <summary>
+  /// Specifies the default value of the state component.
+  /// </summary>
   public object? Default
   {
     get => DefaultValue.HasValue ? DefaultValue.Value : null;

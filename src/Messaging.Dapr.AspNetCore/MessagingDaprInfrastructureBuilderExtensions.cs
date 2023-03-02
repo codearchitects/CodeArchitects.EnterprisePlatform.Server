@@ -22,7 +22,7 @@ using System.Reflection;
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
-/// Extension methods for <see cref="IDaprInfrastructureBuilder"/>.
+/// Extension methods for <see cref="IDaprInfrastructureBuilder"/> for configuring messaging.
 /// </summary>
 public static class MessagingDaprInfrastructureBuilderExtensions
 {
@@ -36,7 +36,7 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   /// if a default bus is configured, an <see cref="IMessageBus"/> also.
   /// </remarks>
   /// <param name="builder">The Dapr infrastructure builder.</param>
-  /// <returns></returns>
+  /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder)
   {
     if (builder is null)
@@ -54,8 +54,8 @@ public static class MessagingDaprInfrastructureBuilderExtensions
   /// configure messaging options and to register message handlers.
   /// </remarks>
   /// <param name="builder">The Dapr infrastructure builder.</param>
-  /// <param name="configure">An action that can be used to configure the messaging options.</param>
-  /// <returns>The builder.</returns>
+  /// <param name="configure">An action used to configure the messaging options.</param>
+  /// <returns>The same builder.</returns>
   public static IDaprInfrastructureBuilder AddMessaging(this IDaprInfrastructureBuilder builder, Action<IDaprMessagingOptionsBuilder> configure)
   {
     if (builder is null)

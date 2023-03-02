@@ -85,7 +85,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
   /// </summary>
   /// <param name="left">The first object to compare.</param>
   /// <param name="right">The second object to compare.</param>
-  /// <returns><c>true</c> if the specified objects are equal; otherwise, <c>false</c>.</returns>
+  /// <returns><see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.</returns>
   public static bool operator ==(Optional<T> left, Optional<T> right)
   {
     return left.Equals(right);
@@ -96,7 +96,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
   /// </summary>
   /// <param name="left">The first object to compare.</param>
   /// <param name="right">The second object to compare.</param>
-  /// <returns><c>true</c> if the specified objects are equal; otherwise, <c>false</c>.</returns>
+  /// <returns><see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.</returns>
   public static bool operator !=(Optional<T> left, Optional<T> right)
   {
     return !(left == right);

@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Actors;
 
 /// <summary>
-/// Specifies that a class is an actor.
+/// Indicates that a class is an actor.
 /// </summary>
 /// <typeparam name="TInterface">The type of the interface that clients can use to interact with the actor.</typeparam>
 [AttributeUsage(AttributeTargets.Class)]

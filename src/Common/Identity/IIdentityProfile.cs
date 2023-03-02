@@ -8,7 +8,7 @@ public interface IIdentityProfile<TUserId, TTenantId> : IUserProfile<TUserId>, I
   where TTenantId : IEquatable<TTenantId>
 {
   /// <summary>
-  /// <c>true</c> if the user is authenticated, <c>false</c> otherwise.
+  /// <see langword="true"/> if the user is authenticated, <see langword="false"/> otherwise.
   /// </summary>
   bool IsAuthenticated { get; }
 }

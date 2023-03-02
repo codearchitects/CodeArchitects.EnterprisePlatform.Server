@@ -9,7 +9,7 @@ internal interface IStoreInfo
   /// Checks whether a state store is known.
   /// </summary>
   /// <param name="storeName">The name of the state store.</param>
-  /// <returns><c>true</c> if the state store is known, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the state store is known, <see langword="false"/> otherwise.</returns>
   bool IsStoreKnown(string storeName);
 
   /// <summary>

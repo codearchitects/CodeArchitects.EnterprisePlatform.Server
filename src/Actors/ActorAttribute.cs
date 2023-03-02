@@ -3,7 +3,7 @@
 namespace CodeArchitects.Platform.Actors;
 
 /// <summary>
-/// Specifies that a class is an actor.
+/// Indicates that a class is an actor.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class ActorAttribute : Attribute, IActorAttribute

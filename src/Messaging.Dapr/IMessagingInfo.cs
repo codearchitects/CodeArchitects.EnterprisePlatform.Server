@@ -16,7 +16,7 @@ internal interface IMessagingInfo
   /// Checks whether a bus is known.
   /// </summary>
   /// <param name="busName">The name of the bus.</param>
-  /// <returns><c>true</c> if the bus is known, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the bus is known, <see langword="false"/> otherwise.</returns>
   bool IsBusKnown(string busName);
 
   /// <summary>

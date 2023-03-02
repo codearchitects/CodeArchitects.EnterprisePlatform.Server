@@ -11,7 +11,7 @@ internal interface IOutputBindingDescriptor
   Type MetadataType { get; }
 
   /// <summary>
-  /// <c>true</c> if the metadata type is type-filtered, <c>false</c> otherwise.
+  /// <see langword="true"/> if the metadata type is type-filtered, <see langword="false"/> otherwise.
   /// </summary>
   bool IsTypeFiltered { get; }
 

@@ -3,7 +3,10 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors;
 
-public class InvalidActorException : Exception
+/// <summary>
+/// Exception thrown when an actor is configured invalidly.
+/// </summary>
+public sealed class InvalidActorException : Exception
 {
   private InvalidActorException(Type actorType, string message)
     : base(message)
@@ -11,6 +14,9 @@ public class InvalidActorException : Exception
     ActorType = actorType;
   }
 
+  /// <summary>
+  /// The type of the invalidly configured actor.
+  /// </summary>
   public Type ActorType { get; }
 
 

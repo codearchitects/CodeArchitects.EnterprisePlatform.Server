@@ -126,7 +126,7 @@ public static class AssociationsAnnotationExtensions
   /// Indicates whether a navigation is between two entities belonging to the same aggregates.
   /// </summary>
   /// <param name="navigation">The navigation.</param>
-  /// <returns><c>true</c> if the navigation represents an intra-aggregate association, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the navigation represents an intra-aggregate association, <see langword="false"/> otherwise.</returns>
   public static bool IsIntraAggregate(this TNavigation navigation)
   {
     if (navigation is null)
@@ -139,7 +139,7 @@ public static class AssociationsAnnotationExtensions
   /// Indicates whether a navigation is between two entities belonging to different aggregates.
   /// </summary>
   /// <param name="navigation">The navigation.</param>
-  /// <returns><c>true</c> if the navigation represents an inter-aggregate association, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the navigation represents an inter-aggregate association, <see langword="false"/> otherwise.</returns>
   public static bool IsInterAggregate(this TNavigation navigation)
   {
     if (navigation is null)
