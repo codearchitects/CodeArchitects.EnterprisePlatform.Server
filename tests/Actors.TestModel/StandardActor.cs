@@ -41,7 +41,7 @@ internal interface IOtherInterface { }
 
 internal class ActorMessage : IActorMessage<string>
 {
-  public string ActorId { get; set; }
+  public string ActorId { get; set; } = default!;
 }
 
 [Actor<IStandardActor>]
@@ -100,7 +100,7 @@ internal class StandardActor : IStandardActor, IOtherInterface, IMessageHandler<
 
 internal class StandardActorState : OrdinaryActorState
 {
-  public string _0 { get; set; }
+  public string _0 { get; set; } = default!;
   public StandardActorStateComponent _1 { get; set; } = default!;
 }
 
@@ -176,7 +176,7 @@ internal class StandardActorActivity7 : StandardActorActivity
 {
   public override int Id => 7;
 
-  public string arg { get; set; }
+  public string arg { get; set; } = default!;
 
   public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
     => actor.ActivityOverload(arg);
@@ -186,7 +186,7 @@ internal class StandardActorActivity8 : StandardActorActivity
 {
   public override int Id => 8;
 
-  public ActorMessage message { get; set; }
+  public ActorMessage message { get; set; } = default!;
 
   public override Task ExecuteAsync(StandardActor actor, CancellationToken cancellationToken)
     => actor.HandleAsync(message, cancellationToken);

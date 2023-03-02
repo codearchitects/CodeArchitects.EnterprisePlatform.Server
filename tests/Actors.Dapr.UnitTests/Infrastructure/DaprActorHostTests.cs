@@ -3,50 +3,42 @@ using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Actors.TestModel;
 using Dapr.Actors.Runtime;
 using System.Text;
+using static CodeArchitects.Platform.Actors.Dapr.Infrastructure.DaprActorHostFixture;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 
-public partial class DaprActorHostTests
+public class DaprActorHostTests
 {
   [Theory]
   [HostData]
-  internal void ActorId_ShouldReturnCorrectId(
-    Mock<ActorTimerManager> timerManagerMock,
-    Mock<IActorStateManager> stateManagerMock,
-    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
-    DaprActorHost<StandardActor, StandardActorState> sut)
+  internal void ActorId_ShouldReturnCorrectId(DaprActorHostFixture fixture, DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
+    _ = fixture; // Suppress warning
 
     // Act
     string actorId = sut.ActorId;
     
     // Assert
-    actorId.Should().Be(HostDataAttribute.Id);
+    actorId.Should().Be(ActorId);
   }
 
   [Theory]
   [HostData]
-  internal async Task ScheduleAsync_ShouldCallRegisterReminderAsync(
-    Mock<ActorTimerManager> timerManagerMock,
-    Mock<IActorStateManager> stateManagerMock,
-    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
-    DaprActorHost<StandardActor, StandardActorState> sut)
+  internal async Task ScheduleAsync_ShouldCallRegisterReminderAsync(DaprActorHostFixture fixture, DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
     int arg = 12;
     byte[] payload = Encoding.UTF8.GetBytes($$"""{":id":1,"arg":{{arg}}}""");
 
-    timerManagerMock
+    fixture.TimerManagerMock
       .Setup(x => x.RegisterReminderAsync(It.IsAny<ActorReminder>()))
       .Returns(Task.CompletedTask);
 
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.ActivityType)
       .Returns(typeof(StandardActorActivity));
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.JsonSerializerOptions)
       .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
 
@@ -58,7 +50,7 @@ public partial class DaprActorHostTests
     await sut.ScheduleAsync(scheduleId, new StandardActorActivity1 { arg = arg }, new SchedulingOptions(timer, period), CancellationToken.None);
 
     // Assert
-    timerManagerMock.Verify(x => x.RegisterReminderAsync(It.Is<ActorReminder>(reminder =>
+    fixture.TimerManagerMock.Verify(x => x.RegisterReminderAsync(It.Is<ActorReminder>(reminder =>
       reminder.Name == scheduleId.Id &&
       reminder.DueTime == timer &&
       reminder.Period == period &&
@@ -67,16 +59,11 @@ public partial class DaprActorHostTests
 
   [Theory]
   [HostData]
-  internal async Task UnscheduleAsync_ShouldCallUnregisterReminderAsync(
-    Mock<ActorTimerManager> timerManagerMock,
-    Mock<IActorStateManager> stateManagerMock,
-    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
-    DaprActorHost<StandardActor, StandardActorState> sut)
+  internal async Task UnscheduleAsync_ShouldCallUnregisterReminderAsync(DaprActorHostFixture fixture, DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
 
-    timerManagerMock
+    fixture.TimerManagerMock
       .Setup(x => x.UnregisterReminderAsync(It.IsAny<ActorReminderToken>()))
       .Returns(Task.CompletedTask);
 
@@ -86,17 +73,12 @@ public partial class DaprActorHostTests
     await sut.UnscheduleAsync(scheduleId, CancellationToken.None);
 
     // Assert
-    timerManagerMock.Verify(x => x.UnregisterReminderAsync(It.Is<ActorReminderToken>(reminder => reminder.Name == scheduleId.Id)));
+    fixture.TimerManagerMock.Verify(x => x.UnregisterReminderAsync(It.Is<ActorReminderToken>(reminder => reminder.Name == scheduleId.Id)));
   }
 
   [Theory]
   [HostData]
-  internal async Task ReceiveReminderAsync_ShouldInvokeActivity(
-    Mock<ActorTimerManager> timerManagerMock,
-    Mock<IActorStateManager> stateManagerMock,
-    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock,
-    DaprActorHost<StandardActor, StandardActorState> sut)
+  internal async Task ReceiveReminderAsync_ShouldInvokeActivity(DaprActorHostFixture fixture, DaprActorHost<StandardActor, StandardActorState> sut)
   {
     // Arrange
     int arg = 12;
@@ -104,24 +86,24 @@ public partial class DaprActorHostTests
 
     Mock<StandardActor> actorMock = new(MockBehavior.Loose);
 
-    stateManagerMock
+    fixture.StateManagerMock
       .Setup(x => x.TryGetStateAsync<StandardActorState>(Constants.ActorStateName, It.IsAny<CancellationToken>()))
       .ReturnsAsync(new ConditionalValue<StandardActorState>(true, new StandardActorState()));
 
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.ActivityType)
       .Returns(typeof(StandardActorActivity));
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.JsonSerializerOptions)
       .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
-    factoryMock
+    fixture.FactoryMock
       .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor, StandardActorState>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
-      .Returns(managerMock.Object);
+      .Returns(fixture.ManagerMock.Object);
 
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.Actor)
       .Returns(actorMock.Object);
-    managerMock
+    fixture.ManagerMock
       .Setup(x => x.OnActivityBegin());
 
     // Act

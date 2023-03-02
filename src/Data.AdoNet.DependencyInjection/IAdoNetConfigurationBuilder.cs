@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet;
+﻿using CodeArchitects.Platform.Data;
+using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using System.Reflection;

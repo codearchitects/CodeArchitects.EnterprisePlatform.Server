@@ -2,5 +2,5 @@
 
 internal class DiagnosticIds
 {
-  public const string CAEP001 = nameof(CAEP001);
+  public const string CAEP000 = nameof(CAEP000);
 }

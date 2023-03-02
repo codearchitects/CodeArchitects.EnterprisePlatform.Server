@@ -19,7 +19,7 @@ public class ExperimentalAnalyzerTests : AnalyzerTest<ExperimentalAnalyzer>
   };
 
   [Fact]
-  public async Task EmptyCode_ShouldNotTriggerCAEP001()
+  public async Task EmptyCode_ShouldNotTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -40,11 +40,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalClassDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalClassDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -69,11 +69,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalClassInheritance_ShouldTriggerCAEP001()
+  public async Task ExperimentalClassInheritance_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -99,11 +99,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalGenericClassDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalGenericClassDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -128,11 +128,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalGenericClassInheritance_ShouldTriggerCAEP001()
+  public async Task ExperimentalGenericClassInheritance_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -158,11 +158,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task DeclarationAndConstructor_ShouldTriggerSingleCAEP001()
+  public async Task DeclarationAndConstructor_ShouldTriggerSingleCAEP000()
   {
     // Arrange
     const string code = @"
@@ -187,11 +187,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalEnumDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalEnumDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -216,11 +216,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalStructDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalStructDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -245,11 +245,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalGenericStructDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalGenericStructDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -274,11 +274,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalMethod_ShouldTriggerCAEP001()
+  public async Task ExperimentalMethod_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -309,11 +309,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalConstructor_ShouldTriggerCAEP001()
+  public async Task ExperimentalConstructor_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -347,11 +347,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task NonExperimentalConstructor_ShouldNotTriggerCAEP001()
+  public async Task NonExperimentalConstructor_ShouldNotTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -385,11 +385,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().NotContain(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalDelegate_ShouldTriggerCAEP001()
+  public async Task ExperimentalDelegate_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -414,11 +414,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalParameterDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalParameterDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -446,11 +446,11 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 
   [Fact]
-  public async Task ExperimentalGenericParameterDeclaration_ShouldTriggerCAEP001()
+  public async Task ExperimentalGenericParameterDeclaration_ShouldTriggerCAEP000()
   {
     // Arrange
     const string code = @"
@@ -478,6 +478,6 @@ namespace Test
     ImmutableArray<Diagnostic> diagnostics = await GetDiagnosticsAsync(code);
 
     // Assert
-    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP001);
+    diagnostics.Should().ContainSingle(x => x.Id == DiagnosticIds.CAEP000);
   }
 }

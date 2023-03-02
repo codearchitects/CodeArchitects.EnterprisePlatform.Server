@@ -5,6 +5,9 @@ using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Factory;
 
+/// <summary>
+/// Base class for configuring the actor model.
+/// </summary>
 public class ActorModelFactory
 {
   private protected delegate ActorDescriptorFactory ActorDescriptorFactoryFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder);

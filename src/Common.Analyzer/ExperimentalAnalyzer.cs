@@ -10,7 +10,7 @@ namespace CodeArchitects.Platform.Common.Analyzer;
 public class ExperimentalAnalyzer : DiagnosticAnalyzer
 {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
-    DiagnosticDescriptors.CAEP001);
+    DiagnosticDescriptors.CAEP000);
 
   private static readonly string s_experimentalAttributeName = "CodeArchitects.Platform.Common.CodeAnalysis.ExperimentalAttribute";
 
@@ -40,7 +40,7 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
     if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
     {
-      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP001, node.GetLocation()));
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP000, node.GetLocation()));
     }
   }
 
@@ -60,7 +60,7 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
     if (isExperimental && (node.Parent is not ObjectCreationExpressionSyntax || node.Parent.Parent is not EqualsValueClauseSyntax))
     {
-      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP001, node.GetLocation()));
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP000, node.GetLocation()));
     }
   }
 
@@ -80,7 +80,7 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
     if (isExperimental)
     {
-      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP001, node.GetLocation()));
+      context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.CAEP000, node.GetLocation()));
     }
   }
 }

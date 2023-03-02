@@ -55,12 +55,12 @@ public readonly record struct ActivitySpec(string Name, Type? ImplementationType
   /// Specifies the implementation type to use for the activity.
   /// </summary>
   /// <param name="implementationType">The type of actor implementation to use for the activity.</param>
-  /// <returns></returns>
+  /// <returns>A new instance of the <see cref="ActivitySpec"/> class with the implementation type.</returns>
   public ActivitySpec WithImplementationType(Type implementationType) => this with { ImplementationType = implementationType };
 
   /// <summary>
   /// Implicitly converts a string representing the method name to an <see cref="ActivitySpec"/>.
   /// </summary>
-  /// <param name="activityName"></param>
+  /// <param name="activityName">The name of the method to execute.</param>
   public static implicit operator ActivitySpec(string activityName) => new(activityName);
 }

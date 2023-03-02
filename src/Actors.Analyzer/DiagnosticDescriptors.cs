@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#pragma warning disable RS2008 // Enable analyzer release tracking
+
+using Microsoft.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Actors.Analyzer;
 
