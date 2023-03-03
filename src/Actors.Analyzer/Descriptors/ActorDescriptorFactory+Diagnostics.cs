@@ -112,7 +112,7 @@ internal readonly ref partial struct ActorDescriptorFactory
   }
 
 
-  // State errors (300-399)
+  // State/id errors (300-399)
 
   public void InvalidStateType(IFieldSymbol stateField, AttributeData stateAttribute)
   {
@@ -156,12 +156,36 @@ internal readonly ref partial struct ActorDescriptorFactory
     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR304, member.Locations[0], memberType.Name));
   }
 
+  public void InvalidIdType(AttributeData idTypeAttribute, ITypeSymbol actorIdType)
+  {
+    if (_disableDiagnostics)
+      return;
+
+    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR304, idTypeAttribute.GetLocation(), actorIdType.Name));
+  }
+
   public void MultipleIdSourceInterfaces(ITypeSymbol idType)
   {
     if (_disableDiagnostics)
       return;
 
     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR305, idType.Locations[0], idType.Name));
+  }
+
+  public void InvalidIdSource(ISymbol member, ITypeSymbol sourceIdType, ITypeSymbol actorIdType)
+  {
+    if (_disableDiagnostics)
+      return;
+
+    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR306, member.Locations[0], sourceIdType.Name, actorIdType.Name));
+  }
+
+  public void DuplicateActorIdTypeAttribute(AttributeData attribute, INamedTypeSymbol actorType)
+  {
+    if (_disableDiagnostics)
+      return;
+
+    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR307, attribute.GetLocation(), actorType.Name));
   }
 
 
@@ -218,6 +242,7 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR405, parameter.Locations[0], method.Name));
   }
+
 
   // Factory errors (600-699)
 

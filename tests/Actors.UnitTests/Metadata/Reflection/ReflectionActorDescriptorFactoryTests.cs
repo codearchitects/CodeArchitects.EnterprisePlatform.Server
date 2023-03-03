@@ -34,7 +34,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute<IStandardActor>());
+      new ActorAttribute<IStandardActor>(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();
@@ -60,7 +61,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute());
+      new ActorAttribute(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();
@@ -86,7 +88,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute());
+      new ActorAttribute(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();
@@ -112,7 +115,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute());
+      new ActorAttribute(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();
@@ -138,7 +142,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute());
+      new ActorAttribute(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();
@@ -164,7 +169,8 @@ public class ReflectionActorDescriptorFactoryTests
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
-      new ActorAttribute());
+      new ActorAttribute(),
+      null);
 
     // Act
     IActorDescriptor descriptor = sut.CreateDescriptor();

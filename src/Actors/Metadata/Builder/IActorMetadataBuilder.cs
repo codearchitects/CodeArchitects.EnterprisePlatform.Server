@@ -146,6 +146,20 @@ public interface IActorMetadataBuilder<TActor>
     where TImplementation : TActor;
 
   /// <summary>
+  /// Specifies what type to use for the actor id.
+  /// </summary>
+  /// <param name="actorIdType">The id type.</param>
+  /// <returns>The same builder.</returns>
+  IActorMetadataBuilder<TActor> HasIdType(Type actorIdType);
+
+  /// <summary>
+  /// Specifies what type to use for the actor id.
+  /// </summary>
+  /// <typeparam name="TActorId">The id type.</typeparam>
+  /// <returns>The same builder.</returns>
+  IActorMetadataBuilder<TActor> HasIdType<TActorId>();
+
+  /// <summary>
   /// Indicates that a method is a message handler.
   /// </summary>
   /// <param name="messageType">The type of the message.</param>

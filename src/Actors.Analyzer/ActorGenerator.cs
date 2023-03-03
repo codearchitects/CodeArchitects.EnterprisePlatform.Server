@@ -62,6 +62,8 @@ internal class ActorGenerator : IIncrementalGenerator
     AttributeData? genericFactoryAttribute = null;
     AttributeData? implementationAttribute = null;
     AttributeData? genericImplementationAttribute = null;
+    AttributeData? idTypeAttribute = null;
+    AttributeData? genericIdTypeAttribute = null;
     foreach (AttributeData attribute in type.GetAttributes())
     {
       if (attribute.AttributeClass is not INamedTypeSymbol attributeType)
@@ -105,11 +107,21 @@ internal class ActorGenerator : IIncrementalGenerator
         case "VirtualAttribute":
           virtualAttribute = attribute;
           break;
+        case "ActorIdTypeAttribute":
+          if (attributeType.IsGenericType)
+          {
+            genericIdTypeAttribute = attribute;
+          }
+          else
+          {
+            idTypeAttribute = attribute;
+          }
+          break;
       }
     }
 
     return
-      actorAttribute is not null          || genericActorAttribute is not null          ? new ActorData(type, actorAttribute, genericActorAttribute, virtualAttribute) :
+      actorAttribute is not null          || genericActorAttribute is not null          ? new ActorData(type, actorAttribute, genericActorAttribute, virtualAttribute, idTypeAttribute, genericIdTypeAttribute) :
       factoryAttribute is not null        || genericFactoryAttribute is not null        ? new FactoryData(type, factoryAttribute, genericFactoryAttribute) :
       implementationAttribute is not null || genericImplementationAttribute is not null ? new ImplementationData(type, implementationAttribute, genericImplementationAttribute) :
       null;

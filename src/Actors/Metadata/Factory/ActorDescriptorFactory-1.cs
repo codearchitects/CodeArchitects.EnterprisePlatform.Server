@@ -32,6 +32,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   protected abstract Type? FactoryType { get; }
 
+  protected abstract Type? IdType { get; }
+
   protected abstract bool IsExplicitVirtual { get; }
 
   protected abstract IReadOnlyCollection<StateComponentMetadata<TActor>> StateComponents { get; }
@@ -327,6 +329,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       {
         if (id is not null)
           throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+        if (IdType is not null && idType != IdType)
+          throw InvalidActorException.InvalidIdSource(ActorType, idType, IdType);
 
         Type actorIdSourceType = typeof(IActorIdSource<>).MakeGenericType(idType.UnderlyingSystemType);
         InterfaceMapping mapping = component.Type.GetInterfaceMap(actorIdSourceType);
@@ -352,6 +356,8 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       {
         if (id is not null)
           throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+        if (IdType is not null && component.Type != IdType)
+          throw InvalidActorException.InvalidIdSource(ActorType, component.Type, IdType);
 
         Expression parseIdExpression = GetParseIdExpression(idParam, component.Type);
 
@@ -376,7 +382,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       id = new ActorIdDescriptor<TState>(metadata.Type);
     }
 
-    return id ?? DefaultActorIdDescriptor<TState>.Instance;
+    return id ?? new DefaultActorIdDescriptor<TState>(IdType ?? typeof(string));
   }
 
   private ActorFactoryDescriptor CreateFactory(Type interfaceType, IActorIdDescriptor id, bool isVirtual)

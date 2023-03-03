@@ -6,11 +6,12 @@ namespace CodeArchitects.Platform.Actors.Metadata.Implementation;
 internal class DefaultActorIdDescriptor<TState> : IActorIdDescriptor<TState>
   where TState : ActorState
 {
-  public static readonly DefaultActorIdDescriptor<TState> Instance = new();
+  public DefaultActorIdDescriptor(Type type)
+  {
+    Type = type;
+  }
 
-  private DefaultActorIdDescriptor() { }
-
-  public Type Type => typeof(string);
+  public Type Type { get; }
 
   public bool HasIdSource => false;
 

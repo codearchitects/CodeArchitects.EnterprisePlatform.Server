@@ -15,6 +15,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
   private readonly Dictionary<Type, List<IMessageHandlerMetadata>> _handlerMetadataDictionary;
   private readonly HashSet<MemberMetadata> _actorIdMembers;
   private Type? _interfaceType;
+  private Type? _idType;
   private Type? _factoryType;
   private bool _isExplicitVirtual;
 
@@ -31,6 +32,8 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
   protected override Type? InterfaceType => _interfaceType;
 
   protected override Type? FactoryType => _factoryType;
+
+  protected override Type? IdType => _idType;
 
   protected override ImplementationDescriptorFactory<TActor> BaseImplementationFactory => _baseImplementationBuilder;
 
@@ -260,6 +263,21 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
       throw new ArgumentNullException(nameof(configure));
 
     HasImplementationCore(configure);
+    return this;
+  }
+
+  IActorMetadataBuilder<TActor> IActorMetadataBuilder<TActor>.HasIdType(Type actorIdType)
+  {
+    if (actorIdType is null)
+      throw new ArgumentNullException(nameof(actorIdType));
+
+    _idType = actorIdType;
+    return this;
+  }
+
+  IActorMetadataBuilder<TActor> IActorMetadataBuilder<TActor>.HasIdType<TActorId>()
+  {
+    _idType = typeof(TActorId);
     return this;
   }
 

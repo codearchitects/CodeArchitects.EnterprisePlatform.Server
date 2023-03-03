@@ -108,8 +108,12 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     CheckInterface(interfaceType, actorType);
 
-    (List<IFieldSymbol> stateFields, Optional<ITypeSymbol?> idType, bool getsIdFromState, bool canBeVirtual)
-      = GetStateAndIdMembers(actorType);
+    ITypeSymbol? actorIdType = data.GetSpecifiedIdType(in this);
+    if (actorIdType is not null && !IsValidIdType(actorIdType))
+    {
+      InvalidIdType(data.GenericIdTypeAttribute ?? data.IdTypeAttribute!, actorIdType);
+    }
+    (List<IFieldSymbol> stateFields, Optional<ITypeSymbol?> idType, bool getsIdFromState, bool canBeVirtual) = GetStateAndIdMembers(actorType, actorIdType);
 
     List<StateDependencyDescriptor>? stateDependencies = CheckConstructor(actorType, stateFields);
 
@@ -377,7 +381,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     }
   }
 
-  private (List<IFieldSymbol> StateFields, Optional<ITypeSymbol?> IdType, bool GetsIdFromState, bool CanBeVirtual) GetStateAndIdMembers(INamedTypeSymbol actorType)
+  private (List<IFieldSymbol> StateFields, Optional<ITypeSymbol?> IdType, bool GetsIdFromState, bool CanBeVirtual) GetStateAndIdMembers(INamedTypeSymbol actorType, ITypeSymbol? actorIdType)
   {
     List<IFieldSymbol> stateFields = new();
     ISymbol? idMember = null;
@@ -449,7 +453,14 @@ internal readonly ref partial struct ActorDescriptorFactory
             else
             {
               idMember = candidateMember;
-              CheckIdType(idMember, idType);
+              if (!IsValidIdType(idType))
+              {
+                InvalidIdType(idMember, idType);
+              }
+              if (actorIdType is not null && !SymbolEqualityComparer.Default.Equals(idType, actorIdType))
+              {
+                InvalidIdSource(idMember, idType, actorIdType);
+              }
 
               if (stateAttribute is not null)
               {
@@ -469,7 +480,14 @@ internal readonly ref partial struct ActorDescriptorFactory
         {
           idMember = candidateMember;
           idType = memberType;
-          CheckIdType(idMember, idType);
+          if (!IsValidIdType(idType))
+          {
+            InvalidIdType(idMember, idType);
+          }
+          if (actorIdType is not null && !SymbolEqualityComparer.Default.Equals(idType, actorIdType))
+          {
+            InvalidIdSource(idMember, idType, actorIdType);
+          }
 
           if (stateAttribute is not null)
           {
@@ -493,7 +511,7 @@ internal readonly ref partial struct ActorDescriptorFactory
       return (stateFields, default, getsIdFromState, canBeVirtual);
     }
 
-    return (stateFields, new Optional<ITypeSymbol?>(idType), getsIdFromState, canBeVirtual);
+    return (stateFields, new Optional<ITypeSymbol?>(idType ?? actorIdType), getsIdFromState, canBeVirtual);
   }
 
   private void CheckStateType(IFieldSymbol stateField, AttributeData stateAttribute)
@@ -583,8 +601,11 @@ internal readonly ref partial struct ActorDescriptorFactory
     }
   }
 
-  private void CheckIdType(ISymbol idMember, ITypeSymbol idType)
+  private bool IsValidIdType(ITypeSymbol idType)
   {
+    if (_disableDiagnostics || idType.SpecialType is SpecialType.System_String)
+      return true;
+
     foreach (ISymbol member in idType.GetMembers())
     {
       if (!member.IsStatic || member.Name != "Parse" || member is not IMethodSymbol method)
@@ -602,13 +623,13 @@ internal readonly ref partial struct ActorDescriptorFactory
         continue;
 
       if (parameters.Length == 1)
-        return;
+        return true;
 
       if (!parameters[1].Type.ContainingNamespace.IsSystemNamespace() || parameters[1].Type.Name != "IFormatProvider")
         continue;
     }
 
-    InvalidIdType(idMember, idType);
+    return false;
   }
 
   private void CheckActorFactory(FactoryData data, INamedTypeSymbol? interfaceType, ITypeSymbol? idType, List<IFieldSymbol> stateFields)

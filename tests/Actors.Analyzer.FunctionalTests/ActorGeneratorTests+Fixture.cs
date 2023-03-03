@@ -117,7 +117,7 @@ public partial class ActorGeneratorTests
     }
   }
 
-  private static void AssertValidFactoryType(Compilation compilation, bool isVirtual, params StateSpec[] stateSpecs)
+  private static void AssertValidFactoryType(Compilation compilation, bool isVirtual, bool getsIdFromState, string? idTypeFullName, params StateSpec[] stateSpecs)
   {
     INamedTypeSymbol? factoryType = compilation.GetTypeByMetadataName("Actors.Tests.IMyActorFactory");
 
@@ -133,7 +133,9 @@ public partial class ActorGeneratorTests
     INamedTypeSymbol taskType = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")!;
     Assert.NotNull(taskType);
 
-    INamedTypeSymbol stringType = compilation.GetSpecialType(SpecialType.System_String);
+    INamedTypeSymbol idType = idTypeFullName is null
+      ? compilation.GetSpecialType(SpecialType.System_String)
+      : compilation.GetTypeByMetadataName(idTypeFullName) ?? throw new Exception($"Invalid id type: {idTypeFullName}");
 
     INamedTypeSymbol cancellationTokenType = compilation.GetTypeByMetadataName("System.Threading.CancellationToken")!;
     Assert.NotNull(cancellationTokenType);
@@ -155,23 +157,30 @@ public partial class ActorGeneratorTests
     getMethod.Parameters.Should().HaveCount(1)
       .And.ContainSingle(parameter =>
         parameter.Name == "id" &&
-        SymbolEqualityComparer.Default.Equals(parameter.Type, stringType));
+        SymbolEqualityComparer.Default.Equals(parameter.Type, idType));
 
     getMethod.ReturnType.Should().BeEquivalentTo(interfaceType, opt => opt.Using(SymbolEqualityComparer.Default));
 
     if (!isVirtual)
     {
       IMethodSymbol createAsyncMethod = members.Should().ContainSingle(member =>
-          member.Kind == SymbolKind.Method &&
-          member.Name == "CreateAsync").Subject.As<IMethodSymbol>();
+        member.Kind == SymbolKind.Method &&
+        member.Name == "CreateAsync").Subject.As<IMethodSymbol>();
 
-      createAsyncMethod.Parameters.Should().HaveCount(2 + stateSpecs.Length)
-        .And.ContainSingle(parameter =>
-          parameter.Name == "id" &&
-          SymbolEqualityComparer.Default.Equals(parameter.Type, stringType))
+      int expectedParameterCount = getsIdFromState
+        ? 1 + stateSpecs.Length
+        : 2 + stateSpecs.Length;
+      createAsyncMethod.Parameters.Should().HaveCount(expectedParameterCount)
         .And.ContainSingle(parameter =>
           parameter.Name == "cancellationToken" &&
           SymbolEqualityComparer.Default.Equals(parameter.Type, cancellationTokenType));
+
+      if (!getsIdFromState)
+      {
+        createAsyncMethod.Parameters.Should().ContainSingle(parameter =>
+          parameter.Name == "id" &&
+          SymbolEqualityComparer.Default.Equals(parameter.Type, idType));
+      }
 
       foreach (StateSpec spec in stateSpecs)
       {

@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Actors.Analyzer;
 public partial class ActorGeneratorTests
 {
   [Fact]
-  public void ShouldGenerateFactory_WhenActorHasImplicitDefaultConstructor()
+  public void ShouldGenerateValidFactory_WhenActorHasImplicitDefaultConstructor()
   {
     // Arrange
     string source = """
@@ -30,11 +30,11 @@ public partial class ActorGeneratorTests
 
     // Assert
     diagnostics.Should().BeEmpty();
-    AssertValidFactoryType(compilation, true);
+    AssertValidFactoryType(compilation, true, false, null);
   }
 
   [Fact]
-  public void ShouldGenerateFactory_WhenActorHasParameterlessConstructor()
+  public void ShouldGenerateValidFactory_WhenActorHasParameterlessConstructor()
   {
     // Arrange
     string source = """
@@ -60,12 +60,12 @@ public partial class ActorGeneratorTests
     CompileWithGenerator(source, out Compilation compilation, out ImmutableArray<Diagnostic> diagnostics);
 
     // Assert
-    AssertValidFactoryType(compilation, true);
+    AssertValidFactoryType(compilation, true, false, null);
     diagnostics.Should().BeEmpty();
   }
 
   [Fact]
-  public void ShouldGenerateFactory_WhenActorIsStateless()
+  public void ShouldGenerateValidFactory_WhenActorIsStateless()
   {
     // Arrange
     string source = """
@@ -94,11 +94,11 @@ public partial class ActorGeneratorTests
 
     // Assert
     diagnostics.Should().BeEmpty();
-    AssertValidFactoryType(compilation, true);
+    AssertValidFactoryType(compilation, true, false, null);
   }
 
   [Fact]
-  public void ShouldGenerateFactory_WhenActorHasOneStateComponent()
+  public void ShouldGenerateValidFactory_WhenActorHasOneStateComponent()
   {
     // Arrange
     string source = """
@@ -130,12 +130,12 @@ public partial class ActorGeneratorTests
 
     // Assert
     diagnostics.Should().BeEmpty();
-    AssertValidFactoryType(compilation, false,
+    AssertValidFactoryType(compilation, false, false, null,
       new StateSpec(compilation.GetSpecialType(SpecialType.System_Int32), "state0"));
   }
 
   [Fact]
-  public void ShouldGenerateFactory_WhenActorHasMultipleStateComponents()
+  public void ShouldGenerateValidFactory_WhenActorHasMultipleStateComponents()
   {
     // Arrange
     string source = """
@@ -169,13 +169,13 @@ public partial class ActorGeneratorTests
 
     // Assert
     diagnostics.Should().BeEmpty();
-    AssertValidFactoryType(compilation, false,
+    AssertValidFactoryType(compilation, false, false, null,
       new StateSpec(compilation.GetSpecialType(SpecialType.System_Int32), "state0"),
       new StateSpec(compilation.GetSpecialType(SpecialType.System_Int16), "state1"));
   }
 
   [Fact]
-  public void ShouldGenerateFactory_WhenActorIsVirtual()
+  public void ShouldGenerateValidFactory_WhenActorIsVirtual()
   {
     // Arrange
     string source = """
@@ -209,9 +209,119 @@ public partial class ActorGeneratorTests
 
     // Assert
     diagnostics.Should().BeEmpty();
-    AssertValidFactoryType(compilation, true,
+    AssertValidFactoryType(compilation, true, false, null,
       new StateSpec(compilation.GetSpecialType(SpecialType.System_Int32), "state0"),
       new StateSpec(compilation.GetSpecialType(SpecialType.System_Int16), "state1"));
+  }
+
+  [Fact]
+  public void ShouldGenerateValidFactory_WhenActorHasCustomIdType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+      using System;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<Guid>]
+        public class MyActor : IMyActor
+        {
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out Compilation compilation, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().BeEmpty();
+    AssertValidFactoryType(compilation, true, false, "System.Guid");
+  }
+
+  [Fact]
+  public void ShouldGenerateValidFactory_WhenStateComponentIsActorId()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId]
+          private readonly int _state;
+
+          public MyActor(int state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out Compilation compilation, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().BeEmpty();
+    AssertValidFactoryType(compilation, false, true, "System.Int32",
+      new StateSpec(compilation.GetSpecialType(SpecialType.System_Int32), "state"));
+  }
+
+  [Fact]
+  public void ShouldGenerateValidFactory_WhenStateComponentIsActorIdSource()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public class MyActorState : IActorIdSource<int>
+        {
+          public int GetActorId() => throw new System.NotImplementedException();
+
+          public void SetActorId(int id) => throw new System.NotImplementedException();
+        }
+
+        public interface IMyActor
+        {
+        }
+        
+        [Actor]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId]
+          private readonly MyActorState _state;
+
+          public MyActor(MyActorState state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out Compilation compilation, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    INamedTypeSymbol stateType = compilation.GetTypeByMetadataName("Actors.Tests.MyActorState")!;
+    stateType.Should().NotBeNull();
+    diagnostics.Should().BeEmpty();
+    AssertValidFactoryType(compilation, false, true, "System.Int32",
+      new StateSpec(stateType, "state"));
   }
 
   [Fact]
@@ -1232,6 +1342,182 @@ public partial class ActorGeneratorTests
     // Assert
     diagnostics.Should().HaveCount(1)
       .And.ContainSingle(MatchDiagnostic(DiagnosticIds.CAEPACTR305, 5, 16, "ActorId"));
+  }
+
+  [Fact]
+  public void ShouldTriggerCAEPACTR306_WhenStateComponentActorIdIsOfWrongType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId] private string _state;
+
+          public MyActor(string state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().HaveCount(1)
+      .And.ContainSingle(MatchDiagnostic(DiagnosticIds.CAEPACTR306, 12, 37, "_state"));
+  }
+
+  [Fact]
+  public void ShouldTriggerCAEPACTR306_WhenActorIdSourceIsOfWrongType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public class MyActorState : IActorIdSource<string>
+        {
+          public string GetActorId() => throw new System.NotImplementedException();
+
+          public void SetActorId(string id) => throw new System.NotImplementedException();
+        }
+
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId] private MyActorState _state;
+
+          public MyActor(MyActorState state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().HaveCount(1)
+      .And.ContainSingle(MatchDiagnostic(DiagnosticIds.CAEPACTR306, 19, 43, "_state"));
+  }
+
+  [Fact]
+  public void ShouldNotTriggerCAEPACTR306_WhenStateComponentActorIdIsOfCorrectType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId] private int _state;
+
+          public MyActor(int state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().BeEmpty();
+  }
+
+  [Fact]
+  public void ShouldNotTriggerCAEPACTR306_WhenActorIdSourceIsOfCorrectType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public class MyActorState : IActorIdSource<int>
+        {
+          public int GetActorId() => throw new System.NotImplementedException();
+
+          public void SetActorId(int id) => throw new System.NotImplementedException();
+        }
+
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+          [State, ActorId] private MyActorState _state;
+
+          public MyActor(MyActorState state)
+          {
+            _state = state;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().BeEmpty();
+  }
+
+  [Fact]
+  public void ShouldTriggerCAEPACTR307_WhenActorHasDuplicateActorIdTypeAttribute()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType(typeof(short)), ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().HaveCount(1)
+      .And.ContainSingle(MatchDiagnostic(DiagnosticIds.CAEPACTR307, 9, 11, "ActorIdType(typeof(short))"));
   }
 
   [Fact]

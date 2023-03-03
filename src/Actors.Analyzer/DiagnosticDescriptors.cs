@@ -82,7 +82,7 @@ internal static class DiagnosticDescriptors
 
   public static readonly DiagnosticDescriptor CAEPACTR009 = new DiagnosticDescriptor(
     DiagnosticIds.CAEPACTR009,
-    "Duplicate actor implementation attribute",
+    "Duplicate ActorImplementation attribute",
     "Duplicate 'ActorImplementation' attribute",
     "Actors",
     DiagnosticSeverity.Error,
@@ -113,7 +113,7 @@ internal static class DiagnosticDescriptors
     isEnabledByDefault: true);
 
 
-  // State errors (300-399)
+  // State/id errors (300-399)
 
   public static readonly DiagnosticDescriptor CAEPACTR300 = new DiagnosticDescriptor(
     DiagnosticIds.CAEPACTR300,
@@ -159,6 +159,22 @@ internal static class DiagnosticDescriptors
     DiagnosticIds.CAEPACTR305,
     "Multiple id source interfaces",
     "Type '{0}' implements IActorIdSource multiple times",
+    "Actors",
+    DiagnosticSeverity.Error,
+    isEnabledByDefault: true);
+
+  public static readonly DiagnosticDescriptor CAEPACTR306 = new DiagnosticDescriptor(
+    DiagnosticIds.CAEPACTR306,
+    "Invalid id source",
+    "An id source provides an id of type '{0}', but the actor id type is '{1}'",
+    "Actors",
+    DiagnosticSeverity.Error,
+    isEnabledByDefault: true);
+
+  public static readonly DiagnosticDescriptor CAEPACTR307 = new DiagnosticDescriptor(
+    DiagnosticIds.CAEPACTR307,
+    "Duplicate ActorIdType attribute",
+    "Duplicate 'ActorIdType' attribute",
     "Actors",
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
@@ -219,7 +235,7 @@ internal static class DiagnosticDescriptors
 
   public static readonly DiagnosticDescriptor CAEPACTR600 = new DiagnosticDescriptor(
     DiagnosticIds.CAEPACTR600,
-    "Duplicate actor factory attribute",
+    "Duplicate ActorFactory attribute",
     "Duplicate 'ActorFactory' attribute on type '{0}'",
     "Actors",
     DiagnosticSeverity.Error,

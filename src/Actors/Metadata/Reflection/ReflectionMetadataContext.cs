@@ -43,7 +43,8 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     _factories[actorType] = delegate (IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
     {
       Type descriptorFactoryType = typeof(ReflectionActorDescriptorFactory<>).MakeGenericType(actorType);
-      return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute })!;
+      IActorIdTypeAttribute? idTypeAttribute = GetActorIdTypeAttribute(actorType);
+      return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute, idTypeAttribute })!;
     };
 
     foreach (Type type in actorType.Assembly.GetTypes())
@@ -88,7 +89,8 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
         _factories[type] = delegate (IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
         {
           Type descriptorFactoryType = typeof(ReflectionActorDescriptorFactory<>).MakeGenericType(type);
-          return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute })!;
+          IActorIdTypeAttribute? idTypeAttribute = GetActorIdTypeAttribute(type);
+          return (ActorDescriptorFactory)Activator.CreateInstance(descriptorFactoryType, new object?[] { stateTypeBuilder, activityTypeBuilder, this, actorAttribute, idTypeAttribute })!;
         };
       }
 
@@ -173,5 +175,23 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     }
 
     return actorImplementationAttribute is not null;
+  }
+
+  private static IActorIdTypeAttribute? GetActorIdTypeAttribute(Type actorType)
+  {
+    IActorIdTypeAttribute? idTypeAttribute = null;
+
+    foreach (object attribute in actorType.GetCustomAttributes(inherit: false))
+    {
+      if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
+      {
+        if (idTypeAttribute is not null)
+          throw InvalidActorException.DuplicateActorIdTypeAttribute(actorType);
+
+        idTypeAttribute = (IActorIdTypeAttribute)attribute;
+      }
+    }
+
+    return idTypeAttribute;
   }
 }

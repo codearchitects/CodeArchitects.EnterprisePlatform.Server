@@ -11,20 +11,24 @@ internal class ReflectionActorDescriptorFactory<TActor> : ActorDescriptorFactory
 {
   private readonly IReflectionMetadataContext _context;
   private readonly IActorAttribute _actorAttribute;
+  private readonly IActorIdTypeAttribute? _idTypeAttribute;
   private IReadOnlyCollection<StateComponentMetadata<TActor>>? _stateComponents;
   private IReadOnlyCollection<ImplementationDescriptorFactory<TActor>>? _implementationFactories;
 
-  public ReflectionActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder, IReflectionMetadataContext context, IActorAttribute actorAttribute)
+  public ReflectionActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder, IReflectionMetadataContext context, IActorAttribute actorAttribute, IActorIdTypeAttribute? idTypeAttribute)
     : base(stateTypeBuilder, activityTypeBuilder)
   {
     _context = context;
     _actorAttribute = actorAttribute;
+    _idTypeAttribute = idTypeAttribute;
     BaseImplementationFactory = new ReflectionImplementationDescriptorFactory<TActor>(0, this, ActorType);
   }
 
   protected override Type? InterfaceType => _actorAttribute.InterfaceType;
 
   protected override Type? FactoryType => _context.GetFactoryType(ActorType);
+
+  protected override Type? IdType => _idTypeAttribute?.IdType;
 
   protected override bool IsExplicitVirtual => ActorType.IsDefined(typeof(VirtualAttribute));
 

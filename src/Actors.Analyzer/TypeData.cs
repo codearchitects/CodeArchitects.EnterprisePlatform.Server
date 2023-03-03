@@ -9,22 +9,24 @@ internal record ActorData(
   INamedTypeSymbol Type,
   AttributeData? ActorAttribute,
   AttributeData? GenericActorAttribute,
-  AttributeData? VirtualAttribute) : TypeData(Type)
+  AttributeData? VirtualAttribute,
+  AttributeData? IdTypeAttribute,
+  AttributeData? GenericIdTypeAttribute) : TypeData(Type)
 {
   public INamedTypeSymbol? GetSpecifiedInterfaceType(in ActorDescriptorFactory factory)
   {
     ITypeSymbol? specifiedInterface;
     AttributeData attribute;
 
-    if (GenericActorAttribute is { } genericActorAttribute)
+    if (GenericActorAttribute is not null)
     {
-      if (ActorAttribute is { } actorAttribute)
+      if (ActorAttribute is not null)
       {
-        factory.DuplicateActorAttribute(actorAttribute);
+        factory.DuplicateActorAttribute(ActorAttribute);
       }
 
-      attribute = genericActorAttribute;
-      specifiedInterface = GetFromGenericAttribute(genericActorAttribute);
+      attribute = GenericActorAttribute;
+      specifiedInterface = GetFromGenericAttribute(GenericActorAttribute);
     }
     else
     {
@@ -59,6 +61,27 @@ internal record ActorData(
       return actorAttribute.AttributeClass!.TypeArguments[0];
     }
   }
+
+  public ITypeSymbol? GetSpecifiedIdType(in ActorDescriptorFactory factory)
+  {
+    ITypeSymbol? specifiedIdType = null;
+
+    if (GenericIdTypeAttribute is not null)
+    {
+      if (IdTypeAttribute is not null)
+      {
+        factory.DuplicateActorIdTypeAttribute(IdTypeAttribute, Type);
+      }
+
+      specifiedIdType = GenericIdTypeAttribute.AttributeClass!.TypeArguments[0];
+    }
+    else if (IdTypeAttribute is not null)
+    {
+      specifiedIdType = (ITypeSymbol)IdTypeAttribute!.ConstructorArguments[0].Value!;
+    }
+
+    return specifiedIdType;
+  }
 }
 
 internal record FactoryData(
@@ -70,14 +93,14 @@ internal record FactoryData(
   {
     ITypeSymbol? specifiedActor;
 
-    if (GenericFactoryAttribute is { } genericFactoryAttribute)
+    if (GenericFactoryAttribute is not null)
     {
-      if (FactoryAttribute is { } factoryAttribute)
+      if (FactoryAttribute is not null)
       {
-        factory.DuplicateActorFactoryAttribute(factoryAttribute);
+        factory.DuplicateActorFactoryAttribute(FactoryAttribute);
       }
 
-      specifiedActor = genericFactoryAttribute.AttributeClass!.TypeArguments[0];
+      specifiedActor = GenericFactoryAttribute.AttributeClass!.TypeArguments[0];
     }
     else
     {
@@ -97,14 +120,14 @@ internal record ImplementationData(
   {
     ITypeSymbol? specifiedActor;
 
-    if (GenericImplementationAttribute is { } genericImplementationAttribute)
+    if (GenericImplementationAttribute is not null)
     {
-      if (ImplementationAttribute is { } implementationAttribute)
+      if (ImplementationAttribute is not null)
       {
-        factory.DuplicateActorImplementationAttribute(implementationAttribute);
+        factory.DuplicateActorImplementationAttribute(ImplementationAttribute);
       }
 
-      specifiedActor = genericImplementationAttribute.AttributeClass!.TypeArguments[0];
+      specifiedActor = GenericImplementationAttribute.AttributeClass!.TypeArguments[0];
     }
     else
     {

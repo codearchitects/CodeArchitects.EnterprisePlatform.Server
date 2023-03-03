@@ -17,13 +17,15 @@ internal class DiagnosticIds
   public const string CAEPACTR011 = nameof(CAEPACTR011); // Invalid implementation
   public const string CAEPACTR012 = nameof(CAEPACTR012); // Abstract implementation
 
-  // State errors (300-399)
+  // State/id errors (300-399)
   public const string CAEPACTR300 = nameof(CAEPACTR300); // Invalid state type
   public const string CAEPACTR301 = nameof(CAEPACTR301); // Invalid default value
   public const string CAEPACTR302 = nameof(CAEPACTR302); // State must be defined in base actor
   public const string CAEPACTR303 = nameof(CAEPACTR303); // Ambiguous actor id source
   public const string CAEPACTR304 = nameof(CAEPACTR304); // Invalid id type
   public const string CAEPACTR305 = nameof(CAEPACTR305); // Multiple id source interfaces
+  public const string CAEPACTR306 = nameof(CAEPACTR306); // Invalid id source
+  public const string CAEPACTR307 = nameof(CAEPACTR307); // Duplicate ActorIdType attribute
 
   // Method or constructor errors (400-599)
   public const string CAEPACTR400 = nameof(CAEPACTR400); // State component name mismatch
