@@ -38,8 +38,8 @@ internal class OrdinaryActorDescriptor<TActor, TState> : ActorDescriptor<TActor,
 
   public override IImplementationDescriptor<TActor, TState> GetImplementation(Type implementationType)
   {
-    Debug.Assert(implementationType == typeof(TActor), "The actor was not supposed to be polymorphic.");
-
-    return BaseImplementation;
+    return implementationType == typeof(TActor)
+      ? BaseImplementation
+      : throw new ArgumentException("Invalid implementation type.", nameof(implementationType));
   }
 }

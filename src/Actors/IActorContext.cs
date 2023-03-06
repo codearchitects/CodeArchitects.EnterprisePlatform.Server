@@ -14,6 +14,15 @@ public interface IActorContext
   string ActorId { get; }
 
   /// <summary>
+  /// Changes the implementation of the current actor instance to the specified implementation.
+  /// </summary>
+  /// <remarks>
+  /// The actor will change implementation after the current execution finishes.
+  /// </remarks>
+  /// <param name="implementationType">The type of actor implementation to become.</param>
+  void Become(Type implementationType);
+
+  /// <summary>
   /// Schedules an activity to be executed by the current actor instance.
   /// </summary>
   /// <remarks>

@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Bindings;
 using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Expressions;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -51,7 +52,19 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   public void Become<TImplementation>()
     where TImplementation : class, TActor
   {
-    State.ImplementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    try
+    {
+      State.ImplementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+    }
+    catch (ArgumentException ex)
+    {
+      throw new TypeArgumentException("Invalid implementation type.", ex);
+    }
+  }
+
+  public void Become(Type implementationType)
+  {
+    State.ImplementationId = _descriptor.GetImplementation(implementationType).Id;
   }
 
   public BindingId RegisterBinding(Func<IBindingBuilder<TActor>, IBindingResult> configure)
