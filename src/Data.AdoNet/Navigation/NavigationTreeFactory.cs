@@ -35,7 +35,7 @@ internal class NavigationTreeFactory : INavigationTreeFactory
         include(includer);
         root = includer.Root;
 
-        ICacheEntry entry = _cache.CreateEntry(include);
+        using ICacheEntry entry = _cache.CreateEntry(include);
         entry.Value = root;
         entry.Size = ComputeEntrySize(root);
       }
