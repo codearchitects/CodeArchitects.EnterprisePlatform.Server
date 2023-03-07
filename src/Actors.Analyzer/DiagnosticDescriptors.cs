@@ -98,7 +98,7 @@ internal static class DiagnosticDescriptors
 
   public static readonly DiagnosticDescriptor CAEPACTR011 = new DiagnosticDescriptor(
     DiagnosticIds.CAEPACTR011,
-    "Invalid implementation",
+    "Actor not inherited",
     "Type '{0}' does not inherit from the actor type it specifies",
     "Actors",
     DiagnosticSeverity.Error,

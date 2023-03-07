@@ -55,8 +55,8 @@ public sealed class InvalidActorException : Exception
   internal static InvalidActorException MultipleDefaultImplementations(Type actorType)
     => Create(actorType, ErrorMessages.MultipleDefaultImplementations, actorType.Name);
 
-  internal static InvalidActorException InvalidImplementation(Type actorType, Type implementationType)
-    => Create(actorType, ErrorMessages.InvalidImplementation, actorType.Name, implementationType.Name);
+  internal static InvalidActorException ActorNotInherited(Type actorType, Type implementationType)
+    => Create(actorType, ErrorMessages.ActorNotInherited, actorType.Name, implementationType.Name);
 
   internal static InvalidActorException AbstractImplementation(Type actorType, Type implementationType)
     => Create(actorType, ErrorMessages.AbstractImplementation, actorType.Name, implementationType.Name);
@@ -154,7 +154,7 @@ public sealed class InvalidActorException : Exception
     public const string ActorCannotBeVirtual = "'{0}' cannot be a virtual actor because a default value for its state could not be computed. For simple state types, either configure the its default value or provide a default parameter value. For complex state types, provide a parameterless constructor for the class.";
     public const string DuplicateImplementationAttribute = "Duplicate 'ActorImplementation' attribute on type '{0}'.";
     public const string MultipleDefaultImplementations = "Multiple default implementations found for actor '{1}'.";
-    public const string InvalidImplementation = "Type '{1}' does not inherit from the actor type it specifies.";
+    public const string ActorNotInherited = "Type '{1}' does not inherit from the actor type it specifies.";
     public const string AbstractImplementation = "Type '{1}' cannot be an actor implementation since it is abstract.";
 
     // State/id errors

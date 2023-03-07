@@ -56,7 +56,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     ITypeSymbol actorType = implementationData.GetSpecifiedActorType(in this);
     if (actorType is not INamedTypeSymbol namedActorType)
     {
-      InvalidImplementation(implementationData.Type);
+      ActorNotInherited(implementationData.Type);
       return;
     }
 
@@ -76,7 +76,7 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     if (baseType.SpecialType is SpecialType.System_Object)
     {
-      InvalidImplementation(implementationType);
+      ActorNotInherited(implementationType);
       return;
     }
 

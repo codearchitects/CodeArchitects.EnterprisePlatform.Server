@@ -14,7 +14,7 @@ internal class DiagnosticIds
   public const string CAEPACTR008 = nameof(CAEPACTR008); // Actor cannot be virtual
   public const string CAEPACTR009 = nameof(CAEPACTR009); // Duplicate actor implementation attribute
   public const string CAEPACTR010 = nameof(CAEPACTR010); // Multiple default implementations
-  public const string CAEPACTR011 = nameof(CAEPACTR011); // Invalid implementation
+  public const string CAEPACTR011 = nameof(CAEPACTR011); // Actor not inherited
   public const string CAEPACTR012 = nameof(CAEPACTR012); // Abstract implementation
 
   // State/id errors (300-399)

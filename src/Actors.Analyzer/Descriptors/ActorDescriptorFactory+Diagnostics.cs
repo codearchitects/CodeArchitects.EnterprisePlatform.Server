@@ -95,7 +95,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR010, actorType.Locations[0], actorType.Name));
   }
 
-  public void InvalidImplementation(INamedTypeSymbol implementationType)
+  public void ActorNotInherited(INamedTypeSymbol implementationType)
   {
     if (_disableDiagnostics)
       return;
