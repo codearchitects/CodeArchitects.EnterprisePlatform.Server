@@ -1,5 +1,5 @@
-﻿using CodeArchitects.Platform.Actors.Metadata;
-using CodeArchitects.Platform.Actors.Infrastructure;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.TestModel;
 using CodeArchitects.Platform.Emit;
 using CodeArchitects.Platform.Emit.Testing;

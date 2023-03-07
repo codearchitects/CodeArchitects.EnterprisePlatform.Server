@@ -1,5 +1,5 @@
-﻿using CodeArchitects.Platform.Actors.Metadata.Implementation;
-using CodeArchitects.Platform.Actors.Infrastructure;
+﻿using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Metadata.Implementation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Linq.Expressions;

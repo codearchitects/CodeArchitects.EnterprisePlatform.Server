@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Collections;
-using CodeArchitects.Platform.Data.AdoNet.Command;
+﻿using CodeArchitects.Platform.Data.AdoNet.Command;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Data.Common;

@@ -1,5 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
-using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;

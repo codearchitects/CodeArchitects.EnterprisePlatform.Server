@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Factory;
-using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Messaging;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Emit;
 using Dapr.Actors.Client;
 using System.Reflection;

@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.Actors.Metadata.Factory;
+﻿using CodeArchitects.Platform.Actors.Messaging;
+using CodeArchitects.Platform.Actors.Metadata.Factory;
 using CodeArchitects.Platform.Actors.Metadata.Implementation;
-using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Reflection;
 

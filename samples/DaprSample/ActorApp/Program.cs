@@ -1,6 +1,5 @@
 using ActorApp.Domain;
 using ActorApp.OldSkool;
-using CodeArchitects.Platform.Actors.Dapr.AspNetCore;
 using CodeArchitects.Platform.Actors.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);

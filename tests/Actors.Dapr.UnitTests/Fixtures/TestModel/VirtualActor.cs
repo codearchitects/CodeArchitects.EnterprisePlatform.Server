@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Dapr.Factory;
 using CodeArchitects.Platform.Actors.Dapr.Infrastructure;
-using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Infrastructure;
+using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.TestModel;
 using Dapr.Actors;
 using Dapr.Actors.Client;
