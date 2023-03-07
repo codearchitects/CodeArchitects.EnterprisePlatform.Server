@@ -1,3 +1,9 @@
+trigger:
+- develop
+
+pool:
+  name: 'DevOpsAzureTFSAgents'
+
 variables:
   solution: 'CodeArchitects.Platform.sln'
   buildPlatform: 'Any CPU'
