@@ -1,4 +1,6 @@
 ﻿using CliWrap;
+using CliWrap.Exceptions;
+using System.Text;
 
 namespace CodeArchitects.Platform.Messaging.Dapr.AspNetCore;
 
@@ -8,10 +10,21 @@ public class TestFixture : IAsyncLifetime
 
   public async Task InitializeAsync()
   {
-    await Cli.Wrap("docker")
-      .WithArguments("compose up --detach")
-      .WithWorkingDirectory(s_dockerComposePath)
-      .ExecuteAsync();
+    StringBuilder errorSb = new();
+
+    try
+    {
+      await Cli.Wrap("docker")
+        .WithArguments("compose up --detach")
+        .WithWorkingDirectory(s_dockerComposePath)
+        .WithStandardErrorPipe(PipeTarget.ToStringBuilder(errorSb))
+        .ExecuteAsync();
+    }
+    catch (CommandExecutionException ex)
+    {
+      throw new Exception($"Exception in executing the command. Error log:\n{errorSb}", ex);
+    }
+
     await Task.Delay(10000);
   }
 
