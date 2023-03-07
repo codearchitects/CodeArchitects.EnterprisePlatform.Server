@@ -10,7 +10,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- template: task/setup-environment.yml
 - template: task/restore-nuget.yml
   parameters:
     solution: $(solution)
@@ -20,7 +19,7 @@ steps:
     targetType: 'inline'
     script: |
       $coveragePath = Join-Path (Resolve-Path .) coverage.xml
-      dotnet sonarscanner begin /k:"efil.intermediazione" /d:sonar.login=$env:SONARQUBE_TOKEN /d:sonar.host.url=$env:SONAR_HOST_URL /d:sonar.cs.vscoveragexml.reportsPaths=$coveragePath
+      dotnet sonarscanner begin /k:"CA-ESP-7" /d:sonar.login=$env:SONARQUBE_TOKEN /d:sonar.host.url=$env:SONAR_HOST_URL /d:sonar.cs.vscoveragexml.reportsPaths=$coveragePath
   env:
     SONARQUBE_TOKEN: $(SONARQUBE_TOKEN)
 - template: task/dotnet-build.yml
