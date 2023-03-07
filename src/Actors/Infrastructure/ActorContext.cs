@@ -90,12 +90,12 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 
   public void EnableBinding(BindingId id)
   {
-    State.EnabledBindings |= (1 << id._index);
+    EnableBindingCore(id._index);
   }
 
   public void DisableBinding(BindingId id)
   {
-    State.EnabledBindings &= ~(1 << id._index);
+    DisableBindingCore(id._index);
   }
 
   public Task ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -262,16 +262,18 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
       throw new InvalidOperationException("Exceeded the maximum number of bindings.");
 
     configure(binding);
-
-    BindingId id = new(index);
     _bindings.Add(binding);
     
     if (binding.IsEnabled)
     {
-      EnableBinding(id);
+      EnableBindingCore(index);
+    }
+    else
+    {
+      DisableBindingCore(index);
     }
 
-    return id;
+    return new BindingId(index);
   }
 
   private TActor CreateInstance(IServiceProvider services, IActorDescriptor<TActor, TState> descriptor, TState state, int implementationId)
@@ -289,6 +291,16 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     {
       binding.VerifyPreCondition(Actor);
     }
+  }
+
+  private void EnableBindingCore(int index)
+  {
+    State.EnabledBindings |= (1 << index);
+  }
+
+  private void DisableBindingCore(int index)
+  {
+    State.EnabledBindings &= ~(1 << index);
   }
 
   private class DynamicArgumentList : IReadOnlyList<object?>
