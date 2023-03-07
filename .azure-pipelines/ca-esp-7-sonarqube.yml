@@ -1,0 +1,49 @@
+variables:
+  solution: 'CodeArchitects.Platform.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- template: task/setup-environment.yml
+- template: task/restore-nuget.yml
+  parameters:
+    solution: $(solution)
+- task: PowerShell@2
+  displayName: "prepare analysis configuration"
+  inputs:
+    targetType: 'inline'
+    script: |
+      $coveragePath = Join-Path (Resolve-Path .) coverage.xml
+      dotnet sonarscanner begin /k:"efil.intermediazione" /d:sonar.login=$env:SONARQUBE_TOKEN /d:sonar.host.url=$env:SONAR_HOST_URL /d:sonar.cs.vscoveragexml.reportsPaths=$coveragePath
+  env:
+    SONARQUBE_TOKEN: $(SONARQUBE_TOKEN)
+- template: task/dotnet-build.yml
+  parameters:
+    solution: $(solution)
+    buildPlatform: $(buildPlatform)
+    buildConfiguration: $(buildConfiguration)
+- template: task/dotnet-test.yml
+  parameters:
+    solution: $(solution)
+- task: PowerShell@2
+  displayName: "run and publish analysis"
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet sonarscanner end /d:sonar.login=$env:SONARQUBE_TOKEN
+  env:
+    SONARQUBE_TOKEN: $(SONARQUBE_TOKEN)
+- task: PowerShell@2
+  displayName: "generate summary"
+  inputs:
+    targetType: 'inline'
+    script: |
+      $filePath = Join-Path $(Build.SourcesDirectory) "SUMMARY.md"
+      $message = "The pipeline is **$(Agent.JobStatus)**.`n"
+      if ("$(Agent.JobStatus)" -eq "Succeeded" -or "$(Agent.JobStatus)" -eq "SucceededWithIssues") {
+        $message += "You can find **SonarQube analysis** on [$env:SONARQUBE_TOKEN]($env:SONAR_HOST_URL)"
+      }
+      New-Item -Path "$(Build.SourcesDirectory)" -Name "SUMMARY.md" -ItemType "file" -Value $message
+
+      Write-Host "##vso[task.addattachment type=Distributedtask.Core.Summary;name=SonarQube;]$filePath"
+  condition: always()

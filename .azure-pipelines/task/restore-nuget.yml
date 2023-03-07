@@ -1,0 +1,26 @@
+parameters:
+  - name: solution
+    displayName: solution
+    type: string
+    default: "*/**.sln"
+
+steps:
+- task: DownloadSecureFile@1
+  name: NuGetConfig
+  inputs:
+    secureFile: 'NuGet.Config'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Copy-Item $(NuGetConfig.secureFilePath) ./NuGet.Config
+      Copy-Item $(NuGetConfig.secureFilePath) ./server/NuGet.Config
+  displayName: 'authentication'
+- task: DotNetCoreCLI@2
+  displayName: Restore NuGet packages with dotnet cli
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+    feedsToUse: 'config'
+    nugetConfigPath: 'NuGet.Config'
+    noCache: true

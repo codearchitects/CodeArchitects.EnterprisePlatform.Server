@@ -1,0 +1,35 @@
+parameters:
+  - name: solution
+    displayName: solution
+    type: string
+    default: "*/**.sln"
+
+steps:
+- task: PowerShell@2
+  displayName: "run docker-compose.integrationtest.yml"
+  inputs:
+    targetType: 'inline'
+    script: |
+      docker compose --profile pre-CI up -d --build --force-recreate
+      Start-Sleep 25
+      docker compose --profile CI up -d --build --force-recreate
+      Start-Sleep 20
+    workingDirectory: 'server'
+- task: PowerShell@2
+  displayName: "run tests & calculate code coverage"
+  inputs:
+    targetType: 'inline'
+    script: |
+      # dotnet tool install --global dotnet-coverage
+      dotnet-coverage collect 'dotnet test $(solution) -m:1' -f xml  -o 'coverage.xml'
+- task: PowerShell@2
+  displayName: "shoutdown docker-compose.yml"
+  inputs:
+    targetType: 'inline'
+    script: |
+      docker compose down
+      docker rm -f $(docker ps -aq); docker volume rm -f $(docker volume ls -q)
+    errorActionPreference: 'continue'
+    workingDirectory: 'server'
+  continueOnError: true
+  condition: always()
