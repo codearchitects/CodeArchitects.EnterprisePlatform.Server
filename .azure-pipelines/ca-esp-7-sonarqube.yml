@@ -33,9 +33,9 @@ steps:
     solution: $(solution)
     buildPlatform: $(buildPlatform)
     buildConfiguration: $(buildConfiguration)
-#- template: task/dotnet-test.yml
-#   parameters:
-#     solution: $(solution)
+- template: task/dotnet-test.yml
+  parameters:
+    solution: $(solution)
 - task: PowerShell@2
   displayName: "run and publish analysis"
   inputs:
