@@ -10,12 +10,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: PowerShell@2
-  displayName: "dotnet version"
-  inputs:
-    targetType: 'inline'
-    script: |
-      dotnet --version
 - template: task/restore-nuget.yml
   parameters:
     solution: $(solution)
