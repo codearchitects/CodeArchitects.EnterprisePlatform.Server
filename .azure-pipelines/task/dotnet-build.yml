@@ -1,0 +1,20 @@
+parameters:
+  - name: solution
+    displayName: solution
+    type: string
+    default: "*/**.sln"
+  - name: buildPlatform
+    displayName: buildPlatform
+    type: string
+    default: "Any CPU"
+  - name: buildConfiguration
+    displayName: buildConfiguration
+    type: string
+    default: "Release"
+
+steps:
+- task: PowerShell@2
+  displayName: build $(solution)
+  inputs:
+    targetType: 'inline'
+    script: 'dotnet build $(solution) --no-restore -c $(buildConfiguration)'
