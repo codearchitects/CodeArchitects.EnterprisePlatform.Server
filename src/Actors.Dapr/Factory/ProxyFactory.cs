@@ -16,14 +16,12 @@ internal abstract class ProxyFactory<THostInterface, TActorId, TInterface, TStat
 
   protected abstract Task InitAsync(THostInterface actorHost, TState state, CancellationToken cancellationToken);
 
-  protected async Task<TInterface> CreateCoreAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
+  protected Task<TInterface> CreateAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
   {
     if (actorId is null)
       throw new ArgumentNullException(nameof(actorId));
-
-    THostInterface host = CreateHost(actorId);
-    await InitAsync(host, state, cancellationToken);
-    return CreateProxy(host);
+    
+    return CreateCoreAsync(actorId, state, cancellationToken);
   }
 
   protected TInterface GetCore(TActorId actorId)
@@ -32,6 +30,13 @@ internal abstract class ProxyFactory<THostInterface, TActorId, TInterface, TStat
       throw new ArgumentNullException(nameof(actorId));
 
     THostInterface host = CreateHost(actorId);
+    return CreateProxy(host);
+  }
+
+  private async Task<TInterface> CreateCoreAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
+  {
+    THostInterface host = CreateHost(actorId);
+    await InitAsync(host, state, cancellationToken);
     return CreateProxy(host);
   }
 }

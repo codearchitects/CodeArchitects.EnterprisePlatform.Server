@@ -14,6 +14,9 @@ public partial class ModelConfigurationTests
     IDataModel dataModel = sut.CreateDataModel();
 
     // Assert
+    dataModel.Entities.Should().HaveCount(2)
+      .And.ContainSingle(entity => entity.Type == typeof(WithAOneToManyIntraAggregate.Parent))
+      .And.ContainSingle(entity => entity.Type == typeof(WithAOneToManyIntraAggregate.Child));
   }
 
   [Fact]
@@ -26,5 +29,8 @@ public partial class ModelConfigurationTests
     IDataModel dataModel = sut.CreateDataModel();
 
     // Assert
+    dataModel.Entities.Should().HaveCount(2)
+      .And.ContainSingle(entity => entity.Type == typeof(WithAManyToManyInterAggregate.EntityA))
+      .And.ContainSingle(entity => entity.Type == typeof(WithAManyToManyInterAggregate.EntityB));
   }
 }

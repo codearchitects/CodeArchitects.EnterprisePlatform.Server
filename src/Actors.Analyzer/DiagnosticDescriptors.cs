@@ -165,8 +165,8 @@ internal static class DiagnosticDescriptors
 
   public static readonly DiagnosticDescriptor CAEPACTR306 = new DiagnosticDescriptor(
     DiagnosticIds.CAEPACTR306,
-    "Invalid id source",
-    "An id source provides an id of type '{0}', but the actor id type is '{1}'",
+    "Invalid id member",
+    "An actor member specified an id of type '{0}', but the declared actor id type is '{1}'",
     "Actors",
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);

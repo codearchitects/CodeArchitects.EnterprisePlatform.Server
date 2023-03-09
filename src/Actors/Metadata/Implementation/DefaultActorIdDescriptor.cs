@@ -21,5 +21,6 @@ internal class DefaultActorIdDescriptor<TState> : IActorIdDescriptor<TState>
 
   public void SetId(TState state, string id)
   {
+    // The state does not contain any id field to set
   }
 }

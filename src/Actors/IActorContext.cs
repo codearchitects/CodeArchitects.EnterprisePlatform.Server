@@ -48,9 +48,9 @@ public interface IActorContext
   /// <summary>
   /// Unschedules a previously scheduled activity with the given id.
   /// </summary>
-  /// <param name="scheduleId">The unique identifier of the scheduled activity to unscheduled.</param>
+  /// <param name="id">The unique identifier of the scheduled activity to unscheduled.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
-  Task UnscheduleAsync(ScheduleId scheduleId, CancellationToken cancellationToken = default);
+  Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken = default);
   
   /// <summary>
   /// Enables a previously registered binding.

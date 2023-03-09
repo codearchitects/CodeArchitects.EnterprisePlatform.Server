@@ -10,7 +10,7 @@ internal interface IHandlerDelegateFactory
   /// <summary>
   /// Creates a <see cref="HandlerDelegate"/> which will execute the pipeline relative to the given handler identity.
   /// </summary>
-  /// <param name="identityDescriptor">The handler identity descriptor.</param>
+  /// <param name="descriptor">The handler identity descriptor.</param>
   /// <returns>The created handler delegate.</returns>
-  HandlerDelegate CreateHandlerDelegate(IHandlerDescriptor identityDescriptor);
+  HandlerDelegate CreateHandlerDelegate(IHandlerDescriptor descriptor);
 }

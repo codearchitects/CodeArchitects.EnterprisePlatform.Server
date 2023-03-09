@@ -13,6 +13,7 @@ public class ExpressionRewriterTests
   private readonly IEntityType _entityType;
   private readonly Mock<IModel> _modelMock;
   private readonly Mock<IQueryRootExpressionInterceptor> _interceptorMock;
+  private readonly Mock<IInterceptorInfo> _interceptorInfoMock;
   private readonly ExpressionRewriter _sut;
 
   public ExpressionRewriterTests()
@@ -26,6 +27,8 @@ public class ExpressionRewriterTests
     _modelMock
       .Setup(x => x.FindEntityType(typeof(Entity)))
       .Returns(_entityType);
+
+    _interceptorInfoMock = new(MockBehavior.Strict);
   }
 
   [Fact]
@@ -37,22 +40,23 @@ public class ExpressionRewriterTests
       .Where(x => x.Id > 4)
       .OrderBy(x => x.Id)
       .Select(x => new { NewId = x.Id });
-    _interceptorMock
-      .Setup(x => x.ShouldApply)
-      .Returns(true);
 
     _interceptorMock
       .Setup(x => x.Apply(It.IsAny<Expression>(), It.IsAny<IEntityType>()))
       .Returns<Expression, IEntityType>((expr, type) => expr);
 
+    _interceptorInfoMock
+      .Setup(x => x.IsEnabled(It.IsAny<IQueryRootExpressionInterceptor>()))
+      .Returns(true);
+
     Expression expression = queryable.Expression;
 
     // Act
-    Expression result = _sut.Rewrite(expression, null);
+    Expression result = _sut.Rewrite(expression, _interceptorInfoMock.Object);
 
     // Assert
     result.Should().BeEquivalentTo(expression, options => options.Using(ExpressionEqualityComparer.Instance)); // Because the interceptor is no-op
-    _interceptorMock.Verify(x => x.ShouldApply);
+    _interceptorInfoMock.Verify(x => x.IsEnabled(_interceptorMock.Object));
     _interceptorMock.Verify(x => x.Apply(It.Is<EntityQueryRootExpression>(expr => expr.Type == typeof(IQueryable<Entity>)), _entityType));
     _interceptorMock.VerifyNoOtherCalls();
   }
@@ -66,22 +70,23 @@ public class ExpressionRewriterTests
       .Where(x => x.Id > 4)
       .OrderBy(x => x.Id)
       .Select(x => new { NewId = x.Id });
-    _interceptorMock
-      .Setup(x => x.ShouldApply)
-      .Returns(false);
   
     _interceptorMock
       .Setup(x => x.Apply(It.IsAny<Expression>(), It.IsAny<IEntityType>()))
       .Returns<Expression, IEntityType>((expr, type) => expr);
-  
+
+    _interceptorInfoMock
+      .Setup(x => x.IsEnabled(It.IsAny<IQueryRootExpressionInterceptor>()))
+      .Returns(false);
+
     Expression expression = queryable.Expression;
   
     // Act
-    Expression result = _sut.Rewrite(expression, null);
+    Expression result = _sut.Rewrite(expression, _interceptorInfoMock.Object);
   
     // Assert
     result.Should().BeEquivalentTo(expression, options => options.Using(ExpressionEqualityComparer.Instance)); // Because the interceptor is no-op
-    _interceptorMock.Verify(x => x.ShouldApply);
+    _interceptorInfoMock.Verify(x => x.IsEnabled(_interceptorMock.Object));
     _interceptorMock.VerifyNoOtherCalls();
   }
 

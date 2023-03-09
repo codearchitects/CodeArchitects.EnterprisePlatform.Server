@@ -18,13 +18,13 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
     _activityManager = activityManager;
   }
 
-  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState? state)
+  public IActorManager<TActor, TState> Create(IActorHost<TActor> host, TState? state)
   {
     state ??= GetDefaultState(host.ActorId);
     return CreateCore(host, state, state.ImplementationId);
   }
 
-  public IActorManager<TActor, TState> Create(IActorHost<TActor, TState> host, TState? state, int implementationId)
+  public IActorManager<TActor, TState> Create(IActorHost<TActor> host, TState? state, int implementationId)
   {
     state ??= GetDefaultState(host.ActorId);
     if (implementationId == 0)
@@ -35,7 +35,7 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
     return CreateCore(host, state, implementationId);
   }
 
-  private IActorManager<TActor, TState> CreateCore(IActorHost<TActor, TState> host, TState state, int implementationId)
+  private IActorManager<TActor, TState> CreateCore(IActorHost<TActor> host, TState state, int implementationId)
   {
     return new ActorContext<TActor, TState>(_services, _descriptor, _activityManager, host, state, implementationId);
   }

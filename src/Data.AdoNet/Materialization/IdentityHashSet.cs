@@ -15,5 +15,6 @@ internal class IdentityHashSet<TEntity> : HashSet<TEntity>, IIdentityCollection
 
   public void Populate()
   {
+    // The collection is already populated
   }
 }

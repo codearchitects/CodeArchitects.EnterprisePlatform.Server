@@ -31,5 +31,5 @@ public enum AdoNetServiceTypes
   /// <summary>
   /// Look for all types of services.
   /// </summary>
-  All = -1
+  All = ModelConfiguration | CommandInterceptors | DataSeed
 }

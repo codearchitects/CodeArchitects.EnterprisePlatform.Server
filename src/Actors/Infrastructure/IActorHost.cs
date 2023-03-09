@@ -2,9 +2,8 @@
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
-internal interface IActorHost<TActor, TState>
+internal interface IActorHost<TActor>
   where TActor : class
-  where TState : ActorState
 {
   string ActorId { get; }
 

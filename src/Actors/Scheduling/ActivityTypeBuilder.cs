@@ -13,10 +13,6 @@ internal class ActivityTypeBuilder : TypeBuilderBase, IActivityTypeBuilder
     name: $"get_{nameof(Activity.Id)}",
     bindingAttr: BindingFlags.Instance | BindingFlags.Public,
     types: Type.EmptyTypes);
-  private static readonly MethodInfo s_implementationIdGetter = typeof(Activity).GetRequiredMethod(
-    name: $"get_{nameof(Activity.ImplementationId)}",
-    bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-    types: Type.EmptyTypes);
 
   public ActivityTypeBuilder(ModuleBuilder module, IILGeneratorProvider ilProvider)
     : base(module, ilProvider)

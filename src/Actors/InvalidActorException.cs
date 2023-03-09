@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Messaging;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace CodeArchitects.Platform.Actors;
 
@@ -14,10 +15,23 @@ public sealed class InvalidActorException : Exception
     ActorType = actorType;
   }
 
+  private InvalidActorException(SerializationInfo info, StreamingContext context)
+    : base(info, context)
+  {
+    ActorType = Type.GetType(info.GetString(nameof(ActorType)));
+  }
+
   /// <summary>
   /// The type of the invalidly configured actor.
   /// </summary>
   public Type ActorType { get; }
+
+  /// <inheritdoc/>
+  public override void GetObjectData(SerializationInfo info, StreamingContext context)
+  {
+    base.GetObjectData(info, context);
+    info.AddValue(nameof(ActorType), ActorType.AssemblyQualifiedName);
+  }
 
 
   // Class errors
@@ -82,8 +96,8 @@ public sealed class InvalidActorException : Exception
   internal static InvalidActorException MultipleIdSourceInterfaces(Type actorType, Type componentType)
     => Create(actorType, ErrorMessages.MultipleIdSourceInterfaces, actorType.Name, componentType.Name);
 
-  internal static InvalidActorException InvalidIdSource(Type actorType, Type sourceIdType, Type actorIdType)
-    => Create(actorType, ErrorMessages.InvalidIdSource, actorType.Name, sourceIdType.Name, actorIdType.Name);
+  internal static InvalidActorException InvalidIdMember(Type actorType, Type sourceIdType, Type actorIdType)
+    => Create(actorType, ErrorMessages.InvalidIdMember, actorType.Name, sourceIdType.Name, actorIdType.Name);
 
   internal static InvalidActorException DuplicateActorIdTypeAttribute(Type actorType)
     => Create(actorType, ErrorMessages.DuplicateActorIdTypeAttribute, actorType.Name);
@@ -164,7 +178,7 @@ public sealed class InvalidActorException : Exception
     public const string AmbiguousActorIdSource = "Multiple actor id sources were set. Only one state component or one state component property can be configured to be the actor id";
     public const string InvalidIdType = "Type '{1}' cannot be used as id type because it does not define a public static method Parse(string) or Parse(string, IFormatProvider) returning the id type.";
     public const string MultipleIdSourceInterfaces = $"Type '{{1}}' implements {nameof(IActorIdSource<object>)} multiple times.";
-    public const string InvalidIdSource = "An id source provides an id of type '{1}', but the actor id type is '{2}'.";
+    public const string InvalidIdMember = "An actor member specified an id of type '{1}', but the declared actor id type is '{2}'.";
     public const string DuplicateActorIdTypeAttribute = "Duplicate 'ActorIdType' attribute on type '{0}'.";
 
     // Method errors

@@ -16,7 +16,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 {
   private readonly IActorDescriptor<TActor, TState> _descriptor;
   private readonly IActivityManager<TActor> _activityManager;
-  private readonly IActorHost<TActor, TState> _host;
+  private readonly IActorHost<TActor> _host;
   private readonly List<IActorBinding<TActor>> _bindings;
   private ExecutionSection _section;
 
@@ -24,7 +24,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     IServiceProvider services,
     IActorDescriptor<TActor, TState> descriptor,
     IActivityManager<TActor> activityManager,
-    IActorHost<TActor, TState> host,
+    IActorHost<TActor> host,
     TState state,
     int implementationId)
   {

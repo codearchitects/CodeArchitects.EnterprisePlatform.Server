@@ -4,7 +4,7 @@ namespace CodeArchitects.Platform.Common.Expressions;
 
 internal partial class ExpressionEvaluator
 {
-  private object Increment(object? operand)
+  private static object Increment(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {
@@ -24,7 +24,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Decrement(object? operand)
+  private static object Decrement(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {
@@ -44,7 +44,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object OnesComplement(object? operand)
+  private static object OnesComplement(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {
@@ -60,7 +60,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Not(object? operand)
+  private static object Not(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {
@@ -69,7 +69,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object UnaryPlus(object? operand)
+  private static object UnaryPlus(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {
@@ -89,7 +89,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Negate(object? operand)
+  private static object Negate(object? operand)
   {
     return System.Convert.GetTypeCode(operand) switch
     {

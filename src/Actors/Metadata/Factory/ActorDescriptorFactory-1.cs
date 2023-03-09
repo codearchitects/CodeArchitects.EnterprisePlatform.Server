@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Metadata.Implementation;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Utils;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -330,7 +331,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
         if (id is not null)
           throw InvalidActorException.AmbiguousActorIdSource(ActorType);
         if (IdType is not null && idType != IdType)
-          throw InvalidActorException.InvalidIdSource(ActorType, idType, IdType);
+          throw InvalidActorException.InvalidIdMember(ActorType, idType, IdType);
 
         Type actorIdSourceType = typeof(IActorIdSource<>).MakeGenericType(idType.UnderlyingSystemType);
         InterfaceMapping mapping = component.Type.GetInterfaceMap(actorIdSourceType);
@@ -350,14 +351,14 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
           parameters: new[] { stateParam, idParam })
           .Compile();
 
-        return new SourceActorIdDescriptor<TState>(getActorIdMethod, stateIndex, setId);
+        id = new SourceActorIdDescriptor<TState>(getActorIdMethod, stateIndex, setId);
       }
       else if (component.IsActorId)
       {
         if (id is not null)
           throw InvalidActorException.AmbiguousActorIdSource(ActorType);
         if (IdType is not null && component.Type != IdType)
-          throw InvalidActorException.InvalidIdSource(ActorType, component.Type, IdType);
+          throw InvalidActorException.InvalidIdMember(ActorType, component.Type, IdType);
 
         Expression parseIdExpression = GetParseIdExpression(idParam, component.Type);
 
@@ -370,7 +371,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
           parameters: new[] { stateParam, idParam })
           .Compile();
 
-        return new ComponentActorIdDescriptor<TState>(component.Type, stateIndex, setId);
+        id = new ComponentActorIdDescriptor<TState>(component.Type, stateIndex, setId);
       }
     }
 
@@ -379,7 +380,10 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       if (id is not null)
         throw InvalidActorException.AmbiguousActorIdSource(ActorType);
 
-      id = new ActorIdDescriptor<TState>(metadata.Type);
+      if (IdType is not null && metadata.Type != IdType)
+        throw InvalidActorException.InvalidIdMember(ActorType, metadata.Type, IdType);
+
+      id = new DefaultActorIdDescriptor<TState>(metadata.Type);
     }
 
     return id ?? new DefaultActorIdDescriptor<TState>(IdType ?? typeof(string));

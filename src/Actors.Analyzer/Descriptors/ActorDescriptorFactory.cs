@@ -459,7 +459,7 @@ internal readonly ref partial struct ActorDescriptorFactory
               }
               if (actorIdType is not null && !SymbolEqualityComparer.Default.Equals(idType, actorIdType))
               {
-                InvalidIdSource(idMember, idType, actorIdType);
+                InvalidIdMember(idMember, idType, actorIdType);
               }
 
               if (stateAttribute is not null)
@@ -486,7 +486,7 @@ internal readonly ref partial struct ActorDescriptorFactory
           }
           if (actorIdType is not null && !SymbolEqualityComparer.Default.Equals(idType, actorIdType))
           {
-            InvalidIdSource(idMember, idType, actorIdType);
+            InvalidIdMember(idMember, idType, actorIdType);
           }
 
           if (stateAttribute is not null)

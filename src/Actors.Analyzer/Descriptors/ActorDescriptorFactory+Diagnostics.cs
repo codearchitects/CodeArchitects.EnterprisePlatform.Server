@@ -172,7 +172,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.CAEPACTR305, idType.Locations[0], idType.Name));
   }
 
-  public void InvalidIdSource(ISymbol member, ITypeSymbol sourceIdType, ITypeSymbol actorIdType)
+  public void InvalidIdMember(ISymbol member, ITypeSymbol sourceIdType, ITypeSymbol actorIdType)
   {
     if (_disableDiagnostics)
       return;

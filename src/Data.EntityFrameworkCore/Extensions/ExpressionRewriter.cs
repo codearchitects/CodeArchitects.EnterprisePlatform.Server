@@ -13,7 +13,7 @@ internal class ExpressionRewriter : ExpressionVisitor, IExpressionRewriter
   // nor the DbContext because it can't be resolved inside its own service provider.
   private readonly IDbContextServices _services;
   private readonly IEnumerable<IQueryRootExpressionInterceptor> _interceptors;
-  private IReadOnlyDictionary<Type, bool>? _disabledInterceptorTypes;
+  private IInterceptorInfo? _interceptorInfo;
 
   public ExpressionRewriter(IDbContextServices services, IEnumerable<IQueryRootExpressionInterceptor> interceptors)
   {
@@ -21,22 +21,21 @@ internal class ExpressionRewriter : ExpressionVisitor, IExpressionRewriter
     _interceptors = interceptors;
   }
 
-  public bool ShouldRewrite(IReadOnlyDictionary<Type, bool>? disabledInterceptorTypes)
+  public bool ShouldRewrite(IInterceptorInfo interceptorInfo)
   {
     foreach (IQueryRootExpressionInterceptor interceptor in _interceptors)
     {
-      return disabledInterceptorTypes is not null && disabledInterceptorTypes.TryGetValue(interceptor.GetType(), out bool enabled)
-        ? enabled
-        : interceptor.ShouldApply;
+      if (interceptorInfo.IsEnabled(interceptor))
+        return true;
     }
     return false;
   }
 
-  public Expression Rewrite(Expression expression, IReadOnlyDictionary<Type, bool>? disabledInterceptorTypes)
+  public Expression Rewrite(Expression expression, IInterceptorInfo interceptorInfo)
   {
-    _disabledInterceptorTypes = disabledInterceptorTypes;
+    _interceptorInfo = interceptorInfo;
     expression = Visit(expression);
-    _disabledInterceptorTypes = null;
+    _interceptorInfo = null;
     return expression;
   }
 
@@ -73,11 +72,7 @@ internal class ExpressionRewriter : ExpressionVisitor, IExpressionRewriter
 
     foreach (IQueryRootExpressionInterceptor interceptor in _interceptors)
     {
-      bool shouldApply = _disabledInterceptorTypes is not null && _disabledInterceptorTypes.TryGetValue(interceptor.GetType(), out bool enabled)
-        ? enabled
-        : interceptor.ShouldApply;
-
-      if (!shouldApply)
+      if (!_interceptorInfo!.IsEnabled(interceptor))
         continue;
 
       node = interceptor.Apply(node, entityModel);

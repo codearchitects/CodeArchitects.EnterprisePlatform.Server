@@ -3,5 +3,6 @@
 internal interface IMessageHandlerMetadata
 {
   string? Bus { get; }
+
   string? Topic { get; }
 }

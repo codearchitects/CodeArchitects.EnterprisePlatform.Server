@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="IDaprActorsOptionsBuilder"/>.
+/// </summary>
 public static class DaprActorsOptionsBuilderExtensions
 {
   /// <summary>

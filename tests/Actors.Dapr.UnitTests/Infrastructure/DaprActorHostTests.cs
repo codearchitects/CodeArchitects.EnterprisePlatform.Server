@@ -97,7 +97,7 @@ public class DaprActorHostTests
       .Setup(x => x.JsonSerializerOptions)
       .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
     fixture.FactoryMock
-      .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor, StandardActorState>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
+      .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
       .Returns(fixture.ManagerMock.Object);
 
     fixture.ManagerMock

@@ -48,7 +48,7 @@ internal class ComponentIdSourceActorProxyFactory : ProxyFactory<IComponentIdSou
 
   public Task<IComponentIdSourceActor> CreateAsync(int state, CancellationToken cancellationToken = default)
   {
-    return CreateCoreAsync(state, new ComponentIdSourceActorState { _0 = state }, cancellationToken);
+    return CreateAsync(state, new ComponentIdSourceActorState { _0 = state }, cancellationToken);
   }
 
   public IComponentIdSourceActor Get(int id)

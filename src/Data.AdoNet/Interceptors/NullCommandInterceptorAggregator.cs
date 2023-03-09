@@ -7,9 +7,11 @@ internal class NullCommandInterceptorAggregator<TDbCommand> : ICommandIntercepto
 {
   public void OnCommandCreated(OperationType operation, TDbCommand command)
   {
+    // No-op, since there are no interceptors to aggregate
   }
 
   public void OnCommandBuilt(OperationType operation, TDbCommand command)
   {
+    // No-op, since there are no interceptors to aggregate
   }
 }

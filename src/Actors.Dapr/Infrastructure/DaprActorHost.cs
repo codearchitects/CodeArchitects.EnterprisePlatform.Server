@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 
-internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>, IRemindable
+internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemindable
   where TActor : class
   where TState : ActorState
 {

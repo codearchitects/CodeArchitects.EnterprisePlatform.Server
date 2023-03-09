@@ -9,13 +9,13 @@ public partial class ActorContextTests
 {
   private readonly Mock<IActorDescriptor<TestActor1, TestActor1State>> _descriptor1Mock;
   private readonly Mock<IActivityManager<TestActor1>> _activityManager1Mock;
-  private readonly Mock<IActorHost<TestActor1, TestActor1State>> _host1Mock;
+  private readonly Mock<IActorHost<TestActor1>> _host1Mock;
   private readonly TestActor1State _state1;
   private readonly ActorContext<TestActor1, TestActor1State> _sut1;
 
   private readonly Mock<IActorDescriptor<TestActor2, TestActor2State>> _descriptor2Mock;
   private readonly Mock<IActivityManager<TestActor2>> _activityManager2Mock;
-  private readonly Mock<IActorHost<TestActor2, TestActor2State>> _host2Mock;
+  private readonly Mock<IActorHost<TestActor2>> _host2Mock;
   private readonly TestActor2State _state2;
   private readonly ActorContext<TestActor2, TestActor2State> _sut2;
 

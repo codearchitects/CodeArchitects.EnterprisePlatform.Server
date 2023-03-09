@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Actors.Analyzer;
 
-internal class DiagnosticIds
+internal static class DiagnosticIds
 {
   // Class errors (000-299)
   public const string CAEPACTR000 = nameof(CAEPACTR000); // Duplicate actor attribute
@@ -24,7 +24,7 @@ internal class DiagnosticIds
   public const string CAEPACTR303 = nameof(CAEPACTR303); // Ambiguous actor id source
   public const string CAEPACTR304 = nameof(CAEPACTR304); // Invalid id type
   public const string CAEPACTR305 = nameof(CAEPACTR305); // Multiple id source interfaces
-  public const string CAEPACTR306 = nameof(CAEPACTR306); // Invalid id source
+  public const string CAEPACTR306 = nameof(CAEPACTR306); // Invalid id member
   public const string CAEPACTR307 = nameof(CAEPACTR307); // Duplicate ActorIdType attribute
 
   // Method or constructor errors (400-599)

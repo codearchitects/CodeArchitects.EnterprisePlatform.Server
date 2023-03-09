@@ -31,8 +31,7 @@ internal class ReflectionImplementationDescriptorFactory<TActor> : Implementatio
       {
         return ImplementationType
           .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-          .Where(ctor => ctor.IsDefined(typeof(ActorConstructorAttribute)))
-          .SingleOrDefault();
+          .SingleOrDefault(ctor => ctor.IsDefined(typeof(ActorConstructorAttribute)));
       }
       catch (InvalidOperationException)
       {

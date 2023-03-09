@@ -43,7 +43,7 @@ internal class TopicRouter
         logger.LogError($"Unsupported media type: '{context.Request.ContentType}'.");
         context.Response.StatusCode = StatusCodes.Status415UnsupportedMediaType;
         return Task.CompletedTask;
-    };
+    }
   }
 
   private async Task ProcessCloudEventAsync(HttpContext context, JsonReader jsonReader, ILogger logger)

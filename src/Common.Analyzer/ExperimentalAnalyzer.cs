@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace CodeArchitects.Platform.Common.Analyzer;
 
@@ -28,7 +29,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
   {
     if (context.Node is not IdentifierNameSyntax node)
     {
-      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
+      Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
+      return;
     }
 
     bool isExperimental = context.SemanticModel
@@ -48,7 +50,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
   {
     if (context.Node is not GenericNameSyntax node)
     {
-      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
+      Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
+      return;
     }
 
     bool isExperimental = context.SemanticModel
@@ -68,7 +71,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
   {
     if (context.Node is not ObjectCreationExpressionSyntax node)
     {
-      throw new Exception($"Invalid syntax kind registered for this action. Expected {nameof(ObjectCreationExpressionSyntax)} but got {context.Node.GetType().Name} instead.");
+      Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(ObjectCreationExpressionSyntax)} but got {context.Node.GetType().Name} instead.");
+      return;
     }
 
     bool isExperimental = context.SemanticModel

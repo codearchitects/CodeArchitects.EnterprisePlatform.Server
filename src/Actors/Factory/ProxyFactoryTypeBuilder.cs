@@ -43,25 +43,25 @@ internal abstract class ProxyFactoryTypeBuilder
 
     IReadOnlyList<FieldInfo> stateFields = state.Fields;
     ConstructorInfo stateConstructor = state.Type.GetRequiredConstructor();
-    MethodInfo createCoreAsyncMethod = type.BaseType!.GetRequiredMethod(
-      name: "CreateCoreAsync",
+    MethodInfo createAsyncMethod = type.BaseType!.GetRequiredMethod(
+      name: "CreateAsync",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic);
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.Final);
     IILGenerator il = _ilProvider.GetILGenerator(method);
 
-    il.Emit(OpCodes.Ldarg_0);                     // Push $this                                                 | Stack: $this
-    LoadId(il, id, out int argOffset);            // Load $id                                                   | Stack: $this, $id
-    il.Emit(OpCodes.Newobj, stateConstructor);    // new TState()                                               | Stack: $this, $id, state
-    for (int i = 0; i < stateFields.Count; i++)   //                                                            |
-    {                                             //                                                            |
-      il.Emit(OpCodes.Dup);                       // Duplicate state                                            | Stack: $this, $id, state, state
-      il.LoadArg(i + argOffset);                  // Push $arg := $args[i + argOffset]                          | Stack: $this, $id, state, state, $arg
-      il.Emit(OpCodes.Stfld, stateFields[i]);     // Assign the value of $arg to the i-th field of the state    | Stack: $this, $id, state
-    }                                             //                                                            |
-    il.LoadArg(stateFields.Count + argOffset);    // Push $ct                                                   | Stack: $this, $id, state, $ct
-    il.Emit(OpCodes.Call, createCoreAsyncMethod); // Call $result := CreateCoreAsync<TActorId>($id, state, $ct) | Stack: $result
-    il.Emit(OpCodes.Ret);                         // Return                                                     | Stack: $result
+    il.Emit(OpCodes.Ldarg_0);                  // Push $this                                                 | Stack: $this
+    LoadId(il, id, out int argOffset);         // Load $id                                                   | Stack: $this, $id
+    il.Emit(OpCodes.Newobj, stateConstructor); // new TState()                                               | Stack: $this, $id, state
+    for (int i = 0; i < stateFields.Count; i++)//                                                            |
+    {                                          //                                                            |
+      il.Emit(OpCodes.Dup);                    // Duplicate state                                            | Stack: $this, $id, state, state
+      il.LoadArg(i + argOffset);               // Push $arg := $args[i + argOffset]                          | Stack: $this, $id, state, state, $arg
+      il.Emit(OpCodes.Stfld, stateFields[i]);  // Assign the value of $arg to the i-th field of the state    | Stack: $this, $id, state
+    }                                          //                                                            |
+    il.LoadArg(stateFields.Count + argOffset); // Push $ct                                                   | Stack: $this, $id, state, $ct
+    il.Emit(OpCodes.Call, createAsyncMethod);  // Call $result := CreateCoreAsync<TActorId>($id, state, $ct) | Stack: $result
+    il.Emit(OpCodes.Ret);                      // Return                                                     | Stack: $result
 
     static void LoadId(IILGenerator il, IActorIdDescriptor id, out int argOffset)
     {

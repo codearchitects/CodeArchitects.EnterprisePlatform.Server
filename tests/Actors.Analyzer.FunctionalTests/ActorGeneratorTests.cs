@@ -1379,6 +1379,40 @@ public partial class ActorGeneratorTests
   }
 
   [Fact]
+  public void ShouldTriggerCAEPACTR306_WhenActorIdMemberIsOfWrongType()
+  {
+    // Arrange
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests
+      {
+        public interface IMyActor
+        {
+        }
+        
+        [Actor, ActorIdType<int>]
+        public class MyActor : IMyActor
+        {
+          [ActorId] private string _id;
+
+          public MyActor(string id)
+          {
+            _id = id;
+          }
+        }
+      }
+      """;
+
+    // Act
+    CompileWithGenerator(source, out _, out ImmutableArray<Diagnostic> diagnostics);
+
+    // Assert
+    diagnostics.Should().HaveCount(1)
+      .And.ContainSingle(MatchDiagnostic(DiagnosticIds.CAEPACTR306, 12, 30, "_id"));
+  }
+
+  [Fact]
   public void ShouldTriggerCAEPACTR306_WhenActorIdSourceIsOfWrongType()
   {
     // Arrange

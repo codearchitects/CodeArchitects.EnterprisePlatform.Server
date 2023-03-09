@@ -56,7 +56,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_3()
       .Stfld(stateFields[1])
       .Ldarg_S(4)
-      .Call(typeof(ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>), "CreateCoreAsync", new[] { typeof(string), typeof(StandardActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IStandardActorHost, string, IStandardActor, StandardActorState>), "CreateAsync", new[] { typeof(string), typeof(StandardActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
@@ -170,7 +170,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Stfld(stateFields[0])
       .Ldarg_2()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int), typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "CreateAsync", new[] { typeof(int), typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
@@ -236,7 +236,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Stfld(stateFields[0])
       .Ldarg_2()
-      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>), "CreateCoreAsync", new[] { typeof(int), typeof(PropertyIdSourceActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IPropertyIdSourceActorHost, int, IPropertyIdSourceActor, PropertyIdSourceActorState>), "CreateAsync", new[] { typeof(int), typeof(PropertyIdSourceActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _

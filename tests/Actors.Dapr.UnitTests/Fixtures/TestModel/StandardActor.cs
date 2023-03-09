@@ -126,7 +126,7 @@ internal class StandardActorProxyFactory : ProxyFactory<IStandardActorHost, stri
 
   public Task<IStandardActor> CreateAsync(string id, string state1, StandardActorStateComponent state2, CancellationToken cancellationToken = default)
   {
-    return CreateCoreAsync(id, new StandardActorState { _0 = state1, _1 = state2 }, cancellationToken);
+    return CreateAsync(id, new StandardActorState { _0 = state1, _1 = state2 }, cancellationToken);
   }
 
   public IStandardActor Get(string id)

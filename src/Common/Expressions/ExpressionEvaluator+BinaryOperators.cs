@@ -4,7 +4,7 @@ namespace CodeArchitects.Platform.Common.Expressions;
 
 internal partial class ExpressionEvaluator
 {
-  private object Add(object? left, object? right)
+  private static object Add(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -20,7 +20,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Subtract(object? left, object? right)
+  private static object Subtract(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -35,7 +35,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Multiply(object? left, object? right)
+  private static object Multiply(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -50,7 +50,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Divide(object? left, object? right)
+  private static object Divide(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -65,7 +65,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Modulo(object? left, object? right)
+  private static object Modulo(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -80,7 +80,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object LeftShift(object? left, object? right)
+  private static object LeftShift(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -92,7 +92,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object RightShift(object? left, object? right)
+  private static object RightShift(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -104,7 +104,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object And(object? left, object? right)
+  private static object And(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -117,7 +117,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Or(object? left, object? right)
+  private static object Or(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -130,7 +130,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object ExclusiveOr(object? left, object? right)
+  private static object ExclusiveOr(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -143,7 +143,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object AndAlso(object? left, object? right)
+  private static object AndAlso(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -152,7 +152,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object OrElse(object? left, object? right)
+  private static object OrElse(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -161,7 +161,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object Equal(object? left, object? right)
+  private static object Equal(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -176,7 +176,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object NotEqual(object? left, object? right)
+  private static object NotEqual(object? left, object? right)
   {
     return System.Convert.GetTypeCode(left) switch
     {
@@ -191,7 +191,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object LessThan(object? left, object? right)
+  private static object LessThan(object? left, object? right)
   {    
     return System.Convert.GetTypeCode(left) switch
     {
@@ -206,7 +206,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object LessThanOrEqual(object? left, object? right)
+  private static object LessThanOrEqual(object? left, object? right)
   {    
     return System.Convert.GetTypeCode(left) switch
     {
@@ -221,7 +221,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object GreaterThanOrEqual(object? left, object? right)
+  private static object GreaterThanOrEqual(object? left, object? right)
   {    
     return System.Convert.GetTypeCode(left) switch
     {
@@ -236,7 +236,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object GreaterThan(object? left, object? right)
+  private static object GreaterThan(object? left, object? right)
   {    
     return System.Convert.GetTypeCode(left) switch
     {
