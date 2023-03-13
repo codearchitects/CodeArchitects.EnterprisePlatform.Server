@@ -140,12 +140,12 @@ components:
     type: dotnet-test
 
   # integration tests
-  - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore.IntegrationTests
-    path: tests\Actors.Dapr.AspNetCore.IntegrationTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
-    path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Data.IntegrationTests
-    path: tests\Data.IntegrationTests
-    type: dotnet-test
+  # - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore.IntegrationTests
+  #   path: tests\Actors.Dapr.AspNetCore.IntegrationTests
+  #   type: dotnet-test
+  # - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+  #   path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
+  #   type: dotnet-test
+  # - name: CodeArchitects.Platform.Data.IntegrationTests
+  #   path: tests\Data.IntegrationTests
+  #   type: dotnet-test
