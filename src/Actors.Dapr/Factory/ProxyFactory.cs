@@ -1,5 +1,6 @@
 ﻿using Dapr.Actors;
 using Dapr.Actors.Client;
+using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Factory;
 
@@ -14,7 +15,7 @@ internal abstract class ProxyFactory<THostInterface, TActorId, TInterface, TStat
 
   protected abstract TInterface CreateProxy(THostInterface actorHost);
 
-  protected abstract Task InitAsync(THostInterface actorHost, TState state, CancellationToken cancellationToken);
+  protected abstract Task InitAsync(THostInterface actorHost, byte[] payload, CancellationToken cancellationToken);
 
   protected Task<TInterface> CreateAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
   {
@@ -36,7 +37,8 @@ internal abstract class ProxyFactory<THostInterface, TActorId, TInterface, TStat
   private async Task<TInterface> CreateCoreAsync(TActorId actorId, TState state, CancellationToken cancellationToken)
   {
     THostInterface host = CreateHost(actorId);
-    await InitAsync(host, state, cancellationToken);
+    byte[] payload = JsonSerializer.SerializeToUtf8Bytes(state);
+    await InitAsync(host, payload, cancellationToken);
     return CreateProxy(host);
   }
 }

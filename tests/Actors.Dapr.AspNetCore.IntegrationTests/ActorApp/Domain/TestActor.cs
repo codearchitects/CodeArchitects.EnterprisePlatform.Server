@@ -1,80 +1,19 @@
 ﻿using CodeArchitects.Platform.Actors;
-using CodeArchitects.Platform.Actors.Bindings;
-using CodeArchitects.Platform.Actors.Scheduling;
-using CodeArchitects.Platform.Messaging;
 
 namespace ActorApp.Domain;
 
-[Actor, Virtual]
-public abstract class TestActor : ITestActor, IMessageHandler<TestMessage>
+[Actor]
+public class TestActor : ITestActor
 {
-  protected readonly BindingId _binding;
+  [State] private readonly int _state;
 
-  [State] protected readonly TestActorState _state;
-  protected readonly IActorContext<TestActor> _context;
-  protected readonly ActorOutput _output;
-
-  public TestActor(TestActorState state, IActorContext<TestActor> context, ActorOutput output)
+  public TestActor(int state)
   {
     _state = state;
-    _context = context;
-    _output = output;
-
-    _binding = context.RegisterBinding(_ => _
-      .WithPostCondition(self => self._state.ExecuteBinding)
-      .IsEnabled()
-      .BindTo(self => self.ExecuteBinding("binding")));
   }
 
-  public abstract ValueTask<int> PolymorphicMethodAsync(CancellationToken cancellationToken = default);
-
-  public Task BecomeAsync(int implementation, CancellationToken cancellationToken = default)
+  public Task<int> GetStateAsync(CancellationToken cancellationToken = default)
   {
-    switch (implementation)
-    {
-      case 1:
-        _context.Become<TestActor1>();
-        return Task.CompletedTask;
-      case 2:
-        _context.Become<TestActor2>();
-        return Task.CompletedTask;
-      default:
-        throw new ArgumentOutOfRangeException(nameof(implementation));
-    }
-  }
-
-  public Task BindingEnablerAsync(CancellationToken cancellationToken = default)
-  {
-    _state.ExecuteBinding = true;
-    return Task.CompletedTask;
-  }
-
-  public Task BindingDisablerAsync(CancellationToken cancellationToken = default)
-  {
-    _context.DisableBinding(_binding);
-    _state.ExecuteBinding = true;
-    return Task.CompletedTask;
-  }
-
-  public async Task ScheduleAsync(string output, CancellationToken cancellationToken = default)
-  {
-    await _context.ScheduleAsync(self => self.Activity(output), SchedulingOptions.In(5.Seconds()), cancellationToken);
-  }
-
-  public Task HandleAsync(TestMessage message, CancellationToken cancellationToken)
-  {
-    _output.SetOutput(_state.Id, message.Output);
-    return Task.CompletedTask;
-  }
-
-  private void ExecuteBinding(string output)
-  {
-    _state.ExecuteBinding = false;
-    _output.SetOutput(_state.Id, output);
-  }
-
-  private void Activity(string output)
-  {
-    _output.SetOutput(_state.Id, output);
+    return Task.FromResult(_state);
   }
 }

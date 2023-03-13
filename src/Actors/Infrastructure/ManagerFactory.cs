@@ -35,6 +35,14 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
     return CreateCore(host, state, implementationId);
   }
 
+  public void InitializeState(TState state)
+  {
+    if (_descriptor.IsPolymorphic)
+    {
+      state.ImplementationId = _descriptor.DefaultImplementation.Id;
+    }
+  }
+
   private IActorManager<TActor, TState> CreateCore(IActorHost<TActor> host, TState state, int implementationId)
   {
     return new ActorContext<TActor, TState>(_services, _descriptor, _activityManager, host, state, implementationId);

@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddDaprInfrastructure(options => options.SetConfiguration(builder.Configuration))
   .AddActors(actors => actors
     .AccessPrivates()
+    .AddActor<VirtualActor>()
     .AddActor<TestActor>())
   .AddMessaging(messaging => messaging
     .Configure(config => config.DefaultBus = "messagebus")

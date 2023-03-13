@@ -21,7 +21,7 @@ internal interface IStandardActorHost : IActor
 
   Task<string> ValueTaskTMethod();
 
-  Task _InitAsync(StandardActorState state, CancellationToken cancellationToken);
+  Task _InitAsync(byte[] payload, CancellationToken cancellationToken);
 }
 
 internal interface IStandardActorMessageHandler : IActor
@@ -56,9 +56,9 @@ internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorSta
     return Actor.ValueTaskTMethod().AsTask();
   }
 
-  public Task _InitAsync(StandardActorState state, CancellationToken cancellationToken)
+  public Task _InitAsync(byte[] payload, CancellationToken cancellationToken)
   {
-    return InitAsync(state, cancellationToken);
+    return InitAsync(payload, cancellationToken);
   }
 
   public Task HandleAsync(ActorMessage message, CancellationToken cancellationToken)
@@ -139,9 +139,9 @@ internal class StandardActorProxyFactory : ProxyFactory<IStandardActorHost, stri
     return new StandardActorProxy(actorHost);
   }
 
-  protected override Task InitAsync(IStandardActorHost actorHost, StandardActorState state, CancellationToken cancellationToken)
+  protected override Task InitAsync(IStandardActorHost actorHost, byte[] payload, CancellationToken cancellationToken)
   {
-    return actorHost._InitAsync(state, cancellationToken);
+    return actorHost._InitAsync(payload, cancellationToken);
   }
 }
 

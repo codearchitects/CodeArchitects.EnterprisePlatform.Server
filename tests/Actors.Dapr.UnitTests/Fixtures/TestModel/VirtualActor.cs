@@ -50,7 +50,7 @@ internal class VirtualActorProxyFactory : ProxyFactory<IVirtualActorHost, string
     return new VirtualActorProxy(actorHost);
   }
 
-  protected override Task InitAsync(IVirtualActorHost actorHost, VirtualActorState state, CancellationToken cancellationToken)
+  protected override Task InitAsync(IVirtualActorHost actorHost, byte[] payload, CancellationToken cancellationToken)
   {
     throw new NotSupportedException();
   }

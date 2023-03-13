@@ -416,7 +416,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     }
     else
     {
-      Type[] createAsyncMethodTypes = (id.HasIdSource ? Type.EmptyTypes : new[] { typeof(string) })
+      Type[] createAsyncMethodTypes = (id.HasIdSource ? Type.EmptyTypes : new[] { id.Type })
         .Concat(StateComponents.Select(component => component.Type))
         .Concat(new[] { typeof(CancellationToken) })
         .ToArray();

@@ -10,6 +10,7 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
   public Tests()
   {
     _http = new();
+    _http.BaseAddress = new Uri("http://localhost:20100/");
   }
 
   [Theory]
@@ -21,7 +22,7 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     // Arrange
 
     // Act
-    PolymorphicResult? result = await _http.GetFromJsonAsync<PolymorphicResult>($"http://localhost:20100/actor/polymorphic-method?implementation={implementation}");
+    PolymorphicResult? result = await _http.GetFromJsonAsync<PolymorphicResult>($"/virtual-actor/polymorphic-method?implementation={implementation}");
 
     // Assert
     result!.Implementation.Should().Be(expectedImplementation);
@@ -34,9 +35,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     const string output = "scheduling works";
 
     // Act
-    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"http://localhost:20100/actor/schedule?output={output}");
+    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/virtual-actor/schedule?output={output}");
     await Task.Delay(6000);
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"http://localhost:20100/actor/{idResult!.Id}/output");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult!.Id}/output");
 
     // Assert
     result!.Output.Should().Be(output);
@@ -48,7 +49,7 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     // Arrange
 
     // Act
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"http://localhost:20100/actor/binding-enabler");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-enabler");
 
     // Assert
     result!.Output.Should().Be("binding");
@@ -60,7 +61,7 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     // Arrange
 
     // Act
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"http://localhost:20100/actor/binding-disabler");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-disabler");
 
     // Assert
     result!.Output.Should().Be("no binding");
@@ -73,12 +74,27 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     const string output = "messaging works";
 
     // Act
-    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"http://localhost:20100/actor/messaging?output={output}");
+    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/virtual-actor/messaging?output={output}");
     await Task.Delay(1000);
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"http://localhost:20100/actor/{idResult!.Id}/output");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult!.Id}/output");
 
     // Assert
     result!.Output.Should().Be(output);
+  }
+
+  [Fact]
+  public async Task CreateAsync_ShouldSetCorrectState()
+  {
+    // Arrange
+    const int state = 92;
+
+    // Act
+    IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/test-actor/create?state={state}");
+    await Task.Delay(1000);
+    StateResult? result = await _http.GetFromJsonAsync<StateResult>($"/test-actor/{idResult!.Id}/state");
+
+    // Assert
+    result!.State.Should().Be(state);
   }
 
   public void Dispose()
@@ -99,5 +115,10 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
   private class IdResult
   {
     public Guid Id { get; set; }
+  }
+
+  private class StateResult
+  {
+    public int State { get; set; }
   }
 }

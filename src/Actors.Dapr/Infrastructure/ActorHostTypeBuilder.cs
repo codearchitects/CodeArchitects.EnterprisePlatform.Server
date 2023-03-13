@@ -84,7 +84,7 @@ internal class ActorHostTypeBuilder
 
     if (!actor.IsVirtual)
     {
-      BuildInitAsyncMethod(interfaceType, hostType, actor.State.Type);
+      BuildInitAsyncMethod(interfaceType, hostType);
     }
 
     Type? handlerInterfaceType = actor.MessageHandlers.Count > 0
@@ -138,9 +138,9 @@ internal class ActorHostTypeBuilder
     il.Emit(OpCodes.Ret);                   // Return                               | Stack: -
   }
 
-  private void BuildInitAsyncMethod(TypeBuilder interfaceType, TypeBuilder classType, Type stateType)
+  private void BuildInitAsyncMethod(TypeBuilder interfaceType, TypeBuilder classType)
   {
-    Type[] parameterTypes = new[] { stateType, typeof(CancellationToken) };
+    Type[] parameterTypes = new[] { typeof(byte[]), typeof(CancellationToken) };
     MethodInfo coreMethod = classType.BaseType!.GetRequiredMethod(
       name: "InitAsync",
       bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,

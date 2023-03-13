@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Actors.Analyzer\CodeArchitects.Platform.Actors.Analyzer.csproj" ReferenceOutputAssembly="false" OutputItemType="analyzer" />
     <ProjectReference Include="..\..\..\src\Actors.Dapr.AspNetCore\CodeArchitects.Platform.Actors.Dapr.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj" />
   </ItemGroup>

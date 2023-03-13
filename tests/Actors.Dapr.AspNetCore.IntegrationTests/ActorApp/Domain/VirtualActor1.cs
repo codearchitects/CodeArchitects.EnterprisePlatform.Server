@@ -2,16 +2,16 @@
 
 namespace ActorApp.Domain;
 
-[ActorImplementation<TestActor>(IsDefault = true)]
-public class TestActor2 : TestActor
+[ActorImplementation<VirtualActor>]
+public class VirtualActor1 : VirtualActor
 {
-  public TestActor2(TestActorState state, IActorContext<TestActor> context, ActorOutput output)
+  public VirtualActor1(VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
     : base(state, context, output)
   {
   }
 
   public override ValueTask<int> PolymorphicMethodAsync(CancellationToken cancellationToken = default)
   {
-    return ValueTask.FromResult(2);
+    return ValueTask.FromResult(1);
   }
 }

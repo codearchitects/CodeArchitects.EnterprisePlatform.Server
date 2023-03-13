@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace ActorApp.Controllers;
 
 [ApiController]
-[Route("actor")]
-public class ActorController : ControllerBase
+[Route("virtual-actor")]
+public class VirtualActorController : ControllerBase
 {
-  private readonly ITestActorFactory _actorFactory;
+  private readonly IVirtualActorFactory _actorFactory;
   private readonly IMessageBus _bus;
   private readonly ActorOutput _output;
 
-  public ActorController(ITestActorFactory actorFactory, IMessageBus bus, ActorOutput output)
+  public VirtualActorController(IVirtualActorFactory actorFactory, IMessageBus bus, ActorOutput output)
   {
     _actorFactory = actorFactory;
     _bus = bus;
@@ -32,7 +32,7 @@ public class ActorController : ControllerBase
   public async Task<ActionResult> PolymorphicMethod(int implementation)
   {
     Guid id = Guid.NewGuid();
-    ITestActor actor = _actorFactory.Get(id);
+    IVirtualActor actor = _actorFactory.Get(id);
 
     if (implementation != 0)
     {
@@ -50,7 +50,7 @@ public class ActorController : ControllerBase
   public async Task<ActionResult> Schedule(string output)
   {
     Guid id = Guid.NewGuid();
-    ITestActor actor = _actorFactory.Get(id);
+    IVirtualActor actor = _actorFactory.Get(id);
 
     await actor.ScheduleAsync(output);
 
@@ -64,7 +64,7 @@ public class ActorController : ControllerBase
   public async Task<ActionResult> BindingEnabler()
   {
     Guid id = Guid.NewGuid();
-    ITestActor actor = _actorFactory.Get(id);
+    IVirtualActor actor = _actorFactory.Get(id);
 
     await actor.BindingEnablerAsync();
 
@@ -78,7 +78,7 @@ public class ActorController : ControllerBase
   public async Task<ActionResult> BindingDisabler()
   {
     Guid id = Guid.NewGuid();
-    ITestActor actor = _actorFactory.Get(id);
+    IVirtualActor actor = _actorFactory.Get(id);
 
     await actor.BindingDisablerAsync();
 

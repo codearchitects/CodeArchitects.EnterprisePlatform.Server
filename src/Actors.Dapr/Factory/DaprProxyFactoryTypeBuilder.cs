@@ -89,12 +89,10 @@ internal class DaprProxyFactoryTypeBuilder : ProxyFactoryTypeBuilder
 
   private void BuildInitAsyncMethod(TypeBuilder type, IActorDescriptor actor, Type hostInterfaceType)
   {
-    Type stateType = actor.State.Type;
-
     MethodInfo declaration = type.BaseType!.GetRequiredMethod(
       name: "InitAsync",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance,
-      types: new[] { hostInterfaceType.UnderlyingSystemType, stateType.UnderlyingSystemType, typeof(CancellationToken) });
+      types: new[] { hostInterfaceType.UnderlyingSystemType, typeof(byte[]), typeof(CancellationToken) });
 
     MethodBuilder method = type.DefineMethodOverrideFromDeclaration(declaration, MethodAttributes.Family | MethodAttributes.Virtual | MethodAttributes.Final);
     IILGenerator il = _ilProvider.GetILGenerator(method);
@@ -113,7 +111,7 @@ internal class DaprProxyFactoryTypeBuilder : ProxyFactoryTypeBuilder
       MethodInfo initAsyncMethod = hostInterfaceType.GetRequiredMethod(
         name: Constants.InitAsyncMethodName,
         bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-        types: new[] { stateType.UnderlyingSystemType, typeof(CancellationToken) });
+        types: new[] { typeof(byte[]), typeof(CancellationToken) });
 
       il.Emit(OpCodes.Ldarg_1);                   // Push $actorHost                                   | Stack: $actorHost
       il.Emit(OpCodes.Ldarg_2);                   // Push $state                                       | Stack: $actorHost, $state

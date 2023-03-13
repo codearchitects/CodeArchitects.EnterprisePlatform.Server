@@ -84,7 +84,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Ldarg_2()
       .Ldarg_3()
-      .Callvirt(typeof(IStandardActorHost), "_InitAsync", new[] { typeof(StandardActorState), typeof(CancellationToken) })
+      .Callvirt(typeof(IStandardActorHost), "_InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
       .Ret());
   }
 
@@ -198,7 +198,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Ldarg_2()
       .Ldarg_3()
-      .Callvirt(typeof(IComponentIdSourceActorHost), "_InitAsync", new[] { typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
+      .Callvirt(typeof(IComponentIdSourceActorHost), "_InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
       .Ret());
   }
 
@@ -264,7 +264,7 @@ public class DaprProxyFactoryTypeBuilderTests
       .Ldarg_1()
       .Ldarg_2()
       .Ldarg_3()
-      .Callvirt(typeof(IPropertyIdSourceActorHost), "_InitAsync", new[] { typeof(PropertyIdSourceActorState), typeof(CancellationToken) })
+      .Callvirt(typeof(IPropertyIdSourceActorHost), "_InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
       .Ret());
   }
 }

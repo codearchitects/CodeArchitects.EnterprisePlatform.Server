@@ -11,7 +11,7 @@ namespace CodeArchitects.Platform.Actors.Dapr.Fixtures.TestModel;
 
 internal interface IComponentIdSourceActorHost : IActor
 {
-  Task _InitAsync(ComponentIdSourceActorState state, CancellationToken cancellationToken);
+  Task _InitAsync(byte[] payload, CancellationToken cancellationToken);
 }
 
 internal class ComponentIdSourceActorHost : DaprActorHost<ComponentIdSourceActor, ComponentIdSourceActorState>, IComponentIdSourceActorHost
@@ -21,9 +21,9 @@ internal class ComponentIdSourceActorHost : DaprActorHost<ComponentIdSourceActor
   {
   }
 
-  public Task _InitAsync(ComponentIdSourceActorState state, CancellationToken cancellationToken)
+  public Task _InitAsync(byte[] payload, CancellationToken cancellationToken)
   {
-    return InitAsync(state, cancellationToken);
+    return InitAsync(payload, cancellationToken);
   }
 }
 
@@ -61,9 +61,9 @@ internal class ComponentIdSourceActorProxyFactory : ProxyFactory<IComponentIdSou
     return new ComponentIdSourceActorProxy(actorHost);
   }
 
-  protected override Task InitAsync(IComponentIdSourceActorHost actorHost, ComponentIdSourceActorState state, CancellationToken cancellationToken)
+  protected override Task InitAsync(IComponentIdSourceActorHost actorHost, byte[] payload, CancellationToken cancellationToken)
   {
-    return actorHost._InitAsync(state, cancellationToken);
+    return actorHost._InitAsync(payload, cancellationToken);
   }
 }
 

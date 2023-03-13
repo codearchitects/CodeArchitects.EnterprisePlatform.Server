@@ -6,4 +6,5 @@ internal interface IManagerFactory<TActor, TState>
 {
   IActorManager<TActor, TState> Create(IActorHost<TActor> host, TState? state);
   IActorManager<TActor, TState> Create(IActorHost<TActor> host, TState? state, int implementationId);
+  void InitializeState(TState state); // TODO: This does not seem to belong here
 }

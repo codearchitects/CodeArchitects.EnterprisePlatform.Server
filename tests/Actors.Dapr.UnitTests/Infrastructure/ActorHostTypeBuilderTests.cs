@@ -56,7 +56,7 @@ public class ActorHostTypeBuilderTests
     interfaceType.Should().HaveMethod($"{nameof(IStandardActor.TaskMethod)}-2", new[] { typeof(int), typeof(CancellationToken) }).Which.Should().Return<Task<int>>();
     interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskMethod), new[] { typeof(CancellationToken) }).Which.Should().Return<Task>();
     interfaceType.Should().HaveMethod(nameof(IStandardActor.ValueTaskTMethod), Type.EmptyTypes).Which.Should().Return<Task<string>>();
-    interfaceType.Should().HaveMethod(Constants.InitAsyncMethodName, new[] { typeof(StandardActorState), typeof(CancellationToken) }).Which.Should().Return<Task>();
+    interfaceType.Should().HaveMethod(Constants.InitAsyncMethodName, new[] { typeof(byte[]), typeof(CancellationToken) }).Which.Should().Return<Task>();
     interfaceType.IsPublic.Should().BeTrue();
 
     handlerInterfaceType.Should().NotBeNull();
@@ -128,7 +128,7 @@ public class ActorHostTypeBuilderTests
       .Ldarg_0()
       .Ldarg_1()
       .Ldarg_2()
-      .Call(baseType, "InitAsync", new[] { typeof(StandardActorState), typeof(CancellationToken) })
+      .Call(baseType, "InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
       .Ret());
   }
 

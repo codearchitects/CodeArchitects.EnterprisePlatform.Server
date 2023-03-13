@@ -33,7 +33,7 @@ public static class DaprActorsOptionsBuilderExtensions
   /// </summary>
   /// <typeparam name="TMarker">A type contained within assembly to scan.</typeparam>
   /// <returns>The same builder.</returns>
-  public static IDaprActorsOptionsBuilder ScanAssembly<TMarker>(this IDaprActorsOptionsBuilder builder)
+  public static IDaprActorsOptionsBuilder ScanAssemblyOfType<TMarker>(this IDaprActorsOptionsBuilder builder)
   {
     return builder.ScanAssembly(typeof(TMarker).Assembly);
   }

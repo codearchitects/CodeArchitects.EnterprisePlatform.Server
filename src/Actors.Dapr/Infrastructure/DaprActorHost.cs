@@ -37,14 +37,18 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemin
 
   protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
   {
+    if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
+      return;
+
     await Manager.ExecuteBindingsAsync(CancellationToken.None);
     Manager.OnExecutionEnd();
     await StateManager.SetStateAsync(Constants.ActorStateName, Manager.State, CancellationToken.None);
   }
 
-  protected Task InitAsync(TState state, CancellationToken cancellationToken)
+  protected Task InitAsync(byte[] payload, CancellationToken cancellationToken)
   {
-    state.ImplementationId = Manager.DefaultImplementationId;
+    TState state = JsonSerializer.Deserialize<TState>(payload)!;
+    _factory.InitializeState(state);
     return StateManager.AddStateAsync(Constants.ActorStateName, state, cancellationToken);
   }
 
