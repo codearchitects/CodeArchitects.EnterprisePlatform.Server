@@ -14,8 +14,14 @@ public class TestFixture : IAsyncLifetime
 
     try
     {
-      await Cli.Wrap("docker")
-        .WithArguments("compose up --detach")
+      await Cli.Wrap("docker-compose")
+        .WithArguments("build --no-cache")
+        .WithWorkingDirectory(s_dockerComposePath)
+        .WithStandardErrorPipe(PipeTarget.ToStringBuilder(errorSb))
+        .ExecuteAsync();
+
+      await Cli.Wrap("docker-compose")
+        .WithArguments("up -d")
         .WithWorkingDirectory(s_dockerComposePath)
         .WithStandardErrorPipe(PipeTarget.ToStringBuilder(errorSb))
         .ExecuteAsync();
