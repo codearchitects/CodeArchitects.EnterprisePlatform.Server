@@ -54,7 +54,10 @@ internal class ManagerFactory<TActor, TState> : IManagerFactory<TActor, TState>
       throw new UninitializedActorException(typeof(TActor));
 
     TState defaultValue = _descriptor.State.DefaultValue!;
-    defaultValue.ImplementationId = _descriptor.DefaultImplementation.Id;
+    if (_descriptor.IsPolymorphic)
+    {
+      defaultValue.ImplementationId = _descriptor.DefaultImplementation.Id;
+    }
     _descriptor.Id.SetId(defaultValue, id);
 
     return defaultValue;
