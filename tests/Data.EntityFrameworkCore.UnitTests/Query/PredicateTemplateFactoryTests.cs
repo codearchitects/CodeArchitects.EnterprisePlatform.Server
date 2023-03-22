@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Fixtures;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
@@ -16,7 +15,7 @@ public class PredicateTemplateFactoryTests
     Expression<Func<EntityWithSimplePropertyKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimplePropertyKey, int>();
 
     // Assert
-    template.Should().BeEquivalentTo(FindPredicateTemplates.SimplePropertyKeyTemplate, options => options.Using(ExpressionEqualityComparer.Instance));
+    template.Should().BeEquivalentTo(FindPredicateTemplates.SimplePropertyKeyTemplate);
   }
 
   [Fact]
@@ -29,7 +28,7 @@ public class PredicateTemplateFactoryTests
     Expression<Func<EntityWithSimpleFieldKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimpleFieldKey, int>();
 
     // Assert
-    template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleFieldKeyTemplate, options => options.Using(ExpressionEqualityComparer.Instance));
+    template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleFieldKeyTemplate);
   }
 
   [Fact]
@@ -42,7 +41,7 @@ public class PredicateTemplateFactoryTests
     Expression<Func<EntityWithSimpleShadowKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimpleShadowKey, int>();
 
     // Assert
-    template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleShadowKeyTemplate, options => options.Using(ExpressionEqualityComparer.Instance));
+    template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleShadowKeyTemplate);
   }
 
   [Fact]
@@ -55,6 +54,6 @@ public class PredicateTemplateFactoryTests
     Expression<Func<EntityWithCompositeKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithCompositeKey, (int, string)>();
 
     // Assert
-    template.Should().BeEquivalentTo(FindPredicateTemplates.CompositeKeyTemplate, options => options.Using(ExpressionEqualityComparer.Instance));
+    template.Should().BeEquivalentTo(FindPredicateTemplates.CompositeKeyTemplate);
   }
 }
