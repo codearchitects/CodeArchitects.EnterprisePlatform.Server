@@ -35,7 +35,7 @@ public static class MaterializationAnnotationExtensions
     if (factory is null)
       throw new ArgumentException(nameof(factory));
 
-    if (EFCoreEnvironment.IsMigration)
+    if (EFCoreEnvironment.IsDesignTime)
       return builder;
 
     builder.HasAnnotation(MaterializationAnnotationNames.DefaultFactory, factory);

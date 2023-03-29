@@ -33,7 +33,7 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
-    if (EFCoreEnvironment.IsMigration)
+    if (EFCoreEnvironment.IsDesignTime)
       return builder;
 
     builder.Metadata.DependentToPrincipal?.IsIntraAggregate();
@@ -56,7 +56,7 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
-    if (EFCoreEnvironment.IsMigration)
+    if (EFCoreEnvironment.IsDesignTime)
       return builder;
 
     builder.Metadata.DependentToPrincipal?.IsInterAggregate();
@@ -79,7 +79,7 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
-    if (EFCoreEnvironment.IsMigration)
+    if (EFCoreEnvironment.IsDesignTime)
       return builder;
 
     builder.Metadata.DependentToPrincipal?.IsIntraAggregate();
@@ -102,7 +102,7 @@ public static class AssociationsAnnotationExtensions
     if (builder is null)
       throw new ArgumentException(nameof(builder));
 
-    if (EFCoreEnvironment.IsMigration)
+    if (EFCoreEnvironment.IsDesignTime)
       return builder;
 
     builder.Metadata.DependentToPrincipal?.IsInterAggregate();
