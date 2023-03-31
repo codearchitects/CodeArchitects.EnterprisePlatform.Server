@@ -19,7 +19,7 @@ public class DataContext : DbContext
       entity
         .HasMany(e => e.Orders)
         .WithOne()
-        .IntraAggregate();
+        .Aggregate();
     });
 
     modelBuilder.Entity<Order>(entity =>
