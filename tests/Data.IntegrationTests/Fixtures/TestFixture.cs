@@ -111,6 +111,8 @@ public class TestFixture : IAsyncLifetime
 
   async Task IAsyncLifetime.InitializeAsync()
   {
+    Environment.SetEnvironmentVariable("EFCORE_ISRUNTIME", "true");
+
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     {
       DockerClient dockerClient = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
@@ -131,6 +133,8 @@ public class TestFixture : IAsyncLifetime
 
   async Task IAsyncLifetime.DisposeAsync()
   {
+    Environment.SetEnvironmentVariable("EFCORE_ISRUNTIME", null);
+
     _sqlServerConnectionLazy.Value.Dispose();
     _postgresConnectionLazy.Value.Dispose();
     _oracleConnectionLazy.Value.Dispose();
