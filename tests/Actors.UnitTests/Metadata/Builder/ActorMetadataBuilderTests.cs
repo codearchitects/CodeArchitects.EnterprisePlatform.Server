@@ -133,23 +133,4 @@ public class ActorMetadataBuilderTests
     // Assert
     ComponentIdSourceActorFixture.AssertValidDescriptor(descriptor);
   }
-
-  [Fact]
-  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForPropertyIdSourceActor()
-  {
-    // Arrange
-    PropertyIdSourceActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
-
-    ActorMetadataBuilder<PropertyIdSourceActor> sut = new(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object);
-
-    sut.AsBuilder()
-      .HasFactoryType<IPropertyIdSourceActorFactory>()
-      .HasState("_state");
-
-    // Act
-    IActorDescriptor descriptor = sut.CreateDescriptor();
-
-    // Assert
-    PropertyIdSourceActorFixture.AssertValidDescriptor(descriptor);
-  }
 }

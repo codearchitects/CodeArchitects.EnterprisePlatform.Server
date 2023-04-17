@@ -10,12 +10,14 @@ public abstract class VirtualActor : IVirtualActor, IMessageHandler<TestMessage>
 {
   protected readonly BindingId _binding;
 
+  [ActorId] protected readonly Guid _id;
   [State] protected readonly VirtualActorState _state;
   protected readonly IActorContext<VirtualActor> _context;
   protected readonly ActorOutput _output;
 
-  public VirtualActor(VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
+  public VirtualActor(Guid id, VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
   {
+    _id = id;
     _state = state;
     _context = context;
     _output = output;
@@ -63,18 +65,18 @@ public abstract class VirtualActor : IVirtualActor, IMessageHandler<TestMessage>
 
   public Task HandleAsync(TestMessage message, CancellationToken cancellationToken)
   {
-    _output.SetOutput(_state.Id, message.Output);
+    _output.SetOutput(_id, message.Output);
     return Task.CompletedTask;
   }
 
   private void ExecuteBinding(string output)
   {
     _state.ExecuteBinding = false;
-    _output.SetOutput(_state.Id, output);
+    _output.SetOutput(_id, output);
   }
 
   private void Activity(string output)
   {
-    _output.SetOutput(_state.Id, output);
+    _output.SetOutput(_id, output);
   }
 }

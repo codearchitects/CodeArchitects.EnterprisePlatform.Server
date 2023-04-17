@@ -5,44 +5,30 @@
 /// </summary>
 public readonly struct ScheduleId : IEquatable<ScheduleId>
 {
-  private ScheduleId(string id)
-  {
-    Id = id;
-  }
+  private ScheduleId(string id) => Id = id;
 
   internal string Id { get; }
 
   /// <inheritdoc/>
-  public bool Equals(ScheduleId other)
-  {
-    return other.Id == Id;
-  }
+  public bool Equals(ScheduleId other) => other.Id == Id;
 
   /// <inheritdoc/>
-  public override bool Equals(object obj)
-  {
-    return obj is ScheduleId other && Equals(other);
-  }
+  public override bool Equals(object obj) => obj is ScheduleId other && Equals(other);
 
   /// <inheritdoc/>
-  public override int GetHashCode()
-  {
-    return Id is not null
-      ? Id.GetHashCode()
-      : typeof(ScheduleId).GetHashCode();
-  }
+  public override int GetHashCode() => Id is not null
+    ? Id.GetHashCode()
+    : typeof(ScheduleId).GetHashCode();
 
   /// <inheritdoc/>
-  public override string ToString()
-  {
-    return Id;
-  }
+  public override string ToString() => Id;
 
+  // TODO: Needs a consistent random before making it public
   /// <summary>
   /// Creates a new random <see cref="ScheduleId"/>.
   /// </summary>
   /// <returns>A new instance of <see cref="ScheduleId"/>.</returns>
-  public static ScheduleId New() => new(Guid.NewGuid().ToString());
+  internal static ScheduleId New() => new(Guid.NewGuid().ToString());
 
   /// <summary>
   /// Creates a <see cref="ScheduleId"/> from the specified string.

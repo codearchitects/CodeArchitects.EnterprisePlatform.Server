@@ -1,6 +1,6 @@
 ﻿using CodeArchitects.Platform.Actors.Analyzer.Utils;
 
-namespace CodeArchitects.Platform.Actors.Analyzer.Descriptors;
+namespace CodeArchitects.Platform.Actors.Analyzer.Generator;
 
 internal record ActorDescriptor(
   string Namespace,

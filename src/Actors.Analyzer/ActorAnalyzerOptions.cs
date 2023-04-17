@@ -3,7 +3,8 @@
 [Flags]
 internal enum ActorAnalyzerOptions
 {
-  None = 0,
-  DisableDiagnostics = 1,
-  DisableFactoryGeneration = 2
+  DisableActorDiagnostics = 1 << 0,
+  DisableActorFactoryGeneration = 1 << 1,
+
+  DisableAll = DisableActorDiagnostics | DisableActorFactoryGeneration
 }

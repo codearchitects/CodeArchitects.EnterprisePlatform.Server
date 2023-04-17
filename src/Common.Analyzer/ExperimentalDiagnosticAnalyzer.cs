@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace CodeArchitects.Platform.Common.Analyzer;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ExperimentalAnalyzer : DiagnosticAnalyzer
+public class ExperimentalDiagnosticAnalyzer : DiagnosticAnalyzer
 {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
     DiagnosticDescriptors.CAEP000);
@@ -17,8 +17,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
   public override void Initialize(AnalysisContext context)
   {
+    context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
     context.EnableConcurrentExecution();
-    context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
 
     context.RegisterSyntaxNodeAction(AnalyzeIdentifierNameNode, SyntaxKind.IdentifierName);
     context.RegisterSyntaxNodeAction(AnalyzeGenericNameNode, SyntaxKind.GenericName);
@@ -27,6 +27,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
   private void AnalyzeIdentifierNameNode(SyntaxNodeAnalysisContext context)
   {
+    context.CancellationToken.ThrowIfCancellationRequested();
+
     if (context.Node is not IdentifierNameSyntax node)
     {
       Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(IdentifierNameSyntax)} but got {context.Node.GetType().Name} instead.");
@@ -48,6 +50,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
   private void AnalyzeGenericNameNode(SyntaxNodeAnalysisContext context)
   {
+    context.CancellationToken.ThrowIfCancellationRequested();
+
     if (context.Node is not GenericNameSyntax node)
     {
       Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(GenericNameSyntax)} but got {context.Node.GetType().Name} instead.");
@@ -69,6 +73,8 @@ public class ExperimentalAnalyzer : DiagnosticAnalyzer
 
   private void AnalyzeObjectCreationNode(SyntaxNodeAnalysisContext context)
   {
+    context.CancellationToken.ThrowIfCancellationRequested();
+
     if (context.Node is not ObjectCreationExpressionSyntax node)
     {
       Debug.Fail($"Invalid syntax kind registered for this action. Expected {nameof(ObjectCreationExpressionSyntax)} but got {context.Node.GetType().Name} instead.");

@@ -5,8 +5,8 @@ namespace ActorApp.Domain;
 [ActorImplementation<VirtualActor>]
 public class VirtualActor1 : VirtualActor
 {
-  public VirtualActor1(VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
-    : base(state, context, output)
+  public VirtualActor1(Guid id, VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
+    : base(id, state, context, output)
   {
   }
 

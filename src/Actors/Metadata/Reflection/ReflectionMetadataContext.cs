@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Actors.Scheduling;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Reflection;
 
@@ -16,6 +17,12 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     _factoryTypes = new();
     _implementationTypes = new();
     _scannedAssemblies = new();
+  }
+
+  internal override IActorModel CreateModel(ModuleBuilder module)
+  {
+    Validate();
+    return base.CreateModel(module);
   }
 
   public Type? GetFactoryType(Type actorType)
@@ -123,6 +130,21 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
     }
   }
 
+  private void Validate()
+  {
+    foreach (Type targetType in _factoryTypes.Keys)
+    {
+      if (!_factories.ContainsKey(targetType))
+        throw InvalidActorException.TargetIsNotAnActor(_factoryTypes[targetType], targetType);
+    }
+
+    foreach (Type targetType in _implementationTypes.Keys)
+    {
+      if (!_factories.ContainsKey(targetType))
+        throw InvalidActorException.TargetIsNotAnActor(_implementationTypes[targetType].First(), targetType);
+    }
+  }
+
   private static bool IsActor(Type type, [NotNullWhen(true)] out IActorAttribute? actorAttribute)
   {
     actorAttribute = null;
@@ -132,7 +154,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       if (typeof(IActorAttribute).IsInstanceOfType(attribute))
       {
         if (actorAttribute is not null)
-          throw InvalidActorException.DuplicateActorAttribute(type);
+          throw InvalidActorException.DuplicateAttribute(type, "Actor");
 
         actorAttribute = (IActorAttribute)attribute;
       }
@@ -150,7 +172,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       if (typeof(IActorFactoryAttribute).IsInstanceOfType(attribute))
       {
         if (actorFactoryAttribute is not null)
-          throw InvalidActorException.DuplicateActorFactoryAttribute(actorFactoryAttribute.ActorType, type);
+          throw InvalidActorException.DuplicateAttribute(type, "ActorFactory");
 
         actorFactoryAttribute = (IActorFactoryAttribute)attribute;
       }
@@ -168,7 +190,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
       {
         if (actorImplementationAttribute is not null)
-          throw InvalidActorException.DuplicateImplementationAttribute(type);
+          throw InvalidActorException.DuplicateAttribute(type, "ActorImplementation");
 
         actorImplementationAttribute = (IActorImplementationAttribute)attribute;
       }
@@ -186,7 +208,7 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
       if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
       {
         if (idTypeAttribute is not null)
-          throw InvalidActorException.DuplicateActorIdTypeAttribute(actorType);
+          throw InvalidActorException.DuplicateAttribute(actorType, "ActorIdType");
 
         idTypeAttribute = (IActorIdTypeAttribute)attribute;
       }

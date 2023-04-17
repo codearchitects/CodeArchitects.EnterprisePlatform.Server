@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.Actors.Analyzer.Descriptors;
+﻿namespace CodeArchitects.Platform.Actors.Analyzer.Generator;
 
 internal record StateDependencyDescriptor(
   string TypeFullName,

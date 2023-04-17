@@ -5,40 +5,226 @@ namespace CodeArchitects.Platform.Actors.Analyzer.Utils;
 
 internal static class SymbolExtensions
 {
-  public static bool IsDisableActorDiagnosticAttribute(this AttributeData attribute)
+  public static bool IsAccessible(this ITypeSymbol type, SemanticModel semanticModel, int position)
   {
-    INamedTypeSymbol? attributeType = attribute.AttributeClass;
-    if (attributeType is null)
-      return false;
-
-    if (attributeType.Name != "DisableActorDiagnosticsAttribute")
-      return false;
-
-    return IsCodeArchitectsPlatformActorsCodeAnalysisNamespace(attributeType.ContainingNamespace);
+    return
+      (type.SpecialType is >= SpecialType.System_Boolean and <= SpecialType.System_String) ||
+      semanticModel.LookupNamespacesAndTypes(position).Contains(type);
   }
 
-  public static bool IsDisableActorFactoryGenerationAttribute(this AttributeData attribute)
+  public static INamespaceSymbol GetBaseNamespace(this ITypeSymbol type)
   {
-    INamedTypeSymbol? attributeType = attribute.AttributeClass;
-    if (attributeType is null)
-      return false;
+    INamespaceSymbol @namespace = type.ContainingNamespace;
 
-    if (attributeType.Name != "DisableActorFactoryGenerationAttribute")
-      return false;
+    if (@namespace.IsGlobalNamespace)
+      return @namespace;
 
-    return IsCodeArchitectsPlatformActorsCodeAnalysisNamespace(attributeType.ContainingNamespace);
+    while (!@namespace.ContainingNamespace.IsGlobalNamespace)
+    {
+      @namespace = @namespace.ContainingNamespace;
+    }
+
+    return @namespace;
   }
 
-  public static bool IsVirtualAttribute(this AttributeData attribute)
+  public static bool TryGetAttributeTargetType(AttributeData? nonGenericAttribute, AttributeData? genericAttribute, [NotNullWhen(true)] out ITypeSymbol? type)
   {
-    INamedTypeSymbol? attributeType = attribute.AttributeClass;
-    if (attributeType is null)
+    if (!TryGetAttributeTargetTypeCore(nonGenericAttribute, genericAttribute, out type))
       return false;
 
-    if (attributeType.Name != "VirtualAttribute")
+    return type.IsNonErrorOrWrongArityErrorType(out type);
+  }
+
+  public static bool TryGetAttributeTargetType(this AttributeData attribute, [NotNullWhen(true)] out ITypeSymbol? type)
+  {
+    if (!TryGetAttributeTargetTypeCore(attribute, out type))
       return false;
 
-    return IsCodeArchitectsPlatformActorsNamespace(attributeType.ContainingNamespace);
+    return type.IsNonErrorOrWrongArityErrorType(out type);
+  }
+
+  private static bool TryGetAttributeTargetTypeCore(AttributeData? nonGenericAttribute, AttributeData? genericAttribute, [NotNullWhen(true)] out ITypeSymbol? type)
+  {
+    type = null;
+
+    if (genericAttribute is null)
+    {
+      if (nonGenericAttribute is null)
+        return false;
+
+      return TryGetNonGenericAttributeTargetType(nonGenericAttribute, out type);
+    }
+
+    if (genericAttribute.AttributeClass is not INamedTypeSymbol attributeClass)
+      return false;
+
+    return TryGetGenericAttributeTargetType(attributeClass, out type);
+  }
+
+  private static bool TryGetAttributeTargetTypeCore(this AttributeData attribute, [NotNullWhen(true)] out ITypeSymbol? type)
+  {
+    type = null;
+
+    if (attribute.AttributeClass is not INamedTypeSymbol attributeClass)
+      return false;
+
+    if (attributeClass.IsGenericType)
+      return TryGetGenericAttributeTargetType(attributeClass, out type);
+
+    return TryGetNonGenericAttributeTargetType(attribute, out type);
+  }
+
+  public static bool IsNonErrorOrWrongArityErrorType(this ITypeSymbol type, [NotNullWhen(true)] out ITypeSymbol? nonErrorType)
+  {
+    if (type is not IErrorTypeSymbol errorType)
+    {
+      nonErrorType = type;
+      return true;
+    }
+
+    if (errorType.CandidateReason is CandidateReason.WrongArity && errorType.CandidateSymbols is [ITypeSymbol candidateType])
+    {
+      nonErrorType = candidateType;
+      return true;
+    }
+
+    nonErrorType = null;
+    return false;
+  }
+
+  public static bool TryGetNonGenericAttributeTargetType(AttributeData attribute, [NotNullWhen(true)] out ITypeSymbol? type)
+  {
+    type = null;
+
+    if (attribute.ConstructorArguments.Length == 0)
+      return false;
+
+    if (attribute.ConstructorArguments[0].Value is not ITypeSymbol argumentValue)
+      return false;
+
+    type = argumentValue;
+    return true;
+  }
+
+  public static bool TryGetGenericAttributeTargetType(INamedTypeSymbol attributeClass, [NotNullWhen(true)] out ITypeSymbol? type)
+  {
+    type = null;
+
+    if (attributeClass.TypeArguments.Length == 0)
+      return false;
+
+    if (attributeClass.TypeArguments[0] is not ITypeSymbol typeArgument)
+      return false;
+
+    type = typeArgument;
+    return true;
+  }
+
+  public static bool TryGetInterfaceType(AttributeData? actorAttribute, AttributeData? genericActorAttribute, out ITypeSymbol? interfaceType)
+  {
+    interfaceType = null;
+
+    if (genericActorAttribute is null || genericActorAttribute.AttributeClass is not INamedTypeSymbol attributeClass)
+    {
+      if (actorAttribute is null)
+        return false;
+
+      foreach (KeyValuePair<string, TypedConstant> namedArgument in actorAttribute.NamedArguments)
+      {
+        if (namedArgument.Key is "InterfaceType")
+        {
+          if (namedArgument.Value.Value is not ITypeSymbol argumentValue)
+            return false;
+
+          interfaceType = argumentValue;
+          return true;
+        }
+      }
+
+      return true;
+    }
+
+    if (attributeClass.TypeArguments.Length == 0)
+      return false;
+
+    interfaceType = attributeClass.TypeArguments[0];
+    return true;
+  }
+
+  public static ISymbol? GetActorMember(this IFieldSymbol field)
+  {
+    if (field.AssociatedSymbol is not ISymbol associatedSymbol)
+      return field;
+
+    return associatedSymbol.Kind is not SymbolKind.Property
+      ? null
+      : associatedSymbol;
+  }
+
+  public static (AttributeData? StateAttribute, AttributeData? ActorIdAttribute) GetMemberAttributes(this ISymbol member)
+  {
+    AttributeData? stateAttribute = null;
+    AttributeData? actorIdAttribute = null;
+    foreach (AttributeData attribute in member.GetAttributes())
+    {
+      if (attribute.AttributeClass is not INamedTypeSymbol attributeType)
+        continue;
+
+      if (!attributeType.ContainingNamespace.IsCodeArchitectsPlatformActorsNamespace())
+        continue;
+
+      switch (attributeType.Name)
+      {
+        case "StateAttribute":
+          stateAttribute = attribute;
+          break;
+        case "ActorIdAttribute":
+          actorIdAttribute = attribute;
+          break;
+      }
+    }
+
+    return (stateAttribute, actorIdAttribute);
+  }
+
+  public static bool HasParameterlessConstructor(this ITypeSymbol type)
+  {
+    if (type is not INamedTypeSymbol namedType)
+      return false;
+
+    foreach (IMethodSymbol constructor in namedType.InstanceConstructors)
+    {
+      if (constructor.Parameters.Length == 0)
+        return true;
+    }
+
+    return false;
+  }
+
+  public static bool HasDefaultValue(this AttributeData stateAttribute, [NotNullWhen(true)] out TypedConstant defaultValue)
+  {
+    foreach (KeyValuePair<string, TypedConstant> namedArgument in stateAttribute.NamedArguments)
+    {
+      if (namedArgument.Key is "Default")
+      {
+        defaultValue = namedArgument.Value;
+        return true;
+      }
+    }
+
+    defaultValue = default;
+    return false;
+  }
+
+  public static bool HasActorConstructorAttribute(this IMethodSymbol constructor)
+  {
+    foreach (AttributeData attribute in constructor.GetAttributes())
+    {
+      if (attribute.IsActorConstructorAttribute())
+        return true;
+    }
+
+    return false;
   }
 
   public static bool IsActorConstructorAttribute(this AttributeData attribute)
@@ -51,36 +237,6 @@ internal static class SymbolExtensions
       return false;
 
     return IsCodeArchitectsPlatformActorsNamespace(attributeType.ContainingNamespace);
-  }
-
-  public static bool IsActorIdSourceType(this ITypeSymbol type, [NotNullWhen(true)] out ITypeSymbol? idType)
-  {
-    if (type is not INamedTypeSymbol namedType)
-    {
-      idType = null;
-      return false;
-    }
-  
-    if (!namedType.IsGenericType)
-    {
-      idType = null;
-      return false;
-    }
-  
-    if (namedType.Name != "IActorIdSource")
-    {
-      idType = null;
-      return false;
-    }
-  
-    if (!namedType.ContainingNamespace.IsCodeArchitectsPlatformActorsNamespace())
-    {
-      idType = null;
-      return false;
-    }
-  
-    idType = namedType.TypeArguments[0];
-    return true;
   }
 
   public static bool IsGenericTaskType(this ITypeSymbol type, [NotNullWhen(true)] out ITypeSymbol? resultType)

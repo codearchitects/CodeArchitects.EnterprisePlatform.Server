@@ -151,31 +151,4 @@ public class ReflectionActorDescriptorFactoryTests
     // Assert
     ComponentIdSourceActorFixture.AssertValidDescriptor(descriptor);
   }
-
-  [Fact]
-  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForPropertyIdSourceActor()
-  {
-    // Arrange
-    PropertyIdSourceActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
-
-    _contextMock
-      .Setup(x => x.GetFactoryType(typeof(PropertyIdSourceActor)))
-      .Returns(typeof(IPropertyIdSourceActorFactory));
-    _contextMock
-      .Setup(x => x.GetImplementationTypes(typeof(PropertyIdSourceActor)))
-      .Returns(Enumerable.Empty<Type>());
-
-    ReflectionActorDescriptorFactory<PropertyIdSourceActor> sut = new(
-      _stateTypeBuilderMock.Object,
-      _activityTypeBuilderMock.Object,
-      _contextMock.Object,
-      new ActorAttribute(),
-      null);
-
-    // Act
-    IActorDescriptor descriptor = sut.CreateDescriptor();
-
-    // Assert
-    PropertyIdSourceActorFixture.AssertValidDescriptor(descriptor);
-  }
 }

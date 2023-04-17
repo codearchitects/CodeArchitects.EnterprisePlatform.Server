@@ -15,6 +15,8 @@ internal partial class ExpressionEvaluator : ExpressionVisitor
   private object?[]? _arguments;
   private Optional<object?> _value;
 
+  private ExpressionEvaluator() { }
+
   protected override Expression VisitBinary(BinaryExpression node)
   {
     object? left = GetValue(node.Left);

@@ -23,7 +23,7 @@ internal abstract class MessagingMetadata
     }
 
     Metadata = messagingAssembly is null
-      ? new UnresolvedMessagingMetadata()
+      ? UnresolvedMessagingMetadata.Instance
       : ResolvedMessagingMetadata.Create(messagingAssembly);
   }
 
@@ -104,6 +104,10 @@ internal abstract class MessagingMetadata
 
   private class UnresolvedMessagingMetadata : MessagingMetadata
   {
+    public static readonly UnresolvedMessagingMetadata Instance = new();
+
+    private UnresolvedMessagingMetadata() { }
+
     public override bool IsReferenced => false;
 
     public override Type AttributeType => throw UnresolvedException();

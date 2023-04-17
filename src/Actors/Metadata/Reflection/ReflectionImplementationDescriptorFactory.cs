@@ -18,7 +18,7 @@ internal class ReflectionImplementationDescriptorFactory<TActor> : Implementatio
 
   public override Type ImplementationType { get; }
 
-  protected override bool HasStateFields => ImplementationType
+  protected override bool DefinesStateMembers => ImplementationType
     .GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
     .Where(member => member.DeclaringType != typeof(TActor))
     .Any(member => member.IsDefined(typeof(StateAttribute)));

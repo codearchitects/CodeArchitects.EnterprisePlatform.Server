@@ -13,22 +13,13 @@ public readonly struct BindingId : IEquatable<BindingId>
   }
 
   /// <inheritdoc/>
-  public bool Equals(BindingId other)
-  {
-    return other._index == _index;
-  }
+  public bool Equals(BindingId other) => other._index == _index;
 
   /// <inheritdoc/>
-  public override bool Equals(object obj)
-  {
-    return obj is BindingId other && Equals(other);
-  }
+  public override bool Equals(object obj) => obj is BindingId other && Equals(other);
 
   /// <inheritdoc/>
-  public override int GetHashCode()
-  {
-    return _index;
-  }
+  public override int GetHashCode() => _index;
 
   /// <summary>
   /// Determines whether two <see cref="BindingId"/> objects are equal.

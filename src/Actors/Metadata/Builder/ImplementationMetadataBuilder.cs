@@ -20,7 +20,7 @@ internal class ImplementationMetadataBuilder<TActor, TImplementation> : Implemen
 
   public override Type ImplementationType => typeof(TImplementation);
 
-  protected override bool HasStateFields => false;
+  protected override bool DefinesStateMembers => false;
 
   protected override ConstructorInfo? Constructor => _constructor;
 

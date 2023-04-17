@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Actors.Analyzer\CodeArchitects.Platform.Actors.Analyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Actors.Analyzer\CodeArchitects.Platform.Actors.Analyzer.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Emit\CodeArchitects.Platform.Emit.csproj" />
   </ItemGroup>
 

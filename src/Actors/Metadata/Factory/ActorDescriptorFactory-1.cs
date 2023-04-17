@@ -3,7 +3,6 @@ using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Metadata.Implementation;
 using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Common.Utils;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -202,17 +201,16 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   private Type GetInterfaceType()
   {
+    string? actorBaseNamespace = ActorType.Namespace?.Split('.')[0];
     Type[] implementedInterfaceTypes = ActorType.GetInterfaces();
 
     if (InterfaceType is null)
     {
-      if (implementedInterfaceTypes.Length == 0)
-        throw InvalidActorException.MissingActorInterface(ActorType);
-
       Type? interfaceType = null;
       foreach (Type implementedInterfaceType in implementedInterfaceTypes)
       {
-        if (MessagingMetadata.Metadata.IsMessageHandlerType(implementedInterfaceType))
+        string? baseNamespace = implementedInterfaceType.Namespace?.Split('.')[0];
+        if (baseNamespace != actorBaseNamespace)
           continue;
 
         if (interfaceType is not null)
@@ -221,11 +219,14 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
         interfaceType = implementedInterfaceType;
       }
 
-      return interfaceType!;
+      if (interfaceType is null)
+        throw InvalidActorException.MissingActorInterface(ActorType);
+
+      return interfaceType;
     }
 
     if (!InterfaceType.IsInterface)
-      throw InvalidActorException.InterfaceTypeIsNotAnInterface(ActorType, InterfaceType);
+      throw InvalidActorException.InvalidInterfaceType(ActorType, InterfaceType);
 
     foreach (Type implementedInterfaceType in implementedInterfaceTypes)
     {
@@ -238,9 +239,6 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   private void CheckInterfaceType(Type interfaceType)
   {
-    if (interfaceType.IsGenericType)
-      throw InvalidActorException.GenericActorsAreNotSupported(interfaceType);
-
     if (interfaceType.GetProperties(BindingFlags.Instance | BindingFlags.Public).Length != 0)
       throw InvalidActorException.PropertiesAreNotSupported(ActorType, interfaceType);
 
@@ -326,37 +324,10 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     {
       int stateIndex = component.Index;
 
-      if (component.IsActorIdSource(out Type? idType))
+      if (component.IsActorId)
       {
         if (id is not null)
-          throw InvalidActorException.AmbiguousActorIdSource(ActorType);
-        if (IdType is not null && idType != IdType)
-          throw InvalidActorException.InvalidIdMember(ActorType, idType, IdType);
-
-        Type actorIdSourceType = typeof(IActorIdSource<>).MakeGenericType(idType.UnderlyingSystemType);
-        InterfaceMapping mapping = component.Type.GetInterfaceMap(actorIdSourceType);
-
-        MethodInfo getActorIdMethod = mapping.TargetMethods.Single(method => method.Name.Contains(nameof(IActorIdSource<object>.GetActorId)));
-        MethodInfo setActorIdMethod = mapping.TargetMethods.Single(method => method.Name.Contains(nameof(IActorIdSource<object>.SetActorId)));
-
-        Expression parseIdExpression = GetParseIdExpression(idParam, idType);
-        
-        Action<TState, string> setId = Expression.Lambda<Action<TState, string>>(
-          body: Expression.Call(
-            instance: Expression.Field(
-              expression: stateParam,
-              field: stateFields[stateIndex]),
-            method: setActorIdMethod,
-            arguments: parseIdExpression),
-          parameters: new[] { stateParam, idParam })
-          .Compile();
-
-        id = new SourceActorIdDescriptor<TState>(getActorIdMethod, stateIndex, setId);
-      }
-      else if (component.IsActorId)
-      {
-        if (id is not null)
-          throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+          throw InvalidActorException.MultipleActorIdMembers(ActorType);
         if (IdType is not null && component.Type != IdType)
           throw InvalidActorException.InvalidIdMember(ActorType, component.Type, IdType);
 
@@ -378,7 +349,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     foreach (MemberMetadata metadata in ActorIdMembers)
     {
       if (id is not null)
-        throw InvalidActorException.AmbiguousActorIdSource(ActorType);
+        throw InvalidActorException.MultipleActorIdMembers(ActorType);
 
       if (IdType is not null && metadata.Type != IdType)
         throw InvalidActorException.InvalidIdMember(ActorType, metadata.Type, IdType);

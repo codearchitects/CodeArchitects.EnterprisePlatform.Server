@@ -45,7 +45,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
 
   public abstract Type ImplementationType { get; }
 
-  protected abstract bool HasStateFields { get; }
+  protected abstract bool DefinesStateMembers { get; }
 
   protected abstract ConstructorInfo? Constructor { get; }
 
@@ -54,7 +54,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
   public IImplementationDescriptor<TActor, TState> CreateDescriptor<TState>(IReadOnlyList<FieldInfo> stateFields)
     where TState : ActorState
   {
-    if (_id != 0 && HasStateFields)
+    if (_id != 0 && DefinesStateMembers)
       throw InvalidActorException.StateMustBeDefinedInBaseActor(ActorType, ImplementationType);
     if (ImplementationType.IsAbstract)
       throw InvalidActorException.AbstractImplementation(ActorType, ImplementationType);

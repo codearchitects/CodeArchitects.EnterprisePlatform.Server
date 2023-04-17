@@ -46,9 +46,14 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
     return true;
   }
 
-  public IEnumerator<T> GetEnumerator()
+  public Enumerator GetEnumerator()
   {
-    return _list.GetEnumerator();
+    return new Enumerator(_list);
+  }
+
+  IEnumerator<T> IEnumerable<T>.GetEnumerator()
+  {
+    return GetEnumerator();
   }
 
   IEnumerator IEnumerable.GetEnumerator()
@@ -57,4 +62,32 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
   }
 
   public static RecordList<T> Empty => new(Array.Empty<T>());
+
+  public struct Enumerator : IEnumerator<T>
+  {
+    private readonly IReadOnlyList<T> _list;
+    private int _index;
+
+    public Enumerator(IReadOnlyList<T> list) : this()
+    {
+      _list = list;
+      _index = -1;
+    }
+
+    public T Current => _list[_index];
+
+    object IEnumerator.Current => Current;
+
+    public void Dispose() { }
+
+    public bool MoveNext()
+    {
+      return ++_index < _list.Count;
+    }
+
+    public void Reset()
+    {
+      _index = 0;
+    }
+  }
 }
