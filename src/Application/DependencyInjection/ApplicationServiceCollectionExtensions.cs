@@ -1,6 +1,8 @@
 ﻿using CodeArchitects.Platform.Application.Identity;
+using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Identity;
-using Microsoft.AspNetCore.Http;
+using CodeArchitects.Platform.Common.Utils;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -11,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ApplicationServiceCollectionExtensions
 {
   /// <summary>
-  /// Adds a base identity profile to the services.
+  /// Adds a basic identity profile to the services.
   /// </summary>
   /// <param name="services">The service collection.</param>
   /// <returns>The service collection.</returns>
@@ -19,16 +21,25 @@ public static class ApplicationServiceCollectionExtensions
   {
     return services
       .AddHttpContextAccessor()
-      .AddScoped(delegate (IServiceProvider services)
-      {
-        IHttpContextAccessor httpContextAccessor = services.GetRequiredService<IHttpContextAccessor>();
-        HttpContext? context = httpContextAccessor.HttpContext;
+      .AddScoped<IIdentityProfile<Guid>, ClaimsIdentityProfile<Guid>>();
+  }
 
-        return context?.User;
-      })
-      .AddScoped<IIdentityProfile<Guid, Guid>, ClaimsIdentityProfile>()
-      .AddScoped<IUserProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>())
-      .AddScoped<ITenantProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>());
+  /// <summary>
+  /// Adds a basic identity profile to the services.
+  /// </summary>
+  /// <param name="services">The service collection.</param>
+  /// <returns>The service collection.</returns>
+  public static IServiceCollection AddIdentityProfile<TUserId>(this IServiceCollection services)
+    where TUserId : IEquatable<TUserId>
+#if NET7_0_OR_GREATER
+      , IParsable<TUserId>
+#endif
+  {
+    Parsable<TUserId>.EnsureInitialized();
+
+    return services
+      .AddHttpContextAccessor()
+      .AddScoped<IIdentityProfile<TUserId>, ClaimsIdentityProfile<TUserId>>();
   }
 
   /// <summary>
@@ -40,21 +51,44 @@ public static class ApplicationServiceCollectionExtensions
   /// <returns>The service collection.</returns>
   /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="TImplementation"/> does not have a constructor which accepts a single parameter of type <see cref="ClaimsPrincipal"/>.</exception>
   public static IServiceCollection AddIdentityProfile<TInterface, TImplementation>(this IServiceCollection services)
-    where TInterface : class, IIdentityProfile<Guid, Guid>
+    where TInterface : class
     where TImplementation : class, TInterface
   {
-    return services
-      .AddHttpContextAccessor()
-      .AddScoped(delegate (IServiceProvider services)
-      {
-        IHttpContextAccessor httpContextAccessor = services.GetRequiredService<IHttpContextAccessor>();
-        HttpContext? context = httpContextAccessor.HttpContext;
+    Type interfaceType = typeof(TInterface);
+    Type identityProfileType;
+    Type? tenantProfileType;
+    
+    try
+    {
+      identityProfileType = interfaceType.GetGenericInterfaces(typeof(IIdentityProfile<>)).Single();
+    }
+    catch (InvalidOperationException)
+    {
+      throw new TypeArgumentException($"'{nameof(TInterface)}' must implement '{nameof(IIdentityProfile<string>)}' exactly once.", nameof(TInterface)); // 'string' type parameter only to make 'nameof' happy
+    }
 
-        return context?.User;
-      })
+    try
+    {
+      tenantProfileType = interfaceType.GetGenericInterfaces(typeof(ITenantProfile<>)).SingleOrDefault();
+    }
+    catch (InvalidOperationException)
+    {
+      throw new TypeArgumentException($"'{nameof(TInterface)}' must implement '{nameof(ITenantProfile<string>)}' at most once.", nameof(TInterface)); // 'string' type parameter only to make 'nameof' happy
+    }
+
+    Type userIdType = identityProfileType.GetGenericArguments()[0];
+    Parsable.EnsureInitialized(userIdType);
+
+    services
+      .AddHttpContextAccessor()
       .AddScoped<TInterface, TImplementation>()
-      .AddScoped<IIdentityProfile<Guid, Guid>>(sp => sp.GetRequiredService<TInterface>())
-      .AddScoped<IUserProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>())
-      .AddScoped<ITenantProfile<Guid>>(sp => sp.GetRequiredService<IIdentityProfile<Guid, Guid>>());
+      .AddScoped(identityProfileType, sp => sp.GetRequiredService<TInterface>());
+
+    if (tenantProfileType is not null)
+    {
+      services.AddScoped(tenantProfileType, sp => sp.GetRequiredService<TInterface>());
+    }
+
+    return services;
   }
 }

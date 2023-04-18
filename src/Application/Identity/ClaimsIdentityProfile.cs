@@ -1,20 +1,30 @@
 ﻿using CodeArchitects.Platform.Common.Identity;
-using Microsoft.Identity.Web;
+using CodeArchitects.Platform.Common.Utils;
+using Microsoft.AspNetCore.Http;
+using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace CodeArchitects.Platform.Application.Identity;
 
 /// <summary>
-/// Implementation of <see cref="IIdentityProfile{TUserId, TTenantId}"/> based on the current user's claims.
+/// Implementation of <see cref="IIdentityProfile{TUserId}"/> based on the current user's claims.
 /// </summary>
-public class ClaimsIdentityProfile : IIdentityProfile<Guid, Guid>
+public class ClaimsIdentityProfile<TUserId> : IIdentityProfile<TUserId>
+  where TUserId : IEquatable<TUserId>
+#if NET7_0_OR_GREATER
+  , IParsable<TUserId>
+#endif
 {
-  private Guid? _userId;
-  private Guid? _tenantId;
+  private static readonly Parse<TUserId> s_parseUserId = Parsable<TUserId>.Parse;
 
-  public ClaimsIdentityProfile(ClaimsPrincipal? claims)
+  /// <summary>
+  /// Creates a new <see cref="ClaimsIdentityProfile{TUserId}"/> instance.
+  /// </summary>
+  /// <param name="httpContextAccessor">The accessor of the <see cref="HttpContext"/>.</param>
+  public ClaimsIdentityProfile(IHttpContextAccessor httpContextAccessor)
   {
-    Claims = claims;
+    Claims = httpContextAccessor.HttpContext?.User;
   }
 
   /// <summary>
@@ -23,29 +33,55 @@ public class ClaimsIdentityProfile : IIdentityProfile<Guid, Guid>
   protected ClaimsPrincipal? Claims { get; }
 
   /// <summary>
-  /// The claim type of the user id claim.
+  /// Returns <see langword="true"/> if the user is authenticated, <see langword="false"/> otherwise.
   /// </summary>
-  public virtual string UserIdClaimType => ClaimTypes.NameIdentifier;
-
-  /// <summary>
-  /// The claim type of the tenant id claim.
-  /// </summary>
-  public virtual string TenantIdClaimType => ClaimConstants.TenantId;
-
+  [MemberNotNullWhen(true, nameof(Claims))]
   public bool IsAuthenticated => Claims?.Identity?.IsAuthenticated ?? false;
 
-  public Guid UserId => _userId ??= Guid.Parse(GetRequiredClaim(UserIdClaimType));
+  /// <summary>
+  /// The type of the user id claim. Defaults to <see cref="JwtRegisteredClaimNames.Sub"/>.
+  /// </summary>
+  protected virtual string UserIdClaimType => JwtRegisteredClaimNames.Sub;
 
-  public Guid TenantId => _tenantId ??= Guid.Parse(GetRequiredClaim(TenantIdClaimType));
+  /// <summary>
+  /// The id of the current user.
+  /// </summary>
+  public TUserId UserId
+  {
+    get
+    {
+      string userIdClaim = GetRequiredClaim(UserIdClaimType);
+      try
+      {
+        return s_parseUserId(userIdClaim);
+      }
+      catch (FormatException)
+      {
+        throw new AuthenticationException();
+      }
+    }
+  }
 
+  /// <summary>
+  /// Returns a claim value corresponding to <paramref name="claimType"/>, if present, or <see langword="null"/> otherwise.
+  /// </summary>
+  /// <param name="claimType">The key of the claim to retrieve.</param>
+  /// <returns>The claim value.</returns>
+  /// <exception cref="AuthenticationException">Thrown when the user is not authenticated.</exception>
   protected string? GetClaim(string claimType)
   {
-    if (Claims is null)
-      return null;
+    if (!IsAuthenticated)
+      throw new AuthenticationException();
 
     return Claims.FindFirstValue(claimType);
   }
 
+  /// <summary>
+  /// Returns a claim value corresponding to <paramref name="claimType"/>, if present, or <see langword="null"/> otherwise it throws.
+  /// </summary>
+  /// <param name="claimType">The key of the claim to retrieve.</param>
+  /// <returns>The claim value.</returns>
+  /// <exception cref="AuthenticationException">Thrown when the user is not authenticated or the claim is not found.</exception>
   protected string GetRequiredClaim(string claimType)
   {
     return GetClaim(claimType) ?? throw new AuthenticationException();

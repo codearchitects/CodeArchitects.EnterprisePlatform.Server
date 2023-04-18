@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using EFCoreSample;
 using EFCoreSample.Domain.Repositories;
+using EFCoreSample.Identity;
 using EFCoreSample.Infrastructure.Data;
 using EFCoreSample.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,15 +22,14 @@ builder.Services
     opt.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
   });
 
-builder.Services.AddIdentityProfile();
+builder.Services.AddIdentityProfile<IIdentityProfile, ClaimsIdentityProfile>();
 
 string connectionString = builder.Configuration.GetConnectionString("SqlServer")!;
 
 builder.Services.AddDbContext<DataContext>(options => options
   .UseSqlServer(connectionString)
   .LogTo(Console.WriteLine, LogLevel.Debug)
-  .UseCaep(data => data
-    .UseMultitenancy<MultitenancyDescriptor>()));
+  .UseCaep(data => data.UseMultitenancy<MultitenancyDescriptor>()));
 
 builder.Services.AddData<DataContext>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
