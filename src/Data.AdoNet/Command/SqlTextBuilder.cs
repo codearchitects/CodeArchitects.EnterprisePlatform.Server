@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Model;
-using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.Features.Associations;
 

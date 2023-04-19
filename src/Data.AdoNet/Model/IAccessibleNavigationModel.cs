@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
@@ -13,7 +13,7 @@ public interface IAccessibleNavigationModel : INavigationModel, IAccessibleMembe
   /// Indicates whether this navigation property represents a collection of entities.
   /// </summary>
   /// <remarks>
-  /// If <c>true</c>, the <see cref="CollectionAccessor"/> property is not null.
+  /// If <see langword="true"/>, the <see cref="CollectionAccessor"/> property is not null.
   /// </remarks>
   [MemberNotNullWhen(true, nameof(CollectionAccessor))]
   new bool IsCollection { get; }

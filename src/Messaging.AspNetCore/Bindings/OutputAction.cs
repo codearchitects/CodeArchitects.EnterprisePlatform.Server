@@ -6,7 +6,7 @@
 internal abstract class OutputAction
 {
   /// <summary>
-  /// <c>true</c> if the output action is executed only for certain types, <c>false</c> otherwise.
+  /// <see langword="true"/> if the output action is executed only for certain types, <see langword="false"/> otherwise.
   /// </summary>
   public abstract bool IsTypeFiltered { get; }
 
@@ -14,7 +14,7 @@ internal abstract class OutputAction
   /// Tells whether the output action can be executed for the given result type.
   /// </summary>
   /// <param name="resultType">The result type.</param>
-  /// <returns><c>true</c> if the action can be executed, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the action can be executed, <see langword="false"/> otherwise.</returns>
   public abstract bool CanExecute(Type resultType);
 
   /// <summary>

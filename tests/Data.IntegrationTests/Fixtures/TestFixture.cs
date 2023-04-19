@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.EntityFrameworkCore;
 using CodeArchitects.Platform.Data.Tracking;
@@ -95,7 +95,7 @@ public class TestFixture : IAsyncLifetime
     {
       RepositoryImplementation.AdoNet => new AdoNetRepository<TEntity, TKey>(_localData.Services.GetRequiredService<AdoNet.IDataContext>()),
       RepositoryImplementation.EFCore => new EFCoreRepository<TEntity, TKey>(_localData.Services.GetRequiredService<EntityFrameworkCore.IDataContext>()),
-      _                               => throw Errors.Unreacheable
+      _                               => throw Errors.Unreachable
     };
   }
 

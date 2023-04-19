@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
-internal class InterceptedEntityQueryProvider : EntityQueryProvider, IInterceptedEntityQueryProvider
+internal class InterceptedEntityQueryProvider : EntityQueryProvider, IInterceptedEntityQueryProvider, IInterceptorInfo
 {
   private readonly IExpressionRewriter _rewriter;
   private Dictionary<Type, bool>? _interceptorTypes;
@@ -46,10 +46,18 @@ internal class InterceptedEntityQueryProvider : EntityQueryProvider, IIntercepte
     return base.ExecuteAsync<TResult>(expression, cancellationToken);
   }
 
+  public bool IsEnabled(IQueryRootExpressionInterceptor interceptor)
+  {
+    if (_interceptorTypes is null || !_interceptorTypes.TryGetValue(interceptor.GetType(), out bool isEnabled))
+      return interceptor.ShouldApply;
+
+    return isEnabled;
+  }
+
   private Expression TryRewrite(Expression expression)
   {
-    return _rewriter.ShouldRewrite(_interceptorTypes)
-      ? _rewriter.Rewrite(expression, _interceptorTypes)
+    return _rewriter.ShouldRewrite(this)
+      ? _rewriter.Rewrite(expression, this)
       : expression;
   }
 }

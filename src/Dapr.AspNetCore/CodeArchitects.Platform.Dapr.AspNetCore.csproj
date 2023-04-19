@@ -18,8 +18,4 @@
     <PackageReference Include="YamlDotNet" Version="12.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
-  </ItemGroup>
-
 </Project>

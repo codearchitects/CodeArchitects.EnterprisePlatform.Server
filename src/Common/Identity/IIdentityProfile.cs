@@ -3,12 +3,16 @@
 /// <summary>
 /// Contains information about the current user.
 /// </summary>
-public interface IIdentityProfile<TUserId, TTenantId> : IUserProfile<TUserId>, ITenantProfile<TTenantId>
+public interface IIdentityProfile<TUserId>
   where TUserId : IEquatable<TUserId>
-  where TTenantId : IEquatable<TTenantId>
 {
   /// <summary>
-  /// <c>true</c> if the user is authenticated, <c>false</c> otherwise.
+  /// <see langword="true"/> if the user is authenticated, <see langword="false"/> otherwise.
   /// </summary>
   bool IsAuthenticated { get; }
+
+  /// <summary>
+  /// The id of the user.
+  /// </summary>
+  TUserId UserId { get; }
 }

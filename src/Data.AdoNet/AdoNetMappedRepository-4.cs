@@ -19,7 +19,7 @@ public abstract class AdoNetMappedRepository<TConnection, TTable, TEntity, TKey>
   /// Initializes a new instance of the <see cref="AdoNetMappedRepository{TConnection, TTable, TEntity, TKey}"/> class.
   /// </summary>
   /// <param name="context">The ADO.NET data context used by the repository.</param>
-  public AdoNetMappedRepository(IDataContext<TConnection> context)
+  protected AdoNetMappedRepository(IDataContext<TConnection> context)
     : base(context)
   {
   }

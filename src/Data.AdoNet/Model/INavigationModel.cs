@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data.Features.Associations;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;

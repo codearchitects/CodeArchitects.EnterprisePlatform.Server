@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="FluentAssertions" Version="6.8.0" />
+    <PackageReference Include="FluentAssertions" Version="6.10.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17">
       <PrivateAssets>all</PrivateAssets>
@@ -41,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.Oracle\CodeArchitects.Platform.Data.AdoNet.Oracle.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.PostgreSQL\CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj" />

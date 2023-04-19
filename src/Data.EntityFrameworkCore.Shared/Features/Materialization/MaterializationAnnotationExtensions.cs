@@ -49,7 +49,7 @@ public static class MaterializationAnnotationExtensions
   /// <typeparam name="TKey">The entity's primary key type.</typeparam>
   /// <param name="entityType">The entity type.</param>
   /// <param name="factory">The default factory, if specified, <c>null</c> otherwise.</param>
-  /// <returns><c>true</c> if a default factory is found, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if a default factory is found, <see langword="false"/> otherwise.</returns>
   public static bool TryGetDefaultFactory<TEntity, TKey>(this TEntityType entityType, [NotNullWhen(true)] out Func<TKey, TEntity>? factory)
     where TEntity : class
     where TKey : IEquatable<TKey>

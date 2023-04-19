@@ -14,7 +14,7 @@ public class Page<T> : IEnumerable<T>
   public int Count { get; }
 
   /// <summary>
-  /// <c>true</c> if the original collection has more pages, <c>false</c> otherwise.
+  /// <see langword="true"/> if the original collection has more pages, <see langword="false"/> otherwise.
   /// </summary>
   public bool HasNext { get; }
 
@@ -28,7 +28,7 @@ public class Page<T> : IEnumerable<T>
   /// </summary>
   /// <param name="elements">The elements of the page.</param>
   /// <param name="count">The number of elements in the collection.</param>
-  /// <param name="hasNext"><c>true</c> if the original collection has more pages, <c>false</c> otherwise.</param>
+  /// <param name="hasNext"><see langword="true"/> if the original collection has more pages, <see langword="false"/> otherwise.</param>
   public Page(IEnumerable<T> elements, int count, bool hasNext)
   {
     Elements = elements ?? throw new ArgumentNullException(nameof(elements));
@@ -40,7 +40,7 @@ public class Page<T> : IEnumerable<T>
   /// Creates a new <see cref="Page{T}"/> from an <see cref="IReadOnlyCollection{T}"/>.
   /// </summary>
   /// <param name="collection">Contains the elements of the page and provides their count.</param>
-  /// <param name="hasNext"><c>true</c> if the original collection has more pages, <c>false</c> otherwise.</param>
+  /// <param name="hasNext"><see langword="true"/> if the original collection has more pages, <see langword="false"/> otherwise.</param>
   public Page(IReadOnlyCollection<T> collection, bool hasNext)
   {
     Elements = collection ?? throw new ArgumentNullException(nameof(collection));
@@ -70,7 +70,7 @@ public static class ReadOnlyCollectionExtensions
   /// </summary>
   /// <typeparam name="T">The element type.</typeparam>
   /// <param name="collection">The elements of the page.</param>
-  /// <param name="hasNext"><c>true</c> if the original collection has more pages, <c>false</c> otherwise.</param>
+  /// <param name="hasNext"><see langword="true"/> if the original collection has more pages, <see langword="false"/> otherwise.</param>
   /// <returns>The created <see cref="Page{T}"/>.</returns>
   public static Page<T> AsPage<T>(this IReadOnlyCollection<T> collection, bool hasNext)
     => new(collection, hasNext);

@@ -39,7 +39,7 @@ public static class MultitenancyCaepOptionsBuilderExtensions
   /// Enables the multitenancy feature within EFCore using the default settings.
   /// </summary>
   /// <param name="builder">The options builder.</param>
-  /// <param name="enableModificationFilters">Specifies whether the modification interceptors should be disable. Defaults to <c>false</c>.</param>
+  /// <param name="enableModificationFilters">Specifies whether the modification interceptors should be disable. Defaults to <see langword="false"/>.</param>
   /// <returns>The same <see cref="CaepOptionsBuilder"/> for further configuration.</returns>
   public static CaepOptionsBuilder UseMultitenancy(this CaepOptionsBuilder builder, bool enableModificationFilters = false)
   {

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -44,7 +44,7 @@ internal abstract class AccessibleMemberComponent<T> : MemberComponent<T>
     {
       PropertyInfo property => PropertyMemberComponent<T>.Create(property),
       FieldInfo field       => FieldMemberComponent<T>.Create(field),
-      _                     => throw Errors.Unreacheable
+      _                     => throw Errors.Unreachable
     };
   }
 }

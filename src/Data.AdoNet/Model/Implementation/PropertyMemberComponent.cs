@@ -51,10 +51,17 @@ internal class PropertyMemberComponent<T> : AccessibleMemberComponent<T>
 
     if (property.SetMethod is null)
     {
-      if (!property.TryGetBackingFieldByConvention(out FieldInfo? backingField))
-        throw new ModelConfigurationException($"Property '{property.Name}' on type '{entityType.Name}' does not have a setter or a backing field resolvable by convention.");
+      try
+      {
+        if (!property.TryGetBackingFieldByConvention(BackingFieldNameConvention.All, out FieldInfo? backingField))
+          throw new ModelConfigurationException($"Property '{property.Name}' on type '{entityType.Name}' does not have a setter or a backing field resolvable by convention.");
 
-      return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
+        return FieldMemberComponent<T>.BuildSetAccessor(backingField, property.Name);
+      }
+      catch (AmbiguousMatchException ex)
+      {
+        throw new ModelConfigurationException($"Property '{property.Name}' on type '{entityType.Name}' does not have a setter or a backing field resolvable by convention.", ex);
+      }
     }
 
     DynamicMethod method = new($"setvalue_{property.Name}", typeof(void), new[] { typeof(object), typeof(T) }, entityType);

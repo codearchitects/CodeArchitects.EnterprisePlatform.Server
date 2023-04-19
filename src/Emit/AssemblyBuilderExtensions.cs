@@ -30,19 +30,14 @@ internal static class AssemblyBuilderExtensions
       attr: TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.Class,
       parent: typeof(Attribute));
 
-    ConstructorInfo attributeUsageConstructor = typeof(AttributeUsageAttribute).GetConstructor(
+    ConstructorInfo attributeUsageConstructor = typeof(AttributeUsageAttribute).GetRequiredConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      binder: null,
-      types: new[] { typeof(AttributeTargets) },
-      modifiers: null) ?? throw new MissingMethodException(typeof(AttributeUsageAttribute).Name, ConstructorInfo.ConstructorName);
+      types: new[] { typeof(AttributeTargets) });
 
-    PropertyInfo allowMultipleProperty = typeof(AttributeUsageAttribute).GetProperty(
+    PropertyInfo allowMultipleProperty = typeof(AttributeUsageAttribute).GetRequiredProperty(
       name: nameof(AttributeUsageAttribute.AllowMultiple),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      binder: null,
-      returnType: typeof(bool),
-      types: Type.EmptyTypes,
-      modifiers: null) ?? throw new MissingMemberException(typeof(AttributeUsageAttribute).Name, nameof(AttributeUsageAttribute.AllowMultiple));
+      types: Type.EmptyTypes);
 
     type.SetCustomAttribute(new CustomAttributeBuilder(
       con: attributeUsageConstructor,

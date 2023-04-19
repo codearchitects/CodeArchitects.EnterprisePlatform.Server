@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Emit;
 
 internal static class ILGeneratorExtensions
 {
-  public static void LoadArgs(this ILGenerator il, int count)
+  public static void LoadArgs(this IILGenerator il, int count)
   {
     for (int i = 1; i <= count; i++)
     {
@@ -14,10 +14,12 @@ internal static class ILGeneratorExtensions
     }
   }
 
-  public static void LoadArg(this ILGenerator il, int index)
+  public static void LoadArg(this IILGenerator il, int index)
   {
     switch (index)
     {
+      case 0:
+        throw new ArgumentException("Index must not be 0.");
       case 1:
         il.Emit(OpCodes.Ldarg_1);
         break;
@@ -36,7 +38,7 @@ internal static class ILGeneratorExtensions
     }
   }
 
-  public static void InitFields(this ILGenerator il, int startIndex, IReadOnlyList<FieldInfo> fields)
+  public static void InitFields(this IILGenerator il, int startIndex, IReadOnlyList<FieldInfo> fields)
   {
     for (int i = 0; i < fields.Count; i++)
     {
@@ -65,12 +67,12 @@ internal static class ILGeneratorExtensions
     }
   }
 
-  public static void InitFields(this ILGenerator il, int startIndex, params FieldInfo[] fields)
+  public static void InitFields(this IILGenerator il, int startIndex, params FieldInfo[] fields)
   {
     InitFields(il, startIndex, fields as IReadOnlyList<FieldInfo>);
   }
 
-  public static void LoadFields(this ILGenerator il, IEnumerable<FieldInfo> fields)
+  public static void LoadFields(this IILGenerator il, IEnumerable<FieldInfo> fields)
   {
     foreach (FieldInfo field in fields)
     {
@@ -79,12 +81,12 @@ internal static class ILGeneratorExtensions
     }
   }
 
-  public static void LoadFields(this ILGenerator il, params FieldInfo[] fields)
+  public static void LoadFields(this IILGenerator il, params FieldInfo[] fields)
   {
     LoadFields(il, fields as IEnumerable<FieldInfo>);
   }
 
-  public static void LoadInt(this ILGenerator il, int number)
+  public static void LoadInt(this IILGenerator il, int number)
   {
     switch (number)
     {
@@ -125,7 +127,7 @@ internal static class ILGeneratorExtensions
         il.Emit(OpCodes.Ldc_I4, number);
         break;
       default:
-        throw Errors.Unreacheable;
+        throw Errors.Unreachable;
     }
   }
 }

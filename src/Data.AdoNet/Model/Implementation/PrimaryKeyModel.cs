@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -74,7 +74,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
       2 => s_create2Method.MakeGenericMethod(membersAndTypes.Map(item => item.Type)).Invoke(null, new object[] { membersAndTypes }),
       3 => s_create3Method.MakeGenericMethod(membersAndTypes.Map(item => item.Type)).Invoke(null, new object[] { membersAndTypes }),
       4 => s_create4Method.MakeGenericMethod(membersAndTypes.Map(item => item.Type)).Invoke(null, new object[] { membersAndTypes }),
-      _ => Errors.Unreacheable
+      _ => Errors.Unreachable
     };
 
     return (PrimaryKeyModel)result!;

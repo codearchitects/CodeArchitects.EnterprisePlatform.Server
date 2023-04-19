@@ -29,7 +29,7 @@ public readonly struct Name
   }
 
   /// <summary>
-  /// <c>true</c> if the instance is representing a column name, <c>false</c> if it is representing a member name.
+  /// <see langword="true"/> if the instance is representing a column name, <see langword="false"/> if it is representing a member name.
   /// </summary>
   public bool IsColumnName => _memberName == string.Empty;
 

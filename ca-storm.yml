@@ -2,14 +2,17 @@ version: 1
 
 components:
   # packages
-  - name: CodeArchitects.Platform.Analyzer
-    path: src\Analyzer
+  - name: CodeArchitects.Platform.Actors
+    path: src\Actors
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Actors.Dapr
+    path: src\Actors.Dapr
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore
+    path: src\Actors.Dapr.AspNetCore
     type: dotnet-package
   - name: CodeArchitects.Platform.Application
     path: src\Application
-    type: dotnet-package
-  - name: CodeArchitects.Platform.CodeAnalysis
-    path: src\CodeAnalysis
     type: dotnet-package
   - name: CodeArchitects.Platform.Common
     path: src\Common
@@ -50,6 +53,9 @@ components:
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection
     path: src\Data.EntityFrameworkCore5.DependencyInjection
     type: dotnet-package
+  - name: CodeArchitects.Platform.Emit
+    path: src\Emit
+    type: dotnet-package
   - name: CodeArchitects.Platform.Infrastructure
     path: src\Infrastructure
     type: dotnet-package
@@ -73,8 +79,11 @@ components:
     type: dotnet-package
 
   # unit tests
-  - name: CodeArchitects.Platform.Analyzer.Tests
-    path: tests\Analyzer.Tests
+  - name: CodeArchitects.Platform.Actors.Dapr.UnitTests
+    path: tests\Actors.Dapr.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Actors.UnitTests
+    path: tests\Actors.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Application.UnitTests
     path: tests\Application.UnitTests
@@ -109,8 +118,20 @@ components:
   - name: CodeArchitects.Platform.Messaging.UnitTests
     path: tests\Messaging.UnitTests
     type: dotnet-test
+  - name: CodeArchitects.Platform.Shared.UnitTests
+    path: tests\Shared.UnitTests
+    type: dotnet-test
 
   # functional tests
+  - name: CodeArchitects.Platform.Actors.Analyzer.FunctionalTests
+    path: tests\Actors.Analyzer.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Actors.FunctionalTests
+    path: tests\Actors.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Common.Analyzer.FunctionalTests
+    path: tests\Common.Analyzer.FunctionalTests
+    type: dotnet-test
   - name: CodeArchitects.Platform.Data.AdoNet.FunctionalTests
     path: tests\Data.AdoNet.FunctionalTests
     type: dotnet-test
@@ -119,9 +140,12 @@ components:
     type: dotnet-test
 
   # integration tests
-  # - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
-  #   path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
-  #   type: dotnet-test
-  # - name: CodeArchitects.Platform.Data.IntegrationTests
-  #   path: tests\Data.IntegrationTests
-  #   type: dotnet-test
+  - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore.IntegrationTests
+    path: tests\Actors.Dapr.AspNetCore.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+    path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.IntegrationTests
+    path: tests\Data.IntegrationTests
+    type: dotnet-test

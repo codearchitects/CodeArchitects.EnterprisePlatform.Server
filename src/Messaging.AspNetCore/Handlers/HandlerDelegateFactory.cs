@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Messaging.AspNetCore.Bindings;
 using CodeArchitects.Platform.Messaging.Descriptors;
 using OneOf;
@@ -97,7 +97,7 @@ internal class HandlerDelegateFactory : IHandlerDelegateFactory
       7 => typeof(HandlerDelegate<,,,,,,,,>),
       8 => typeof(HandlerDelegate<,,,,,,,,,>),
       9 => typeof(HandlerDelegate<,,,,,,,,,,>),
-      _ => throw Errors.Unreacheable
+      _ => throw Errors.Unreachable
     };
 
     Type[] handlerDelegateTypeArguments = new Type[2 + arity];

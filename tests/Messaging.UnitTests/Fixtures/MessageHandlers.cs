@@ -35,10 +35,10 @@ public static class StandardMessageHandlerInfo
 
   static StandardMessageHandlerInfo()
   {
-    MethodInfo handlerMethod2 = typeof(StandardMessageHandler).GetMethod(
+    MethodInfo handlerMethod2 = typeof(StandardMessageHandler).GetRequiredMethod(
       name: nameof(StandardMessageHandler.HandleAsync),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      types: new[] { typeof(Message2), typeof(CancellationToken) }) ?? throw new MissingMethodException(typeof(StandardMessageHandler).Name, nameof(StandardMessageHandler.HandleAsync));
+      types: new[] { typeof(Message2), typeof(CancellationToken) });
 
     Identity2MetadataObject = (FakeOutputBinding1Attribute)handlerMethod2.ReturnTypeCustomAttributes.GetCustomAttributes(typeof(FakeOutputBinding1Attribute), false)[0];
   }

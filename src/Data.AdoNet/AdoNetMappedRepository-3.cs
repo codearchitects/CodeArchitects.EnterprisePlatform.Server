@@ -17,7 +17,7 @@ public abstract class AdoNetMappedRepository<TTable, TEntity, TKey> : MappedRepo
   /// Initializes a new instance of the <see cref="AdoNetMappedRepository{TTable, TEntity, TKey}"/> class.
   /// </summary>
   /// <param name="context">The ADO.NET data context used by the repository.</param>
-  public AdoNetMappedRepository(IDataContext context)
+  protected AdoNetMappedRepository(IDataContext context)
   {
     Context = context;
   }
@@ -25,7 +25,7 @@ public abstract class AdoNetMappedRepository<TTable, TEntity, TKey> : MappedRepo
   /// <summary>
   /// The ADO.NET data context used by the repository.
   /// </summary>
-  protected new IDataContext Context { get; }
+  protected IDataContext Context { get; }
 
   /// <summary>
   /// The connection used by the repository's data context.

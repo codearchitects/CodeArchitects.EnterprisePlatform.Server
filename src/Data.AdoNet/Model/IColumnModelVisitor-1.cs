@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
@@ -12,28 +12,28 @@ public interface IColumnModelVisitor<out TResult>
   /// <summary>
   /// Visits an <see cref="IForeignKeyColumnModel"/>.
   /// </summary>
-  /// <param name="column">The column model.</param>
+  /// <param name="columnModel">The column model.</param>
   /// <returns>The result of the operation.</returns>
-  TResult VisitForeignKey(IForeignKeyColumnModel column);
+  TResult VisitForeignKey(IForeignKeyColumnModel columnModel);
 
   /// <summary>
   /// Visits an <see cref="IOrdinaryColumnModel"/>.
   /// </summary>
-  /// <param name="column">The column model.</param>
+  /// <param name="columnModel">The column model.</param>
   /// <returns>The result of the operation.</returns>
-  TResult VisitOrdinary(IOrdinaryColumnModel column);
+  TResult VisitOrdinary(IOrdinaryColumnModel columnModel);
 
   /// <summary>
   /// Visits an <see cref="IPrimaryAndForeignKeyColumnModel"/>.
   /// </summary>
-  /// <param name="column">The column model.</param>
+  /// <param name="columnModel">The column model.</param>
   /// <returns>The result of the operation.</returns>
-  TResult VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel column);
+  TResult VisitPrimaryAndForeignKey(IPrimaryAndForeignKeyColumnModel columnModel);
 
   /// <summary>
   /// Visits an <see cref="IPrimaryKeyColumnModel"/>.
   /// </summary>
-  /// <param name="column">The column model.</param>
+  /// <param name="columnModel">The column model.</param>
   /// <returns>The result of the operation.</returns>
-  TResult VisitPrimaryKey(IPrimaryKeyColumnModel column);
+  TResult VisitPrimaryKey(IPrimaryKeyColumnModel columnModel);
 }

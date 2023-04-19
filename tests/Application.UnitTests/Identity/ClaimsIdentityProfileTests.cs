@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Web;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Identity.Web;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace CodeArchitects.Platform.Application.Identity;
@@ -11,9 +13,10 @@ public class ClaimsIdentityProfileTests
   public void IsAuthenticated_ShouldBe_PrincipalIdentityIsAuthenticated(bool expected)
   {
     // Arrange
-    ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.Identity!.IsAuthenticated == expected, MockBehavior.Strict);
+    ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(instance => instance.Identity!.IsAuthenticated == expected, MockBehavior.Strict);
+    IHttpContextAccessor httpContextAccessor = Mock.Of<IHttpContextAccessor>(instance => instance.HttpContext!.User == principal, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new(principal);
+    ClaimsIdentityProfile<Guid> sut = new(httpContextAccessor);
 
     // Act
     bool actual = sut.IsAuthenticated;
@@ -27,8 +30,9 @@ public class ClaimsIdentityProfileTests
   {
     // Arrange
     ClaimsPrincipal principal = new(Enumerable.Empty<ClaimsIdentity>());
+    IHttpContextAccessor httpContextAccessor = Mock.Of<IHttpContextAccessor>(instance => instance.HttpContext!.User == principal, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new(principal);
+    ClaimsIdentityProfile<Guid> sut = new(httpContextAccessor);
 
     // Act
     bool isAuthenticated = sut.IsAuthenticated;
@@ -41,31 +45,19 @@ public class ClaimsIdentityProfileTests
   public void UserId_ShouldBe_ValueOfNameIdentifierClaim()
   {
     // Arrange
-    Claim userIdClaim = new(ClaimTypes.NameIdentifier, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
-    ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.FindFirst(ClaimTypes.NameIdentifier) == userIdClaim, MockBehavior.Strict);
+    Claim userIdClaim = new(JwtRegisteredClaimNames.Sub, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
+    ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(instance =>
+      instance.Identity!.IsAuthenticated == true &&
+      instance.FindFirst(JwtRegisteredClaimNames.Sub) == userIdClaim,
+      MockBehavior.Strict);
+    IHttpContextAccessor httpContextAccessor = Mock.Of<IHttpContextAccessor>(instance => instance.HttpContext!.User == principal, MockBehavior.Strict);
 
-    ClaimsIdentityProfile sut = new(principal);
+    ClaimsIdentityProfile<Guid> sut = new(httpContextAccessor);
 
     // Act
     Guid userId = sut.UserId;
 
     // Assert
     userId.Should().Be(userIdClaim.Value);
-  }
-
-  [Fact]
-  public void TenantId_ShouldBe_ValueOfTenantIdClaim()
-  {
-    // Arrange
-    Claim tenantIdClaim = new(ClaimConstants.TenantId, "c88e015e-b550-4fd4-83ab-65cf9495f3c2");
-    ClaimsPrincipal principal = Mock.Of<ClaimsPrincipal>(principal => principal.FindFirst(ClaimConstants.TenantId) == tenantIdClaim, MockBehavior.Strict);
-
-    ClaimsIdentityProfile sut = new(principal);
-
-    // Act
-    Guid tenantId = sut.TenantId;
-
-    // Assert
-    tenantId.Should().Be(tenantIdClaim.Value);
   }
 }

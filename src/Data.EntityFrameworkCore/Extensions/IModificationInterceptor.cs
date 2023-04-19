@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 public interface IModificationInterceptor
 {
   /// <summary>
-  /// If <c>true</c> the interceptor will execute, if <c>false</c> the interceptor will not execute.
+  /// If <see langword="true"/> the interceptor will execute, if <see langword="false"/> the interceptor will not execute.
   /// </summary>
   bool ShouldApply { get; }
 

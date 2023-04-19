@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Common.Exceptions;
 /// The exception that is thrown when one of the type arguments provided to a method is not valid.
 /// </summary>
 [Serializable]
-public class TypeArgumentException : SystemException, ISerializable
+public class TypeArgumentException : SystemException
 {
   /// <summary>
   /// Initializes a new instance of the <see cref="TypeArgumentException"/> class with default error message.

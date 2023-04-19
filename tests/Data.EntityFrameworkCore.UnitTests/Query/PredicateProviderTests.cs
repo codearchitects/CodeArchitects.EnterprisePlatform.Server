@@ -1,7 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
@@ -22,7 +21,7 @@ public partial class PredicateProviderTests
     var predicate = sut.GetFindPredicate<EntityWithSimplePropertyKey, int>(id);
 
     // Assert
-    predicate.Should().BeEquivalentTo(expected, options => options.Using(ExpressionEqualityComparer.Instance));
+    predicate.Should().BeEquivalentTo(expected);
     cacheMock.VerifyAll();
     cacheMock.VerifyNoOtherCalls();
   }
@@ -41,7 +40,7 @@ public partial class PredicateProviderTests
     var predicate = sut.GetFindPredicate<EntityWithSimpleFieldKey, int>(id);
 
     // Assert
-    predicate.Should().BeEquivalentTo(expected, options => options.Using(ExpressionEqualityComparer.Instance));
+    predicate.Should().BeEquivalentTo(expected);
     cacheMock.VerifyAll();
     cacheMock.VerifyNoOtherCalls();
   }
@@ -60,7 +59,7 @@ public partial class PredicateProviderTests
     var predicate = sut.GetFindPredicate<EntityWithSimpleShadowKey, int>(id);
 
     // Assert
-    predicate.Should().BeEquivalentTo(expected, options => options.Using(ExpressionEqualityComparer.Instance));
+    predicate.Should().BeEquivalentTo(expected);
     cacheMock.VerifyAll();
     cacheMock.VerifyNoOtherCalls();
   }
@@ -80,7 +79,7 @@ public partial class PredicateProviderTests
     var predicate = sut.GetFindPredicate<EntityWithCompositeKey, (int, string)>((id1, id2));
 
     // Assert
-    predicate.Should().BeEquivalentTo(expected, options => options.Using(ExpressionEqualityComparer.Instance));
+    predicate.Should().BeEquivalentTo(expected);
     cacheMock.VerifyAll();
     cacheMock.VerifyNoOtherCalls();
   }

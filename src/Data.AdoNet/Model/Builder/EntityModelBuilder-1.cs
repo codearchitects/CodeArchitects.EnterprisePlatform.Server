@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Reflection;
+﻿using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

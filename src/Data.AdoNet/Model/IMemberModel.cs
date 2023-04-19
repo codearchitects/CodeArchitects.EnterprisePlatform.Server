@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -35,7 +35,7 @@ public interface IMemberModel
   /// If true, the entity defines the member represented by this model, otherwise the member is "hidden".
   /// </summary>
   /// <remarks>
-  /// If <c>true</c>, the <see cref="Member"/>, <see cref="GetValue"/>, and <see cref="SetValue"/> properties are not null.
+  /// If <see langword="true"/>, the <see cref="Member"/>, <see cref="GetValue"/>, and <see cref="SetValue"/> properties are not null.
   /// </remarks>
   [MemberNotNullWhen(true, nameof(Member), nameof(GetValue), nameof(SetValue))]
   bool HasMember { get; }

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
@@ -39,6 +39,6 @@ public interface IPrimaryKeyModel
   /// </summary>
   /// <param name="name">The name of the column to get.</param>
   /// <param name="column">The column, if found, <c>null</c> otherwise.</param>
-  /// <returns><c>true</c> if the column was found, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the column was found, <see langword="false"/> otherwise.</returns>
   bool TryGetColumn(ReadOnlySpan<char> name, [NotNullWhen(true)] out IPrimaryKeyColumnModel? column);
 }

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -60,7 +60,7 @@ internal class BuilderBase
     {
       PropertyInfo property => (property, property.PropertyType),
       FieldInfo field       => (field, field.FieldType),
-      _                     => throw Errors.Unreacheable,
+      _                     => throw Errors.Unreachable,
     };
   }
 

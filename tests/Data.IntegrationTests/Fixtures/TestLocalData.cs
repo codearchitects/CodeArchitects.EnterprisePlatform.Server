@@ -1,17 +1,13 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet;
-using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Oracle;
 using CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 using CodeArchitects.Platform.Data.AdoNet.SQLServer;
 using CodeArchitects.Platform.Data.EntityFrameworkCore;
 using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 using CodeArchitects.Platform.Data.Fixtures.Model;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using Oracle.ManagedDataAccess.Client;
 using System.Data.Common;
 using Xunit.Abstractions;
 
@@ -140,7 +136,7 @@ public class TestLocalData
       DbProvider.SqlServer => _sqlServerServices,
       DbProvider.Postgres  => _postgresServices,
       DbProvider.Oracle    => _oracleServices,
-      _                    => throw Errors.Unreacheable
+      _                    => throw Errors.Unreachable
     };
     _scope = services.CreateScope();
     _services = _scope.ServiceProvider;
@@ -157,7 +153,7 @@ public class TestLocalData
           DbProvider.SqlServer => services.GetRequiredService<SQLServerProvider>(),
           DbProvider.Postgres  => services.GetRequiredService<PostgreSQLProvider>(),
           DbProvider.Oracle    => services.GetRequiredService<OracleProvider>(),
-          _                    => throw Errors.Unreacheable
+          _                    => throw Errors.Unreachable
         };
 
         databaseProvider.ApplySeed(services, seed);

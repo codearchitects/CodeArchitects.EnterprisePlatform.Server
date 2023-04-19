@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
@@ -17,7 +17,7 @@ public interface ISimpleNavigationModel : INavigationModel
   /// Indicates whether this navigation property is on the dependent side of the relationship.
   /// </summary>
   /// <remarks>
-  /// If <c>false</c>, the <see cref="NavigationEntity"/> property is not null.
+  /// If <see langword="false"/>, the <see cref="NavigationEntity"/> property is not null.
   /// </remarks>
   [MemberNotNullWhen(false, nameof(NavigationEntity))]
   new bool IsOnDependent { get; } // TODO: Rename 'IsOnPrincipal' and change value accordingly

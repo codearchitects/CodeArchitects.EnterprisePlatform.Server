@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Utils;
+﻿using CodeArchitects.Platform.Common.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
@@ -33,7 +33,7 @@ internal class JoinTablePrimaryKeyModel : IPrimaryKeyModel
         6 => typeof(ValueTuple<,,,,,>),
         7 => typeof(ValueTuple<,,,,,,>),
         8 => typeof(ValueTuple<,,,,,,,>),
-        _ => throw Errors.Unreacheable
+        _ => throw Errors.Unreachable
       };
       _type = _type.MakeGenericType(Columns.Map(column => column.Type));
 

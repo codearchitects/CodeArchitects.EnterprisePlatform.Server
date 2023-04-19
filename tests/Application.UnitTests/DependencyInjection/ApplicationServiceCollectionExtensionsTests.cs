@@ -18,11 +18,8 @@ public class ApplicationServiceCollectionExtensionsTests
     services.AddIdentityProfile();
 
     // Assert
-    services.Should().HaveCount(5)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IIdentityProfile<Guid, Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IUserProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(ITenantProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(ClaimsPrincipal) && descriptor.Lifetime == ServiceLifetime.Scoped)
+    services.Should().HaveCount(2)
+      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IIdentityProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
       .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IHttpContextAccessor) && descriptor.Lifetime == ServiceLifetime.Singleton);
   }
 
@@ -36,27 +33,27 @@ public class ApplicationServiceCollectionExtensionsTests
     services.AddIdentityProfile<IMyIdentityProfile, MyClaimsIdentityProfile>();
 
     // Assert
-    services.Should().HaveCount(6)
+    services.Should().HaveCount(4)
       .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IMyIdentityProfile) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IIdentityProfile<Guid, Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IUserProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
+      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IIdentityProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
       .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(ITenantProfile<Guid>) && descriptor.Lifetime == ServiceLifetime.Scoped)
-      .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(ClaimsPrincipal) && descriptor.Lifetime == ServiceLifetime.Scoped)
       .And.ContainSingle(descriptor => descriptor.ServiceType == typeof(IHttpContextAccessor) && descriptor.Lifetime == ServiceLifetime.Singleton);
   }
 
-  private interface IMyIdentityProfile : IIdentityProfile<Guid, Guid>
+  private interface IMyIdentityProfile : IIdentityProfile<Guid>, ITenantProfile<Guid>
   {
     string MyClaim { get; }
   }
 
-  private class MyClaimsIdentityProfile : ClaimsIdentityProfile, IMyIdentityProfile
+  private class MyClaimsIdentityProfile : ClaimsIdentityProfile<Guid>, IMyIdentityProfile
   {
-    public MyClaimsIdentityProfile(ClaimsPrincipal? claims)
-      : base(claims)
+    public MyClaimsIdentityProfile(IHttpContextAccessor httpContextAccessor)
+      : base(httpContextAccessor)
     {
     }
 
     public string MyClaim => GetRequiredClaim("myClaimType");
+
+    public Guid TenantId => Guid.Parse(GetRequiredClaim("tenantId"));
   }
 }

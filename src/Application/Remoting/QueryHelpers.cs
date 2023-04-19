@@ -20,26 +20,20 @@ public static class QueryHelpers
   {
     s_queryDelegates = new ConcurrentDictionary<Type, QueryDelegate>();
 
-    s_appendSingleMethod = typeof(QueryHelpers).GetMethod(
+    s_appendSingleMethod = typeof(QueryHelpers).GetRequiredMethod(
       name: nameof(AppendSingle),
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
-      binder: null,
-      types: new[] { typeof(StringBuilder), typeof(string), typeof(object) },
-      modifiers: null) ?? throw new MissingMethodException(typeof(QueryHelpers).Name, nameof(AppendSingle));
+      types: new[] { typeof(StringBuilder), typeof(string), typeof(object) });
 
-    s_appendManyMethod = typeof(QueryHelpers).GetMethod(
+    s_appendManyMethod = typeof(QueryHelpers).GetRequiredMethod(
       name: nameof(AppendMany),
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
-      binder: null,
-      types: new[] { typeof(StringBuilder), typeof(string), typeof(IEnumerable<object>) },
-      modifiers: null) ?? throw new MissingMethodException(typeof(QueryHelpers).Name, nameof(AppendMany));
+      types: new[] { typeof(StringBuilder), typeof(string), typeof(IEnumerable<object>) });
 
-    s_appendChar = typeof(StringBuilder).GetMethod(
+    s_appendChar = typeof(StringBuilder).GetRequiredMethod(
       name: nameof(StringBuilder.Append),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      binder: null,
-      types: new[] { typeof(char) },
-      modifiers: null) ?? throw new MissingMethodException(typeof(StringBuilder).Name, nameof(StringBuilder.Append));
+      types: new[] { typeof(char) });
   }
 
   /// <summary>

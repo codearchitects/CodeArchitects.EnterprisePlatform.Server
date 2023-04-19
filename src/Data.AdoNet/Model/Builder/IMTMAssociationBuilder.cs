@@ -47,7 +47,7 @@ public interface IMTMAssociationBuilder<TFrom, TTo>
   /// <summary>
   /// Specifies the names of the columns of the junction table used to support the many-to-many relationship.
   /// </summary>
-  /// <param name="keyNames">The names of the columns.</param>
+  /// <param name="columnNames">The names of the columns.</param>
   /// <returns>The same <see cref="IOTOAssociationBuilder{TFrom, TTo}"/> that can be used to configure the many-to-many relationship.</returns>
-  IMTMAssociationBuilder<TFrom, TTo> JunctionColumnNames(params string[] keyNames);
+  IMTMAssociationBuilder<TFrom, TTo> JunctionColumnNames(params string[] columnNames);
 }

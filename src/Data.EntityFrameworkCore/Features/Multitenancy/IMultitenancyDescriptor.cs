@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy
 public interface IMultitenancyDescriptor
 {
   /// <summary>
-  /// If <c>true</c> the modification interceptors for multitenancy will be enabled.
+  /// If <see langword="true"/> the modification interceptors for multitenancy will be enabled.
   /// </summary>
   bool UsesModificationInterceptors { get; }
 

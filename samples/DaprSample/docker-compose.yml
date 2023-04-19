@@ -3,31 +3,86 @@ version: '3.4'
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
     
   redis:
     image: redis:alpine
+    ports:
+      - 5379:6379
 
   microservicea:
     image: ${DOCKER_REGISTRY-}microservicea
     build:
       context: .
       dockerfile: MicroserviceA/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 5000:80
 
   microservicea-dapr:
     image: daprio/daprd:latest
     network_mode: service:microservicea
     depends_on:
       - microservicea
+    command: ["./daprd",
+      "-app-id", "microservicea",
+      "-app-port", "80",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
 
   microserviceb:
     image: ${DOCKER_REGISTRY-}microserviceb
     build:
       context: .
       dockerfile: MicroserviceB/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 5001:80
 
   microserviceb-dapr:
     image: daprio/daprd:latest
     network_mode: service:microserviceb
     depends_on:
       - microserviceb
+    command: ["./daprd",
+      "-app-id", "microserviceb",
+      "-app-port", "80",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+
+  actorapp:
+    image: ${DOCKER_REGISTRY-}actorapp
+    build:
+      context: .
+      dockerfile: ActorApp/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 5010:80
+
+  actorapp-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:actorapp
+    depends_on:
+      - actorapp
+    command: ["./daprd",
+      "-app-id", "actorapp",
+      "-app-port", "80",
+      "-placement-host-address", "dapr-placement:50000",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+      
+  dapr-placement:
+    image: "daprio/dapr:latest"
+    command: ["./placement", "-port", "50000", "-log-level", "debug"]
       

@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.CodeAnalysis;
+﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
@@ -27,6 +27,6 @@ public interface ICollectionAccessor
   /// </summary>
   /// <param name="instance">The instance of the collection.</param>
   /// <param name="count">The number of elements in the collection, if successful, 0 otherwise.</param>
-  /// <returns><c>true</c> if the count can be obtained without enumerating the collection, <c>false</c> otherwise.</returns>
+  /// <returns><see langword="true"/> if the count can be obtained without enumerating the collection, <see langword="false"/> otherwise.</returns>
   bool TryGetNonEnumeratedCount(object instance, out int count);
 }
