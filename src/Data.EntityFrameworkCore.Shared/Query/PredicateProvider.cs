@@ -10,7 +10,7 @@ internal class PredicateProvider : IPredicateProvider
 {
   private readonly IPredicateTemplateFactory _templateFactory;
   private readonly IPredicateTemplateCache _cache;
-  private readonly IModel _model;
+  private readonly IModel _model; // TODO: Make DataContext pass the IEntityModel to each method call
 
   public PredicateProvider(IPredicateTemplateFactory templateFactory, IPredicateTemplateCache cache, IModel model)
   {

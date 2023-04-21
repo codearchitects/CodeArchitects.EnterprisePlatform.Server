@@ -182,7 +182,7 @@ internal class ActorDescriptorEqualityComparer :
     }
     else
     {
-      if (y.DefaultValue != null)
+      if (y.DefaultValue is not null)
         return false;
     }
 

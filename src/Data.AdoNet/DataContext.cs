@@ -76,7 +76,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Insert, Connection);
+      TDbCommand command = CreateCommand(OperationType.Insert, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteInsertAsync(command, entity, model, cancellationToken);
@@ -124,7 +124,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Update, Connection);
+      TDbCommand command = CreateCommand(OperationType.Update, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteUpdateAsync(command, entity, model, cancellationToken);
@@ -162,7 +162,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Upsert, Connection);
+      TDbCommand command = CreateCommand(OperationType.Upsert, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteUpsertAsync(command, entity, model, cancellationToken);
@@ -180,7 +180,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+      TDbCommand command = CreateCommand(OperationType.Remove, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteRemoveAsync(command, entity, model, cancellationToken);
@@ -195,7 +195,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+      TDbCommand command = CreateCommand(OperationType.Remove, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteRemoveAsync(command, key, model, cancellationToken);

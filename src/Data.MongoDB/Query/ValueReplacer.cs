@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
+namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
 internal class ValueReplacer : ExpressionVisitor
 {
