@@ -2,6 +2,6 @@
 
 public enum RepositoryImplementation
 {
-  AdoNet,
-  EFCore
+  AdoNet = 1,
+  EFCore = 2
 }

@@ -4,59 +4,29 @@ using CodeArchitects.Platform.Data.EntityFrameworkCore;
 using CodeArchitects.Platform.Data.Tracking;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using Oracle.ManagedDataAccess.Client;
 using System.Runtime.InteropServices;
+using Testcontainers.MsSql;
+using Testcontainers.Oracle;
+using Testcontainers.PostgreSql;
 using Xunit.Abstractions;
 
 namespace CodeArchitects.Platform.Data.Fixtures;
 
 public class TestFixture : IAsyncLifetime
 {
-  private readonly MsSqlTestcontainer _msSqlContainer;
-  private readonly PostgreSqlTestcontainer _postgresContainer;
-  private readonly OracleTestcontainer _oracleContainer;
-
-  private readonly Lazy<SqlConnection> _sqlServerConnectionLazy;
-  private readonly Lazy<NpgsqlConnection> _postgresConnectionLazy;
-  private readonly Lazy<OracleConnection> _oracleConnectionLazy;
+  private readonly MsSqlContainer _msSqlContainer;
+  private readonly PostgreSqlContainer _postgresContainer;
+  private readonly OracleContainer _oracleContainer;
 
   private readonly TestLocalData _localData;
 
   public TestFixture()
   {
-    _msSqlContainer = new TestcontainersBuilder<MsSqlTestcontainer>()
-      .WithDatabase(new MsSqlTestcontainerConfiguration
-      {
-        Database = "Test",
-        Password = "Password1"
-      })
-      .Build();
-
-    _postgresContainer = new TestcontainersBuilder<PostgreSqlTestcontainer>()
-      .WithDatabase(new PostgreSqlTestcontainerConfiguration
-      {
-        Database = "Test",
-        Username = "codearchitects",
-        Password = "Password1"
-      })
-      .Build();
-
-    _oracleContainer = new TestcontainersBuilder<OracleTestcontainer>()
-      .WithDatabase(new OracleTestcontainerConfiguration
-      {
-        Password = "Password1"
-      })
-      .Build();
-
-    _sqlServerConnectionLazy = new(() => new SqlConnection(SqlServerConnectionString));
-    _postgresConnectionLazy = new(() => new NpgsqlConnection(PostgresConnectionString));
-    _oracleConnectionLazy = new(() => new OracleConnection(OracleConnectionString));
+    _msSqlContainer = new MsSqlBuilder().Build();
+    _postgresContainer = new PostgreSqlBuilder().Build();
+    _oracleContainer = new OracleBuilder().Build();
 
     _localData = new(this);
   }
@@ -65,26 +35,20 @@ public class TestFixture : IAsyncLifetime
 
   public ITrackingContext TrackingContext => _localData.Services.GetRequiredService<ITrackingContext>();
 
-  public string SqlServerConnectionString => _msSqlContainer.ConnectionString + "TrustServerCertificate=True;";
+  public string SqlServerConnectionString => _msSqlContainer.GetConnectionString();
 
-  public string PostgresConnectionString => _postgresContainer.ConnectionString;
+  public string PostgresConnectionString => _postgresContainer.GetConnectionString();
 
-  public string OracleConnectionString => _oracleContainer.ConnectionString;
-
-  public SqlConnection SqlServerConnection => _sqlServerConnectionLazy.Value;
-
-  public NpgsqlConnection PostgresConnection => _postgresConnectionLazy.Value;
-
-  public OracleConnection OracleConnection => _oracleConnectionLazy.Value;
+  public string OracleConnectionString => _oracleContainer.GetConnectionString();
 
   public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>(
     RepositoryDependencies dependencies,
     Action<ISeeder>? seedingAction = null,
-    RepositoryImplementation seedImplementation = ((RepositoryImplementation)(-1)))
+    RepositoryImplementation seedImplementation = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (seedImplementation == ((RepositoryImplementation)(-1)))
+    if (seedImplementation == default)
     {
       seedImplementation = dependencies.Implementation;
     }
@@ -133,20 +97,13 @@ public class TestFixture : IAsyncLifetime
 
   async Task IAsyncLifetime.DisposeAsync()
   {
-    Environment.SetEnvironmentVariable("EFCORE_ISRUNTIME", null);
-
-    _sqlServerConnectionLazy.Value.Dispose();
-    _postgresConnectionLazy.Value.Dispose();
-    _oracleConnectionLazy.Value.Dispose();
-
     await CleanUpContainerAsync(_msSqlContainer);
     await CleanUpContainerAsync(_postgresContainer);
     await CleanUpContainerAsync(_oracleContainer);
 
-    static async Task CleanUpContainerAsync(TestcontainersContainer container)
+    static async Task CleanUpContainerAsync(DockerContainer container)
     {
       await container.StopAsync();
-      await container.CleanUpAsync();
       await container.DisposeAsync();
     }
   }
