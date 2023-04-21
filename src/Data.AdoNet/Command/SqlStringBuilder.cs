@@ -145,20 +145,20 @@ internal readonly struct SqlStringBuilder
   }
 
 
-  public void AppendParameter(IColumnModel column)
+  public void AppendParameter(IColumnModel column, int offset)
   {
     Append(_syntaxProvider.ParameterPrefix);
     Append('p');
-    Append(column.Index);
+    Append(column.Index + offset);
   }
 
-  public void AppendParameters(IEnumerable<IColumnModel> columns)
+  public void AppendParameters(IEnumerable<IColumnModel> columns, int offset)
   {
-    AppendJoin(", ", columns, AppendParameter);
+    AppendJoin(", ", offset, columns, AppendParameter);
 
-    static void AppendParameter(in SqlStringBuilder stringBuilder, IColumnModel column)
+    static void AppendParameter(in SqlStringBuilder stringBuilder, int offset, IColumnModel column)
     {
-      stringBuilder.AppendParameter(column);
+      stringBuilder.AppendParameter(column, offset);
     }
   }
 
@@ -202,7 +202,7 @@ internal readonly struct SqlStringBuilder
     {
       stringBuilder.AppendEscaped(column.Name);
       stringBuilder.Append(" = ");
-      stringBuilder.AppendParameter(column);
+      stringBuilder.AppendParameter(column, 0);
     }
   }
 

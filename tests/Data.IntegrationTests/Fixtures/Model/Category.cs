@@ -13,4 +13,6 @@ public class Category
     .RuleFor(category => category.Name, faker => faker.Lorem.Word());
 
   public static Category One() => s_faker.Generate();
+
+  public static List<Category> Many(int count) => s_faker.Generate(count);
 }

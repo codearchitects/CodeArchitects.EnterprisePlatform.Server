@@ -21,12 +21,12 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public INavigationModel Navigation => _navigation;
 
-  public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+  public override TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitForeignKey(this);
   }
 
-  public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+  public override TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitForeignKey(this, in state);
   }

@@ -41,12 +41,12 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public new Setter<object?> SetValue => _memberComponent.SetValue;
 
-  public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+  public override TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitPrimaryAndForeignKey(this);
   }
 
-  public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+  public override TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitPrimaryAndForeignKey(this, in state);
   }

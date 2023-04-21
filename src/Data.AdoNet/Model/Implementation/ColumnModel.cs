@@ -17,9 +17,7 @@ internal abstract class ColumnModel : MemberModel, IColumnModel
 
   public short Index { get; }
 
-  public abstract TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IColumnModelVisitor<TResult>;
+  public abstract TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor);
 
-  public abstract TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IColumnModelVisitor<TResult, TState>;
+  public abstract TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state);
 }

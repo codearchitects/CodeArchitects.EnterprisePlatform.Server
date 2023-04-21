@@ -19,19 +19,18 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Category category = Category.One();
-    Typology typology0 = Typology.One();
-    Typology typology1 = Typology.One();
-    category.Typologies = new() { typology0, typology1 };
-    string? oldTypologyName = typology0.Name;
+    List<Typology> typologies = Typology.Many(2);
+    category.Typologies = new(typologies);
+    string? oldTypologyName = typologies[0].Name;
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(typology0, typology1);
+      seeder.Seed(typologies);
       seeder.Seed(category);
     });
 
     category.Name = "New category name";
-    typology0.Name = "New typology name";
+    typologies[0].Name = "New typology name";
 
     // Act
     await sut.UpdateAsync(category);
@@ -44,8 +43,8 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(category.Name);
     fromDb.Typologies.Should().HaveCount(2)
-      .And.ContainSingle(typology => typology.Id == typology0.Id && typology.Name == oldTypologyName)
-      .And.ContainSingle(typology => typology.Id == typology1.Id && typology.Name == typology1.Name);
+      .And.ContainSingle(typology => typology.Id == typologies[0].Id && typology.Name == oldTypologyName)
+      .And.ContainSingle(typology => typology.Id == typologies[1].Id && typology.Name == typologies[1].Name);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -53,24 +52,22 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Category category = Category.One();
-    Typology typology0 = Typology.One();
-    Typology typology1 = Typology.One();
-    category.Typologies = new() { typology0 };
-    string? oldTypologyName = typology0.Name;
+    List<Typology> typologies = Typology.Many(2);
+    category.Typologies = new() { typologies[0] };
+    string? oldTypologyName = typologies[0].Name;
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(typology0, typology1);
+      seeder.Seed(typologies);
       seeder.Seed(category);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
-    typology0.Name = "New typology name";
-    category.Typologies.Add(typology1);
-    trackingContext.SetTrackingState(category, TrackingState.Modified);
-    trackingContext.SetTrackingState(typology0, TrackingState.Unchanged);
-    trackingContext.SetTrackingState(typology1, TrackingState.Added);
+    typologies[0].Name = "New typology name";
+    category.Typologies.Add(typologies[1]);
+    trackingContext.SetTrackingState(typologies[0], TrackingState.Unchanged);
+    trackingContext.SetTrackingState(typologies[1], TrackingState.Added);
 
     // Act
     await sut.UpdateAsync(category);
@@ -83,8 +80,8 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(category.Name);
     fromDb.Typologies.Should().HaveCount(2)
-      .And.ContainSingle(typology => typology.Id == typology0.Id && typology.Name == oldTypologyName)
-      .And.ContainSingle(typology => typology.Id == typology1.Id && typology.Name == typology1.Name);
+      .And.ContainSingle(typology => typology.Id == typologies[0].Id && typology.Name == oldTypologyName)
+      .And.ContainSingle(typology => typology.Id == typologies[1].Id && typology.Name == typologies[1].Name);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -92,23 +89,21 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Category category = Category.One();
-    Typology typology0 = Typology.One();
-    Typology typology1 = Typology.One();
-    category.Typologies = new() { typology0, typology1 };
-    string? oldTypologyName = typology0.Name;
+    List<Typology> typologies = Typology.Many(2);
+    category.Typologies = new(typologies);
+    string? oldTypologyName = typologies[0].Name;
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(typology0, typology1);
+      seeder.Seed(typologies);
       seeder.Seed(category);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     category.Name = "New category name";
-    typology0.Name = "New typology name";
-    trackingContext.SetTrackingState(category, TrackingState.Modified);
-    trackingContext.SetTrackingState(typology0, TrackingState.Unchanged);
-    trackingContext.SetTrackingState(typology1, TrackingState.Removed);
+    typologies[0].Name = "New typology name";
+    trackingContext.SetTrackingState(typologies[0], TrackingState.Unchanged);
+    trackingContext.SetTrackingState(typologies[1], TrackingState.Removed);
 
     // Act
     await sut.UpdateAsync(category);
@@ -121,7 +116,7 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(category.Name);
     fromDb.Typologies.Should().HaveCount(1)
-      .And.ContainSingle(typology => typology.Id == typology0.Id && typology.Name == oldTypologyName);
+      .And.ContainSingle(typology => typology.Id == typologies[0].Id && typology.Name == oldTypologyName);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -129,20 +124,18 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Category category = Category.One();
-    Typology typology0 = Typology.One();
-    Typology typology1 = Typology.One();
-    category.Typologies = new() { typology0, typology1 };
+    List<Typology> typologies = Typology.Many(2);
+    category.Typologies = new(typologies);
 
     var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(typology0, typology1);
+      seeder.Seed(typologies);
       seeder.Seed(category);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
-    trackingContext.SetTrackingState(category, TrackingState.Modified);
-    trackingContext.SetTrackingState(typology0, TrackingState.Modified);
-    trackingContext.SetTrackingState(typology1, TrackingState.Modified);
+    trackingContext.SetTrackingState(typologies[0], TrackingState.Modified);
+    trackingContext.SetTrackingState(typologies[1], TrackingState.Modified);
 
     // Act
     Func<Task> act = () => sut.UpdateAsync(category);
@@ -156,19 +149,18 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Customer customer = Customer.One();
-    Cart cart0 = Cart.One();
-    Cart cart1 = Cart.One();
-    customer.Carts = new() { cart0, cart1 };
-    string? oldCartName = cart0.Name;
+    List<Cart> carts = Cart.Many(2);
+    customer.Carts = new(carts);
+    string? oldCartName = carts[0].Name;
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(cart0, cart1);
+      seeder.Seed(carts);
       seeder.Seed(customer);
     });
 
     customer.Name = "New customer name";
-    cart0.Name = "New cart name";
+    carts[0].Name = "New cart name";
 
     // Act
     await sut.UpdateAsync(customer);
@@ -181,8 +173,8 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(2)
-      .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName)
-      .And.ContainSingle(cart => cart.Id == cart1.Id && cart.Name == cart1.Name);
+      .And.ContainSingle(cart => cart.Id == carts[0].Id && cart.Name == oldCartName)
+      .And.ContainSingle(cart => cart.Id == carts[1].Id && cart.Name == carts[1].Name);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -190,24 +182,22 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Customer customer = Customer.One();
-    Cart cart0 = Cart.One();
-    Cart cart1 = Cart.One();
-    customer.Carts = new() { cart0 };
-    string? oldCartName = cart0.Name;
+    List<Cart> carts = Cart.Many(2);
+    customer.Carts = new() { carts[0] };
+    string? oldCartName = carts[0].Name;
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(cart0, cart1);
+      seeder.Seed(carts);
       seeder.Seed(customer);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
-    cart0.Name = "New cart name";
-    customer.Carts.Add(cart1);
-    trackingContext.SetTrackingState(customer, TrackingState.Modified);
-    trackingContext.SetTrackingState(cart0, TrackingState.Unchanged);
-    trackingContext.SetTrackingState(cart1, TrackingState.Added);
+    carts[0].Name = "New cart name";
+    customer.Carts.Add(carts[1]);
+    trackingContext.SetTrackingState(carts[0], TrackingState.Unchanged);
+    trackingContext.SetTrackingState(carts[1], TrackingState.Added);
 
     // Act
     await sut.UpdateAsync(customer);
@@ -220,8 +210,8 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(2)
-      .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName)
-      .And.ContainSingle(cart => cart.Id == cart1.Id && cart.Name == cart1.Name);
+      .And.ContainSingle(cart => cart.Id == carts[0].Id && cart.Name == oldCartName)
+      .And.ContainSingle(cart => cart.Id == carts[1].Id && cart.Name == carts[1].Name);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -229,23 +219,21 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Customer customer = Customer.One();
-    Cart cart0 = Cart.One();
-    Cart cart1 = Cart.One();
-    customer.Carts = new() { cart0, cart1 };
-    string? oldCartName = cart0.Name;
+    List<Cart> carts = Cart.Many(2);
+    customer.Carts = new(carts);
+    string? oldCartName = carts[0].Name;
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(cart0, cart1);
+      seeder.Seed(carts);
       seeder.Seed(customer);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     customer.Name = "New customer name";
-    cart0.Name = "New cart name";
-    trackingContext.SetTrackingState(customer, TrackingState.Modified);
-    trackingContext.SetTrackingState(cart0, TrackingState.Unchanged);
-    trackingContext.SetTrackingState(cart1, TrackingState.Removed);
+    carts[0].Name = "New cart name";
+    trackingContext.SetTrackingState(carts[0], TrackingState.Unchanged);
+    trackingContext.SetTrackingState(carts[1], TrackingState.Removed);
 
     // Act
     await sut.UpdateAsync(customer);
@@ -258,36 +246,33 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(customer.Name);
     fromDb.Carts.Should().HaveCount(1)
-      .And.ContainSingle(cart => cart.Id == cart0.Id && cart.Name == oldCartName);
+      .And.ContainSingle(cart => cart.Id == carts[0].Id && cart.Name == oldCartName);
   }
 
   [Theory, RepositoryDependenciesData]
   public async Task UpdateAsync_ShouldUpdateEntityAndRemoveOrAddLinksOfAggregateEntity_WhenNavigationIsManyToManyAndNavigationIsRemoved(RepositoryDependencies dependencies)
   {
     // Arrange
-    Product product1 = Product.One();
-    Product product2 = Product.One();
-    Product product3 = Product.One();
+    List<Product> products = Product.Many(3);
     Cart cart = Cart.One();
     CartItem item = CartItem.One(cart.Id);
-    item.Products = new() { product1, product2 };
+    item.Products = new() { products[0], products[1] };
     cart.Items = new() { item };
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
     {
       seeder.Seed(cart);
       seeder.Seed(item);
-      seeder.Seed(product1, product2, product3);
+      seeder.Seed(products);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";
     item.Name = "New item name";
-    item.Products = new() { product1, product3 };
-    trackingContext.SetTrackingState(cart, TrackingState.Modified);
+    item.Products = new() { products[0], products[2] };
     trackingContext.SetTrackingState(item, TrackingState.Modified);
-    trackingContext.SetTrackingState(product1, TrackingState.Removed);
-    trackingContext.SetTrackingState(product3, TrackingState.Added);
+    trackingContext.SetTrackingState(products[0], TrackingState.Removed);
+    trackingContext.SetTrackingState(products[2], TrackingState.Added);
 
     // Act
     await sut.UpdateAsync(cart);
@@ -302,8 +287,8 @@ public class UpdateAsyncTests : TestBase
     fromDb!.Name.Should().Be(cart.Name);
     fromDb.Items.Should().HaveCount(1);
     fromDb.Items![0].Products.Should().HaveCount(2)
-      .And.ContainSingle(product => product.Id == product2.Id)
-      .And.ContainSingle(product => product.Id == product3.Id);
+      .And.ContainSingle(product => product.Id == products[1].Id)
+      .And.ContainSingle(product => product.Id == products[2].Id);
   }
 
   [Theory, RepositoryDependenciesData]
@@ -311,20 +296,18 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Customer customer = Customer.One();
-    Cart cart0 = Cart.One();
-    Cart cart1 = Cart.One();
-    customer.Carts = new() { cart0, cart1 };
+    List<Cart> carts = Cart.Many(2);
+    customer.Carts = new(carts);
 
     var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
     {
-      seeder.Seed(cart0, cart1);
+      seeder.Seed(carts);
       seeder.Seed(customer);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
-    trackingContext.SetTrackingState(customer, TrackingState.Modified);
-    trackingContext.SetTrackingState(cart0, TrackingState.Modified);
-    trackingContext.SetTrackingState(cart1, TrackingState.Modified);
+    trackingContext.SetTrackingState(carts[0], TrackingState.Modified);
+    trackingContext.SetTrackingState(carts[1], TrackingState.Modified);
 
     // Act
     Func<Task> act = () => sut.UpdateAsync(customer);
@@ -379,10 +362,9 @@ public class UpdateAsyncTests : TestBase
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
-    first.Name = "New customer name";
+    first.Name = "New first name";
     second.Name = "New second name";
     first.Partner = second;
-    trackingContext.SetTrackingState(first, TrackingState.Modified);
     trackingContext.SetTrackingState(second, TrackingState.Added);
 
     // Act
@@ -415,9 +397,8 @@ public class UpdateAsyncTests : TestBase
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
-    first.Name = "New customer name";
+    first.Name = "New first name";
     second.Name = "New second name";
-    trackingContext.SetTrackingState(first, TrackingState.Modified);
     trackingContext.SetTrackingState(second, TrackingState.Removed);
 
     // Act
@@ -427,11 +408,12 @@ public class UpdateAsyncTests : TestBase
     Person? fromDb = _fixture.DbContext.Set<Person>()
       .Include(x => x.Partner)
       .FirstOrDefault(x => x.Id == first.Id);
+    Person? partner = _fixture.DbContext.Set<Person>().FirstOrDefault(person => person.Id == second.Id);
 
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(first.Name);
     fromDb.Partner.Should().BeNull();
-    _fixture.DbContext.Set<Person>().FirstOrDefault(person => person.Id == second.Id).Should().NotBeNull();
+    partner.Should().NotBeNull();
   }
 
   [Theory, RepositoryDependenciesData]
@@ -450,7 +432,6 @@ public class UpdateAsyncTests : TestBase
 
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
-    trackingContext.SetTrackingState(first, TrackingState.Modified);
     trackingContext.SetTrackingState(second, TrackingState.Modified);
 
     // Act
@@ -465,24 +446,22 @@ public class UpdateAsyncTests : TestBase
   {
     // Arrange
     Cart cart = Cart.One();
-    CartItem item0 = CartItem.One(cart.Id);
-    CartItem item1 = CartItem.One(cart.Id);
-    cart.Items = new() { item0, item1 };
+    List<CartItem> items = CartItem.Many(2, cart.Id);
+    cart.Items = new(items);
 
     var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
     {
       seeder.Seed(cart);
-      seeder.Seed(item0, item1);
+      seeder.Seed(items);
     });
     ITrackingContext trackingContext = _fixture.TrackingContext;
 
     cart.Name = "New cart name";
-    item1.Name = "New item name";
+    items[1].Name = "New item name";
     CartItem item2 = CartItem.One(cart.Id);
     cart.Items.Add(item2);
-    trackingContext.SetTrackingState(cart, TrackingState.Modified);
-    trackingContext.SetTrackingState(item0, TrackingState.Removed);
-    trackingContext.SetTrackingState(item1, TrackingState.Modified);
+    trackingContext.SetTrackingState(items[0], TrackingState.Removed);
+    trackingContext.SetTrackingState(items[1], TrackingState.Modified);
     trackingContext.SetTrackingState(item2, TrackingState.Added);
 
     // Act
@@ -496,7 +475,7 @@ public class UpdateAsyncTests : TestBase
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(cart.Name);
     fromDb.Items.Should().HaveCount(2)
-      .And.ContainSingle(item => item.Index == item1.Index && item.Name == item1.Name)
+      .And.ContainSingle(item => item.Index == items[1].Index && item.Name == items[1].Name)
       .And.ContainSingle(item => item.Index == item2.Index && item.Name == item2.Name);
   }
 }

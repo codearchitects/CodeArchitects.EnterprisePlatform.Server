@@ -10,12 +10,20 @@ internal interface IExecutor<TDbCommand>
   Task<TEntity?> ExecuteFindAsync<TEntity, TKey>(TDbCommand command, TKey key, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
-  
+
   Task ExecuteInsertAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
+  Task ExecuteInsertManyAsync<TEntity, TKey>(TDbCommand command, IEnumerable<TEntity> entities, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
+
   Task ExecuteUpdateAsync<TEntity, TKey>(TDbCommand command, TEntity entity, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
+    where TEntity : class
+    where TKey : IEquatable<TKey>;
+
+  Task ExecuteUpdateManyAsync<TEntity, TKey>(TDbCommand command, IEnumerable<TEntity> entities, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
@@ -30,8 +38,4 @@ internal interface IExecutor<TDbCommand>
   Task ExecuteRemoveAsync<TEntity, TKey>(TDbCommand command, TKey key, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>;
-
-  void VisitGraph<TState>(object node, IEntityModel model, TState state, VisitNodeCallback<TState> callback);
-
-  Task VisitGraphAsync<TState>(object node, IEntityModel model, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken);
 }

@@ -15,4 +15,6 @@ public class Customer
     .RuleFor(customer => customer.Name, faker => faker.Name.FullName());
 
   public static Customer One() => s_faker.Generate();
+
+  public static List<Customer> Many(int count) => s_faker.Generate(count);
 }

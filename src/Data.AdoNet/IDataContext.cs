@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Data;
 
@@ -41,6 +42,16 @@ public interface IDataContext : Data.IDataContext
     where TEntity : class;
 
   /// <summary>
+  /// Visits all nodes in the graph represented by the specified entity, starting from the root node.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the entity.</typeparam>
+  /// <param name="entity">The root entity of the graph to be visited.</param>
+  /// <param name="visitor">The visitor specifying the actions to execute on each visited node.</param>
+  [Experimental]
+  void VisitGraph<TEntity>(TEntity entity, IGraphVisitor visitor)
+    where TEntity : class;
+
+  /// <summary>
   /// Asynchronously visits all nodes in the graph represented by the specified entity, starting from the root node.
   /// </summary>
   /// <typeparam name="TEntity">The type of the entity.</typeparam>
@@ -51,6 +62,17 @@ public interface IDataContext : Data.IDataContext
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
   [Experimental]
   Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+    where TEntity : class;
+
+  /// <summary>
+  /// Asynchronously visits all nodes in the graph represented by the specified entity, starting from the root node.
+  /// </summary>
+  /// <typeparam name="TEntity">The type of the entity.</typeparam>
+  /// <param name="entity">The root entity of the graph to be visited.</param>
+  /// <param name="visitor">The visitor specifying the actions to execute on each visited node.</param>
+  /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
+  [Experimental]
+  Task VisitGraphAsync<TEntity>(TEntity entity, IAsyncGraphVisitor visitor, CancellationToken cancellationToken)
     where TEntity : class;
 
   /// <summary>

@@ -57,10 +57,24 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual async Task InsertManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+  {
+    IEnumerable<TTable> tables = entities.Select(EntityToTable);
+    await DataContext.InsertManyAsync<TTable, TKey>(tables, cancellationToken);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     TTable table = EntityToTable(entity);
     await DataContext.UpdateAsync<TTable, TKey>(table, cancellationToken);
+  }
+
+  /// <inheritdoc/>
+  public virtual async Task UpdateManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+  {
+    IEnumerable<TTable> tables = entities.Select(EntityToTable);
+    await DataContext.UpdateManyAsync<TTable, TKey>(tables, cancellationToken);
   }
 
   /// <inheritdoc/>

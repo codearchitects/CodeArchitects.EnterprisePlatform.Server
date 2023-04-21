@@ -13,4 +13,6 @@ public class Typology
     .RuleFor(typology => typology.Name, faker => faker.Lorem.Word());
 
   public static Typology One() => s_faker.Generate();
+
+  public static List<Typology> Many(int count) => s_faker.Generate(count);
 }

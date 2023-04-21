@@ -44,14 +44,12 @@ internal class MockForeignKeyPropertyModel : IForeignKeyColumnModel
 
   public object? DefaultValue => _mock.DefaultValue;
 
-  public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IColumnModelVisitor<TResult>
+  public TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitForeignKey(this);
   }
 
-  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IColumnModelVisitor<TResult, TState>
+  public TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitForeignKey(this, in state);
   }

@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Data;
 using System.Data.Common;
@@ -82,6 +83,34 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     }, startTransaction, cancellationToken);
   }
 
+  public Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = false;
+    foreach (TEntity entity in entities)
+    {
+      if (ShouldStartTransaction(model, entity))
+      {
+        startTransaction = true;
+        break;
+      }
+    }
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      TDbCommand command = CreateCommand(OperationType.InsertMany, Connection);
+
+      command.Transaction = transaction;
+      await _executor.ExecuteInsertManyAsync(command, entities, model, cancellationToken);
+    }, startTransaction, cancellationToken);
+  }
+
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -100,6 +129,24 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       command.Transaction = transaction;
       await _executor.ExecuteUpdateAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
+  }
+
+  public Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      TDbCommand command = CreateCommand(OperationType.UpdateMany, Connection);
+
+      command.Transaction = transaction;
+      await _executor.ExecuteUpdateManyAsync(command, entities, model, cancellationToken);
+    }, true, cancellationToken);
   }
 
   public Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -180,12 +227,21 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       throw new ArgumentNullException(nameof(callback));
 
     IEntityModel model = EnsureEntity<TEntity>();
-
-    callback(entity, model, default, state);
-    _executor.VisitGraph(entity, model, state, callback);
+    Graph.Visit(entity, model, state, callback);
   }
 
-  public async Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+  public void VisitGraph<TEntity>(TEntity entity, IGraphVisitor visitor) where TEntity : class
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (visitor is null)
+      throw new ArgumentNullException(nameof(visitor));
+
+    IEntityModel model = EnsureEntity<TEntity>();
+    Graph.Visit(entity, model, visitor);
+  }
+
+  public Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
     where TEntity : class
   {
     if (entity is null)
@@ -194,9 +250,18 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       throw new ArgumentNullException(nameof(callback));
 
     IEntityModel model = EnsureEntity<TEntity>();
+    return Graph.VisitAsync(entity, model, state, callback, cancellationToken);
+  }
 
-    await callback(entity, model, default, state, cancellationToken);
-    await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  public Task VisitGraphAsync<TEntity>(TEntity entity, IAsyncGraphVisitor visitor, CancellationToken cancellationToken) where TEntity : class
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (visitor is null)
+      throw new ArgumentNullException(nameof(visitor));
+
+    IEntityModel model = EnsureEntity<TEntity>();
+    return Graph.VisitAsync(entity, model, visitor, cancellationToken);
   }
 
   public string IncludeNavigations<TEntity, TKey>(string query, IncludeAction<TEntity> includeAction)

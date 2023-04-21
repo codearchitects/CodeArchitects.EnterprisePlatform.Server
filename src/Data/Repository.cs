@@ -36,9 +36,21 @@ public abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
   }
 
   /// <inheritdoc/>
+  public virtual async Task InsertManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+  {
+    await DataContext.InsertManyAsync<TEntity, TKey>(entities, cancellationToken);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     await DataContext.UpdateAsync<TEntity, TKey>(entity, cancellationToken);
+  }
+
+  /// <inheritdoc/>
+  public virtual async Task UpdateManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+  {
+    await DataContext.UpdateManyAsync<TEntity, TKey>(entities, cancellationToken);
   }
 
   /// <inheritdoc/>

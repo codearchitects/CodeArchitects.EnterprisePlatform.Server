@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 
@@ -64,8 +65,11 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
         _entries.Add((entity, entityModel, default));
       }
 
-      _executor.VisitGraph(entity, entityModel, null as object, (node, model, navigation, _) =>
+      Graph.Visit(entity, entityModel, null as object, (node, model, navigation, _) =>
       {
+        if (navigation == default)
+          return true;
+
         if (navigation.NavigationModel.From == navigation.NavigationModel.To)
           throw new InvalidOperationException("Seeding entities with self reference is not supported.");
 

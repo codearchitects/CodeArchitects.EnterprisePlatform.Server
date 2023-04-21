@@ -28,5 +28,15 @@ public enum OperationType
   /// <summary>
   /// The Remove operation.
   /// </summary>
-  Remove
+  Remove,
+
+  /// <summary>
+  /// The InsertMany operation.
+  /// </summary>
+  InsertMany,
+
+  /// <summary>
+  /// The UpdateMany operation.
+  /// </summary>
+  UpdateMany
 }
