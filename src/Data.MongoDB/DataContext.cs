@@ -59,7 +59,24 @@ internal class DataContext : IDataContext
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {
-      await collection.InsertOneAsync(entity, cancellationToken: cancellationToken, options: null);
+      await collection.InsertOneAsync(entity, cancellationToken: cancellationToken);
+    }, cancellationToken);
+  }
+
+  public Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+
+    return _stateManager.ExecuteAsync(async (cancellationToken) =>
+    {
+      await collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
     }, cancellationToken);
   }
 
@@ -82,6 +99,13 @@ internal class DataContext : IDataContext
       if (!IsEntityReplaced(updateResult))
         throw new DBConcurrencyException(); // TODO: Message
     }, cancellationToken);
+  }
+
+  public Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    throw new NotSupportedException($"'{nameof(UpdateManyAsync)}' is not yet supported.");
   }
 
   public Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)

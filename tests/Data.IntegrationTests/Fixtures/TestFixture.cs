@@ -7,6 +7,7 @@ using Docker.DotNet.Models;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
+using Testcontainers.MariaDb;
 using Testcontainers.MsSql;
 using Testcontainers.Oracle;
 using Testcontainers.PostgreSql;
@@ -19,6 +20,7 @@ public class TestFixture : IAsyncLifetime
   private readonly MsSqlContainer _msSqlContainer;
   private readonly PostgreSqlContainer _postgresContainer;
   private readonly OracleContainer _oracleContainer;
+  private readonly MariaDbContainer _mariaDbContainer;
 
   private readonly TestLocalData _localData;
 
@@ -27,6 +29,7 @@ public class TestFixture : IAsyncLifetime
     _msSqlContainer = new MsSqlBuilder().Build();
     _postgresContainer = new PostgreSqlBuilder().Build();
     _oracleContainer = new OracleBuilder().Build();
+    _mariaDbContainer = new MariaDbBuilder().Build();
 
     _localData = new(this);
   }
@@ -40,6 +43,8 @@ public class TestFixture : IAsyncLifetime
   public string PostgresConnectionString => _postgresContainer.GetConnectionString();
 
   public string OracleConnectionString => _oracleContainer.GetConnectionString();
+
+  public string MariaDbConnectionString => _mariaDbContainer.GetConnectionString();
 
   public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>(
     RepositoryDependencies dependencies,
@@ -91,15 +96,19 @@ public class TestFixture : IAsyncLifetime
     await _msSqlContainer.StartAsync();
     await _postgresContainer.StartAsync();
     await _oracleContainer.StartAsync();
+    await _mariaDbContainer.StartAsync();
 
     _localData.Initialize();
   }
 
   async Task IAsyncLifetime.DisposeAsync()
   {
+    Environment.SetEnvironmentVariable("EFCORE_ISRUNTIME", null);
+
     await CleanUpContainerAsync(_msSqlContainer);
     await CleanUpContainerAsync(_postgresContainer);
     await CleanUpContainerAsync(_oracleContainer);
+    await CleanUpContainerAsync(_mariaDbContainer);
 
     static async Task CleanUpContainerAsync(DockerContainer container)
     {

@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet;
+using CodeArchitects.Platform.Data.AdoNet.MySQL;
 using CodeArchitects.Platform.Data.AdoNet.Oracle;
 using CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 using CodeArchitects.Platform.Data.AdoNet.SQLServer;
@@ -35,6 +36,7 @@ public class TestLocalData
   private IServiceProvider _sqlServerServices = default!;
   private IServiceProvider _postgresServices = default!;
   private IServiceProvider _oracleServices = default!;
+  private IServiceProvider _mariaDbServices = default!;
 
   private IServiceScope? _scope;
   private IServiceProvider? _services;
@@ -59,6 +61,7 @@ public class TestLocalData
     ServiceCollection sqlServerServiceCollection = new();
     ServiceCollection postgresServiceCollection = new();
     ServiceCollection oracleServiceCollection = new();
+    ServiceCollection mariaDbServiceCollection = new();
 
     sqlServerServiceCollection.AddDbContext<TestDbContext>(options => options
       .UseSqlServer(_fixture.SqlServerConnectionString)
@@ -72,6 +75,7 @@ public class TestLocalData
       .UseProvider<SQLServerProvider>(provider => provider.UseConnection(_fixture.SqlServerConnectionString))
       .UseModel<TestModelConfiguration>());
 
+
     postgresServiceCollection.AddDbContext<TestDbContext>(options => options
       .UseNpgsql(_fixture.PostgresConnectionString)
       .EnableSensitiveDataLogging()
@@ -83,6 +87,7 @@ public class TestLocalData
     postgresServiceCollection.AddData(options => options
       .UseProvider<PostgreSQLProvider>(provider => provider.UseConnection(_fixture.PostgresConnectionString))
       .UseModel<TestModelConfiguration>());
+
 
     oracleServiceCollection.AddDbContext<TestDbContext>(options => options
       .UseOracle(_fixture.OracleConnectionString)
@@ -96,24 +101,48 @@ public class TestLocalData
       .UseProvider<OracleProvider>(provider => provider.UseConnection(_fixture.OracleConnectionString))
       .UseModel<TestModelConfiguration>());
 
+
+    mariaDbServiceCollection.AddDbContext<TestDbContext>(options => options
+      .UseMySql(_fixture.MariaDbConnectionString, ServerVersion.AutoDetect(_fixture.MariaDbConnectionString))
+      .EnableSensitiveDataLogging()
+      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseCaep());
+
+    mariaDbServiceCollection.AddData<TestDbContext>();
+
+    mariaDbServiceCollection.AddData(options => options
+      .UseProvider<MySQLProvider>(provider => provider.UseConnection(_fixture.MariaDbConnectionString))
+      .UseModel<TestModelConfiguration>());
+
+
     _sqlServerServices = sqlServerServiceCollection.BuildServiceProvider();
     _postgresServices = postgresServiceCollection.BuildServiceProvider();
     _oracleServices = oracleServiceCollection.BuildServiceProvider();
+    _mariaDbServices = mariaDbServiceCollection.BuildServiceProvider();
 
     using IServiceScope sqlServerScope = _sqlServerServices.CreateScope();
     using IServiceScope postgresScope = _postgresServices.CreateScope();
     using IServiceScope oracleScope = _oracleServices.CreateScope();
+    using IServiceScope mariaDbScope = _mariaDbServices.CreateScope();
 
     TestDbContext dbContext;
+    bool created;
 
     dbContext = sqlServerScope.ServiceProvider.GetRequiredService<TestDbContext>();
-    dbContext.Database.EnsureCreated();
+    created = dbContext.Database.EnsureCreated();
+    created.Should().BeTrue();
 
     dbContext = postgresScope.ServiceProvider.GetRequiredService<TestDbContext>();
-    dbContext.Database.EnsureCreated();
+    created = dbContext.Database.EnsureCreated();
+    created.Should().BeTrue();
 
     dbContext = oracleScope.ServiceProvider.GetRequiredService<TestDbContext>();
-    dbContext.Database.EnsureCreated();
+    created = dbContext.Database.EnsureCreated();
+    created.Should().BeTrue();
+
+    dbContext = mariaDbScope.ServiceProvider.GetRequiredService<TestDbContext>();
+    created = dbContext.Database.EnsureCreated();
+    created.Should().BeTrue();
   }
 
   public void Setup(ITestOutputHelper output)
@@ -136,6 +165,7 @@ public class TestLocalData
       DbProvider.SqlServer => _sqlServerServices,
       DbProvider.Postgres  => _postgresServices,
       DbProvider.Oracle    => _oracleServices,
+      DbProvider.MariaDb   => _mariaDbServices,
       _                    => throw Errors.Unreachable
     };
     _scope = services.CreateScope();
@@ -153,6 +183,7 @@ public class TestLocalData
           DbProvider.SqlServer => services.GetRequiredService<SQLServerProvider>(),
           DbProvider.Postgres  => services.GetRequiredService<PostgreSQLProvider>(),
           DbProvider.Oracle    => services.GetRequiredService<OracleProvider>(),
+          DbProvider.MariaDb   => services.GetRequiredService<MySQLProvider>(),
           _                    => throw Errors.Unreachable
         };
 
@@ -170,11 +201,15 @@ public class TestLocalData
     connection.Open();
     using (DbCommand command = connection.CreateCommand())
     {
-      char escapeLeft = _provider is DbProvider.SqlServer ? '[' : '"';
-      char escapeRight = _provider is DbProvider.SqlServer ? ']' : '"';
       foreach (string entityName in s_entityNames)
       {
-        command.CommandText = $"DELETE FROM {escapeLeft}{entityName}{escapeRight}";
+        if (entityName is "Person" && _provider is DbProvider.MariaDb)
+        {
+          command.CommandText = $"UPDATE {Escape(entityName)} SET {Escape("PartnerId")} = NULL WHERE {Escape("PartnerId")} IS NOT NULL";
+          command.ExecuteNonQuery();
+        }
+
+        command.CommandText = $"DELETE FROM {Escape(entityName)}";
         command.ExecuteNonQuery();
       }
     }
@@ -185,5 +220,23 @@ public class TestLocalData
     _provider = s_defaultProvider;
 
     _isExecuting = false;
+  }
+
+  private string Escape(string name)
+  {
+    char escapeLeft = _provider switch
+    {
+      DbProvider.SqlServer => '[',
+      DbProvider.MariaDb   => '`',
+      _                    => '"'
+    };
+    char escapeRight = _provider switch
+    {
+      DbProvider.SqlServer => ']',
+      DbProvider.MariaDb   => '`',
+      _                    => '"'
+    };
+
+    return $"{escapeLeft}{name}{escapeRight}";
   }
 }
