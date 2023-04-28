@@ -18,7 +18,7 @@ internal class MessageHandlerTypeBuilder
     _ilProvider = ilProvider;
   }
 
-  protected TypeBuilder DefineType(Type actorType, Type baseType, Type[] interfaceTypes)
+  protected TypeBuilder DefineType(Type actorType, Type baseType)
   {
     return _module.DefineType(
       name: actorType.GetComponentTypeName(ComponentName),

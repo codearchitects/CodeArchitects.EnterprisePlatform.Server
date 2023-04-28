@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
+namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
 [Serializable]
 public class ModelConfigurationException : Exception

@@ -104,7 +104,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.InsertMany, Connection);
+      TDbCommand command = CreateCommand(OperationType.InsertMany, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteInsertManyAsync(command, entities, model, cancellationToken);
@@ -142,7 +142,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.UpdateMany, Connection);
+      TDbCommand command = CreateCommand(OperationType.UpdateMany, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteUpdateManyAsync(command, entities, model, cancellationToken);

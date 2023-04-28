@@ -18,12 +18,15 @@ public class RemoveAsyncTests : TestBase
     // Arrange
     Product product = Product.One();
 
-    var sut = _fixture.CreateRepository<Product, Guid>(dependencies, seeder => seeder.Seed(product));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(product));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Product, Guid>();
 
     // Act
     await sut.RemoveAsync(product.Id);
 
     // Assert
-    _fixture.DbContext.Set<Product>().FirstOrDefault(p => p.Id == product.Id).Should().BeNull();
+    scope.DbContext.Set<Product>().FirstOrDefault(p => p.Id == product.Id).Should().BeNull();
   }
 }

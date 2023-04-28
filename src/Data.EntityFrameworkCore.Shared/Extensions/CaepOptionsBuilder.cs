@@ -16,7 +16,8 @@ public class CaepOptionsBuilder : ICaepOptionsBuilderInfrastructure
 
   void ICaepOptionsBuilderInfrastructure.AddOrUpdatePlugin<TPlugin>(TPlugin plugin)
   {
-    ArgumentNullException.ThrowIfNull(plugin);
+    if (plugin is null)
+      throw new ArgumentNullException(nameof(plugin));
 
     _plugins[typeof(TPlugin)] = plugin;
   }

@@ -16,6 +16,12 @@ internal class JoinColumnModel : ColumnModel, IPrimaryKeyColumnModel
 
   public override bool IsForeignKey => true;
 
+  public override bool IsConcurrencyToken
+  {
+    get => false;
+    set => throw new InvalidOperationException("A join column cannot be a concurrency token.");
+  }
+
   public override string Name
   {
     get => _memberComponent.Name;

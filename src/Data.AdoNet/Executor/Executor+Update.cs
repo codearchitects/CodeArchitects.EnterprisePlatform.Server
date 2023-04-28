@@ -14,6 +14,11 @@ internal partial class Executor<TDbCommand>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (model.ConcurrencyToken is IAccessibleColumnModel concurrencyColumn)
+    {
+      _concurrencyContext.CreateToken(entity, concurrencyColumn);
+    }
+
     ExecuteUpdateGraphVisitor visitor = new(this, command);
     return Graph.VisitAsync(entity, model, visitor, cancellationToken);
   }

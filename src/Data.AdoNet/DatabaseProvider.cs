@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Data.Common;
@@ -24,7 +25,7 @@ public abstract class DatabaseProvider
 
   private protected abstract ISyntaxProvider CreateSyntaxProvider();
 
-  private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder);
+  private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext);
 
   public void ApplySeed(IServiceProvider services)
   {
@@ -39,13 +40,13 @@ public abstract class DatabaseProvider
 
   internal abstract void ApplySeed(IServiceProvider services, DataSeed seed);
 
-  internal object CreateCommandBuilder(IMemoryCache cache)
+  internal object CreateCommandBuilder(IMemoryCache cache, IConcurrencyContext concurrencyContext)
   {
     SqlTextCache sqlCache = new(cache);
     ISyntaxProvider syntaxProvider = CreateSyntaxProvider();
     SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
 
-    return CreateCommandBuilderCore(sqlBuilder);
+    return CreateCommandBuilderCore(sqlBuilder, concurrencyContext);
   }
 
   internal Type MakeGenericType(Type genericTypeDefinition)

@@ -5,13 +5,27 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
 internal abstract class CaepExtensionBase : IDbContextOptionsExtension
 {
-  public abstract DbContextOptionsExtensionInfo Info { get; }
+  private readonly IEnumerable<ICaepExtensionPlugin> _plugins;
 
-  public virtual void ApplyServices(IServiceCollection services)
+  public CaepExtensionBase(IEnumerable<ICaepExtensionPlugin> plugins)
   {
+    _plugins = plugins;
   }
 
-  public virtual void Validate(IDbContextOptions options)
+  public abstract DbContextOptionsExtensionInfo Info { get; }
+
+  public void ApplyServices(IServiceCollection services)
+  {
+    services.AddScoped<AggregateServiceProvider>();
+    PluginServiceCollection pluginServices = new(services);
+
+    foreach (ICaepExtensionPlugin plugin in _plugins)
+    {
+      plugin.ApplyServices(pluginServices);
+    }
+  }
+
+  public void Validate(IDbContextOptions options)
   {
   }
 }

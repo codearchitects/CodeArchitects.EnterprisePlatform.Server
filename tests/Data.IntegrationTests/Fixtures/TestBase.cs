@@ -13,15 +13,19 @@ public class TestBase : IAsyncLifetime
     _output = output;
   }
 
-  Task IAsyncLifetime.InitializeAsync()
+  protected virtual Task InitializeAsync()
   {
     _fixture.Setup(_output);
     return Task.CompletedTask;
   }
 
-  Task IAsyncLifetime.DisposeAsync()
+  protected virtual Task DisposeAsync()
   {
     _fixture.Reset();
     return Task.CompletedTask;
   }
+
+  Task IAsyncLifetime.InitializeAsync() => InitializeAsync();
+
+  Task IAsyncLifetime.DisposeAsync() => DisposeAsync();
 }

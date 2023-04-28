@@ -19,13 +19,15 @@ public class InsertAsyncTests : TestBase
     // Arrange
     SerialEntity entity = SerialEntity.One();
 
-    var sut = _fixture.CreateRepository<SerialEntity, int>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<SerialEntity, int>();
 
     // Act
     await sut.InsertAsync(entity);
 
     // Assert
-    SerialEntity? fromDb = _fixture.DbContext.Set<SerialEntity>()
+    SerialEntity? fromDb = scope.DbContext.Set<SerialEntity>()
       .FirstOrDefault(x => x.Id == entity.Id);
 
     fromDb.Should().NotBeNull();
@@ -40,12 +42,15 @@ public class InsertAsyncTests : TestBase
     Category category = Category.One();
     category.Typologies = new() { typology };
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder => seeder.Seed(typology));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(typology));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
 
     // Act
     await sut.InsertAsync(category);
 
-    Category? fromDb = _fixture.DbContext.Set<Category>()
+    Category? fromDb = scope.DbContext.Set<Category>()
       .Include(x => x.Typologies)
       .FirstOrDefault(x => x.Id == category.Id);
 
@@ -64,12 +69,15 @@ public class InsertAsyncTests : TestBase
     cart.Items = CartItem.Many(1, cart.Id);
     customer.Carts = new() { cart };
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder => seeder.Seed(cart));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(cart));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
 
     // Act
     await sut.InsertAsync(customer);
 
-    Customer? fromDb = _fixture.DbContext.Set<Customer>()
+    Customer? fromDb = scope.DbContext.Set<Customer>()
       .Include(x => x.Carts)
       .FirstOrDefault(x => x.Id == customer.Id);
 
@@ -87,12 +95,15 @@ public class InsertAsyncTests : TestBase
     Person second = Person.One();
     second.Partner = first;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder => seeder.Seed(first));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(first));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
 
     // Act
     await sut.InsertAsync(second);
 
-    Person? fromDb = _fixture.DbContext.Set<Person>()
+    Person? fromDb = scope.DbContext.Set<Person>()
       .Include(x => x.Partner)
       .FirstOrDefault(x => x.Id == second.Id);
 
@@ -109,12 +120,14 @@ public class InsertAsyncTests : TestBase
     CartItem item = CartItem.One(cart.Id);
     cart.Items = new() { item };
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Cart, Guid>();
 
     // Act
     await sut.InsertAsync(cart);
 
-    Cart? fromDb = _fixture.DbContext.Set<Cart>()
+    Cart? fromDb = scope.DbContext.Set<Cart>()
       .Include(x => x.Items)
       .FirstOrDefault(x => x.Id == cart.Id);
 
@@ -131,12 +144,14 @@ public class InsertAsyncTests : TestBase
     Customer customer = Customer.One();
     customer.Address = Address.One();
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
 
     // Act
     await sut.InsertAsync(customer);
 
-    Customer? fromDb = _fixture.DbContext.Set<Customer>()
+    Customer? fromDb = scope.DbContext.Set<Customer>()
       .Include(x => x.Address)
       .FirstOrDefault(x => x.Id == customer.Id);
 

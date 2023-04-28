@@ -19,6 +19,8 @@ internal class OrdinaryColumnModel : ColumnModel, IOrdinaryColumnModel
 
   public override bool IsForeignKey => false;
 
+  public override bool IsConcurrencyToken { get; set; }
+
   [AllowNull]
   public override string Name
   {

@@ -4,6 +4,11 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
 internal class CaepExtension : CaepExtensionBase
 {
+  public CaepExtension(IEnumerable<ICaepExtensionPlugin> plugins)
+    : base(plugins)
+  {
+  }
+
   public override DbContextOptionsExtensionInfo Info => new DataExtensionInfo(this);
 
   private class DataExtensionInfo : DbContextOptionsExtensionInfo

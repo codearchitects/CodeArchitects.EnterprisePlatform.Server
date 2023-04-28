@@ -17,7 +17,7 @@ using TNavigation =
 /// <summary>
 /// Extension methods for configuring associations.
 /// </summary>
-public static class AssociationsAnnotationExtensions
+public static class AnnotationExtensions
 {
   /// <summary>
   /// Specifies that an association is between two entities belonging to the same aggregates.

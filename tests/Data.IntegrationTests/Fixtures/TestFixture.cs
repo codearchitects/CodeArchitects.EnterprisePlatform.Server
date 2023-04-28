@@ -1,10 +1,14 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.Data.AdoNet;
-using CodeArchitects.Platform.Data.EntityFrameworkCore;
-using CodeArchitects.Platform.Data.Tracking;
+using CodeArchitects.Platform.Data.AdoNet.MySQL;
+using CodeArchitects.Platform.Data.AdoNet.Oracle;
+using CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
+using CodeArchitects.Platform.Data.AdoNet.SQLServer;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
+using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Concurrency;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Containers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 using Testcontainers.MariaDb;
@@ -22,7 +26,12 @@ public class TestFixture : IAsyncLifetime
   private readonly OracleContainer _oracleContainer;
   private readonly MariaDbContainer _mariaDbContainer;
 
-  private readonly TestLocalData _localData;
+  private IServiceProvider _sqlServerServices = default!;
+  private IServiceProvider _postgresServices = default!;
+  private IServiceProvider _oracleServices = default!;
+  private IServiceProvider _mariaDbServices = default!;
+
+  private bool _isExecuting;
 
   public TestFixture()
   {
@@ -30,52 +39,58 @@ public class TestFixture : IAsyncLifetime
     _postgresContainer = new PostgreSqlBuilder().Build();
     _oracleContainer = new OracleBuilder().Build();
     _mariaDbContainer = new MariaDbBuilder().Build();
-
-    _localData = new(this);
   }
 
-  public TestDbContext DbContext => _localData.DbContext;
+  public ITestOutputHelper? Output { get; private set; }
 
-  public ITrackingContext TrackingContext => _localData.Services.GetRequiredService<ITrackingContext>();
+  private string SqlServerConnectionString => _msSqlContainer.GetConnectionString();
 
-  public string SqlServerConnectionString => _msSqlContainer.GetConnectionString();
+  private string PostgresConnectionString => _postgresContainer.GetConnectionString();
 
-  public string PostgresConnectionString => _postgresContainer.GetConnectionString();
+  private string OracleConnectionString => _oracleContainer.GetConnectionString();
 
-  public string OracleConnectionString => _oracleContainer.GetConnectionString();
+  private string MariaDbConnectionString => _mariaDbContainer.GetConnectionString();
 
-  public string MariaDbConnectionString => _mariaDbContainer.GetConnectionString();
-
-  public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>(
-    RepositoryDependencies dependencies,
-    Action<ISeeder>? seedingAction = null,
-    RepositoryImplementation seedImplementation = default)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
+  internal DatabaseFixture CreateDbFixture(RepositoryDependencies dependencies)
   {
-    if (seedImplementation == default)
-    {
-      seedImplementation = dependencies.Implementation;
-    }
+    IServiceProvider services = GetProviderServices(dependencies.Provider);
+    return DatabaseFixture.Create(services, dependencies);
+  }
 
-    _localData.InitializeServices(dependencies.Provider, new TestDataSeed(seedingAction ?? (seeder => { })), seedImplementation);
-
-    return dependencies.Implementation switch
-    {
-      RepositoryImplementation.AdoNet => new AdoNetRepository<TEntity, TKey>(_localData.Services.GetRequiredService<AdoNet.IDataContext>()),
-      RepositoryImplementation.EFCore => new EFCoreRepository<TEntity, TKey>(_localData.Services.GetRequiredService<EntityFrameworkCore.IDataContext>()),
-      _                               => throw Errors.Unreachable
-    };
+  internal TestScope CreateScope(RepositoryDependencies dependencies)
+  {
+    IServiceProvider services = GetProviderServices(dependencies.Provider);
+    return TestScope.Create(services, dependencies.Implementation);
   }
 
   public void Setup(ITestOutputHelper output)
   {
-    _localData.Setup(output);
+    if (_isExecuting)
+      throw new InvalidOperationException("Another test is executing.");
+
+    _isExecuting = true;
+    Output = output;
   }
 
   public void Reset()
   {
-    _localData.Reset();
+    if (!_isExecuting)
+      throw new InvalidOperationException("Nothing to reset.");
+
+    _isExecuting = false;
+    Output = null;
+  }
+
+  public IServiceProvider GetProviderServices(DbProvider dbProvider)
+  {
+    return dbProvider switch
+    {
+      DbProvider.SqlServer => _sqlServerServices,
+      DbProvider.Postgres  => _postgresServices,
+      DbProvider.Oracle    => _oracleServices,
+      DbProvider.MariaDb   => _mariaDbServices,
+      _                    => throw Errors.Unreachable
+    };
   }
 
   async Task IAsyncLifetime.InitializeAsync()
@@ -98,7 +113,50 @@ public class TestFixture : IAsyncLifetime
     await _oracleContainer.StartAsync();
     await _mariaDbContainer.StartAsync();
 
-    _localData.Initialize();
+    _sqlServerServices = CreateServiceProvider(
+      options => options.UseSqlServer(SqlServerConnectionString),
+      options => options.UseProvider<SQLServerProvider>(sqlServer => sqlServer.UseConnection(SqlServerConnectionString)));
+
+    _postgresServices = CreateServiceProvider(
+      options => options.UseNpgsql(PostgresConnectionString),
+      options => options.UseProvider<PostgreSQLProvider>(postgres => postgres.UseConnection(PostgresConnectionString)));
+
+    _oracleServices = CreateServiceProvider(
+      options => options.UseOracle(OracleConnectionString),
+      options => options.UseProvider<OracleProvider>(oracle => oracle.UseConnection(OracleConnectionString)));
+
+    _mariaDbServices = CreateServiceProvider(
+      options => options.UseMySql(MariaDbConnectionString, new MariaDbServerVersion("10.10.0")),
+      options => options.UseProvider<MySQLProvider>(mySql => mySql.UseConnection(MariaDbConnectionString)));
+  }
+
+  private IServiceProvider CreateServiceProvider(
+    Func<DbContextOptionsBuilder, DbContextOptionsBuilder> useEfCoreProvider,
+    Func<IAdoNetConfigurationBuilder, IAdoNetConfigurationBuilderWithProvider> useAdoNetProvider)
+  {
+    ServiceCollection serviceCollection = new();
+
+    serviceCollection.AddDbContext<TestDbContext>(options => useEfCoreProvider(options)
+      .EnableSensitiveDataLogging()
+      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseCaep(caep => caep
+        .UseOptimisticConcurrency()));
+
+    serviceCollection.AddData<TestDbContext>();
+
+    serviceCollection.AddData(options => useAdoNetProvider(options).UseModel<TestModelConfiguration>());
+
+    IServiceProvider services = serviceCollection.BuildServiceProvider();
+    using IServiceScope scope = services.CreateScope();
+
+    bool created = scope.ServiceProvider
+      .GetRequiredService<TestDbContext>()
+      .Database
+      .EnsureCreated();
+
+    created.Should().BeTrue();
+
+    return services;
   }
 
   async Task IAsyncLifetime.DisposeAsync()

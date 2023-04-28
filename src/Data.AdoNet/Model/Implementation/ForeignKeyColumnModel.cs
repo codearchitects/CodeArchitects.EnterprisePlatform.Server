@@ -15,6 +15,12 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 
   public override bool IsForeignKey => true;
 
+  public override bool IsConcurrencyToken
+  {
+    get => false;
+    set => throw new ModelConfigurationException("Primary keys and foreign keys cannot be used as concurrency tokens.");
+  }
+
   public short ForeignKeyIndex { get; }
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => _navigation.PrimaryKey.Columns[ForeignKeyIndex];

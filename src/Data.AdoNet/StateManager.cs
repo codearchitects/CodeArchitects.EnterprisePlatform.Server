@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
+using System.Data;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -7,14 +8,16 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
   where TDbConnection : DbConnection
 {
   private readonly IConnectionFactory<TDbConnection> _connectionFactory;
+  private readonly IConcurrencyContext _concurrencyContext;
   private readonly List<Execution<TDbConnection, DbTransaction>> _executions;
   private bool _startTransaction;
   private TDbConnection? _connection;
   private bool _isDisposed;
 
-  public StateManager(IConnectionFactory<TDbConnection> connectionFactory)
+  public StateManager(IConnectionFactory<TDbConnection> connectionFactory, IConcurrencyContext concurrencyContext)
   {
     _connectionFactory = connectionFactory;
+    _concurrencyContext = concurrencyContext;
     _executions = new(2);
   }
 
@@ -48,6 +51,8 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
       {
         await transaction.CommitAsync(cancellationToken);
       }
+
+      _concurrencyContext.Accept();
     }
     catch when (transaction is not null)
     {
@@ -56,10 +61,11 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
     }
     finally
     {
-      _startTransaction = false;
       transaction?.Dispose();
-      _executions.Clear();
       Connection.Close();
+      _startTransaction = false;
+      _executions.Clear();
+      _concurrencyContext.Clear();
     }
   }
 

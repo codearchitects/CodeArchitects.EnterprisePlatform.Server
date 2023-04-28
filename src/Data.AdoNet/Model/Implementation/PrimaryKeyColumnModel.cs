@@ -19,6 +19,12 @@ internal class PrimaryKeyColumnModel : ColumnModel, IPrimaryKeyColumnModel
 
   public override bool IsForeignKey => false;
 
+  public override bool IsConcurrencyToken
+  {
+    get => false;
+    set => throw new ModelConfigurationException("Primary keys and foreign keys cannot be used as concurrency tokens.");
+  }
+
   [AllowNull]
   public override string Name
   {

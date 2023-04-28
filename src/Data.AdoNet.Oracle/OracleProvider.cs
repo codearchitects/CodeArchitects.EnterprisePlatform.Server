@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
 using Oracle.ManagedDataAccess.Client;
 
@@ -11,9 +12,9 @@ public class OracleProvider : DatabaseProvider<OracleConnection, OracleCommand>
 {
   private protected override ISyntaxProvider CreateSyntaxProvider() => new OracleSyntaxProvider();
 
-  private protected override CommandBuilder<OracleCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder)
+  private protected override CommandBuilder<OracleCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
   {
-    return new Command.OracleCommandBuilder(sqlBuilder);
+    return new Command.OracleCommandBuilder(sqlBuilder, concurrencyContext);
   }
 
   /// <summary>

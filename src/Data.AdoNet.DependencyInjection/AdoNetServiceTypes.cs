@@ -29,7 +29,12 @@ public enum AdoNetServiceTypes
   DataSeed = 4,
 
   /// <summary>
+  /// Look for concurrency token providers.
+  /// </summary>
+  ConcurrencyTokenProvider = 8,
+
+  /// <summary>
   /// Look for all types of services.
   /// </summary>
-  All = ModelConfiguration | CommandInterceptors | DataSeed
+  All = ModelConfiguration | CommandInterceptors | DataSeed | ConcurrencyTokenProvider
 }

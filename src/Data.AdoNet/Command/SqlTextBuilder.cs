@@ -92,7 +92,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Reuse string builder
     stringBuilder.Append(')');
     stringBuilder.AppendOutputBefore(entityModel);
     stringBuilder.Append(" VALUES (");
-    stringBuilder.AppendParameters(columns, 0);
+    stringBuilder.AppendParameters(columns);
     stringBuilder.Append(')');
     for (int i = 1; i < count; i++)
     {
@@ -169,7 +169,7 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Reuse string builder
     stringBuilder.Append(')');
     stringBuilder.AppendOutputBefore(entityModel);
     stringBuilder.Append(" VALUES (");
-    stringBuilder.AppendParameters(columns, 0);
+    stringBuilder.AppendParameters(columns);
     stringBuilder.Append(')');
     stringBuilder.AppendOutputAfter(entityModel);
 
@@ -181,14 +181,27 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Reuse string builder
 
   private void BuildUpdateText(in SqlStringBuilder stringBuilder, IEntityModel entityModel)
   {
-    IEnumerable<IColumnModel> columns = entityModel.Columns.Where(column => column.IsForeignKey || !column.IsPrimaryKey);
+    IEnumerable<IColumnModel> columns = entityModel.Columns.Where(column => (column.IsForeignKey || !column.IsPrimaryKey) && !column.IsConcurrencyToken);
+    IColumnModel? concurrencyToken = entityModel.ConcurrencyToken;
 
     stringBuilder.Append("UPDATE ");
     stringBuilder.AppendEscaped(entityModel.TableName);
     stringBuilder.Append(" SET ");
     stringBuilder.AppendJoin(", ", columns, AppendColumnUpdate);
+    if (concurrencyToken is not null)
+    {
+      stringBuilder.Append(", ");
+      stringBuilder.AppendEscaped(concurrencyToken.Name);
+      stringBuilder.Append(" = ");
+      stringBuilder.AppendParameter(Constants.ConcurrencyTokenParameterName);
+    }
     stringBuilder.Append(" WHERE ");
     stringBuilder.AppendWhereConditions(entityModel.PrimaryKey.Columns);
+    if (concurrencyToken is not null)
+    {
+      stringBuilder.Append(" AND ");
+      stringBuilder.AppendWhereCondition(concurrencyToken);
+    }
 
     static void AppendColumnUpdate(in SqlStringBuilder stringBuilder, IColumnModel columnModel)
     {
@@ -198,14 +211,14 @@ internal class SqlTextBuilder : ISqlTextBuilder // TODO: Reuse string builder
       if (columnModel is IForeignKeyColumnModel { HasMember: false, Navigation: { AssociationKind: AssociationKind.IntraAggregate, HasMember: false } })
       {
         stringBuilder.Append("COALESCE(");
-        stringBuilder.AppendParameter(columnModel, 0);
+        stringBuilder.AppendParameter(columnModel);
         stringBuilder.Append(", ");
         stringBuilder.AppendEscaped(columnModel.Name);
         stringBuilder.Append(")");
       }
       else
       {
-        stringBuilder.AppendParameter(columnModel, 0);
+        stringBuilder.AppendParameter(columnModel);
       }
     }
   }

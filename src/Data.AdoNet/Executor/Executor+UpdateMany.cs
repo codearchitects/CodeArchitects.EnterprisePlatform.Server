@@ -12,6 +12,11 @@ internal partial class Executor<TDbCommand>
     ExecuteUpdateGraphVisitor visitor = new(this, command);
     foreach (TEntity entity in entities)
     {
+      if (model.ConcurrencyToken is IAccessibleColumnModel concurrencyColumn)
+      {
+        _concurrencyContext.CreateToken(entity, concurrencyColumn);
+      }
+
       await Graph.VisitAsync(entity, model, visitor, cancellationToken);
     }
   }

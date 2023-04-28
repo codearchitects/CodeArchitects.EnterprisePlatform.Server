@@ -19,7 +19,9 @@ public class InsertManyAsyncTests : TestBase
     // Arrange
     List<SerialEntity> entities = SerialEntity.Many(2);
 
-    var sut = _fixture.CreateRepository<SerialEntity, int>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<SerialEntity, int>();
 
     // Act
     await sut.InsertManyAsync(entities);
@@ -27,8 +29,8 @@ public class InsertManyAsyncTests : TestBase
     // Assert
     SerialEntity?[] fromDb = new[]
     {
-      _fixture.DbContext.Set<SerialEntity>().FirstOrDefault(x => x.Id == entities[0].Id),
-      _fixture.DbContext.Set<SerialEntity>().FirstOrDefault(x => x.Id == entities[1].Id),
+      scope.DbContext.Set<SerialEntity>().FirstOrDefault(x => x.Id == entities[0].Id),
+      scope.DbContext.Set<SerialEntity>().FirstOrDefault(x => x.Id == entities[1].Id),
     };
 
     fromDb[0].Should().NotBeNull();
@@ -46,13 +48,16 @@ public class InsertManyAsyncTests : TestBase
     categories[0].Typologies = new() { typology };
     categories[1].Typologies = new() { typology };
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder => seeder.Seed(typology));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(typology));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
 
     // Act
     await sut.InsertManyAsync(categories);
 
     // Assert
-    IQueryable<Category> queryable = _fixture.DbContext.Set<Category>().Include(x => x.Typologies);
+    IQueryable<Category> queryable = scope.DbContext.Set<Category>().Include(x => x.Typologies);
     Category?[] fromDb = new[]
     {
       queryable.FirstOrDefault(x => x.Id == categories[0].Id),
@@ -79,13 +84,16 @@ public class InsertManyAsyncTests : TestBase
     cart1.Items = CartItem.Many(1, cart1.Id);
     customers[1].Carts = new() { cart1 };
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder => seeder.Seed(cart0, cart1));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(cart0, cart1));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
 
     // Act
     await sut.InsertManyAsync(customers);
 
     // Assert
-    IQueryable<Customer> queryable = _fixture.DbContext.Set<Customer>().Include(x => x.Carts);
+    IQueryable<Customer> queryable = scope.DbContext.Set<Customer>().Include(x => x.Carts);
     Customer?[] fromDb = new[]
     {
       queryable.FirstOrDefault(x => x.Id == customers[0].Id),
@@ -108,13 +116,16 @@ public class InsertManyAsyncTests : TestBase
     seconds[0].Partner = firsts[0];
     seconds[1].Partner = firsts[1];
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder => seeder.Seed(firsts));
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(firsts));
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
 
     // Act
     await sut.InsertManyAsync(seconds);
 
     // Assert
-    IQueryable<Person> queryable = _fixture.DbContext.Set<Person>().Include(x => x.Partner);
+    IQueryable<Person> queryable = scope.DbContext.Set<Person>().Include(x => x.Partner);
     Person?[] fromDb = new[]
     {
       queryable.FirstOrDefault(x => x.Id == seconds[0].Id),
@@ -137,13 +148,15 @@ public class InsertManyAsyncTests : TestBase
     CartItem item1 = CartItem.One(carts[1].Id);
     carts[1].Items = new() { item1 };
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Cart, Guid>();
 
     // Act
     await sut.InsertManyAsync(carts);
 
     // Assert
-    IQueryable<Cart> queryable = _fixture.DbContext.Set<Cart>().Include(x => x.Items);
+    IQueryable<Cart> queryable = scope.DbContext.Set<Cart>().Include(x => x.Items);
     Cart?[] fromDb = new[]
     {
       queryable.FirstOrDefault(x => x.Id == carts[0].Id),
@@ -166,13 +179,15 @@ public class InsertManyAsyncTests : TestBase
     customers[0].Address = Address.One();
     customers[1].Address = Address.One();
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies);
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
 
     // Act
     await sut.InsertManyAsync(customers);
 
     // Assert
-    IQueryable<Customer> queryable = _fixture.DbContext.Set<Customer>().Include(x => x.Address);
+    IQueryable<Customer> queryable = scope.DbContext.Set<Customer>().Include(x => x.Address);
     Customer?[] fromDb = new[]
     {
       queryable.FirstOrDefault(x => x.Id == customers[0].Id),

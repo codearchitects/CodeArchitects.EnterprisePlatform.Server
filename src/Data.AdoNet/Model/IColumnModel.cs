@@ -19,6 +19,11 @@ public interface IColumnModel : IMemberModel
   bool IsForeignKey { get; }
 
   /// <summary>
+  /// Indicates whether this column is used within concurrency checks.
+  /// </summary>
+  bool IsConcurrencyToken { get; }
+
+  /// <summary>
   /// The name of this column.
   /// </summary>
   string Name { get; }

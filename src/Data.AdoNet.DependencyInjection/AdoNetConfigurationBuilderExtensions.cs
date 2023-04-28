@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
+using CodeArchitects.Platform.Data.Features.Concurrency;
 using System.Data.Common;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -54,6 +55,22 @@ public static class AdoNetConfigurationBuilderExtensions
       throw new ArgumentNullException(nameof(builder));
   
     return builder.UseSeed(typeof(TDataSeed));
+  }
+
+  /// <summary>
+  /// Specifies the provider to use for generating concurrency tokens.
+  /// </summary>
+  /// <typeparam name="TTokenProvider">The concurrency token provider implementation type.</typeparam>
+  /// <param name="builder">The ADO.NET configuration builder.</param>
+  /// <param name="tokenProviderLifetime">The lifetime of the <see cref="IConcurrencyTokenProvider"/> service.</param>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  public static IAdoNetConfigurationBuilderWithProvider UseConcurrencyTokenProvider<TTokenProvider>(this IAdoNetConfigurationBuilderWithProvider builder, ServiceLifetime tokenProviderLifetime = ServiceLifetime.Singleton)
+    where TTokenProvider : class, IConcurrencyTokenProvider
+  {
+    if (builder is null)
+      throw new ArgumentNullException(nameof(builder));
+
+    return builder.UseConcurrencyTokenProvider(typeof(TTokenProvider), tokenProviderLifetime);
   }
 
   /// <summary>

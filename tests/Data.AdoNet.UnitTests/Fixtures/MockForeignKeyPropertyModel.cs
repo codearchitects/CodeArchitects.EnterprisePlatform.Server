@@ -22,6 +22,8 @@ internal class MockForeignKeyPropertyModel : IForeignKeyColumnModel
 
   public bool IsForeignKey => _mock.IsForeignKey;
 
+  public bool IsConcurrencyToken => _mock.IsConcurrencyToken;
+
   public string Name => _mock.Name;
 
   public short Index => _mock.Index;

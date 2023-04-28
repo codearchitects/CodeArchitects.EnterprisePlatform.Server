@@ -23,11 +23,14 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new(typologies);
     string? oldTypologyName = typologies[0].Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(typologies);
       seeder.Seed(category);
     });
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
 
     category.Name = "New category name";
     typologies[0].Name = "New typology name";
@@ -36,7 +39,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(category);
 
     // Assert
-    Category? fromDb = _fixture.DbContext.Set<Category>()
+    Category? fromDb = scope.DbContext.Set<Category>()
       .Include(x => x.Typologies)
       .FirstOrDefault(x => x.Id == category.Id);
 
@@ -56,12 +59,15 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new() { typologies[0] };
     string? oldTypologyName = typologies[0].Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(typologies);
       seeder.Seed(category);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     category.Name = "New category name";
     typologies[0].Name = "New typology name";
@@ -73,7 +79,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(category);
 
     // Assert
-    Category? fromDb = _fixture.DbContext.Set<Category>()
+    Category? fromDb = scope.DbContext.Set<Category>()
       .Include(x => x.Typologies)
       .FirstOrDefault(x => x.Id == category.Id);
 
@@ -93,12 +99,15 @@ public class UpdateAsyncTests : TestBase
     category.Typologies = new(typologies);
     string? oldTypologyName = typologies[0].Name;
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(typologies);
       seeder.Seed(category);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     category.Name = "New category name";
     typologies[0].Name = "New typology name";
@@ -109,7 +118,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(category);
 
     // Assert
-    Category? fromDb = _fixture.DbContext.Set<Category>()
+    Category? fromDb = scope.DbContext.Set<Category>()
       .Include(x => x.Typologies)
       .FirstOrDefault(x => x.Id == category.Id);
 
@@ -127,12 +136,15 @@ public class UpdateAsyncTests : TestBase
     List<Typology> typologies = Typology.Many(2);
     category.Typologies = new(typologies);
 
-    var sut = _fixture.CreateRepository<Category, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(typologies);
       seeder.Seed(category);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Category, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     trackingContext.SetTrackingState(typologies[0], TrackingState.Modified);
     trackingContext.SetTrackingState(typologies[1], TrackingState.Modified);
@@ -152,12 +164,15 @@ public class UpdateAsyncTests : TestBase
     List<Cart> carts = Cart.Many(2);
     customer.Carts = new(carts);
     string? oldCartName = carts[0].Name;
-
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(carts);
       seeder.Seed(customer);
     });
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
 
     customer.Name = "New customer name";
     carts[0].Name = "New cart name";
@@ -166,7 +181,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(customer);
 
     // Assert
-    Customer? fromDb = _fixture.DbContext.Set<Customer>()
+    Customer? fromDb = scope.DbContext.Set<Customer>()
       .Include(x => x.Carts)
       .FirstOrDefault(x => x.Id == customer.Id);
 
@@ -186,12 +201,15 @@ public class UpdateAsyncTests : TestBase
     customer.Carts = new() { carts[0] };
     string? oldCartName = carts[0].Name;
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(carts);
       seeder.Seed(customer);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     customer.Name = "New customer name";
     carts[0].Name = "New cart name";
@@ -203,7 +221,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(customer);
 
     // Assert
-    Customer? fromDb = _fixture.DbContext.Set<Customer>()
+    Customer? fromDb = scope.DbContext.Set<Customer>()
       .Include(x => x.Carts)
       .FirstOrDefault(x => x.Id == customer.Id);
 
@@ -222,13 +240,16 @@ public class UpdateAsyncTests : TestBase
     List<Cart> carts = Cart.Many(2);
     customer.Carts = new(carts);
     string? oldCartName = carts[0].Name;
-
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(carts);
       seeder.Seed(customer);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     customer.Name = "New customer name";
     carts[0].Name = "New cart name";
@@ -239,7 +260,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(customer);
 
     // Assert
-    Customer? fromDb = _fixture.DbContext.Set<Customer>()
+    Customer? fromDb = scope.DbContext.Set<Customer>()
       .Include(x => x.Carts)
       .FirstOrDefault(x => x.Id == customer.Id);
 
@@ -259,13 +280,16 @@ public class UpdateAsyncTests : TestBase
     item.Products = new() { products[0], products[1] };
     cart.Items = new() { item };
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(cart);
       seeder.Seed(item);
       seeder.Seed(products);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Cart, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     cart.Name = "New cart name";
     item.Name = "New item name";
@@ -278,7 +302,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(cart);
 
     // Assert
-    Cart? fromDb = _fixture.DbContext.Set<Cart>()
+    Cart? fromDb = scope.DbContext.Set<Cart>()
       .Include(x => x.Items!)
       .ThenInclude(x => x.Products)
       .FirstOrDefault(x => x.Id == cart.Id);
@@ -299,12 +323,15 @@ public class UpdateAsyncTests : TestBase
     List<Cart> carts = Cart.Many(2);
     customer.Carts = new(carts);
 
-    var sut = _fixture.CreateRepository<Customer, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(carts);
       seeder.Seed(customer);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Customer, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     trackingContext.SetTrackingState(carts[0], TrackingState.Modified);
     trackingContext.SetTrackingState(carts[1], TrackingState.Modified);
@@ -325,11 +352,14 @@ public class UpdateAsyncTests : TestBase
     first.Partner = second;
     string? oldSecondName = second.Name;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(first);
       seeder.Seed(second);
     }, seedImplementation: RepositoryImplementation.EFCore);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
 
     first.Name = "New first name";
     second.Name = "New second name";
@@ -338,7 +368,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(first);
 
     // Assert
-    Person? fromDb = _fixture.DbContext.Set<Person>()
+    Person? fromDb = scope.DbContext.Set<Person>()
       .Include(x => x.Partner)
       .FirstOrDefault(x => x.Id == first.Id);
 
@@ -354,13 +384,16 @@ public class UpdateAsyncTests : TestBase
     Person first = Person.One();
     Person second = Person.One();
     string? oldSecondName = second.Name;
-
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(first);
       seeder.Seed(second);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     first.Name = "New first name";
     second.Name = "New second name";
@@ -371,7 +404,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(first);
 
     // Assert
-    Person? fromDb = _fixture.DbContext.Set<Person>()
+    Person? fromDb = scope.DbContext.Set<Person>()
       .Include(x => x.Partner)
       .FirstOrDefault(x => x.Id == first.Id);
 
@@ -389,13 +422,16 @@ public class UpdateAsyncTests : TestBase
     Person first = Person.One();
     Person second = Person.One();
     string? oldSecondName = second.Name;
-
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(first);
       seeder.Seed(second);
-    });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    }, seedImplementation: RepositoryImplementation.EFCore);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     first.Name = "New first name";
     second.Name = "New second name";
@@ -405,10 +441,10 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(first);
 
     // Assert
-    Person? fromDb = _fixture.DbContext.Set<Person>()
+    Person? fromDb = scope.DbContext.Set<Person>()
       .Include(x => x.Partner)
       .FirstOrDefault(x => x.Id == first.Id);
-    Person? partner = _fixture.DbContext.Set<Person>().FirstOrDefault(person => person.Id == second.Id);
+    Person? partner = scope.DbContext.Set<Person>().FirstOrDefault(person => person.Id == second.Id);
 
     fromDb.Should().NotBeNull();
     fromDb!.Name.Should().Be(first.Name);
@@ -424,13 +460,16 @@ public class UpdateAsyncTests : TestBase
     Person second = Person.One();
     first.Partner = second;
 
-    var sut = _fixture.CreateRepository<Person, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(first);
       seeder.Seed(second);
     }, seedImplementation: RepositoryImplementation.EFCore);
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Person, Guid>();
 
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     trackingContext.SetTrackingState(second, TrackingState.Modified);
 
@@ -449,12 +488,15 @@ public class UpdateAsyncTests : TestBase
     List<CartItem> items = CartItem.Many(2, cart.Id);
     cart.Items = new(items);
 
-    var sut = _fixture.CreateRepository<Cart, Guid>(dependencies, seeder =>
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder =>
     {
       seeder.Seed(cart);
       seeder.Seed(items);
     });
-    ITrackingContext trackingContext = _fixture.TrackingContext;
+    using var scope = _fixture.CreateScope(dependencies);
+    var sut = scope.CreateRepository<Cart, Guid>();
+    ITrackingContext trackingContext = scope.TrackingContext;
 
     cart.Name = "New cart name";
     items[1].Name = "New item name";
@@ -468,7 +510,7 @@ public class UpdateAsyncTests : TestBase
     await sut.UpdateAsync(cart);
 
     // Assert
-    Cart? fromDb = _fixture.DbContext.Set<Cart>()
+    Cart? fromDb = scope.DbContext.Set<Cart>()
       .Include(x => x.Items)
       .FirstOrDefault(x => x.Id == cart.Id);
 
@@ -477,5 +519,43 @@ public class UpdateAsyncTests : TestBase
     fromDb.Items.Should().HaveCount(2)
       .And.ContainSingle(item => item.Index == items[1].Index && item.Name == items[1].Name)
       .And.ContainSingle(item => item.Index == item2.Index && item.Name == item2.Name);
+  }
+
+  [Theory, RepositoryDependenciesData]
+  public async Task UpdateAsync_ShouldApplyOptimisticConcurrency(RepositoryDependencies dependencies)
+  {
+    // Arrange / Act
+    ConcurrencyEntity original = ConcurrencyEntity.One();
+    Guid id = original.Id;
+    
+    using var dbFixture = _fixture.CreateDbFixture(dependencies);
+    dbFixture.Seed(seeder => seeder.Seed(original));
+
+    Task t1 = Task.Run(async () =>
+    {
+      using var scope = _fixture.CreateScope(dependencies);
+      var sut = scope.CreateRepository<ConcurrencyEntity, Guid>();
+      ConcurrencyEntity cloned = original.Clone();
+      cloned.Name = "Updated name 1";
+
+      await sut.UpdateAsync(cloned);
+    });
+
+    Task t2 = Task.Run(async () =>
+    {
+      using var scope = _fixture.CreateScope(dependencies);
+      var sut = scope.CreateRepository<ConcurrencyEntity, Guid>();
+      ConcurrencyEntity cloned = original.Clone();
+      cloned.Name = "Updated name 2";
+
+      await Task.Delay(2000);
+      await sut.UpdateAsync(cloned);
+    });
+
+    await Task.WhenAll(t1.ContinueWith(_ => { }), t2.ContinueWith(_ => { }));
+    await t1;
+
+    // Assert
+    t2.Exception?.InnerException.Should().BeOfType(dependencies.ConcurrencyExceptionType);
   }
 }

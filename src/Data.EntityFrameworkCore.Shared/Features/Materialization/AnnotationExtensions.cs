@@ -16,7 +16,7 @@ using TEntityType =
 /// <summary>
 /// Extension methods for configuring materialization.
 /// </summary>
-public static class MaterializationAnnotationExtensions
+public static class AnnotationExtensions
 {
   /// <summary>
   /// Specifies a factory function that can be used to create an entity instance, given its primary key.

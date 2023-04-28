@@ -2,6 +2,7 @@
 using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
+using CodeArchitects.Platform.Data.Features.Concurrency;
 using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,21 @@ public interface IAdoNetConfigurationBuilderWithProvider
   /// <param name="seedType">The seed type. It must extend <see cref="DataSeed"/>.</param>
   /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
   IAdoNetConfigurationBuilderWithProvider UseSeed(Type seedType);
+
+  /// <summary>
+  /// Specifies the provider to use for generating concurrency tokens.
+  /// </summary>
+  /// <param name="tokenProviderType">The concurrency token provider implementation type. It must implement <see cref="IConcurrencyTokenProvider"/>.</param>
+  /// <param name="tokenProviderLifetime">The lifetime of the <see cref="IConcurrencyTokenProvider"/> service.</param>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  IAdoNetConfigurationBuilderWithProvider UseConcurrencyTokenProvider(Type tokenProviderType, ServiceLifetime tokenProviderLifetime = ServiceLifetime.Singleton);
+
+  /// <summary>
+  /// Specifies the provider to use for generating concurrency tokens.
+  /// </summary>
+  /// <param name="tokenProvider">The concurrency token provider instance that will generate concurrency tokens.</param>
+  /// <returns>An <see cref="IAdoNetConfigurationBuilderWithProvider"/> for further configuration.</returns>
+  IAdoNetConfigurationBuilderWithProvider UseConcurrencyTokenProvider(IConcurrencyTokenProvider tokenProvider);
 
   /// <summary>
   /// Scans the specifies assembly and looks for a <see cref="ModelConfiguration"/> type to use and registers any found <see cref="ICommandInterceptor{TCommand}"/> implementation.

@@ -138,6 +138,13 @@ public class TestDbContext : DbContext
     });
 
     modelBuilder.Entity<SerialEntity>();
+
+    modelBuilder.Entity<ConcurrencyEntity>(entity =>
+    {
+      entity
+        .Property(e => e.Version)
+        .IsConcurrencyToken();
+    });
   }
 }
 
@@ -167,6 +174,16 @@ public class OracleDbContext : TestDbContext // For Oracle migrations
   {
     optionsBuilder
       .UseOracle("-")
+      .UseCaep();
+  }
+}
+
+public class MariaDbDbContext : TestDbContext // For MariaDb migrations
+{
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+    optionsBuilder
+      .UseMySql("Server=localhost;Port=3306;Database=mariadb;Uid=mariadb;Pwd=mariadb", new MariaDbServerVersion("10.10.0"))
       .UseCaep();
   }
 }

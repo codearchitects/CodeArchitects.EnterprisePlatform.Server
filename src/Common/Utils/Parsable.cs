@@ -1,6 +1,6 @@
 ﻿// This enable using Type.Parse(string) without static abstract interface members from .NET 7
 
-namespace CodeArchitects.Platform.Common.Utils; 
+namespace CodeArchitects.Platform.Common.Utils;
 
 using System.Reflection;
 

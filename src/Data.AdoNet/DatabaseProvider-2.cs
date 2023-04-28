@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.Executor;
+using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Data.Common;
 
@@ -31,13 +32,13 @@ public abstract class DatabaseProvider<TDbConnection, TDbCommand> : DatabaseProv
     seeder.Apply(seed);
   }
 
-  private protected sealed override object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder)
+  private protected sealed override object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
   {
-    return CreateCommandBuilder(sqlBuilder);
+    return CreateCommandBuilder(sqlBuilder, concurrencyContext);
   }
 
-  private protected virtual CommandBuilder<TDbCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder)
+  private protected virtual CommandBuilder<TDbCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
   {
-    return new CommandBuilder<TDbCommand>(sqlBuilder);
+    return new CommandBuilder<TDbCommand>(sqlBuilder, concurrencyContext);
   }
 }

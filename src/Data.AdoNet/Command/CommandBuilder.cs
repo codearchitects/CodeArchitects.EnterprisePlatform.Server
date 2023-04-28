@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using System.Data;
@@ -9,10 +10,12 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
   where TDbCommand : IDbCommand
 {
   private readonly ISqlTextBuilder _sqlBuilder;
+  private readonly IConcurrencyContext _concurrencyContext;
 
-  public CommandBuilder(ISqlTextBuilder sqlBuilder)
+  public CommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
   {
     _sqlBuilder = sqlBuilder;
+    _concurrencyContext = concurrencyContext;
   }
 
   public void BuildFindCommand<TEntity, TKey>(TDbCommand command, TKey key, INavigationRoot<TEntity, TKey> root)
@@ -56,6 +59,12 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
     {
       object? value = visitor.GetColumnValue(column, entity);
       CreateParameter(command, $"p{column.Index}", value);
+    }
+
+    if (model.UsesConcurrencyChecks)
+    {
+      object concurrencyToken = _concurrencyContext.GetToken(entity);
+      CreateParameter(command, Constants.ConcurrencyTokenParameterName, concurrencyToken);
     }
   }
 
