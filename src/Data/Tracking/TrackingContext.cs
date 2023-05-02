@@ -24,6 +24,13 @@ internal class TrackingContext : ITrackingContext
     if (obj is null)
       throw new ArgumentNullException(nameof(obj));
 
-    _states[obj] = state;
+    if (state is TrackingState.Detached)
+    {
+      _ = _states.Remove(obj);
+    }
+    else
+    {
+      _states[obj] = state;
+    }
   }
 }

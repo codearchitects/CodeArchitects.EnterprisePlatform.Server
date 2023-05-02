@@ -251,7 +251,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           }
           return false;
 
-        case INavigation navigation: // One-to-one or many-to-many navigation
+        case INavigation navigation: // One-to-one or one-to-many navigation
           if (navigation.IsOnDependent)
             return false;
 
