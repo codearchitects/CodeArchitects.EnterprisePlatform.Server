@@ -133,7 +133,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
   [DebuggerDisplay("<none>")]
   private class NoneValue
   {
-    public static readonly NoneValue Instance = new NoneValue();
+    public static readonly NoneValue Instance = new();
 
     private NoneValue() { }
   }
@@ -142,7 +142,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
   [DebuggerDisplay("null")]
   private class NullValue
   {
-    public static readonly NullValue Instance = new NullValue();
+    public static readonly NullValue Instance = new();
 
     private NullValue() { }
   }

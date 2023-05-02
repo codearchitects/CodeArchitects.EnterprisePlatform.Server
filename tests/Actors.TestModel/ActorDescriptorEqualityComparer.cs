@@ -13,7 +13,7 @@ internal class ActorDescriptorEqualityComparer :
   IEqualityComparer<IMessageHandlerDescriptor>,
   IEqualityComparer<IMessageHandlerMetadata>
 {
-  public static readonly ActorDescriptorEqualityComparer Instance = new ActorDescriptorEqualityComparer();
+  public static readonly ActorDescriptorEqualityComparer Instance = new();
 
   public bool Equals(IActorDescriptor? x, IActorDescriptor? y)
   {

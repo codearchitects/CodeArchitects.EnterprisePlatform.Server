@@ -4,7 +4,6 @@ using CodeArchitects.Platform.Data.Navigation;
 using MongoDB.Driver;
 using System.Data;
 using System.Linq.Expressions;
-using System.Threading;
 
 namespace CodeArchitects.Platform.Data.MongoDB;
 

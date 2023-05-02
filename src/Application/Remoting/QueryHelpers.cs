@@ -7,6 +7,9 @@ using System.Web;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
+/// <summary>
+/// Helper methods for constructing http query strings.
+/// </summary>
 public static class QueryHelpers
 {
   private delegate void QueryDelegate(StringBuilder url, object? queryObject);

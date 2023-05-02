@@ -46,7 +46,7 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
       }, true);
     }
 
-    _stateManager.SaveAsync(CancellationToken.None).GetAwaiter().GetResult();
+    _stateManager.Save();
     _entries.Clear();
   }
 
@@ -137,7 +137,7 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
 
   private class EntryEqualityComparer : IEqualityComparer<(object, IEntityModel, NavigationContext)>
   {
-    public static readonly EntryEqualityComparer Instance = new EntryEqualityComparer();
+    public static readonly EntryEqualityComparer Instance = new();
 
     public bool Equals([AllowNull] (object, IEntityModel, NavigationContext) x, [AllowNull] (object, IEntityModel, NavigationContext) y)
     {

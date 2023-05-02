@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using System.Threading;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 

@@ -126,7 +126,7 @@ internal static class Graph
       if (child is null)
         continue;
 
-      NavigationContext context = new NavigationContext(node, accessibleNavigationModel);
+      NavigationContext context = new(node, accessibleNavigationModel);
 
       if (accessibleNavigationModel.IsCollection)
       {
@@ -237,7 +237,7 @@ internal static class Graph
       if (child is null)
         continue;
 
-      NavigationContext context = new NavigationContext(node, accessibleNavigationModel);
+      NavigationContext context = new(node, accessibleNavigationModel);
 
       if (accessibleNavigationModel.IsCollection)
       {

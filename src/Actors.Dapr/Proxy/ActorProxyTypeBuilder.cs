@@ -35,7 +35,7 @@ internal class ActorProxyTypeBuilder
 
     BuildConstructor(type, actorHostField);
 
-    ProxyMethodBuilder methodBuilder = new ProxyMethodBuilder(_ilProvider, type, hostEmitResult, actorHostField);
+    ProxyMethodBuilder methodBuilder = new(_ilProvider, type, hostEmitResult, actorHostField);
     foreach (IMethodDescriptor method in actor.Methods)
     {
       method.Accept(methodBuilder);

@@ -15,7 +15,7 @@ using TNavigation =
   ;
 
 /// <summary>
-/// Extension methods for configuring associations.
+/// Extension methods for association annotations.
 /// </summary>
 public static class AnnotationExtensions
 {

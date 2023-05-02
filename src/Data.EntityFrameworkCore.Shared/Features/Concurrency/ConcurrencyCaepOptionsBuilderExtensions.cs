@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Concurrency;
 
+/// <summary>
+/// Extension of <see cref="CaepOptionsBuilder"/> to enable the optimistic concurrency feature.
+/// </summary>
 public static class ConcurrencyCaepOptionsBuilderExtensions
 {
   /// <summary>

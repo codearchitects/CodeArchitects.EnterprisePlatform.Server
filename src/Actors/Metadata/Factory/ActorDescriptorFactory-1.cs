@@ -176,7 +176,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
         messageHandlers);
     }
 
-    PolymorphicActorDescriptor<TActor, TState> polymorphicActor = new PolymorphicActorDescriptor<TActor, TState>(
+    PolymorphicActorDescriptor<TActor, TState> polymorphicActor = new(
       interfaceType,
       isVirtual,
       activityBaseType,

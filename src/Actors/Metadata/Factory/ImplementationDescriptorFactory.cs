@@ -86,7 +86,7 @@ internal abstract class ImplementationDescriptorFactory<TActor>
     ParameterExpression contextParam = Expression.Parameter(typeof(IActorContext<TActor>), "context");
 
     int stateComponentCount = 0;
-    List<Expression> arguments = new List<Expression>();
+    List<Expression> arguments = new();
     foreach (ParameterInfo parameter in constructor.GetParameters())
     {
       string? parameterName = parameter.Name;

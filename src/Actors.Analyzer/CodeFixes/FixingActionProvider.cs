@@ -18,7 +18,7 @@ internal abstract class FixingActionProvider
 
   protected abstract string DiagnosticId { get; }
 
-  protected static ValueTask<CodeAction?> None => new ValueTask<CodeAction?>(null as CodeAction);
+  protected static ValueTask<CodeAction?> None => new(null as CodeAction);
 
   protected abstract ValueTask<CodeAction?> GetFixingActionAsync(Document document, SyntaxNode root, SyntaxNode node, IReadOnlyList<string> properties, CancellationToken cancellationToken);
 

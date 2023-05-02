@@ -14,7 +14,7 @@ using TEntityType =
   ;
 
 /// <summary>
-/// Extension methods for configuring materialization.
+/// Extension methods for materialization annotations.
 /// </summary>
 public static class AnnotationExtensions
 {

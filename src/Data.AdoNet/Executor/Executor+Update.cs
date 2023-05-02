@@ -4,7 +4,6 @@ using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using CodeArchitects.Platform.Data.Features.Associations;
 using CodeArchitects.Platform.Data.Tracking;
 using System.Diagnostics;
-using System.Threading;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 

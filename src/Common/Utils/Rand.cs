@@ -2,7 +2,7 @@
 
 internal static class Rand // To have a thread-safe random number generator mechanism without .NET 6+
 {
-  private static readonly Random s_global = new Random();
+  private static readonly Random s_global = new();
 
   [ThreadStatic]
   private static Random? t_instance;
