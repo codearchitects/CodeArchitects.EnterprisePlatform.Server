@@ -23,12 +23,11 @@ public abstract class DatabaseProvider<TDbConnection, TDbCommand> : DatabaseProv
 
   internal sealed override void ApplySeed(IServiceProvider services, DataSeed seed)
   {
-    IExecutor<TDbCommand> executor = (IExecutor<TDbCommand>)services.GetService(typeof(IExecutor<TDbCommand>))!;
     IStateManager<TDbConnection> stateManager = (IStateManager<TDbConnection>)services.GetService(typeof(IStateManager<TDbConnection>))!;
     ICommandBuilder<TDbCommand> commandBuilder = (ICommandBuilder<TDbCommand>)services.GetService(typeof(ICommandBuilder<TDbCommand>))!;
     IDataModel dataModel = (IDataModel)services.GetService(typeof(IDataModel))!;
 
-    Seeder<TDbConnection, TDbCommand> seeder = new(executor, stateManager, commandBuilder, dataModel);
+    Seeder<TDbConnection, TDbCommand> seeder = new(stateManager, commandBuilder, dataModel);
     seeder.Apply(seed);
   }
 
