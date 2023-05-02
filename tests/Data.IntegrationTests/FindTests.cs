@@ -6,13 +6,13 @@ using Xunit.Abstractions;
 namespace CodeArchitects.Platform.Data;
 
 [Collection(TestCollection.Name)]
-public class FindAsyncTests : TestBase
+public class FindTests : TestBase
 {
   private readonly Customer _customer;
   private readonly Category _category;
   private readonly Action<ISeeder> _seedingAction;
 
-  public FindAsyncTests(TestFixture fixture, ITestOutputHelper output)
+  public FindTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
   {
     _customer = Customer.One();

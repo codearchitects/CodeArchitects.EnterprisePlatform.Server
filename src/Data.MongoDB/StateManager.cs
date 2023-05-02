@@ -18,9 +18,40 @@ internal class StateManager : Data.StateManager, IStateManager
     _executions.Add(execution);
   }
 
+  protected override void SaveCore()
+  {
+    using IClientSessionHandle session = _client.StartSession();
+
+    if (_executions.Count > 1)
+    {
+      session.StartTransaction();
+    }
+
+    try
+    {
+      foreach (var execution in _executions)
+      {
+        execution(CancellationToken.None).GetAwaiter().GetResult();
+      }
+      if (session.IsInTransaction)
+      {
+        session.CommitTransaction();
+      }
+    }
+    catch when (session.IsInTransaction)
+    {
+      session.AbortTransaction();
+      throw;
+    }
+    finally
+    {
+      _executions.Clear();
+    }
+  }
+
   protected override async Task SaveCoreAsync(CancellationToken cancellationToken)
   {
-    IClientSessionHandle session = await _client.StartSessionAsync(cancellationToken: cancellationToken);
+    using IClientSessionHandle session = await _client.StartSessionAsync(cancellationToken: cancellationToken);
 
     if (_executions.Count > 1)
     {
@@ -45,7 +76,6 @@ internal class StateManager : Data.StateManager, IStateManager
     }
     finally
     {
-      session.Dispose();
       _executions.Clear();
     }
   }

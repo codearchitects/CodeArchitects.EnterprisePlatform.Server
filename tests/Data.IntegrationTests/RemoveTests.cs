@@ -5,9 +5,9 @@ using Xunit.Abstractions;
 namespace CodeArchitects.Platform.Data;
 
 [Collection(TestCollection.Name)]
-public class RemoveAsyncTests : TestBase
+public class RemoveTests : TestBase
 {
-  public RemoveAsyncTests(TestFixture fixture, ITestOutputHelper output)
+  public RemoveTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
   {
   }

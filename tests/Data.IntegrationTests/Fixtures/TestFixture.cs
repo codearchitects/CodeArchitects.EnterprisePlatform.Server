@@ -60,7 +60,7 @@ public class TestFixture : IAsyncLifetime
   internal TestScope CreateScope(RepositoryDependencies dependencies)
   {
     IServiceProvider services = GetProviderServices(dependencies.Provider);
-    return TestScope.Create(services, dependencies.Implementation);
+    return TestScope.Create(services, dependencies);
   }
 
   public void Setup(ITestOutputHelper output)

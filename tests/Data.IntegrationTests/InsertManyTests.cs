@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 namespace CodeArchitects.Platform.Data;
 
 [Collection(TestCollection.Name)]
-public class InsertManyAsyncTests : TestBase
+public class InsertManyTests : TestBase
 {
-  public InsertManyAsyncTests(TestFixture fixture, ITestOutputHelper output)
+  public InsertManyTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
   {
   }

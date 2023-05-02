@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.Navigation;
+using System.Threading;
 
 namespace CodeArchitects.Platform.Data;
 
@@ -34,6 +35,16 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   protected abstract TTable EntityToTable(TEntity entity);
 
   /// <inheritdoc/>
+  public virtual TEntity? Find(TKey key)
+  {
+    TTable? table = DataContext.Find<TTable, TKey>(key);
+    if (table is null)
+      return null;
+
+    return TableToEntity(table);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task<TEntity?> FindAsync(TKey key, CancellationToken cancellationToken = default)
   {
     TTable? table = await DataContext.FindAsync<TTable, TKey>(key, cancellationToken);
@@ -44,9 +55,22 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual TEntity? Find(TKey key, IncludeAction<TEntity> includeAction)
+  {
+    throw new NotSupportedException();
+  }
+
+  /// <inheritdoc/>
   public virtual Task<TEntity?> FindAsync(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
   {
     throw new NotSupportedException();
+  }
+
+  /// <inheritdoc/>
+  public virtual void Insert(TEntity entity)
+  {
+    TTable table = EntityToTable(entity);
+    DataContext.Insert<TTable, TKey>(table);
   }
 
   /// <inheritdoc/>
@@ -57,10 +81,24 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual void InsertMany(IEnumerable<TEntity> entities)
+  {
+    IEnumerable<TTable> tables = entities.Select(EntityToTable);
+    DataContext.InsertMany<TTable, TKey>(tables);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task InsertManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
   {
     IEnumerable<TTable> tables = entities.Select(EntityToTable);
     await DataContext.InsertManyAsync<TTable, TKey>(tables, cancellationToken);
+  }
+
+  /// <inheritdoc/>
+  public virtual void Update(TEntity entity)
+  {
+    TTable table = EntityToTable(entity);
+    DataContext.Update<TTable, TKey>(table);
   }
 
   /// <inheritdoc/>
@@ -71,10 +109,24 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual void UpdateMany(IEnumerable<TEntity> entities)
+  {
+    IEnumerable<TTable> tables = entities.Select(EntityToTable);
+    DataContext.UpdateMany<TTable, TKey>(tables);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task UpdateManyAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
   {
     IEnumerable<TTable> tables = entities.Select(EntityToTable);
     await DataContext.UpdateManyAsync<TTable, TKey>(tables, cancellationToken);
+  }
+
+  /// <inheritdoc/>
+  public virtual void Upsert(TEntity entity)
+  {
+    TTable table = EntityToTable(entity);
+    DataContext.Upsert<TTable, TKey>(table);
   }
 
   /// <inheritdoc/>
@@ -85,10 +137,23 @@ public abstract class MappedRepository<TTable, TEntity, TKey> : IRepository<TEnt
   }
 
   /// <inheritdoc/>
+  public virtual void Remove(TEntity entity)
+  {
+    TTable table = EntityToTable(entity);
+    DataContext.Remove<TTable, TKey>(table);
+  }
+
+  /// <inheritdoc/>
   public virtual async Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     TTable table = EntityToTable(entity);
     await DataContext.RemoveAsync<TTable, TKey>(table, cancellationToken);
+  }
+
+  /// <inheritdoc/>
+  public virtual void Remove(TKey key)
+  {
+    DataContext.Remove<TTable, TKey>(key);
   }
 
   /// <inheritdoc/>

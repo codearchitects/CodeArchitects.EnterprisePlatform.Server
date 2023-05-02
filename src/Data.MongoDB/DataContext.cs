@@ -4,6 +4,7 @@ using CodeArchitects.Platform.Data.Navigation;
 using MongoDB.Driver;
 using System.Data;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace CodeArchitects.Platform.Data.MongoDB;
 
@@ -27,6 +28,18 @@ internal class DataContext : IDataContext
 
   public IMongoDatabase Database { get; }
 
+  public TEntity? Find<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+
+    return collection.Find(filter).FirstOrDefault();
+  }
+
   public async Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -39,11 +52,36 @@ internal class DataContext : IDataContext
     return await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
   }
 
+  public TEntity? Find<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    return Find<TEntity, TKey>(key);
+  }
+
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     return FindAsync<TEntity, TKey>(key, cancellationToken);
+  }
+
+  public void Insert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+
+    _stateManager.Execute((cancellationToken) =>
+    {
+      collection.InsertOne(entity);
+      return Task.CompletedTask;
+    });
   }
 
   public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -63,6 +101,24 @@ internal class DataContext : IDataContext
     }, cancellationToken);
   }
 
+  public void InsertMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+
+    _stateManager.Execute((cancellationToken) =>
+    {
+      collection.InsertMany(entities);
+      return Task.CompletedTask;
+    });
+  }
+
   public Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -78,6 +134,29 @@ internal class DataContext : IDataContext
     {
       await collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
     }, cancellationToken);
+  }
+
+  public void Update<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+
+    _stateManager.Execute((cancellationToken) =>
+    {
+      ReplaceOneResult updateResult = collection.ReplaceOne(filter, entity);
+
+      if (!IsEntityReplaced(updateResult))
+        throw new DBConcurrencyException(); // TODO: Message
+
+      return Task.CompletedTask;
+    });
   }
 
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -101,11 +180,41 @@ internal class DataContext : IDataContext
     }, cancellationToken);
   }
 
+  public void UpdateMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    throw new NotSupportedException();
+  }
+
   public Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw new NotSupportedException($"'{nameof(UpdateManyAsync)}' is not yet supported.");
+    throw new NotSupportedException();
+  }
+
+  public void Upsert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+
+    _stateManager.Execute((cancellationToken) =>
+    {
+      ReplaceOneResult upsertResult = collection.ReplaceOne(filter, entity, new ReplaceOptions { IsUpsert = true });
+
+      if (!IsEntityUpsert(upsertResult))
+        throw new DBConcurrencyException(); // TODO: Message
+
+      return Task.CompletedTask;
+    });
   }
 
   public Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -129,22 +238,27 @@ internal class DataContext : IDataContext
     }, cancellationToken);
   }
 
-  public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+  public void Remove<TEntity, TKey>(TEntity entity)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
 
-    return _stateManager.ExecuteAsync(async (cancellationToken) =>
+    _stateManager.Execute((cancellationToken) =>
     {
-      DeleteResult deleteResult = await collection.DeleteOneAsync(filter, cancellationToken);
+      DeleteResult deleteResult = collection.DeleteOne(filter);
 
       if (!IsEntityDeleted(deleteResult))
         throw new DBConcurrencyException(); // TODO: Message
-    }, cancellationToken);
+
+      return Task.CompletedTask;
+    });
   }
 
   public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -158,6 +272,44 @@ internal class DataContext : IDataContext
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
     Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+
+    return _stateManager.ExecuteAsync(async (cancellationToken) =>
+    {
+      DeleteResult deleteResult = await collection.DeleteOneAsync(filter, cancellationToken);
+
+      if (!IsEntityDeleted(deleteResult))
+        throw new DBConcurrencyException(); // TODO: Message
+    }, cancellationToken);
+  }
+
+  public void Remove<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+
+    _stateManager.Execute((cancellationToken) =>
+    {
+      DeleteResult deleteResult = collection.DeleteOne(filter);
+
+      if (!IsEntityDeleted(deleteResult))
+        throw new DBConcurrencyException(); // TODO: Message
+
+      return Task.CompletedTask;
+    });
+  }
+
+  public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel entityModel = EnsureEntity<TEntity>();
+
+    IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {

@@ -12,6 +12,11 @@ internal class StateManager<TDbContext> : StateManager, IStateManager<TDbContext
 
   public TDbContext DbContext { get; }
 
+  protected override void SaveCore()
+  {
+    DbContext.SaveChanges();
+  }
+
   protected override Task SaveCoreAsync(CancellationToken cancellationToken)
   {
     return DbContext.SaveChangesAsync(cancellationToken);

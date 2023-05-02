@@ -5,6 +5,18 @@ namespace CodeArchitects.Platform.Data.AdoNet.Executor;
 
 internal partial class Executor<TDbCommand>
 {
+  public void ExecuteUpdateMany<TEntity, TKey>(TDbCommand command, IEnumerable<TEntity> entities, IEntityModel<TEntity, TKey> model)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    ExecuteUpdateGraphVisitor visitor = new(this, command);
+    foreach (TEntity entity in entities)
+    {
+      TryCreateConcurrencyToken(entity, model);
+      Graph.Visit(entity, model, visitor);
+    }
+  }
+
   public async Task ExecuteUpdateManyAsync<TEntity, TKey>(TDbCommand command, IEnumerable<TEntity> entities, IEntityModel<TEntity, TKey> model, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>

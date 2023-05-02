@@ -26,6 +26,13 @@ public interface IDataContext : Data.IDataContext
   /// </summary>
   /// <param name="execution">The operation that will be executed on the unit of work completion.</param>
   /// <param name="startTransaction">A value indicating whether a new transaction should be started before executing the delayed operations.</param>
+  void BatchExecute(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction);
+
+  /// <summary>
+  /// Executes an operation within the scope of a unit of work. Delays the execution of the specified operation until the unit of work completes.
+  /// </summary>
+  /// <param name="execution">The operation that will be executed on the unit of work completion.</param>
+  /// <param name="startTransaction">A value indicating whether a new transaction should be started before executing the delayed operations.</param>
   /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
   Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default);
 

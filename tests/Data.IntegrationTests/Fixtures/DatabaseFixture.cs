@@ -32,31 +32,31 @@ internal sealed class DatabaseFixture : IDisposable
 
   private readonly IServiceScope _scope;
   private readonly DbProvider _provider;
-  private readonly RepositoryImplementation _implementation;
+  private readonly DataImplementation _implementation;
 
-  public DatabaseFixture(IServiceScope scope, DbProvider provider, RepositoryImplementation implementation)
+  public DatabaseFixture(IServiceScope scope, DbProvider provider, DataImplementation implementation)
   {
     _scope = scope;
     _provider = provider;
     _implementation = implementation;
   }
 
-  public void Seed(Action<ISeeder> seedingAction, RepositoryImplementation seedImplementation = RepositoryImplementation.Default)
+  public void Seed(Action<ISeeder> seedingAction, DataImplementation seedImplementation = DataImplementation.Default)
   {
     IServiceProvider services = _scope.ServiceProvider;
     TestDataSeed seed = new(seedingAction);
-    if (seedImplementation is RepositoryImplementation.Default)
+    if (seedImplementation is DataImplementation.Default)
     {
       seedImplementation = _implementation;
     }
 
     switch (seedImplementation)
     {
-      case RepositoryImplementation.EFCore:
+      case DataImplementation.EFCore:
         TestDbContext dbContext = services.GetRequiredService<TestDbContext>();
         dbContext.Seed(seed);
         break;
-      case RepositoryImplementation.AdoNet:
+      case DataImplementation.AdoNet:
         DatabaseProvider databaseProvider = _provider switch
         {
           DbProvider.SqlServer => services.GetRequiredService<SQLServerProvider>(),

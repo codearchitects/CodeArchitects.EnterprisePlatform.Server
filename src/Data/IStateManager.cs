@@ -2,5 +2,6 @@
 
 internal interface IStateManager
 {
+  void Save();
   Task SaveAsync(CancellationToken cancellationToken);
 }

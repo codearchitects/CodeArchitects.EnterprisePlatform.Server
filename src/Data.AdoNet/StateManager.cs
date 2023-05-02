@@ -61,11 +61,47 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
     }
     finally
     {
-      transaction?.Dispose();
-      Connection.Close();
+      if (transaction is not null)
+      {
+        await transaction.DisposeAsync();
+      }
+      await Connection.CloseAsync();
       _startTransaction = false;
       _executions.Clear();
       _concurrencyContext.Clear();
+    }
+  }
+
+  protected override void SaveCore()
+  {
+    EnsureNotDisposed();
+
+    Connection.Open();
+
+    DbTransaction? transaction = _startTransaction || _executions.Count > 1
+      ? Connection.BeginTransaction(IsolationLevel.Unspecified)
+      : null;
+
+    try
+    {
+      foreach (var execution in _executions)
+      {
+        execution(Connection, transaction, CancellationToken.None).GetAwaiter().GetResult();
+      }
+
+      transaction?.Commit();
+    }
+    catch when (transaction is not null)
+    {
+      transaction.Rollback();
+      throw;
+    }
+    finally
+    {
+      _startTransaction = false;
+      transaction?.Dispose();
+      _executions.Clear();
+      Connection.Close();
     }
   }
 

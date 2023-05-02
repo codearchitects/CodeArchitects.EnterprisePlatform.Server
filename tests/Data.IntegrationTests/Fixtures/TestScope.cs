@@ -9,12 +9,14 @@ namespace CodeArchitects.Platform.Data.Fixtures;
 public sealed class TestScope : IDisposable
 {
   private readonly IServiceScope _scope;
-  private readonly RepositoryImplementation _implementation;
+  private readonly DataImplementation _implementation;
+  private readonly bool _async;
 
-  public TestScope(IServiceScope scope, RepositoryImplementation implementation)
+  public TestScope(IServiceScope scope, DataImplementation implementation, bool async)
   {
     _scope = scope;
     _implementation = implementation;
+    _async = async;
   }
 
   public IServiceProvider Services => _scope.ServiceProvider;
@@ -23,21 +25,23 @@ public sealed class TestScope : IDisposable
 
   public ITrackingContext TrackingContext => Services.GetRequiredService<ITrackingContext>();
 
-  public Repository<TEntity, TKey> CreateRepository<TEntity, TKey>()
+  public IRepository<TEntity, TKey> CreateRepository<TEntity, TKey>()
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    return _implementation switch
+    IRepository<TEntity, TKey> repository = _implementation switch
     {
-      RepositoryImplementation.AdoNet => new AdoNetRepository<TEntity, TKey>(Services.GetRequiredService<AdoNet.IDataContext>()),
-      RepositoryImplementation.EFCore => new EFCoreRepository<TEntity, TKey>(Services.GetRequiredService<EntityFrameworkCore.IDataContext>()),
-      _                               => throw Errors.Unreachable
+      DataImplementation.AdoNet => new AdoNetRepository<TEntity, TKey>(Services.GetRequiredService<AdoNet.IDataContext>()),
+      DataImplementation.EFCore => new EFCoreRepository<TEntity, TKey>(Services.GetRequiredService<EntityFrameworkCore.IDataContext>()),
+      _                         => throw Errors.Unreachable
     };
+
+    return new TestRepository<TEntity, TKey>(repository, _async);
   }
 
-  public static TestScope Create(IServiceProvider services, RepositoryImplementation implementation)
+  public static TestScope Create(IServiceProvider services, RepositoryDependencies dependencies)
   {
-    return new(services.CreateScope(), implementation);
+    return new(services.CreateScope(), dependencies.Implementation, dependencies.Async);
   }
 
   public void Dispose()

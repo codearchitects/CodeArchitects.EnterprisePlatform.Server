@@ -7,9 +7,9 @@ using Xunit.Abstractions;
 namespace CodeArchitects.Platform.Data;
 
 [Collection(TestCollection.Name)]
-public class UpdateAsyncTests : TestBase
+public class UpdateTests : TestBase
 {
-  public UpdateAsyncTests(TestFixture fixture, ITestOutputHelper output)
+  public UpdateTests(TestFixture fixture, ITestOutputHelper output)
     : base(fixture, output)
   {
   }
@@ -357,7 +357,7 @@ public class UpdateAsyncTests : TestBase
     {
       seeder.Seed(first);
       seeder.Seed(second);
-    }, seedImplementation: RepositoryImplementation.EFCore);
+    }, seedImplementation: DataImplementation.EFCore);
     using var scope = _fixture.CreateScope(dependencies);
     var sut = scope.CreateRepository<Person, Guid>();
 
@@ -428,7 +428,7 @@ public class UpdateAsyncTests : TestBase
     {
       seeder.Seed(first);
       seeder.Seed(second);
-    }, seedImplementation: RepositoryImplementation.EFCore);
+    }, seedImplementation: DataImplementation.EFCore);
     using var scope = _fixture.CreateScope(dependencies);
     var sut = scope.CreateRepository<Person, Guid>();
     ITrackingContext trackingContext = scope.TrackingContext;
@@ -465,7 +465,7 @@ public class UpdateAsyncTests : TestBase
     {
       seeder.Seed(first);
       seeder.Seed(second);
-    }, seedImplementation: RepositoryImplementation.EFCore);
+    }, seedImplementation: DataImplementation.EFCore);
     using var scope = _fixture.CreateScope(dependencies);
     var sut = scope.CreateRepository<Person, Guid>();
 

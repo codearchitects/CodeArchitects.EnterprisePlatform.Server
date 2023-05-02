@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.Data.Fixtures;
 
-public enum RepositoryImplementation
+public enum DataImplementation
 {
   Default = 0,
   AdoNet = 1,

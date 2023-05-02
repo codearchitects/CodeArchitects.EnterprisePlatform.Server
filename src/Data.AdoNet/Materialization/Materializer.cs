@@ -21,6 +21,22 @@ internal class Materializer : IMaterializer, IMaterializerHub
     _identityCollections = new();
   }
 
+  public TEntity? ReadEntity<TEntity, TKey>(DbDataReader reader, INavigationRoot<TEntity, TKey> root)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IRowReader rowReader = _readerProvider.GetRowReader(root.Entity);
+
+    object? entity = null;
+    while (reader.Read())
+    {
+      int offset = 0;
+      entity = rowReader.ReadRow(reader, ref offset, this, root.Navigations);
+    }
+
+    return FinalizeRead<TEntity>(entity);
+  }
+
   public async Task<TEntity?> ReadEntityAsync<TEntity, TKey>(DbDataReader reader, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -34,13 +50,7 @@ internal class Materializer : IMaterializer, IMaterializerHub
       entity = rowReader.ReadRow(reader, ref offset, this, root.Navigations);
     }
 
-    foreach (IIdentityCollection list in _identityCollections)
-    {
-      list.Populate();
-    }
-    _identityCollections.Clear();
-
-    return (TEntity?)entity;
+    return FinalizeRead<TEntity>(entity);
   }
 
   public void AddMaterialized(IdentityCacheKey key, object materialized)
@@ -65,5 +75,20 @@ internal class Materializer : IMaterializer, IMaterializerHub
     IRowReader rowReader = _readerProvider.GetRowReader(model);
 
     return rowReader.ReadRow(reader, ref offset, this, navigations);
+  }
+
+  private TEntity? FinalizeRead<TEntity>(object? entity)
+    where TEntity : class
+  {
+    if (entity is null)
+      return null;
+
+    foreach (IIdentityCollection list in _identityCollections)
+    {
+      list.Populate();
+    }
+    _identityCollections.Clear();
+
+    return (TEntity)entity;
   }
 }
