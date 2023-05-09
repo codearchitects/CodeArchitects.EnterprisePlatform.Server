@@ -454,8 +454,7 @@ internal static class StandardActorFixture
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateIndex(-1)
-        .SetGetActorIdMethod(null))
+        .SetStateIndex(-1))
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(StandardActorState)))
         .SetFields(stateFields)

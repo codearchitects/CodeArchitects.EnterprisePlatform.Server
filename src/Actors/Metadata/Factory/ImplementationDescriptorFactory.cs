@@ -115,8 +115,9 @@ internal abstract class ImplementationDescriptorFactory<TActor>
       if (_actorDescriptorFactory.IsActorId(parameterName, parameterType))
       {
         Expression idExpression = Expression.Call(contextParam, s_getActorIdMethod);
-        Expression parseIdExpression = _actorDescriptorFactory.GetParseIdExpression(idExpression, parameterType);
-        arguments.Add(parseIdExpression);
+        Expression idArgumentException = _actorDescriptorFactory.GetIdExpression(idExpression, parameterType);
+
+        arguments.Add(idArgumentException);
         continue;
       }
 

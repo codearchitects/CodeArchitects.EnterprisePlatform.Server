@@ -2,10 +2,12 @@
 using CodeArchitects.Platform.Actors.Messaging;
 using CodeArchitects.Platform.Actors.Metadata.Implementation;
 using CodeArchitects.Platform.Actors.Scheduling;
+using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Factory;
 
@@ -106,12 +108,16 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     }
     catch (TargetInvocationException ex)
     {
-      throw ex.InnerException;
+      ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+      throw Errors.Unreachable;
     }
   }
 
-  public Expression GetParseIdExpression(Expression idExpression, Type idType)
+  public Expression GetIdExpression(Expression idExpression, Type idType)
   {
+    if (idType == typeof(string))
+      return idExpression;
+
     MethodInfo? parseMethod = idType.GetMethod(
       name: "Parse",
       bindingAttr: BindingFlags.Static | BindingFlags.Public,
@@ -331,18 +337,18 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
         if (IdType is not null && component.Type != IdType)
           throw InvalidActorException.InvalidIdMember(ActorType, component.Type, IdType);
 
-        Expression parseIdExpression = GetParseIdExpression(idParam, component.Type);
+        Expression idExpression = GetIdExpression(idParam, component.Type);
 
         Action<TState, string> setId = Expression.Lambda<Action<TState, string>>(
           body: Expression.Assign(
             left: Expression.Field(
               expression: stateParam,
               field: stateFields[stateIndex]),
-            right: parseIdExpression),
+            right: idExpression),
           parameters: new[] { stateParam, idParam })
           .Compile();
 
-        id = new ComponentActorIdDescriptor<TState>(component.Type, stateIndex, setId);
+        id = new StateActorIdDescriptor<TState>(component.Type, stateIndex, setId);
       }
     }
 
