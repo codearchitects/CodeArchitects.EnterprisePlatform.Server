@@ -126,19 +126,19 @@ public class ReflectionActorDescriptorFactoryTests
   }
 
   [Fact]
-  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForComponentIdSourceActor()
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForStateIdActor()
   {
     // Arrange
-    ComponentIdSourceActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+    StateIdActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
 
     _contextMock
-      .Setup(x => x.GetFactoryType(typeof(ComponentIdSourceActor)))
-      .Returns(typeof(IComponentIdSourceActorFactory));
+      .Setup(x => x.GetFactoryType(typeof(StateIdActor)))
+      .Returns(typeof(IStateIdActorFactory));
     _contextMock
-      .Setup(x => x.GetImplementationTypes(typeof(ComponentIdSourceActor)))
+      .Setup(x => x.GetImplementationTypes(typeof(StateIdActor)))
       .Returns(Enumerable.Empty<Type>());
 
-    ReflectionActorDescriptorFactory<ComponentIdSourceActor> sut = new(
+    ReflectionActorDescriptorFactory<StateIdActor> sut = new(
       _stateTypeBuilderMock.Object,
       _activityTypeBuilderMock.Object,
       _contextMock.Object,
@@ -149,6 +149,33 @@ public class ReflectionActorDescriptorFactoryTests
     IActorDescriptor descriptor = sut.CreateDescriptor();
 
     // Assert
-    ComponentIdSourceActorFixture.AssertValidDescriptor(descriptor);
+    StateIdActorFixture.AssertValidDescriptor(descriptor);
+  }
+
+  [Fact]
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForInjectedStringIdActor()
+  {
+    // Arrange
+    InjectedStringIdActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+
+    _contextMock
+      .Setup(x => x.GetFactoryType(typeof(InjectedStringIdActor)))
+      .Returns(typeof(IInjectedStringIdActorFactory));
+    _contextMock
+      .Setup(x => x.GetImplementationTypes(typeof(InjectedStringIdActor)))
+      .Returns(Enumerable.Empty<Type>());
+
+    ReflectionActorDescriptorFactory<InjectedStringIdActor> sut = new(
+      _stateTypeBuilderMock.Object,
+      _activityTypeBuilderMock.Object,
+      _contextMock.Object,
+      new ActorAttribute(),
+      null);
+
+    // Act
+    IActorDescriptor descriptor = sut.CreateDescriptor();
+
+    // Assert
+    InjectedStringIdActorFixture.AssertValidDescriptor(descriptor);
   }
 }

@@ -132,8 +132,7 @@ internal static class VirtualActorFixture
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateIndex(-1)
-        .SetGetActorIdMethod(null))
+        .SetStateIndex(-1))
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(VirtualActorState)))
         .SetFields(stateFields)

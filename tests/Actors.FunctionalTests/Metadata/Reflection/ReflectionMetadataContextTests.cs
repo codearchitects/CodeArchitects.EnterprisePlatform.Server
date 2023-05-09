@@ -16,11 +16,12 @@ public class ReflectionMetadataContextTests
     IActorModel model = sut.CreateModel(DynamicAssembly.NewModule());
 
     // Assert
-    model.Actors.Should().HaveCount(5)
+    model.Actors.Should().HaveCount(6)
       .And.ContainSingle(actor => actor.ActorType == typeof(StandardActor))
       .And.ContainSingle(actor => actor.ActorType == typeof(PolymorphicActor))
       .And.ContainSingle(actor => actor.ActorType == typeof(StatelessActor))
       .And.ContainSingle(actor => actor.ActorType == typeof(VirtualActor))
-      .And.ContainSingle(actor => actor.ActorType == typeof(ComponentIdSourceActor));
+      .And.ContainSingle(actor => actor.ActorType == typeof(StateIdActor))
+      .And.ContainSingle(actor => actor.ActorType == typeof(InjectedStringIdActor));
   }
 }

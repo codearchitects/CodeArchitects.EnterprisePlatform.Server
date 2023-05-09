@@ -155,9 +155,6 @@ internal class ActorDescriptorEqualityComparer :
     if (x.StateIndex != y.StateIndex)
       return false;
 
-    if (x.GetActorIdMethod != y.GetActorIdMethod)
-      return false;
-
     return true;
   }
 

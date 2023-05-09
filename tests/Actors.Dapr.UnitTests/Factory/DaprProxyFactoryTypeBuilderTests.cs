@@ -138,11 +138,11 @@ public class DaprProxyFactoryTypeBuilderTests
   }
 
   [Fact]
-  public void Build_ShouldCreateFactoryType_ForComponentIdSourceActor() // https://sharplab.io/#v2:C4LglgNgPgAgTARgLACgYAYAEMEDoAqAFgE4CmAhgCZgB2A5gNyobYICsTKzAzJrcKWIAzcgGNSmAJIBBUcAD2xAArF5ADwCeAMTELiGzAG9MAX1Q9M5AEYBnYMV3Y4mFeu27FGgDz4AEvLtJGgFhMVIAGkx8IJCRcUj8AGVgcgEAPlRDVExMAAdiMAA3VIkyKnkaCAMZOUVXTR1a/UwAfQ9iRr0NTmy81QE5UkoXVQb2jQAKGr169yaDds7PAEperJQcnLampeaAXksd8c4csw3MXvz5AYFh6zsHOVYsWT0AOXIAWwljOlJgBimcznK43IaWWz2RzRYKCOISADCZQEswmfgCwBicLChz0/jsyx6IP6pEGd0hj2A2AAbFIaGBgNIbBoaKI0fjMbDQuJcYoOQlkiVMHYSpEEeRWaQIBBUmAKvh5ABrUg0TCiCXiaWy+VKlWE4E5UGk240nxY7mkNKYJEUAQIxSkJks0Q+V6KSSUNJot3ED2832UAUpATC4MRa0aqUy4BymgK5Wq9WSrUxnUJ1bnHIAd0Iggk+B9fpAmBo1xoAFdpb0cnsrcASPIsyXSE23tdJJ9chBSN9YZQAKJqcS5VM0Cb6rjE67G8Ew2I4gDi/3tZFdTQ9XoL67u24zm0wObzUULw2LpeAFarmcwtcw9dUTZoLcwbcxne7vdug+Ho/HnDOFj8NiPKSPanYVCqmKUIk8jlsQ4g+kYQKTjAvDwNa8jgU+wQejBcEIU0goCJkvSoXwwStCKAgAEJiIqtB0FoYBSpQJybKRvD8JRYZIX8VK3i0VGkLRoj0fQTEsYCNj/DeVqCWGIliYxzEQMMBzFBA5akICZwAWgnFcvCUhgbkEE4dBsHwY6TQciR5wwLSLRBAyTqshMJlmVBeFWT6RESEJYqRimsbxiqapBdGIW6jQE56WR6EedhXmWQRMyjAYxagZhplJbhKXWXodmGgUxQhmUlAVFUxnZZ5eX4QVfIYq07QckSORkYlkF1T5TSollWFdRZ9U+hy/ocnuRjVs1NlNQcLUYmxunAvFzideZ3mpXU6W7BlIxuDtXj9Tlg0bQ1xD8tVA3rflPpijVuVDT1eh+RkKDrO1vBrclw29dt4xTD6sw7f6O0TTkxZWOQ0kTIs4wTe9yGXCSZKYPIhSCAUlASDgLxNB83yyZgABEX3dZtxBE212BodSh2k495NWjaJSuWyXEBRGyaRWmYVJpq3NxtFN6YFjIiVsA8NTTAADs1rIqQK6Osybkc0+Tb06dvk8cY8klIpDESapwtCaYkR81G2qC+mi0GtTl3HddP16JgS7ABMXFgJQkvXjLLvLg67tezbk7FdOKNoxjnsSEdtUM2dcu2qQfUazdM12GNGLe/uvtqxhV3fU9W1uDDacS8HSNhyaEfEJj2O0s5jLK2yMcPZrpcZ3Yd352TZ1+aGoqc/zluhYmEXD9FWebL7812LgTn0o3zoTBz5vBTzMXByYQA=
+  public void Build_ShouldCreateFactoryType_ForStateIdActor() // https://sharplab.io/#v2:C4LglgNgPgAgTARgLACgYAYAEMEDoAqAFgE4CmAhgCZgB2A5gNyobYICsTKzAzJrcKWIAzcgGNSmAJIBBUcAD2xAArF5ADwCeAMTELiGzAG9MAX1Q9M5AEYBnYMV3Y4mFeu27FGgDz4AEvLtJGgFhMVIAGkx8IJCRcUj8AGVgcgEAPlRDVExMAAdiMAA3VIkyKnkaCAMZOUVXTR1a/UwAfQ9iRr0NTmy81QE5UkoXVQb2jQAKGr169yaDds7PAEperJQcnLampeaAXksd8c4csw3MXvz5AYFh6zsHOVYsWT0AOXIAWwljOlJgBimcznK43IaWWz2RzRYKCOISADCZQEswmfgCwBicLChz0/jsyx6IP6pEGd0hj2A2AAbFIaGBgNIbBoaKI0fjMbDQuJcYoOQlkiVMHYSpEEeRWaQIBBUmAKvh5ABrUg0TCiCXiaWy+VKlWE4E5UGk240nxY7mkNKYJEUAQIxSkJks0Q+V6KSSUNJot3ED2832UAUpATC4MRa0aqUy4BymgK5Wq9WSrUxnUJ1bnHIAd0Iggk+B9fpAmBo1xoAFdpb0cnsrcASPIsyXSE23tdJJ9chBSN9YZQAKJqcS5VM0Cb6rjE67G8Ew2I4gDi/3tZFdTQ9XoL67u24zm0wObzUULw2LpeAFarmcwtcw9dUTZoLcwbcxne7vdug+Ho/HnDOFj8NiPKSPanYVCqmKUIk8jlsQ4g+kYQKTjAvDwNa8jgU+wQejBcEIU0goCJkvSoXwwStCKAgAEJiIqtB0FoYBSpQJybKRvD8JRYZIX8VK3i0VGkLRoj0fQTEsYCNj/DeVqCWGIliYxzEQMMBzFBA5akICZwAWgnFcvCUhgbkEE4dBsHwY6TQciR5wwLSLRBAyTqshMJlmVBeFWT6RESEJYqRimsbxiqapBdGIW6jQE56WR6EedhXmWQRMyjAYxagZhplJbhKXWXodmGgUxQhmUlAVFUxnZZ5eX4QVfIYq07QckSORkYlkF1T5TSollWFdRZ9U+hy/ocnuRjVs1NlNQcLUYmxunAvFzideZ3mpXU6W7BlIxuDtXj9Tlg0bQ1xD8tVA3rflPpijVuVDT1eh+RkKDrO1vBrclw29dt4xTD6sw7f6O0TTkxZWOQ0kTIs4wTe9yGXCSZKYPIhSCAUlASDgLxNB83yyZgABEX3dZtxBE212BodSh2k495NWjaJSuWyXEBRGyaRWmYVJpq3NxtFN6YFjIiVsA8NTTAADs1rIqQK6Osybkc0+Tb06dvk8cY8klIpDESapwtCaYkR81G2qC+mi0GtTl3HddP16JgS7ABMXFgJQkvXjLLvLg67tezbk7FdOKNoxjnsSEdtUM2dcu2qQfUazdM12GNGLe/uvtqxhV3fU9W1uDDacS8HSNhyaEfEJj2O0s5jLK2yMcPZrpcZ3Yd352TZ1+aGoqc/zluhYmEXD9FWebL7812LgTn0o3zoTBz5vBTzMXByYQA=
   {
     // Arrange
     string actorName = "name";
-    IActorDescriptor actor = ComponentIdSourceActorFixture.Descriptor;
+    IActorDescriptor actor = StateIdActorFixture.Descriptor;
     Type actorType = actor.ActorType;
     IReadOnlyList<FieldInfo> stateFields = actor.State.Fields;
 
@@ -154,35 +154,35 @@ public class DaprProxyFactoryTypeBuilderTests
     FakeILGenerator initAsyncMethodIL = _ilProvider.AddGenerator();
 
     // Act
-    Type proxyFactoryType = _sut.Build(actor, ComponentIdSourceActorDaprFixture.HostEmitResult, typeof(ComponentIdSourceActorProxy), actorName);
+    Type proxyFactoryType = _sut.Build(actor, StateIdActorDaprFixture.HostEmitResult, typeof(StateIdActorProxy), actorName);
 
     // Assert
     proxyFactoryType.Namespace.Should().Be(actorType.Namespace);
     proxyFactoryType.Name.Should().Be($"<{actorType.Name}>{DaprProxyFactoryTypeBuilder.ComponentName}");
-    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>>();
-    proxyFactoryType.Should().Implement<IComponentIdSourceActorFactory>();
+    proxyFactoryType.Should().BeDerivedFrom<ProxyFactory<IStateIdActorHost, int, IStateIdActor, StateIdActorState>>();
+    proxyFactoryType.Should().Implement<IStateIdActorFactory>();
 
     createAsyncMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Newobj(typeof(ComponentIdSourceActorState), Type.EmptyTypes)
+      .Newobj(typeof(StateIdActorState), Type.EmptyTypes)
       .Dup()
       .Ldarg_1()
       .Stfld(stateFields[0])
       .Ldarg_2()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "CreateAsync", new[] { typeof(int), typeof(ComponentIdSourceActorState), typeof(CancellationToken) })
+      .Call(typeof(ProxyFactory<IStateIdActorHost, int, IStateIdActor, StateIdActorState>), "CreateAsync", new[] { typeof(int), typeof(StateIdActorState), typeof(CancellationToken) })
       .Ret());
 
     getMethodIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), "GetCore", new[] { typeof(int) })
+      .Call(typeof(ProxyFactory<IStateIdActorHost, int, IStateIdActor, StateIdActorState>), "GetCore", new[] { typeof(int) })
       .Ret());
 
     constructorIL.VerifyIL(_ => _
       .Ldarg_0()
       .Ldarg_1()
-      .Call(typeof(ProxyFactory<IComponentIdSourceActorHost, int, IComponentIdSourceActor, ComponentIdSourceActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
+      .Call(typeof(ProxyFactory<IStateIdActorHost, int, IStateIdActor, StateIdActorState>), ConstructorInfo.ConstructorName, new[] { typeof(IActorProxyFactory) })
       .Ret());
 
     actorNameGetterIL.VerifyIL(_ => _
@@ -191,14 +191,14 @@ public class DaprProxyFactoryTypeBuilderTests
 
     createProxyMethodIL.VerifyIL(_ => _
       .Ldarg_1()
-      .Newobj(typeof(ComponentIdSourceActorProxy), new[] { typeof(IComponentIdSourceActorHost) })
+      .Newobj(typeof(StateIdActorProxy), new[] { typeof(IStateIdActorHost) })
       .Ret());
 
     initAsyncMethodIL.VerifyIL(_ => _
       .Ldarg_1()
       .Ldarg_2()
       .Ldarg_3()
-      .Callvirt(typeof(IComponentIdSourceActorHost), "_InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
+      .Callvirt(typeof(IStateIdActorHost), "_InitAsync", new[] { typeof(byte[]), typeof(CancellationToken) })
       .Ret());
   }
 }

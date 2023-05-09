@@ -115,15 +115,15 @@ public class ActorMetadataBuilderTests
   }
 
   [Fact]
-  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForComponentIdSourceActor()
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForStateIdActor()
   {
     // Arrange
-    ComponentIdSourceActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+    StateIdActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
 
-    ActorMetadataBuilder<ComponentIdSourceActor> sut = new(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object);
+    ActorMetadataBuilder<StateIdActor> sut = new(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object);
 
     sut.AsBuilder()
-      .HasFactoryType<IComponentIdSourceActorFactory>()
+      .HasFactoryType<IStateIdActorFactory>()
       .HasState<int>("_state", state => state
         .IsActorId());
 
@@ -131,6 +131,25 @@ public class ActorMetadataBuilderTests
     IActorDescriptor descriptor = sut.CreateDescriptor();
 
     // Assert
-    ComponentIdSourceActorFixture.AssertValidDescriptor(descriptor);
+    StateIdActorFixture.AssertValidDescriptor(descriptor);
+  }
+
+  [Fact]
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForInjectedStringIdActor()
+  {
+    // Arrange
+    InjectedStringIdActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+
+    ActorMetadataBuilder<InjectedStringIdActor> sut = new(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object);
+
+    sut.AsBuilder()
+      .HasFactoryType<IInjectedStringIdActorFactory>()
+      .HasId("_id");
+
+    // Act
+    IActorDescriptor descriptor = sut.CreateDescriptor();
+
+    // Assert
+    InjectedStringIdActorFixture.AssertValidDescriptor(descriptor);
   }
 }
