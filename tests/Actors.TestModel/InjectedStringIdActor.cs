@@ -7,68 +7,70 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
 
-internal interface IStatelessActor
+internal interface IInjectedStringIdActor
 {
 }
 
 [Actor]
-internal class StatelessActor : IStatelessActor
+internal class InjectedStringIdActor : IInjectedStringIdActor
 {
-  private readonly IService1 _service1;
+  [ActorId]
+  private readonly string _id;
 
-  public StatelessActor(IService1 service1)
+  public InjectedStringIdActor(string id)
   {
-    _service1 = service1;
+    _id = id;
   }
 }
 
-internal class StatelessActorState : OrdinaryActorState
+internal class InjectedStringIdActorState : OrdinaryActorState
 {
-  public override bool Equals(object? obj) => obj is StatelessActorState;
+  public override bool Equals(object? obj) => obj is InjectedStringIdActorState;
 
   public override int GetHashCode() => 0;
 }
 
-[ActorFactory(typeof(StatelessActor))]
-internal interface IStatelessActorFactory
-{
-  IStatelessActor Get(string id);
-}
-
-internal abstract class StatelessActorActivity : Activity<StatelessActor>
+internal abstract class InjectedStringIdActorActivity : Activity<InjectedStringIdActor>
 {
 }
 
-internal static class StatelessActorFixture
+[ActorFactory(typeof(InjectedStringIdActor))]
+internal interface IInjectedStringIdActorFactory
+{
+  IInjectedStringIdActor Get(string id);
+}
+
+internal static class InjectedStringIdActorFixture
 {
   public static readonly IActorDescriptor Descriptor;
 
-  static StatelessActorFixture()
+  static InjectedStringIdActorFixture()
   {
-    ConstructorInfo constructor = typeof(StatelessActor).GetRequiredConstructor(
-      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: new[] { typeof(IService1) });
-
-    ParameterInfo[] constructorParameters = constructor.GetParameters();
-
-    MethodInfo factoryGetMethod = typeof(IStatelessActorFactory).GetRequiredMethod(
-      name: nameof(IStatelessActorFactory.Get),
+    ConstructorInfo constructor = typeof(InjectedStringIdActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Instance | BindingFlags.Public,
       types: new[] { typeof(string) });
 
+    ParameterInfo[] constructorParameters = constructor.GetParameters();
+
+    MethodInfo factoryGetMethod = typeof(IInjectedStringIdActorFactory).GetRequiredMethod(
+      name: nameof(IInjectedStringIdActorFactory.Get),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: new[] { typeof(string) });
+
+
     IImplementationDescriptor implementation = ImplementationDescriptorBuilder.Build(_ => _
       .SetId(0)
-      .SetType(typeof(StatelessActor)));
+      .SetType(typeof(InjectedStringIdActor)));
 
     Descriptor = ActorDescriptorBuilder.Build(_ => _
-      .SetInterfaceType(typeof(IStatelessActor))
-      .SetActorType(typeof(StatelessActor))
+      .SetInterfaceType(typeof(IInjectedStringIdActor))
+      .SetActorType(typeof(InjectedStringIdActor))
       .SetBaseImplementation(implementation)
       .SetDefaultImplementation(implementation)
       .SetImplementations(implementation)
-      .SetActivityBaseType(typeof(StatelessActorActivity))
       .SetIsPolymorphic(false)
       .SetIsVirtual(true)
+      .SetActivityBaseType(typeof(InjectedStringIdActorActivity))
       .SetMethods()
       .SetActivities()
       .SetId(_ => _
@@ -76,20 +78,19 @@ internal static class StatelessActorFixture
         .SetHasIdSource(false)
         .SetStateIndex(-1))
       .SetState(_ => _
-        .SetType(new StateTypeDelegator(typeof(StatelessActorState)))
-        .SetFields()
-        .SetDefaultValue(new StatelessActorState()))
+        .SetType(typeof(InjectedStringIdActorState))
+        .SetFields(Array.Empty<FieldInfo>())
+        .SetDefaultValue(new InjectedStringIdActorState()))
       .SetFactory(_ => _
-        .SetFactoryType(typeof(IStatelessActorFactory))
-        .SetCreateAsyncMethod(null)
+        .SetFactoryType(typeof(IInjectedStringIdActorFactory))
         .SetGetMethod(factoryGetMethod))
       .SetMessageHandlers());
   }
 
   public static void SetupMocks(Mock<IStateTypeBuilder> stateTypeBuilderMock, Mock<IActivityTypeBuilder> activityTypeBuilderMock)
   {
-    Type actorType = typeof(StatelessActor);
-    Type activityBaseType = typeof(StatelessActorActivity);
+    Type actorType = typeof(InjectedStringIdActor);
+    Type activityBaseType = typeof(InjectedStringIdActorActivity);
 
     stateTypeBuilderMock
       .Setup(x => x.Build(actorType, It.IsAny<IEnumerable<IStateComponentMetadata>>(), false))
@@ -102,7 +103,7 @@ internal static class StatelessActorFixture
 
   public static void AssertValidDescriptor(IActorDescriptor descriptor)
   {
-    descriptor.Should().BeAssignableTo<IActorDescriptor<StatelessActor, StatelessActorState>>();
+    descriptor.Should().BeAssignableTo<IActorDescriptor<InjectedStringIdActor, InjectedStringIdActorState>>();
     descriptor.Should().BeEquivalentTo(Descriptor, opt => opt.Using<IActorDescriptor>(ActorDescriptorEqualityComparer.Instance));
   }
 }

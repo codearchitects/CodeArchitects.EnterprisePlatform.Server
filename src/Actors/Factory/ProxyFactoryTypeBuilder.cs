@@ -74,24 +74,7 @@ internal abstract class ProxyFactoryTypeBuilder
       }
 
       int stateDependencyIndex = id.StateIndex;
-
-      if (id.GetActorIdMethod is { } getActorIdMethod)
-      {
-        if (getActorIdMethod.DeclaringType.IsValueType)
-        {
-          il.Emit(OpCodes.Ldarga_S, stateDependencyIndex + 1); // Push $idDependency
-          il.Emit(OpCodes.Call, getActorIdMethod);             // Get $id := $idDependency.GetActorId()
-        }
-        else
-        {
-          il.LoadArg(stateDependencyIndex + 1);        // Push $idDependency
-          il.Emit(OpCodes.Callvirt, getActorIdMethod); // Get $id := $idDependency.GetActorId()
-        }
-      }
-      else
-      {
-        il.LoadArg(stateDependencyIndex + 1); // Push $idDependency
-      }
+      il.LoadArg(stateDependencyIndex + 1); // Push $idDependency
 
       argOffset = 1;
     }

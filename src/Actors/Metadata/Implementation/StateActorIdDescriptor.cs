@@ -1,22 +1,20 @@
 ﻿using CodeArchitects.Platform.Actors.Infrastructure;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Implementation;
 
-internal abstract class StateActorIdDescriptor<TState> : IActorIdDescriptor<TState>
+internal class StateActorIdDescriptor<TState> : IActorIdDescriptor<TState>
   where TState : ActorState
 {
   private readonly Action<TState, string> _setId;
 
-  protected StateActorIdDescriptor(int stateIndex, Action<TState, string> setId)
+  public StateActorIdDescriptor(Type type, int stateIndex, Action<TState, string> setId)
   {
+    Type = type;
     StateIndex = stateIndex;
     _setId = setId;
   }
 
-  public abstract Type Type { get; }
-
-  public abstract MethodInfo? GetActorIdMethod { get; }
+  public Type Type { get; }
 
   public bool HasIdSource => true;
 

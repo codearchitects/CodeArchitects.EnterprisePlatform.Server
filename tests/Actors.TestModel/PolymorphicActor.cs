@@ -310,8 +310,7 @@ internal static class PolymorphicActorFixture
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
-        .SetStateIndex(-1)
-        .SetGetActorIdMethod(null))
+        .SetStateIndex(-1))
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(PolymorphicActorState)))
         .SetFields(stateFields)

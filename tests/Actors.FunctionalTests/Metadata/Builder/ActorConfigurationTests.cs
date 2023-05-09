@@ -21,7 +21,7 @@ public class ActorConfigurationTests
       .And.ContainSingle(actor => actor.ActorType == typeof(PolymorphicActor))
       .And.ContainSingle(actor => actor.ActorType == typeof(StatelessActor))
       .And.ContainSingle(actor => actor.ActorType == typeof(VirtualActor))
-      .And.ContainSingle(actor => actor.ActorType == typeof(ComponentIdSourceActor));
+      .And.ContainSingle(actor => actor.ActorType == typeof(StateIdActor));
   }
 
   private class TestActorConfiguration : ActorConfiguration
@@ -64,8 +64,8 @@ public class ActorConfigurationTests
           .HasDefaultValue(VirtualActorFixture.State1Default))
         .HasState("_state2"));
 
-      Actor<ComponentIdSourceActor>(actor => actor
-        .HasFactoryType<IComponentIdSourceActorFactory>()
+      Actor<StateIdActor>(actor => actor
+        .HasFactoryType<IStateIdActorFactory>()
         .HasState<int>("_state", state => state
           .IsActorId()));
     }

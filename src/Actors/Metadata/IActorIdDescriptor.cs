@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace CodeArchitects.Platform.Actors.Metadata;
+﻿namespace CodeArchitects.Platform.Actors.Metadata;
 
 internal interface IActorIdDescriptor
 {
@@ -9,6 +7,4 @@ internal interface IActorIdDescriptor
   bool HasIdSource { get; }
   
   int StateIndex { get; }
-
-  MethodInfo? GetActorIdMethod { get; }
 }
