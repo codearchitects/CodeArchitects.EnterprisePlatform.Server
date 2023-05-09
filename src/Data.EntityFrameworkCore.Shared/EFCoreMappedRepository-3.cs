@@ -17,7 +17,7 @@ public abstract class EFCoreMappedRepository<TTable, TEntity, TKey> : MappedRepo
   /// Initializes a new instance of the <see cref="EFCoreMappedRepository{TTable, TEntity, TKey}"/> class.
   /// </summary>
   /// <param name="context">The EFCore data context used by the repository.</param>
-  public EFCoreMappedRepository(IDataContext context)
+  protected EFCoreMappedRepository(IDataContext context)
   {
     Context = context;
   }

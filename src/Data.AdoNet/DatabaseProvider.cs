@@ -78,7 +78,7 @@ public abstract class DatabaseProvider
     }
   }
 
-  protected internal void UseConnectionFactoryCore(Type connectionFactoryType)
+  private protected void UseConnectionFactoryCore(Type connectionFactoryType)
   {
     Type interfaceType = MakeGenericType(typeof(IConnectionFactory<>));
     if (!interfaceType.IsAssignableFrom(connectionFactoryType))

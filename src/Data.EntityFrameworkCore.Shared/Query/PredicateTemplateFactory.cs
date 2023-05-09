@@ -25,31 +25,31 @@ internal class PredicateTemplateFactory : IPredicateTemplateFactory
     ParameterExpression entity = Expression.Parameter(typeof(TEntity), nameof(entity));
 
     Expression body = typeof(ITuple).IsAssignableFrom(typeof(TKey))
-      ? CreateFromTuple<TEntity>(entity, keyModels)
-      : CreateFromScalar<TEntity>(entity, keyModels[0]);
+      ? CreateFromTuple(entity, keyModels)
+      : CreateFromScalar(entity, keyModels[0]);
 
     return Expression.Lambda<Func<TEntity, bool>>(body, entity);
   }
 
-  private static Expression CreateFromTuple<TEntity>(ParameterExpression entity, IReadOnlyList<IProperty> keyModels)
+  private static Expression CreateFromTuple(ParameterExpression entity, IReadOnlyList<IProperty> keyModels)
   {
-    Expression result = GetEqualityComponentTemplate<TEntity>(entity, keyModels[0]);
+    Expression result = GetEqualityComponentTemplate(entity, keyModels[0]);
 
     for (int i = 1; i < keyModels.Count; i++)
     {
       result = Expression.AndAlso(
         left: result,
-        right: GetEqualityComponentTemplate<TEntity>(entity, keyModels[i]));
+        right: GetEqualityComponentTemplate(entity, keyModels[i]));
     }
     return result;
   }
 
-  private static Expression CreateFromScalar<TEntity>(ParameterExpression entity, IProperty keyModel)
+  private static Expression CreateFromScalar(ParameterExpression entity, IProperty keyModel)
   {
-    return GetEqualityComponentTemplate<TEntity>(entity, keyModel);
+    return GetEqualityComponentTemplate(entity, keyModel);
   }
 
-  private static Expression GetEqualityComponentTemplate<TEntity>(ParameterExpression entity, IProperty propertyModel)
+  private static Expression GetEqualityComponentTemplate(ParameterExpression entity, IProperty propertyModel)
   {
     return Expression.Equal(
       left: ExpressionHelpers.MakePropertyAccess(entity, propertyModel),

@@ -85,7 +85,7 @@ internal partial class Executor<TDbCommand>
     _interceptor.OnCommandBuilt(OperationType.InsertMany, command);
   }
 
-  private class ExecuteInsertManyGraphVisitor : ExecuteInsertGraphVisitor
+  private sealed class ExecuteInsertManyGraphVisitor : ExecuteInsertGraphVisitor
   {
     public ExecuteInsertManyGraphVisitor(Executor<TDbCommand> executor, TDbCommand command)
       : base(executor, command)

@@ -482,7 +482,6 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     }
     finally
     {
-      command.Dispose();
       Connection.Close();
     }
   }

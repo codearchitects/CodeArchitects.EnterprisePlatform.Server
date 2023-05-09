@@ -243,7 +243,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           node.Entry.State = EntityState.Added;
           return true;
 
-        case ISkipNavigation skipNavigation: // Many-to-many navigation
+        case ISkipNavigation: // Many-to-many navigation
           if (node.Entry.State is EntityState.Detached)
           {
             node.Entry.State = EntityState.Unchanged;
@@ -332,7 +332,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           node.Entry.State = EntityState.Modified;
           return true;
 
-        case ISkipNavigation skipNavigation: // Many-to-many navigation
+        case ISkipNavigation: // Many-to-many navigation
           return false;
 
         case INavigation navigation: // One-to-one or one-to-many navigation

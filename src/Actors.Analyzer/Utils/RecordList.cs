@@ -16,6 +16,20 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
 
   public T this[int index] => _list[index];
 
+  public bool Equals(RecordList<T> other)
+  {
+    if (other.Count != Count)
+      return false;
+
+    for (int i = 0; i < Count; i++)
+    {
+      if (!_list[i].Equals(other._list[i]))
+        return false;
+    }
+
+    return true;
+  }
+
   public override bool Equals(object obj)
   {
     return obj is RecordList<T> other && Equals(other);
@@ -30,20 +44,6 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
     }
 
     return hashCode.ToHashCode();
-  }
-
-  public bool Equals(RecordList<T> other)
-  {
-    if (other.Count != Count)
-      return false;
-
-    for (int i = 0; i < Count; i++)
-    {
-      if (!_list[i].Equals(other._list[i]))
-        return false;
-    }
-
-    return true;
   }
 
   public Enumerator GetEnumerator()
@@ -78,8 +78,6 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
 
     object IEnumerator.Current => Current;
 
-    public void Dispose() { }
-
     public bool MoveNext()
     {
       return ++_index < _list.Count;
@@ -89,5 +87,7 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
     {
       _index = 0;
     }
+
+    void IDisposable.Dispose() { }
   }
 }

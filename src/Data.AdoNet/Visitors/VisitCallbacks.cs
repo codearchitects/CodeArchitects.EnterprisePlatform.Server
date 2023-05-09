@@ -13,7 +13,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Visitors;
 /// <param name="state">The state object passed to the callback.</param>
 /// <returns>A value indicating whether the traversal should continue.</returns>
 [Experimental]
-public delegate bool VisitNodeCallback<TState>(object node, IEntityModel model, NavigationContext context, TState state);
+public delegate bool VisitNodeCallback<in TState>(object node, IEntityModel model, NavigationContext context, TState state);
 
 /// <summary>
 /// Represents an asynchronous callback used to visit a node in a graph during a graph traversal.
@@ -26,4 +26,4 @@ public delegate bool VisitNodeCallback<TState>(object node, IEntityModel model, 
 /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the operation.</param>
 /// <returns>A value indicating whether the traversal should continue.</returns>
 [Experimental]
-public delegate Task<bool> AsyncVisitNodeCallback<TState>(object node, IEntityModel model, NavigationContext context, TState state, CancellationToken cancellationToken);
+public delegate Task<bool> AsyncVisitNodeCallback<in TState>(object node, IEntityModel model, NavigationContext context, TState state, CancellationToken cancellationToken);

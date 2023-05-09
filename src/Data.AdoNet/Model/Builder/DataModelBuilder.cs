@@ -54,7 +54,7 @@ internal class DataModelBuilder : INavigationIdGenerator
           break;
         default:
           throw Errors.Unreachable;
-      };
+      }
     }
 
     foreach (EntityModelBuilder entityBuilder in _entityBuilders.Values)

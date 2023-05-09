@@ -38,7 +38,7 @@ internal abstract class MessagingMetadata
   public abstract bool IsMessageHandlerType(Type type);
   public abstract bool IsMessageHandlerAttribute(Attribute attribute);
 
-  private class ResolvedMessagingMetadata : MessagingMetadata
+  private sealed class ResolvedMessagingMetadata : MessagingMetadata
   {
     private ResolvedMessagingMetadata(Type attributeType, ConstructorInfo attributeConstructor, PropertyInfo attributeBusProperty, PropertyInfo attributeTopicProperty, Type messageHandlerType, Type messageHandlerWithResultType)
     {
@@ -102,7 +102,7 @@ internal abstract class MessagingMetadata
     }
   }
 
-  private class UnresolvedMessagingMetadata : MessagingMetadata
+  private sealed class UnresolvedMessagingMetadata : MessagingMetadata
   {
     public static readonly UnresolvedMessagingMetadata Instance = new();
 

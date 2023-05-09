@@ -11,7 +11,7 @@ internal class CaepExtension : CaepExtensionBase
 
   public override DbContextOptionsExtensionInfo Info => new DataExtensionInfo(this);
 
-  private class DataExtensionInfo : DbContextOptionsExtensionInfo
+  private sealed class DataExtensionInfo : DbContextOptionsExtensionInfo
   {
     public DataExtensionInfo(CaepExtension extension)
       : base(extension)

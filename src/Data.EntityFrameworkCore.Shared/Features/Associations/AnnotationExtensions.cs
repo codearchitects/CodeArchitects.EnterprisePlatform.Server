@@ -31,7 +31,7 @@ public static class AnnotationExtensions
     where TDependentEntity : class
   {
     if (builder is null)
-      throw new ArgumentException(nameof(builder));
+      throw new ArgumentNullException(nameof(builder));
 
     if (EFCoreEnvironment.IsDesignTime)
       return builder;
@@ -54,7 +54,7 @@ public static class AnnotationExtensions
     where TDependentEntity : class
   {
     if (builder is null)
-      throw new ArgumentException(nameof(builder));
+      throw new ArgumentNullException(nameof(builder));
 
     if (EFCoreEnvironment.IsDesignTime)
       return builder;
@@ -77,7 +77,7 @@ public static class AnnotationExtensions
     where TDependentEntity : class
   {
     if (builder is null)
-      throw new ArgumentException(nameof(builder));
+      throw new ArgumentNullException(nameof(builder));
 
     if (EFCoreEnvironment.IsDesignTime)
       return builder;
@@ -100,7 +100,7 @@ public static class AnnotationExtensions
     where TDependentEntity : class
   {
     if (builder is null)
-      throw new ArgumentException(nameof(builder));
+      throw new ArgumentNullException(nameof(builder));
 
     if (EFCoreEnvironment.IsDesignTime)
       return builder;
@@ -130,7 +130,7 @@ public static class AnnotationExtensions
   public static bool IsIntraAggregate(this TNavigation navigation)
   {
     if (navigation is null)
-      throw new ArgumentException(nameof(navigation));
+      throw new ArgumentNullException(nameof(navigation));
 
     return navigation.Is(AssociationKind.IntraAggregate);
   }
@@ -143,7 +143,7 @@ public static class AnnotationExtensions
   public static bool IsInterAggregate(this TNavigation navigation)
   {
     if (navigation is null)
-      throw new ArgumentException(nameof(navigation));
+      throw new ArgumentNullException(nameof(navigation));
 
     return navigation.Is(AssociationKind.InterAggregate);
   }

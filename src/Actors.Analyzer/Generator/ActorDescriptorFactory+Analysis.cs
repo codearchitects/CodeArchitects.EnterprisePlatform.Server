@@ -40,7 +40,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     AnalyzeMethods(actorType);
     AnalyzeActorMessages(actor, idType);
 
-    bool hasFactory = AnalyzeFactories(actorType, factories, interfaceType, idType, stateFields, memberAnalysisResult.AmbiguousIdType, isVirtual, memberAnalysisResult.GetsIdFromState);
+    bool hasFactory = AnalyzeFactories(actorType, factories, interfaceType, idType, stateFields, isVirtual, memberAnalysisResult.GetsIdFromState);
     AnalyzeImplementations(actor, memberAnalysisResult.IdMember, idType, implementations);
 
     if (isGeneric || hasFactory || !hasInterface || stateDependencies is null)
@@ -304,7 +304,7 @@ internal readonly ref partial struct ActorDescriptorFactory
       memberIdType = null;
     }
 
-    return new(stateFields, ambiguousIdType, idMember, memberIdType, getsIdFromState, canBeVirtual);
+    return new(stateFields, idMember, memberIdType, getsIdFromState, canBeVirtual);
   }
 
   private void AnalyzeStateType(IFieldSymbol stateField, AttributeData stateAttribute)
@@ -628,7 +628,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     return false;
   }
 
-  private bool AnalyzeFactories(INamedTypeSymbol actorType, List<FactoryData>? factories, INamedTypeSymbol? interfaceType, ITypeSymbol? idType, List<IFieldSymbol> stateFields, bool ambiguousIdType, bool isVirtual, bool getsIdFromState)
+  private bool AnalyzeFactories(INamedTypeSymbol actorType, List<FactoryData>? factories, INamedTypeSymbol? interfaceType, ITypeSymbol? idType, List<IFieldSymbol> stateFields, bool isVirtual, bool getsIdFromState)
   {
     if (_disableActorDiagnostics)
       return factories is not null && factories.Count != 0;
@@ -650,13 +650,13 @@ internal readonly ref partial struct ActorDescriptorFactory
 
     foreach (FactoryData factory in factories)
     {
-      AnalyzeFactory(factory, interfaceType, idType, stateFields, ambiguousIdType, isVirtual, getsIdFromState);
+      AnalyzeFactory(factory, interfaceType, idType, stateFields, isVirtual);
     }
 
     return true;
   }
 
-  private void AnalyzeFactory(FactoryData factory, INamedTypeSymbol? interfaceType, ITypeSymbol? idType, List<IFieldSymbol> stateFields, bool ambiguousIdType, bool isVirtual, bool getsIdFromState)
+  private void AnalyzeFactory(FactoryData factory, INamedTypeSymbol? interfaceType, ITypeSymbol? idType, List<IFieldSymbol> stateFields, bool isVirtual)
   {
     INamedTypeSymbol factoryType = factory.FactoryType;
     int stateArity = stateFields.Count;
@@ -728,7 +728,7 @@ internal readonly ref partial struct ActorDescriptorFactory
     bool createAsyncSignatureMatches =
       createAsyncParameters.Length == 2 + stateArity &&
       MatchesIdType(createAsyncParameters[0].Type, idType) &&
-      createAsyncParameters[createAsyncParameters.Length - 1].Type.IsCancellationTokenType();
+      createAsyncParameters[^1].Type.IsCancellationTokenType();
 
     if (!createAsyncSignatureMatches)
     {
@@ -814,9 +814,8 @@ internal readonly ref partial struct ActorDescriptorFactory
     return found;
   }
 
-  private record MemberAnalysisResult(
+  private sealed record MemberAnalysisResult(
     List<IFieldSymbol> StateFields,
-    bool AmbiguousIdType,
     ISymbol? IdMember,
     ITypeSymbol? MemberIdType,
     bool GetsIdFromState,

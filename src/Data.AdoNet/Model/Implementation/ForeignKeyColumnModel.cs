@@ -4,7 +4,7 @@ internal abstract class ForeignKeyColumnModel : ColumnModel, IForeignKeyColumnMo
 {
   private readonly ISimpleNavigationModel _navigation;
 
-  public ForeignKeyColumnModel(short index, short foreignKeyIndex, ISimpleNavigationModel navigation)
+  protected ForeignKeyColumnModel(short index, short foreignKeyIndex, ISimpleNavigationModel navigation)
     : base(index)
   {
     ForeignKeyIndex = foreignKeyIndex;

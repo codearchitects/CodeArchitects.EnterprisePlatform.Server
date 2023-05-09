@@ -11,7 +11,7 @@ public static class OracleProviderExtensions
   /// Specifies a factory that creates instances of <see cref="OracleConnection"/>.
   /// </summary>
   /// <typeparam name="TConnectionFactory">The connection factory type.</typeparam>
-  /// <param name="provider">The Oracle provider.</param>
+  /// <param name="provider">The database provider.</param>
   /// <returns>The same <see cref="OracleProvider"/> for further configuration.</returns>
   public static OracleProvider UseConnectionFactory<TConnectionFactory>(this OracleProvider provider)
     where TConnectionFactory : IConnectionFactory<OracleConnection>

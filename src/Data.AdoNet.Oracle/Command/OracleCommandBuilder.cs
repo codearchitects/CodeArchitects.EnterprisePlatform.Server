@@ -21,7 +21,7 @@ internal class OracleCommandBuilder : CommandBuilder<OracleCommand>
     }
     else
     {
-      if (value.GetType() == typeof(Guid))
+      if (value is Guid)
       {
         parameter.OracleDbType = OracleDbType.Raw;
       }

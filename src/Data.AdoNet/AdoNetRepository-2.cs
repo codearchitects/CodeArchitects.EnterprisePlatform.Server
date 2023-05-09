@@ -23,7 +23,7 @@ public class AdoNetRepository<TEntity, TKey> : Repository<TEntity, TKey>
   /// <summary>
   /// The ADO.NET data context used by the repository.
   /// </summary>
-  protected new IDataContext Context { get; }
+  protected IDataContext Context { get; }
 
   /// <summary>
   /// The connection used by the repository's data context.

@@ -27,5 +27,6 @@ internal abstract class CaepExtensionBase : IDbContextOptionsExtension
 
   public void Validate(IDbContextOptions options)
   {
+    // Nothing to validate
   }
 }

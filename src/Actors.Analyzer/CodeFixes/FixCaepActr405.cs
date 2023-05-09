@@ -89,7 +89,7 @@ internal class FixCaepActr405 : FixingActionProvider<ParameterSyntax>
     return solution;
   }
 
-  private class SignatureFixer
+  private sealed class SignatureFixer
   {
     private readonly ParameterSyntax _cancellationTokenParameter;
     private readonly List<int> _indices;

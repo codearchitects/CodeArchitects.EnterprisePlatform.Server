@@ -114,7 +114,7 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
     }
   }
 
-  private class EntryEqualityComparer : IEqualityComparer<SeedEntry>
+  private sealed class EntryEqualityComparer : IEqualityComparer<SeedEntry>
   {
     public static readonly EntryEqualityComparer Instance = new();
 

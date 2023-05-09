@@ -10,27 +10,20 @@ namespace CodeArchitects.Platform.Actors.Metadata.Factory;
 internal abstract class ImplementationDescriptorFactory<TActor>
   where TActor : class
 {
-  private static readonly MethodInfo s_getServiceMethod;
-  private static readonly MethodInfo s_getRequiredServiceMethod;
-  private static readonly MethodInfo s_getActorIdMethod;
-
-  static ImplementationDescriptorFactory()
-  {
-    s_getServiceMethod = typeof(ServiceProviderServiceExtensions).GetRequiredMethod(
-      name: nameof(ServiceProviderServiceExtensions.GetService),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IServiceProvider) });
-
-    s_getRequiredServiceMethod = typeof(ServiceProviderServiceExtensions).GetRequiredMethod(
-      name: nameof(ServiceProviderServiceExtensions.GetRequiredService),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IServiceProvider) });
-
-    s_getActorIdMethod = typeof(IActorContext).GetRequiredMethod(
-      name: $"get_{nameof(IActorContext.ActorId)}",
-      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-      types: Type.EmptyTypes);
-  }
+  private static readonly MethodInfo s_getServiceMethod = typeof(ServiceProviderServiceExtensions).GetRequiredMethod(
+    name: nameof(ServiceProviderServiceExtensions.GetService),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IServiceProvider) });
+  
+  private static readonly MethodInfo s_getRequiredServiceMethod = typeof(ServiceProviderServiceExtensions).GetRequiredMethod(
+    name: nameof(ServiceProviderServiceExtensions.GetRequiredService),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IServiceProvider) });
+  
+  private static readonly MethodInfo s_getActorIdMethod = typeof(IActorContext).GetRequiredMethod(
+    name: $"get_{nameof(IActorContext.ActorId)}",
+    bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+    types: Type.EmptyTypes);
 
   private readonly int _id;
   private readonly ActorDescriptorFactory<TActor> _actorDescriptorFactory;

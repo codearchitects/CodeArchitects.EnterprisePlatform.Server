@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
-using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Data.Common;

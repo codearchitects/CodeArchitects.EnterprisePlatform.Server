@@ -22,7 +22,7 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
   private readonly IStateTypeBuilder _stateTypeBuilder;
   private readonly IActivityTypeBuilder _activityTypeBuilder;
 
-  public ActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
+  protected ActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
   {
     _stateTypeBuilder = stateTypeBuilder;
     _activityTypeBuilder = activityTypeBuilder;
@@ -78,20 +78,18 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
   public bool IsActorId(string name, Type type)
   {
-    foreach (MemberMetadata metadata in ActorIdMembers)
-    {
-      string memberName = metadata.Member.Name;
+    if (ActorIdMembers.FirstOrDefault() is not MemberMetadata metadata)
+      return false;
+    
+    string memberName = metadata.Member.Name;
 
-      bool isMatch =
-        name.MatchesUnderscorePrefixConvention(memberName) || // _name
-        name.Equals(memberName)                            || // name
-        memberName.MatchesCamelCaseConvention(name)        || // Name
-        name.MatchesMemberPrefixConvention(memberName);       // m_name
+    bool isMatch =
+      name.MatchesUnderscorePrefixConvention(memberName) || // _name
+      name.Equals(memberName)                            || // name
+      memberName.MatchesCamelCaseConvention(name)        || // Name
+      name.MatchesMemberPrefixConvention(memberName);       // m_name
 
-      return isMatch && metadata.Type == type;
-    }
-
-    return false;
+    return isMatch && metadata.Type == type;
   }
 
   public override IActorDescriptor CreateDescriptor()

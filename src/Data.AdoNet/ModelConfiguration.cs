@@ -50,7 +50,7 @@ public abstract class ModelConfiguration // TODO: The whole model building secti
   /// <summary>
   /// Creates a new instance of <see cref="ModelConfiguration"/>.
   /// </summary>
-  public ModelConfiguration()
+  protected ModelConfiguration()
   {
     _modelBuilder = new();
   }

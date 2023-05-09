@@ -21,9 +21,8 @@ public static class ApplicationHubEndpointRouteBuilderExtensions
   {
     HubConfiguration configuration = endpoints.ServiceProvider.GetRequiredService<HubConfiguration>();
 
-    foreach (KeyValuePair<Type, Type> entry in configuration.HubMap)
+    foreach (Type hubType in configuration.HubMap.Select(entry => entry.Value))
     {
-      Type hubType = entry.Value;
       HubEndpointAttribute? hubEndpoint = hubType.GetCustomAttribute<HubEndpointAttribute>();
       if (hubEndpoint is null)
       {
@@ -41,7 +40,7 @@ public static class ApplicationHubEndpointRouteBuilderExtensions
 
     public static MapHubDelegate Create(Type hubType) => (MapHubDelegate)Activator.CreateInstance(typeof(ConcreteMapHubDelegate<>).MakeGenericType(hubType))!;
 
-    private class ConcreteMapHubDelegate<THub> : MapHubDelegate
+    private sealed class ConcreteMapHubDelegate<THub> : MapHubDelegate
       where THub : Hub
     {
       public override HubEndpointConventionBuilder Invoke(IEndpointRouteBuilder endpoints, string pattern, Action<HttpConnectionDispatcherOptions>? configureOptions) => configureOptions is null

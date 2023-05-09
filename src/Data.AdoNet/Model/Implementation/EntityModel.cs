@@ -9,7 +9,7 @@ internal abstract class EntityModel : IEntityModel
   private readonly List<ColumnModel> _columns;
   private readonly List<NavigationModel> _navigations;
 
-  public EntityModel(InitializerModel initializer)
+  protected EntityModel(InitializerModel initializer)
   {
     Initializer = initializer;
     _columns = new();

@@ -67,7 +67,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
   /// <inheritdoc/>
   public override string? ToString()
   {
-    return HasValue ? Value?.ToString() : null;
+    return HasValue ? Value?.ToString() : "";
   }
 
   /// <inheritdoc/>
@@ -131,7 +131,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
 
   [ExcludeFromCodeCoverage]
   [DebuggerDisplay("<none>")]
-  private class NoneValue
+  private sealed class NoneValue
   {
     public static readonly NoneValue Instance = new();
 
@@ -140,7 +140,7 @@ internal readonly struct Optional<T> : IEquatable<Optional<T>>
 
   [ExcludeFromCodeCoverage]
   [DebuggerDisplay("null")]
-  private class NullValue
+  private sealed class NullValue
   {
     public static readonly NullValue Instance = new();
 

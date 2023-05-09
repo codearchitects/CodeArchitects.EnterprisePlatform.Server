@@ -102,7 +102,7 @@ internal class ActivityTypeBuilder : TypeBuilderBase, IActivityTypeBuilder
     il.Emit(OpCodes.Ret);                               // Return                             | Stack: $task
   }
 
-  private class ExecuteCallImplementor : IMethodDescriptorVisitor
+  private sealed class ExecuteCallImplementor : IMethodDescriptorVisitor
   {
     private static readonly MethodInfo s_completedTaskGetter = typeof(Task).GetRequiredMethod(
       name: $"get_{nameof(Task.CompletedTask)}",

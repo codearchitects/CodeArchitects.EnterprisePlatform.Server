@@ -25,7 +25,7 @@ internal abstract class PrimaryKeyModel : IPrimaryKeyModel
 
   private readonly List<IPrimaryKeyColumnModel> _columns;
 
-  public PrimaryKeyModel()
+  protected PrimaryKeyModel()
   {
     _columns = new();
   }

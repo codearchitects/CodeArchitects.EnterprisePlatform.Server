@@ -10,5 +10,7 @@ internal abstract class TypeData : IEquatable<TypeData>
 
   public bool Equals(TypeData? other) => other is not null && SymbolEqualityComparer.Default.Equals(Type, other.Type);
 
+  public override bool Equals(object obj) => Equals(obj as TypeData);
+
   public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Type);
 }

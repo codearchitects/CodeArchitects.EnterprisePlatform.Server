@@ -31,9 +31,9 @@ public static class AnnotationExtensions
     where TKey : IEquatable<TKey>
   {
     if (builder is null)
-      throw new ArgumentException(nameof(builder));
+      throw new ArgumentNullException(nameof(builder));
     if (factory is null)
-      throw new ArgumentException(nameof(factory));
+      throw new ArgumentNullException(nameof(factory));
 
     if (EFCoreEnvironment.IsDesignTime)
       return builder;

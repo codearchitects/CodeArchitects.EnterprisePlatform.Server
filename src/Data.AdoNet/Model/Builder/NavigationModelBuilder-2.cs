@@ -13,7 +13,7 @@ internal abstract class NavigationModelBuilder<TFrom, TTo> : NavigationModelBuil
   protected MemberInfo? _directNavigationMember;
   protected MemberInfo? _inverseNavigationMember;
 
-  public NavigationModelBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
+  protected NavigationModelBuilder(INavigationIdGenerator idGenerator, AssociationKind kind)
   {
     _idGenerator = idGenerator;
     _kind = kind;

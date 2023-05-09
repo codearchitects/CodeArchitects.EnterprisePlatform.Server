@@ -6,7 +6,7 @@ using Oracle.ManagedDataAccess.Client;
 namespace CodeArchitects.Platform.Data.AdoNet.Oracle;
 
 /// <summary>
-/// The Oracle database provider.
+/// The provider for Oracle databases.
 /// </summary>
 public class OracleProvider : DatabaseProvider<OracleConnection, OracleCommand>
 {

@@ -71,7 +71,7 @@ internal class ActorProxyTypeBuilder
     il.Emit(OpCodes.Ret);                               // Return                                   | Stack: -
   }
 
-  private class ProxyMethodBuilder : IMethodDescriptorVisitor
+  private sealed class ProxyMethodBuilder : IMethodDescriptorVisitor
   {
     private readonly IILGeneratorProvider _ilProvider;
     private readonly TypeBuilder _type;

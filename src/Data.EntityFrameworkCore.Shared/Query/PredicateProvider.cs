@@ -54,7 +54,7 @@ internal class PredicateProvider : IPredicateProvider
     return template;
   }
 
-  private class EntityReplacer : ExpressionVisitor
+  private sealed class EntityReplacer : ExpressionVisitor
   {
     private readonly object _entity;
     private readonly IReadOnlyList<IProperty> _keyProperties;

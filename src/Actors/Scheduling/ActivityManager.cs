@@ -171,7 +171,7 @@ internal class ActivityManager<TActor> : IActivityManager<TActor>
     }
   }
 
-  private class MethodDescriptorEqualityComparer : EqualityComparer<IMethodDescriptor>
+  private sealed class MethodDescriptorEqualityComparer : EqualityComparer<IMethodDescriptor>
   {
     public static readonly MethodDescriptorEqualityComparer Instance = new();
 

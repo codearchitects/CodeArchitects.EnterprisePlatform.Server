@@ -150,7 +150,7 @@ internal class CommandBuilder<TDbCommand> : ICommandBuilder<TDbCommand>
     command.Parameters.Add(parameter);
   }
 
-  private class ParameterValueVisitor : IColumnModelVisitor<object?, object>
+  private sealed class ParameterValueVisitor : IColumnModelVisitor<object?, object>
   {
     private readonly NavigationContext _context;
 
