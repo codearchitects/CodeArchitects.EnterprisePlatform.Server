@@ -10,9 +10,17 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- template: task/restore-nuget.yml
-  parameters:
-    solution: $(solution)
+# - template: task/restore-nuget.yml
+#   parameters:
+#     solution: $(solution)
+- task: DotNetCoreCLI@2
+  displayName: Restore NuGet packages with dotnet cli
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
+    feedsToUse: 'config'
+    nugetConfigPath: 'NuGet.Config'
+    noCache: true
 - task: PowerShell@2
   displayName: "prepare analysis configuration"
   inputs:

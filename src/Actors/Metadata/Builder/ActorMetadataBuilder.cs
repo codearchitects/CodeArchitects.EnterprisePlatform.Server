@@ -253,8 +253,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
 
   IActorMetadataBuilder<TActor> IActorMetadataBuilder<TActor>.HasImplementation<TImplementation>()
   {
-    HasImplementationCore<TImplementation>(_ => { });
-    return this;
+    return HasImplementationCore<TImplementation>(_ => { });
   }
 
   IActorMetadataBuilder<TActor> IActorMetadataBuilder<TActor>.HasImplementation<TImplementation>(Action<IImplementationMetadataBuilder<TActor, TImplementation>> configure)
@@ -262,8 +261,7 @@ internal class ActorMetadataBuilder<TActor> : ActorDescriptorFactory<TActor>, IA
     if (configure is null)
       throw new ArgumentNullException(nameof(configure));
 
-    HasImplementationCore(configure);
-    return this;
+    return HasImplementationCore(configure);
   }
 
   IActorMetadataBuilder<TActor> IActorMetadataBuilder<TActor>.HasIdType(Type actorIdType)

@@ -15,4 +15,6 @@ public class Product
     .RuleFor(product => product.Name, faker => faker.Lorem.Word());
 
   public static Product One() => s_faker.Generate();
+
+  public static List<Product> Many(int count) => s_faker.Generate(count);
 }

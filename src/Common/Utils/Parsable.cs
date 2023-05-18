@@ -1,6 +1,6 @@
 ﻿// This enable using Type.Parse(string) without static abstract interface members from .NET 7
 
-namespace CodeArchitects.Platform.Common.Utils; 
+namespace CodeArchitects.Platform.Common.Utils;
 
 using System.Reflection;
 
@@ -16,7 +16,10 @@ internal static class Parsable<TParsable>
     Parse = s => TParsable.Parse(s, null);
   }
 
-  public static void EnsureInitialized() { }
+  public static void EnsureInitialized()
+  {
+    // This just triggers the static constructor
+  }
 }
 
 #else
@@ -66,7 +69,10 @@ internal static class Parsable<TParsable>
     throw new TypeArgumentException($"'{typeof(TParsable).Name}' does not define a public static method Parse(string) or Parse(string, IFormatProvider).", nameof(TParsable));
   }
 
-  public static void EnsureInitialized() { }
+  public static void EnsureInitialized()
+  {
+    // This just triggers the static constructor
+  }
 }
 
 #endif

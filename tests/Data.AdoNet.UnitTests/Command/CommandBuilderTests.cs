@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Fixtures;
+﻿using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
+using CodeArchitects.Platform.Data.AdoNet.Fixtures;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using System.Data;
@@ -8,11 +9,13 @@ namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 public class CommandBuilderTests
 {
+  private readonly Mock<IConcurrencyContext> _concurrencyContextMock;
   private readonly CommandBuilder<IDbCommand> _sut;
 
   public CommandBuilderTests()
   {
-    _sut = new(Mock.Of<ISqlTextBuilder>());
+    _concurrencyContextMock = new(MockBehavior.Strict);
+    _sut = new(Mock.Of<ISqlTextBuilder>(), _concurrencyContextMock.Object);
   }
 
   [Fact]

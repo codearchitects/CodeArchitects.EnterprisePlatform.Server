@@ -145,20 +145,26 @@ internal readonly struct SqlStringBuilder
   }
 
 
-  public void AppendParameter(IColumnModel column)
+  public void AppendParameter(IColumnModel column, int offset = 0)
   {
     Append(_syntaxProvider.ParameterPrefix);
     Append('p');
-    Append(column.Index);
+    Append(column.Index + offset);
   }
 
-  public void AppendParameters(IEnumerable<IColumnModel> columns)
+  public void AppendParameter(string parameterName)
   {
-    AppendJoin(", ", columns, AppendParameter);
+    Append(_syntaxProvider.ParameterPrefix);
+    Append(parameterName);
+  }
 
-    static void AppendParameter(in SqlStringBuilder stringBuilder, IColumnModel column)
+  public void AppendParameters(IEnumerable<IColumnModel> columns, int offset = 0)
+  {
+    AppendJoin(", ", offset, columns, AppendParameter);
+
+    static void AppendParameter(in SqlStringBuilder stringBuilder, int offset, IColumnModel column)
     {
-      stringBuilder.AppendParameter(column);
+      stringBuilder.AppendParameter(column, offset);
     }
   }
 
@@ -200,10 +206,15 @@ internal readonly struct SqlStringBuilder
 
     static void AppendWhereCondition(in SqlStringBuilder stringBuilder, IColumnModel column)
     {
-      stringBuilder.AppendEscaped(column.Name);
-      stringBuilder.Append(" = ");
-      stringBuilder.AppendParameter(column);
+      stringBuilder.AppendWhereCondition(column);
     }
+  }
+
+  public void AppendWhereCondition(IColumnModel column)
+  {
+    AppendEscaped(column.Name);
+    Append(" = ");
+    AppendParameter(column);
   }
 
   public void AppendChildrenColumns(IReadOnlyCollection<INavigation> children)

@@ -151,12 +151,12 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
 
     foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
-      if (typeof(IActorAttribute).IsInstanceOfType(attribute))
+      if (attribute is IActorAttribute currentAttribute)
       {
         if (actorAttribute is not null)
           throw InvalidActorException.DuplicateAttribute(type, "Actor");
 
-        actorAttribute = (IActorAttribute)attribute;
+        actorAttribute = currentAttribute;
       }
     }
 
@@ -169,12 +169,12 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
 
     foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
-      if (typeof(IActorFactoryAttribute).IsInstanceOfType(attribute))
+      if (attribute is IActorFactoryAttribute currentAttribute)
       {
         if (actorFactoryAttribute is not null)
           throw InvalidActorException.DuplicateAttribute(type, "ActorFactory");
 
-        actorFactoryAttribute = (IActorFactoryAttribute)attribute;
+        actorFactoryAttribute = currentAttribute;
       }
     }
 
@@ -187,12 +187,12 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
 
     foreach (object attribute in type.GetCustomAttributes(inherit: false))
     {
-      if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
-      {
+      if (attribute is IActorImplementationAttribute currentAttribute)
+        {
         if (actorImplementationAttribute is not null)
           throw InvalidActorException.DuplicateAttribute(type, "ActorImplementation");
 
-        actorImplementationAttribute = (IActorImplementationAttribute)attribute;
+        actorImplementationAttribute = currentAttribute;
       }
     }
 
@@ -205,12 +205,12 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
 
     foreach (object attribute in actorType.GetCustomAttributes(inherit: false))
     {
-      if (typeof(IActorImplementationAttribute).IsInstanceOfType(attribute))
+      if (attribute is IActorIdTypeAttribute currentAttribute)
       {
         if (idTypeAttribute is not null)
           throw InvalidActorException.DuplicateAttribute(actorType, "ActorIdType");
 
-        idTypeAttribute = (IActorIdTypeAttribute)attribute;
+        idTypeAttribute = currentAttribute;
       }
     }
 

@@ -32,6 +32,15 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
 
   DbContext IDataContext.DbContext => _stateManager.DbContext;
 
+  public TEntity? Find<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+
+    return DbContext.Set<TEntity>().FirstOrDefault(keyPredicate);
+  }
+
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -41,21 +50,190 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     return DbContext.Set<TEntity>().FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
   }
 
+  public TEntity? Find<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+
+    return Include(includeAction).FirstOrDefault(keyPredicate)!;
+  }
+
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
     Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
 
-    Includer<TEntity> includer = new(DbContext.Set<TEntity>());
-    includeAction(includer);
+    return Include(includeAction).FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
+  }
 
-    return includer.Queryable.FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
+  public void Insert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    InsertCore(entity);
+    _stateManager.Save();
   }
 
   public async Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
+  {
+    InsertCore(entity);
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void InsertMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    foreach (TEntity entity in entities)
+    {
+      InsertCore(entity);
+    }
+    _stateManager.Save();
+  }
+
+  public async Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    foreach (TEntity entity in entities)
+    {
+      InsertCore(entity);
+    }
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void Update<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    UpdateCore(entity);
+    _stateManager.Save();
+  }
+
+  public async Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    UpdateCore(entity);
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void UpdateMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    foreach (TEntity entity in entities)
+    {
+      UpdateCore(entity);
+    }
+    _stateManager.Save();
+  }
+
+  public async Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    foreach (TEntity entity in entities)
+    {
+      UpdateCore(entity);
+    }
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void Upsert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (DbContext.Set<TEntity>().Any(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity)))
+    {
+      UpdateCore(entity);
+    }
+    else
+    {
+      InsertCore(entity);
+    }
+    _stateManager.Save();
+  }
+
+  public async Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (await DbContext.Set<TEntity>().AnyAsync(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity), cancellationToken))
+    {
+      await UpdateAsync<TEntity, TKey>(entity, cancellationToken);
+    }
+    else
+    {
+      await InsertAsync<TEntity, TKey>(entity, cancellationToken);
+    }
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void Remove<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    DbContext.Set<TEntity>().Remove(entity);
+
+    _stateManager.Save();
+  }
+
+  public async Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    DbContext.Set<TEntity>().Remove(entity);
+
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  public void Remove<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (!_defaultEntityFactory.TryCreate(key, out TEntity? entity))
+    {
+      // TODO: Log warning
+      entity = Find<TEntity, TKey>(key)
+        ?? throw new DbUpdateConcurrencyException("Entity was not found in the database."); // TODO: Improve message
+    }
+
+    DbContext.Set<TEntity>().Remove(entity);
+
+    _stateManager.Save();
+  }
+
+  public async Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (!_defaultEntityFactory.TryCreate(key, out TEntity? entity))
+    {
+      // TODO: Log warning
+      entity = await FindAsync<TEntity, TKey>(key, cancellationToken)
+        ?? throw new DbUpdateConcurrencyException("Entity was not found in the database."); // TODO: Improve message
+    }
+
+    DbContext.Set<TEntity>().Remove(entity);
+
+    await _stateManager.SaveAsync(cancellationToken);
+  }
+
+  private IQueryable<TEntity> Include<TEntity>(IncludeAction<TEntity> includeAction)
+    where TEntity : class
+  {
+    Includer<TEntity> includer = new(DbContext.Set<TEntity>());
+    includeAction(includer);
+    return includer.Queryable;
+  }
+
+  private void InsertCore<TEntity>(TEntity entity)
+    where TEntity : class
   {
     DbContext.ChangeTracker.TrackGraph(entity, null, static delegate (EntityEntryGraphNode<object?> node)
     {
@@ -65,14 +243,14 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           node.Entry.State = EntityState.Added;
           return true;
 
-        case ISkipNavigation skipNavigation: // Many-to-many navigation
+        case ISkipNavigation: // Many-to-many navigation
           if (node.Entry.State is EntityState.Detached)
           {
             node.Entry.State = EntityState.Unchanged;
           }
           return false;
 
-        case INavigation navigation: // One-to-one or many-to-many navigation
+        case INavigation navigation: // One-to-one or one-to-many navigation
           if (navigation.IsOnDependent)
             return false;
 
@@ -95,20 +273,11 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           return false;
       }
     });
-
-    await _stateManager.SaveAsync(cancellationToken);
   }
 
-  public async Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
+  private void UpdateCore<TEntity>(TEntity entity)
     where TEntity : class
-    where TKey : IEquatable<TKey>
   {
-    if (_trackingContext.GetTrackingState(entity) is not TrackingState.Modified)
-    {
-      DbContext.Entry(entity).State = EntityState.Modified;
-      await _stateManager.SaveAsync(cancellationToken);
-    }
-
     List<Action> manyToManyUpdates = new();
     DbContext.ChangeTracker.TrackGraph(entity, null, delegate (EntityEntryGraphNode<object?> node)
     {
@@ -163,7 +332,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
           node.Entry.State = EntityState.Modified;
           return true;
 
-        case ISkipNavigation skipNavigation: // Many-to-many navigation
+        case ISkipNavigation: // Many-to-many navigation
           return false;
 
         case INavigation navigation: // One-to-one or one-to-many navigation
@@ -259,46 +428,5 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     {
       manyToManyUpdate();
     }
-
-    await _stateManager.SaveAsync(cancellationToken);
-  }
-
-  public async Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    if (await DbContext.Set<TEntity>().AnyAsync(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity), cancellationToken))
-    {
-      await UpdateAsync<TEntity, TKey>(entity, cancellationToken);
-    }
-    else
-    {
-      await InsertAsync<TEntity, TKey>(entity, cancellationToken);
-    }
-  }
-
-  public async Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    DbContext.Set<TEntity>().Remove(entity);
-
-    await _stateManager.SaveAsync(cancellationToken);
-  }
-
-  public async Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    if (!_defaultEntityFactory.TryCreate(key, out TEntity? entity))
-    {
-      // TODO: Log warning
-      entity = await FindAsync<TEntity, TKey>(key, cancellationToken)
-        ?? throw new DbUpdateConcurrencyException("Entity was not found on the database."); // TODO: Improve message
-    }
-
-    DbContext.Set<TEntity>().Remove(entity);
-
-    await _stateManager.SaveAsync(cancellationToken);
   }
 }

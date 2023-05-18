@@ -31,6 +31,7 @@
     <ProjectReference Include="..\..\src\Common\CodeArchitects.Platform.Common.csproj">
       <SetTargetFramework>TargetFramework=netstandard2.1</SetTargetFramework>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Data.AdoNet.MySQL\CodeArchitects.Platform.Data.AdoNet.MySQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.Oracle\CodeArchitects.Platform.Data.AdoNet.Oracle.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.PostgreSQL\CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj" />

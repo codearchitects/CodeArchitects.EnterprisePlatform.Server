@@ -93,7 +93,7 @@ internal class SqlTextCache : ISqlTextCache
     return text;
   }
 
-  private record CacheKey(OperationType Operation, IEntityModel EntityModel);
+  private sealed record CacheKey(OperationType Operation, IEntityModel EntityModel);
 
   private enum OperationType
   {

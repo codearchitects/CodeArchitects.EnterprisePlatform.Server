@@ -13,7 +13,7 @@ internal class LocalVerifier
   public void VerifyComplete()
   {
     if (_index != _locals.Count)
-      throw new Exception($"Remaining {_locals.Count - _index} locals were not verified.");
+      throw new InvalidOperationException($"Remaining {_locals.Count - _index} locals were not verified.");
   }
 
   public LocalVerifier OfType(Type localType, bool pinned = false)
@@ -21,15 +21,15 @@ internal class LocalVerifier
     FakeLocalBuilder local = _locals[_index];
 
     if (local.LocalType != localType)
-      throw new Exception($"Expected local at index '{_index}' to have type '{localType}', but found '{local.LocalType}'.");
+      throw new InvalidOperationException($"Expected local at index '{_index}' to have type '{localType}', but found '{local.LocalType}'.");
 
     if (local.IsPinned && !pinned)
     {
-      throw new Exception($"Expected local at index '{_index}' to be not pinned, but such local is.");
+      throw new InvalidOperationException($"Expected local at index '{_index}' to be not pinned, but such local is.");
     }
     else if (!local.IsPinned && pinned)
     {
-      throw new Exception($"Expected local at index '{_index}' to be pinned, but such local is not.");
+      throw new InvalidOperationException($"Expected local at index '{_index}' to be pinned, but such local is not.");
     }
 
     _index++;

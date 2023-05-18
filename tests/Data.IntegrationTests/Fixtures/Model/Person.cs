@@ -13,4 +13,6 @@ public class Person
     .RuleFor(person => person.Name, faker => faker.Lorem.Word());
 
   public static Person One() => s_faker.Generate();
+
+  public static List<Person> Many(int count) => s_faker.Generate(count);
 }

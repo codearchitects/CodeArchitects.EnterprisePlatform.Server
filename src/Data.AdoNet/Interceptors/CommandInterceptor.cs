@@ -11,9 +11,11 @@ public class CommandInterceptor<TDbCommand> : ICommandInterceptor<TDbCommand>
 {
   public virtual void OnCommandBuilt(OperationType operation, TDbCommand command)
   {
+    // Default empty implementation
   }
 
   public virtual void OnCommandCreated(OperationType operation, TDbCommand command)
   {
+    // Default empty implementation
   }
 }

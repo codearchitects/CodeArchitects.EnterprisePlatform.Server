@@ -12,5 +12,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model;
 [Experimental]
 public interface IAccessibleSkipNavigationModel : ISkipNavigationModel, IAccessibleNavigationModel
 {
+  /// <summary>
+  /// An object that provides access to the elements in the collection represented by this navigation.
+  /// </summary>
   new ICollectionAccessor CollectionAccessor { get; }
 }

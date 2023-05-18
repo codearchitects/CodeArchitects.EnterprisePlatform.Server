@@ -4,17 +4,16 @@ namespace CodeArchitects.Platform.Data.Fixtures;
 
 public class XunitLogger : ILogger
 {
-  private readonly TestLocalData _localData;
+  private readonly TestFixture _fixture;
 
-  public XunitLogger(TestLocalData localData)
+  public XunitLogger(TestFixture fixture)
   {
-    _localData = localData;
+    _fixture = fixture;
   }
 
-  public IDisposable? BeginScope<TState>(TState state)
-    where TState : notnull
+  public IDisposable BeginScope<TState>(TState state)
   {
-    return null;
+    return new Scope();
   }
 
   public bool IsEnabled(LogLevel logLevel)
@@ -24,17 +23,22 @@ public class XunitLogger : ILogger
 
   public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
   {
-    _localData.Output?.WriteLine($"[{logLevel}]: {formatter(state, exception)}");
+    _fixture.Output?.WriteLine($"[{logLevel}]: {formatter(state, exception)}");
+  }
+
+  private sealed class Scope : IDisposable
+  {
+    public void Dispose() { }
   }
 }
 
 public class XunitLoggerFactory : ILoggerFactory
 {
-  private readonly TestLocalData _localData;
+  private readonly TestFixture _fixture;
 
-  public XunitLoggerFactory(TestLocalData localData)
+  public XunitLoggerFactory(TestFixture fixture)
   {
-    _localData = localData;
+    _fixture = fixture;
   }
 
   public void AddProvider(ILoggerProvider provider)
@@ -43,7 +47,7 @@ public class XunitLoggerFactory : ILoggerFactory
 
   public ILogger CreateLogger(string categoryName)
   {
-    return new XunitLogger(_localData);
+    return new XunitLogger(_fixture);
   }
 
   public void Dispose()

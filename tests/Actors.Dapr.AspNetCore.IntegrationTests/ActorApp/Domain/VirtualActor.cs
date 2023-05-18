@@ -15,7 +15,7 @@ public abstract class VirtualActor : IVirtualActor, IMessageHandler<TestMessage>
   protected readonly IActorContext<VirtualActor> _context;
   protected readonly ActorOutput _output;
 
-  public VirtualActor(Guid id, VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
+  protected VirtualActor(Guid id, VirtualActorState state, IActorContext<VirtualActor> context, ActorOutput output)
   {
     _id = id;
     _state = state;

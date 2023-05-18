@@ -19,6 +19,11 @@ public interface IColumnModel : IMemberModel
   bool IsForeignKey { get; }
 
   /// <summary>
+  /// Indicates whether this column is used within concurrency checks.
+  /// </summary>
+  bool IsConcurrencyToken { get; }
+
+  /// <summary>
   /// The name of this column.
   /// </summary>
   string Name { get; }
@@ -36,22 +41,18 @@ public interface IColumnModel : IMemberModel
   /// <summary>
   /// Dispatches to the specific visit method for this column type.
   /// </summary>
-  /// <typeparam name="TVisitor">The visitor type.</typeparam>
   /// <typeparam name="TResult">The result type.</typeparam>
   /// <param name="visitor">The visitor.</param>
   /// <returns>The result produced by the visitor.</returns>
-  TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IColumnModelVisitor<TResult>;
+  TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor);
 
   /// <summary>
   /// Dispatches to the specific visit method for this column type.
   /// </summary>
-  /// <typeparam name="TVisitor">The visitor type.</typeparam>
   /// <typeparam name="TResult">The result type.</typeparam>
   /// <typeparam name="TState">The type of the state object passed to the visitor.</typeparam>
   /// <param name="visitor">The visitor.</param>
   /// <param name="state">The state object to pass to the visitor.</param>
   /// <returns>The result produced by the visitor.</returns>
-  TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IColumnModelVisitor<TResult, TState>;
+  TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state);
 }

@@ -26,7 +26,7 @@ internal class ConventionSetPlugin : IConventionSetPlugin
     return conventionSet;
   }
 
-  private class Convention : IModelInitializedConvention, IModelFinalizedConvention
+  private sealed class Convention : IModelInitializedConvention, IModelFinalizedConvention
   {
     private readonly Type _tenantIdType;
 

@@ -9,21 +9,15 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.SoftDelete;
 /// </summary>
 public static class SoftDeleteQueryableExtensions
 {
-  internal static readonly MethodInfo s_asNoSoftDeleteMethodInfo;
-  internal static readonly MethodInfo s_asSoftDeleteMethodInfo;
+  internal static readonly MethodInfo s_asNoSoftDeleteMethodInfo = typeof(SoftDeleteQueryableExtensions).GetRequiredMethod(
+    name: nameof(AsNoSoftDelete),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
 
-  static SoftDeleteQueryableExtensions()
-  {
-    s_asNoSoftDeleteMethodInfo = typeof(SoftDeleteQueryableExtensions).GetRequiredMethod(
-      name: nameof(AsNoSoftDelete),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
-
-    s_asSoftDeleteMethodInfo = typeof(SoftDeleteQueryableExtensions).GetRequiredMethod(
-      name: nameof(AsSoftDelete),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
-  }
+  internal static readonly MethodInfo s_asSoftDeleteMethodInfo = typeof(SoftDeleteQueryableExtensions).GetRequiredMethod(
+    name: nameof(AsSoftDelete),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
 
   /// <summary>
   /// Disables the soft delete filter for the query.

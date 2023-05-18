@@ -108,7 +108,7 @@ internal partial class ExpressionEvaluator
     };
   }
 
-  private object? Convert(object? operand, Type type)
+  private static object? Convert(object? operand, Type type)
   {
     if (operand is null)
     {

@@ -29,6 +29,9 @@ components:
   - name: CodeArchitects.Platform.Data.AdoNet.DependencyInjection
     path: src\Data.AdoNet.DependencyInjection
     type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.MySQL
+    path: src\Data.AdoNet.MySQL
+    type: dotnet-package
   - name: CodeArchitects.Platform.Data.AdoNet.Oracle
     path: src\Data.AdoNet.Oracle
     type: dotnet-package
@@ -52,6 +55,12 @@ components:
     type: dotnet-package
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection
     path: src\Data.EntityFrameworkCore5.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.MongoDB
+    path: src\Data.MongoDB
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.MongoDB.DependencyInjection
+    path: src\Data.MongoDB.DependencyInjection
     type: dotnet-package
   - name: CodeArchitects.Platform.Emit
     path: src\Emit
@@ -99,6 +108,9 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests
     path: tests\Data.EntityFrameworkCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.MongoDB.UnitTests
+    path: tests\Data.MongoDB.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
     path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
@@ -148,4 +160,7 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Data.IntegrationTests
     path: tests\Data.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.MongoDB.IntegrationTests
+    path: tests\Data.MongoDB.IntegrationTests
     type: dotnet-test

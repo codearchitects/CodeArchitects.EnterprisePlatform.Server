@@ -2,7 +2,6 @@
 using CodeArchitects.Platform.Common.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System.Security.Claims;
 
 namespace CodeArchitects.Platform.Application.DependencyInjection;
 

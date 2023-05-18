@@ -210,7 +210,7 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
     return result;
   }
 
-  private record MessageTypeInfo(
+  private sealed record MessageTypeInfo(
     Document Document,
     SemanticModel SemanticModel,
     CompilationUnitSyntax Root,

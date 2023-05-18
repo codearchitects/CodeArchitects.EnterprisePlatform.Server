@@ -303,7 +303,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     State.EnabledBindings &= ~(1 << index);
   }
 
-  private class DynamicArgumentList : IReadOnlyList<object?>
+  private sealed class DynamicArgumentList : IReadOnlyList<object?>
   {
     private readonly ReadOnlyCollection<Expression> _arguments;
 

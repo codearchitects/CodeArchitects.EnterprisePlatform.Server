@@ -5,27 +5,21 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
 
-internal class ExpressionHelpers
+internal static class ExpressionHelpers
 {
-  private static readonly MethodInfo s_efPropertyMethod;
-  private static readonly MethodInfo s_whereMethod;
+  private static readonly MethodInfo s_efPropertyMethod = typeof(EF).GetRequiredMethod(
+    name: nameof(EF.Property),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(object), typeof(string) });
 
-  static ExpressionHelpers()
-  {
-    s_efPropertyMethod = typeof(EF).GetRequiredMethod(
-      name: nameof(EF.Property),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(object), typeof(string) });
-
-    s_whereMethod = typeof(Queryable).GetRequiredMethod(
-      name: nameof(Queryable.Where),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[]
-      {
-        typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)),
-        typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(bool)))
-      });
-  }
+  private static readonly MethodInfo s_whereMethod = typeof(Queryable).GetRequiredMethod(
+    name: nameof(Queryable.Where),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[]
+    {
+      typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)),
+      typeof(Expression<>).MakeGenericType(typeof(Func<,>).MakeGenericType(Type.MakeGenericMethodParameter(0), typeof(bool)))
+    });
 
 #if NET6_0_OR_GREATER
   public static Expression MakePropertyAccess(Expression entity, IReadOnlyProperty property)

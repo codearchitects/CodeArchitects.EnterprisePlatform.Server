@@ -81,4 +81,20 @@ public interface IEntityModelBuilder<TEntity>
   /// <param name="columnName">The name of the column.</param>
   /// <returns>The same <see cref="IEntityModelBuilder{TEntity}"/> that can be used to further configure the entity.</returns>
   IEntityModelBuilder<TEntity> WithColumnName(string memberName, string columnName);
+
+  /// <summary>
+  /// Specifies a column must be treated like a concurrency token.
+  /// </summary>
+  /// <typeparam name="TMember">The member type.</typeparam>
+  /// <param name="expression">An expression that represents the path to the member.</param>
+  /// <returns>The same <see cref="IEntityModelBuilder{TEntity}"/> that can be used to further configure the entity.</returns>
+  IEntityModelBuilder<TEntity> WithConcurrencyToken<TMember>(Expression<Func<TEntity, TMember>> expression);
+
+  /// <summary>
+  /// Specifies a column must be treated like a concurrency token.
+  /// </summary>
+  /// <typeparam name="TMember">The member type.</typeparam>
+  /// <param name="memberName">The name of the member</param>
+  /// <returns>The same <see cref="IEntityModelBuilder{TEntity}"/> that can be used to further configure the entity.</returns>
+  IEntityModelBuilder<TEntity> WithConcurrencyToken<TMember>(string memberName);
 }

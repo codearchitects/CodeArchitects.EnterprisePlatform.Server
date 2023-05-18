@@ -14,4 +14,6 @@ internal class SerialEntity
     .RuleFor(entity => entity.Name, faker => faker.Name.FullName());
 
   public static SerialEntity One() => s_faker.Generate();
+
+  public static List<SerialEntity> Many(int count) => s_faker.Generate(count);
 }

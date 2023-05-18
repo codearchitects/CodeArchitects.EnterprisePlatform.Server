@@ -5,7 +5,7 @@ using Microsoft.Data.SqlClient;
 namespace CodeArchitects.Platform.Data.AdoNet.SQLServer;
 
 /// <summary>
-/// The SQL Server database provider.
+/// The provider for SQL Server databases.
 /// </summary>
 public class SQLServerProvider : DatabaseProvider<SqlConnection, SqlCommand>
 {

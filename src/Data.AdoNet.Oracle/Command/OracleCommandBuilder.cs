@@ -1,12 +1,13 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using Oracle.ManagedDataAccess.Client;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Oracle.Command;
 
 internal class OracleCommandBuilder : CommandBuilder<OracleCommand>
 {
-  public OracleCommandBuilder(ISqlTextBuilder sqlBuilder)
-    : base(sqlBuilder)
+  public OracleCommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
+    : base(sqlBuilder, concurrencyContext)
   {
   }
 
@@ -20,7 +21,7 @@ internal class OracleCommandBuilder : CommandBuilder<OracleCommand>
     }
     else
     {
-      if (value.GetType() == typeof(Guid))
+      if (value is Guid)
       {
         parameter.OracleDbType = OracleDbType.Raw;
       }

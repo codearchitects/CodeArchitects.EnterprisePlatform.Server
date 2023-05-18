@@ -19,6 +19,8 @@ internal class OrdinaryColumnModel : ColumnModel, IOrdinaryColumnModel
 
   public override bool IsForeignKey => false;
 
+  public override bool IsConcurrencyToken { get; set; }
+
   [AllowNull]
   public override string Name
   {
@@ -32,12 +34,12 @@ internal class OrdinaryColumnModel : ColumnModel, IOrdinaryColumnModel
 
   public new Setter<object?> SetValue => _memberComponent.SetValue;
 
-  public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+  public override TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitOrdinary(this);
   }
 
-  public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+  public override TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitOrdinary(this, in state);
   }

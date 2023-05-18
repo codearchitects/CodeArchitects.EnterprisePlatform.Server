@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Executor;
-using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using System.Data;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
@@ -12,9 +12,9 @@ internal interface ICommandBuilder<in TDbCommand>
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  void BuildInsertCommand(TDbCommand command, object entity, IEntityModel model, in NavigationContext context);
+  void BuildInsertCommand(TDbCommand command, object entity, IEntityModel model, NavigationContext context);
 
-  void BuildUpdateCommand(TDbCommand command, object entity, IEntityModel model, in NavigationContext context);
+  void BuildUpdateCommand(TDbCommand command, object entity, IEntityModel model, NavigationContext context);
 
   void BuildUpsertCommand(TDbCommand command, object entity, IEntityModel model);
 
@@ -27,4 +27,6 @@ internal interface ICommandBuilder<in TDbCommand>
   void BuildCountCommand(TDbCommand command, IEntityModel model);
 
   string BuildCustomCommand(string query, INavigationRoot root);
+
+  void BuildInsertManyCommand(TDbCommand command, IEnumerable<object> entities, IEntityModel model, NavigationContext context);
 }

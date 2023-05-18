@@ -6,6 +6,10 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class HubEndpointAttribute : Attribute
 {
+  /// <summary>
+  /// Creates a new <see cref="HubEndpointAttribute"/>.
+  /// </summary>
+  /// <param name="endpoint">The hub endpoint.</param>
   public HubEndpointAttribute(string endpoint)
   {
     Endpoint = endpoint;

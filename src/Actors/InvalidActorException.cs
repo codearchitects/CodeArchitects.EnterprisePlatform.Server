@@ -7,6 +7,7 @@ namespace CodeArchitects.Platform.Actors;
 /// <summary>
 /// Exception thrown when an actor is configured invalidly.
 /// </summary>
+[Serializable]
 public sealed class InvalidActorException : Exception
 {
   private InvalidActorException(Type type, string message)

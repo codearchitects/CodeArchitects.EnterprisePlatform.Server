@@ -26,7 +26,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>
     where T : class
   {
     if (thenInclude is null)
-      throw new ArgumentException(nameof(thenInclude));
+      throw new ArgumentNullException(nameof(thenInclude));
 
     ReferenceInclude<TEntity, T> includeFunc = queryable => queryable.Include(includeExpression)!;
     ReferenceIncluder<TEntity, T> includer = new(Queryable, includeFunc);
@@ -43,7 +43,7 @@ internal class Includer<TEntity> : IIncluder<TEntity>
     where T : class
   {
     if (thenInclude is null)
-      throw new ArgumentException(nameof(thenInclude));
+      throw new ArgumentNullException(nameof(thenInclude));
 
     CollectionInclude<TEntity, T> includeFunc = queryable => queryable.Include(includeExpression)!;
     CollectionIncluder<TEntity, T> includer = new(Queryable, includeFunc);

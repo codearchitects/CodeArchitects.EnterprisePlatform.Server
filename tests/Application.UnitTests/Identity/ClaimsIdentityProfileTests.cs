@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Identity.Web;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

@@ -30,6 +30,16 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
       : Task.CompletedTask;
   }
 
+  public void Save()
+  {
+    if (_current is not null)
+      return;
+
+    SaveCore();
+  }
+
+  protected abstract void SaveCore();
+
   protected abstract Task SaveCoreAsync(CancellationToken cancellationToken);
 
   private sealed class UnitOfWork : IUnitOfWork
@@ -51,6 +61,11 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
       return _manager.SaveCoreAsync(cancellationToken);
     }
 
+    public void Save()
+    {
+      _manager.SaveCore();
+    }
+
     public ValueTask DisposeAsync()
     {
       if (_isDisposed)
@@ -59,6 +74,19 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
       _isDisposed = true;
       _manager._current = null;
       return new(_autoSave ? _manager.SaveCoreAsync(_cancellationToken) : Task.CompletedTask);
+    }
+
+    public void Dispose()
+    {
+      if (_isDisposed)
+        return;
+
+      _isDisposed = true;
+      _manager._current = null;
+      if (_autoSave)
+      {
+        _manager.SaveCore();
+      }
     }
   }
 }

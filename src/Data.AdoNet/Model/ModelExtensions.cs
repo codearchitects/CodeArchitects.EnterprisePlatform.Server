@@ -2,6 +2,9 @@
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;
 
+/// <summary>
+/// Extension methods for model interfaces.
+/// </summary>
 [Experimental]
 public static class ModelExtensions
 {

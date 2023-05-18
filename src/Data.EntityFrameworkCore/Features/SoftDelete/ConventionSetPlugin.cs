@@ -15,7 +15,7 @@ internal class ConventionSetPlugin : IConventionSetPlugin
     return conventionSet;
   }
 
-  private class Convention : IModelFinalizedConvention
+  private sealed class Convention : IModelFinalizedConvention
   {
     public IModel ProcessModelFinalized(IModel model)
     {

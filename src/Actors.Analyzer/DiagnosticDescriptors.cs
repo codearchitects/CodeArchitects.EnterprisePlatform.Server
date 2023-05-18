@@ -20,7 +20,7 @@ internal static class DiagnosticDescriptors
 
   // Class errors (000-299)
 
-  public static readonly DiagnosticDescriptor CAEPACTR000 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR000 = new(
     DiagnosticIds.CAEPACTR000,
     "Generic actors are not supported",
     "Actor '{0}' is generic, which is not supported",
@@ -28,7 +28,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR001 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR001 = new(
     DiagnosticIds.CAEPACTR001,
     "Missing actor interface",
     "An actor must implement an interface which exposes its public methods, but '{0}' does not implement any suitable interface",
@@ -36,7 +36,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR002 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR002 = new(
     DiagnosticIds.CAEPACTR002,
     "Ambiguous actor interface",
     "Could not infer the actor interface type because '{0}' implements more than one interface",
@@ -44,7 +44,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR003 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR003 = new(
     DiagnosticIds.CAEPACTR003,
     "Interface not implemented",
     "Type '{0}' does not implement the specified interface type",
@@ -52,7 +52,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR004 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR004 = new(
     DiagnosticIds.CAEPACTR004,
     "Invalid interface type",
     "'{0}' was specified as the interface type of the actor, but it is either not an interface or an invalid one",
@@ -60,7 +60,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR005 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR005 = new(
     DiagnosticIds.CAEPACTR005,
     "Properties are not supported",
     "Interface '{0}' defines properties, which are not supported",
@@ -68,7 +68,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR006 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR006 = new(
     DiagnosticIds.CAEPACTR006,
     "Events are not supported",
     "Interface '{0}' defines events, which are not supported",
@@ -76,7 +76,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR007 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR007 = new(
     DiagnosticIds.CAEPACTR007,
     "Actor cannot be virtual",
     "'{0}' cannot be a virtual actor because a default value for its state cannot be computed. For simple state types, either configure the its default value or provide a default parameter value. For complex state types, provide a parameterless constructor for the class.",
@@ -84,7 +84,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR008 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR008 = new(
     DiagnosticIds.CAEPACTR008,
     "Multiple default implementations",
     "Multiple default implementations found for actor '{0}'",
@@ -92,7 +92,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR009 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR009 = new(
     DiagnosticIds.CAEPACTR009,
     "Actor not inherited",
     "Type '{0}' does not inherit from the specified actor type",
@@ -100,7 +100,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR010 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR010 = new(
     DiagnosticIds.CAEPACTR010,
     "Abstract implementation",
     "Type '{0}' cannot be an actor implementation since it is abstract",
@@ -111,7 +111,7 @@ internal static class DiagnosticDescriptors
 
   // State/id errors (300-399)
 
-  public static readonly DiagnosticDescriptor CAEPACTR300 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR300 = new(
     DiagnosticIds.CAEPACTR300,
     "Invalid state type",
     "Type '{0}' cannot be used as an actor state",
@@ -119,7 +119,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR301 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR301 = new(
     DiagnosticIds.CAEPACTR301,
     "Invalid default value",
     "The provided default value for state component '{0}' is of the wrong type",
@@ -127,7 +127,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR302 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR302 = new(
     DiagnosticIds.CAEPACTR302,
     "State must be defined in base actor",
     "Each component of the actor's state must be defined in the actor's base class. Implementation '{0}' defines state members.",
@@ -135,7 +135,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR303 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR303 = new(
     DiagnosticIds.CAEPACTR303,
     "Multiple id members",
     "Multiple actor id members were specified",
@@ -143,7 +143,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR304 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR304 = new(
     DiagnosticIds.CAEPACTR304,
     "Invalid id type",
     "Type '{0}' cannot be used as id type because it does not define a public static method Parse(string) or Parse(string, IFormatProvider) returning the id type",
@@ -151,7 +151,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR305 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR305 = new(
     DiagnosticIds.CAEPACTR305,
     "Invalid id member",
     "An actor member specified an id of type '{0}', but the declared actor id type is '{1}'",
@@ -162,7 +162,7 @@ internal static class DiagnosticDescriptors
 
   // Method or constructor errors (400-599)
 
-  public static readonly DiagnosticDescriptor CAEPACTR400 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR400 = new(
     DiagnosticIds.CAEPACTR400,
     "State component name mismatch",
     "Could not find a one-to-one correspondence between state members and state constructor parameters",
@@ -170,7 +170,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR401 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR401 = new(
     DiagnosticIds.CAEPACTR401,
     "Ambiguous actor constructor",
     "Could not infer the actor constructor",
@@ -178,7 +178,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR402 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR402 = new(
     DiagnosticIds.CAEPACTR402,
     "Wrong generic actor context",
     "The actor context parameter '{0}' must be of type 'IActorContext<{1}>'",
@@ -186,7 +186,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR403 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR403 = new(
     DiagnosticIds.CAEPACTR403,
     "Generic methods are not supported",
     "Method '{0}' is generic, which is not supported",
@@ -194,7 +194,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR404 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR404 = new(
     DiagnosticIds.CAEPACTR404,
     "Invalid method return type",
     "Method '{0}' has an invalid return type '{1}'",
@@ -202,7 +202,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR405 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR405 = new(
     DiagnosticIds.CAEPACTR405,
     "CancellationToken must be last parameter",
     "Method '{0}' has a CancellationToken parameter which is not its last parameter",
@@ -213,7 +213,7 @@ internal static class DiagnosticDescriptors
 
   // Factory errors (600-699)
 
-  public static readonly DiagnosticDescriptor CAEPACTR600 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR600 = new(
     DiagnosticIds.CAEPACTR600,
     "Generic actor factories are not supported",
     "Actor factory '{0}' is generic, which is not supported",
@@ -221,7 +221,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR601 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR601 = new(
     DiagnosticIds.CAEPACTR601,
     "Missing actor factory type",
     "Could not find a suitable factory interface for '{0}'",
@@ -229,7 +229,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR602 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR602 = new(
     DiagnosticIds.CAEPACTR602,
     "Invalid actor factory type",
     "Actor factory '{0}' is not an interface or has the wrong method signatures",
@@ -237,7 +237,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR603 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR603 = new(
     DiagnosticIds.CAEPACTR603,
     "Ambiguous actor factory type",
     "Multiple actor factories were specified for actor '{0}'",
@@ -248,7 +248,7 @@ internal static class DiagnosticDescriptors
 
   // Other errors (700-999)
 
-  public static readonly DiagnosticDescriptor CAEPACTR700 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR700 = new(
     DiagnosticIds.CAEPACTR700,
     "Duplicate attribute",
     "Duplicate '{0}' attribute",
@@ -256,7 +256,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR701 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR701 = new(
     DiagnosticIds.CAEPACTR701,
     "Target is not an actor",
     "Type '{0}' is not an actor",
@@ -264,7 +264,7 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
-  public static readonly DiagnosticDescriptor CAEPACTR702 = new DiagnosticDescriptor(
+  public static readonly DiagnosticDescriptor CAEPACTR702 = new(
     DiagnosticIds.CAEPACTR702,
     "Invalid actor message",
     "Message type '{0}' does not implement the IActorMessage interface or it has the wrong actor id type",

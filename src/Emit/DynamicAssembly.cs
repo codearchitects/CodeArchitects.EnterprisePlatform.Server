@@ -3,18 +3,12 @@ using System.Reflection.Emit;
 
 namespace CodeArchitects.Platform.Emit;
 
-internal class DynamicAssembly
+internal static class DynamicAssembly
 {
   public const string AssemblyName = "CodeArchitects.Platform.Dynamic";
 
-  public static readonly AssemblyBuilder Assembly;
-  public static readonly ModuleBuilder Module;
-
-  static DynamicAssembly()
-  {
-    Assembly = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(AssemblyName), AssemblyBuilderAccess.RunAndCollect);
-    Module = Assembly.DefineDynamicModule(AssemblyName);
-  }
+  public static readonly AssemblyBuilder Assembly = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(AssemblyName), AssemblyBuilderAccess.RunAndCollect);
+  public static readonly ModuleBuilder Module = Assembly.DefineDynamicModule(AssemblyName);
 
   public static ModuleBuilder NewModule()
   {

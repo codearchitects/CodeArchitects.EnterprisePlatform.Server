@@ -31,7 +31,7 @@ public class TestFixture : IAsyncLifetime
       throw new Exception($"Exception in executing the command. Error log:\n{errorSb}", ex);
     }
 
-    await Task.Delay(10000);
+    await Task.Delay(15000);
   }
 
   public async Task DisposeAsync()

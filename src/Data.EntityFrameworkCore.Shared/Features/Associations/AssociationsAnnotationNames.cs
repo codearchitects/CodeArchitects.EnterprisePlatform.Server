@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Names for association annotations.
-/// Use the extension methods defined in <see cref="AssociationsAnnotationExtensions"/> to retrieve the annotations from the metadata.
+/// Use the extension methods defined in <see cref="AnnotationExtensions"/> to retrieve the annotations from the metadata.
 /// </summary>
 public static class AssociationsAnnotationNames
 {

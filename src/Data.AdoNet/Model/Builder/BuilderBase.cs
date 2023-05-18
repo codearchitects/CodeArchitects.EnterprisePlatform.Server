@@ -7,6 +7,8 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 
 internal class BuilderBase
 {
+  protected BuilderBase() { }
+
   protected static bool TryGetMemberAndTypeFromExpression(Expression body, [NotNullWhen(true)] out MemberInfo? member, [NotNullWhen(true)] out Type? type)
   {
     if (body is not MemberExpression memberExpression)

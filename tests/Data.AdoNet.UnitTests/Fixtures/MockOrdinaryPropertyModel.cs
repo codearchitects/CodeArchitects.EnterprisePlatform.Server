@@ -16,6 +16,8 @@ internal class MockOrdinaryPropertyModel : IOrdinaryColumnModel
 
   public bool IsForeignKey => _mock.IsForeignKey;
 
+  public bool IsConcurrencyToken => _mock.IsConcurrencyToken;
+
   public string Name => _mock.Name;
 
   public short Index => _mock.Index;
@@ -38,14 +40,12 @@ internal class MockOrdinaryPropertyModel : IOrdinaryColumnModel
 
   public object? DefaultValue => _mock.DefaultValue;
 
-  public TResult Accept<TVisitor, TResult>(in TVisitor visitor)
-    where TVisitor : IColumnModelVisitor<TResult>
+  public TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitOrdinary(this);
   }
 
-  public TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
-    where TVisitor : IColumnModelVisitor<TResult, TState>
+  public TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitOrdinary(this, in state);
   }

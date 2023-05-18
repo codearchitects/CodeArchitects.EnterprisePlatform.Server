@@ -29,7 +29,6 @@ internal class ValueReplacer : ExpressionVisitor
     return Expression.Constant(_value, node.Type);
   }
 
-
   public static Expression Replace(Expression template, object? value)
   {
     return new ValueReplacer(value).Visit(template);

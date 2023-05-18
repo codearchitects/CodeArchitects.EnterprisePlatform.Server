@@ -16,9 +16,6 @@ internal class TrackingMappingAction<TSource, TDestination> : IMappingAction<TSo
 
   public void Process(TSource source, TDestination destination, ResolutionContext context)
   {
-    if (source.TrackingState is TrackingState.Detached)
-      return;
-
     _trackingContext.SetTrackingState(destination, source.TrackingState);
   }
 }

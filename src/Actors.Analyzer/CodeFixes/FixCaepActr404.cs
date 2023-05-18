@@ -104,7 +104,7 @@ internal class FixCaepActr404 : FixingActionProvider<MethodDeclarationSyntax>
     return solution;
   }
 
-  private class ReturnTypeFixer
+  private sealed class ReturnTypeFixer
   {
     private readonly TypeSyntax _newReturnType;
     private readonly INamedTypeSymbol _taskTypeSymbol;

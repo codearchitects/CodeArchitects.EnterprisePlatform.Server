@@ -7,34 +7,29 @@ using System.Web;
 
 namespace CodeArchitects.Platform.Application.Remoting;
 
+/// <summary>
+/// Helper methods for constructing http query strings.
+/// </summary>
 public static class QueryHelpers
 {
   private delegate void QueryDelegate(StringBuilder url, object? queryObject);
 
-  private static readonly ConcurrentDictionary<Type, QueryDelegate> s_queryDelegates;
-  private static readonly MethodInfo s_appendSingleMethod;
-  private static readonly MethodInfo s_appendManyMethod;
-  private static readonly MethodInfo s_appendChar;
+  private static readonly ConcurrentDictionary<Type, QueryDelegate> s_queryDelegates = new ConcurrentDictionary<Type, QueryDelegate>();
+  
+  private static readonly MethodInfo s_appendSingleMethod = typeof(QueryHelpers).GetRequiredMethod(
+    name: nameof(AppendSingle),
+    bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
+    types: new[] { typeof(StringBuilder), typeof(string), typeof(object) });
+  
+  private static readonly MethodInfo s_appendManyMethod = typeof(QueryHelpers).GetRequiredMethod(
+    name: nameof(AppendMany),
+    bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
+    types: new[] { typeof(StringBuilder), typeof(string), typeof(IEnumerable<object>) });
 
-  static QueryHelpers()
-  {
-    s_queryDelegates = new ConcurrentDictionary<Type, QueryDelegate>();
-
-    s_appendSingleMethod = typeof(QueryHelpers).GetRequiredMethod(
-      name: nameof(AppendSingle),
-      bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
-      types: new[] { typeof(StringBuilder), typeof(string), typeof(object) });
-
-    s_appendManyMethod = typeof(QueryHelpers).GetRequiredMethod(
-      name: nameof(AppendMany),
-      bindingAttr: BindingFlags.NonPublic | BindingFlags.Static,
-      types: new[] { typeof(StringBuilder), typeof(string), typeof(IEnumerable<object>) });
-
-    s_appendChar = typeof(StringBuilder).GetRequiredMethod(
-      name: nameof(StringBuilder.Append),
-      bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      types: new[] { typeof(char) });
-  }
+  private static readonly MethodInfo s_appendChar = typeof(StringBuilder).GetRequiredMethod(
+    name: nameof(StringBuilder.Append),
+    bindingAttr: BindingFlags.Public | BindingFlags.Instance,
+    types: new[] { typeof(char) });
 
   /// <summary>
   /// Encodes an object as query string and appends it to a given url.

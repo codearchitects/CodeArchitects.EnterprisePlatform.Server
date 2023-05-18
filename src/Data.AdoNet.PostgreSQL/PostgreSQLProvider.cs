@@ -5,7 +5,7 @@ using Npgsql;
 namespace CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 
 /// <summary>
-/// The PostgreSQL database provider.
+/// The provider for PostgreSQL databases.
 /// </summary>
 public class PostgreSQLProvider : DatabaseProvider<NpgsqlConnection, NpgsqlCommand>
 {

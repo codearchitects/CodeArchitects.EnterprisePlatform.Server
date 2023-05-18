@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
 using CodeArchitects.Platform.Data.AdoNet.Executor;
+using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Materialization;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
@@ -49,7 +50,7 @@ public static class DataAdoNetServiceCollectionExtensions
     Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
 
     services.TryAddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions { SizeLimit = 10240 }));
-    services.AddSingleton(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<IMemoryCache>()));
+    services.AddScoped(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<IMemoryCache>(), sp.GetRequiredService<IConcurrencyContext>()));
 
     // Materializer
     services.TryAddSingleton<IIdentityCollectionFactory>(IdentityCollectionFactory.Create());
@@ -115,6 +116,10 @@ public static class DataAdoNetServiceCollectionExtensions
 
     // Navigation
     services.TryAddSingleton<INavigationTreeFactory, NavigationTreeFactory>();
+
+    // Concurrency
+    services.TryAddScoped<IConcurrencyContext, ConcurrencyContext>();
+    services.Add(configurationBuilder.ConcurrencyTokenProviderDescriptor);
 
     // Data context
     Type dataContextType = provider.MakeGenericType(typeof(IDataContext<>));

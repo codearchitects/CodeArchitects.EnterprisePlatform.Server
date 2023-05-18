@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Interceptors;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Data;
 using System.Data.Common;
@@ -41,6 +42,15 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
   IDbConnection IDataContext.Connection => _stateManager.Connection;
 
+  public TEntity? Find<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
+
+    return FindCore(key, _navigationTreeFactory.CreateEmpty(entityModel));
+  }
+
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
@@ -48,6 +58,18 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
     return FindAsyncCore(key, _navigationTreeFactory.CreateEmpty(entityModel), cancellationToken);
+  }
+
+  public TEntity? Find<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (includeAction is null)
+      throw new ArgumentNullException(nameof(includeAction));
+
+    IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
+
+    return FindCore(key, _navigationTreeFactory.Create(entityModel, includeAction));
   }
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
@@ -60,6 +82,28 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     IEntityModel<TEntity, TKey> entityModel = EnsureEntity<TEntity, TKey>();
 
     return FindAsyncCore(key, _navigationTreeFactory.Create(entityModel, includeAction), cancellationToken);
+  }
+
+  public void Insert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.Insert, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteInsert(command, entity, model);
+
+      return Task.CompletedTask;
+    }, startTransaction);
   }
 
   public Task InsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -75,11 +119,91 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Insert, Connection);
+      await using TDbCommand command = CreateCommand(OperationType.Insert, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteInsertAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
+  }
+
+  public void InsertMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = false;
+    foreach (TEntity entity in entities)
+    {
+      if (ShouldStartTransaction(model, entity))
+      {
+        startTransaction = true;
+        break;
+      }
+    }
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.InsertMany, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteInsertMany(command, entities, model);
+
+      return Task.CompletedTask;
+    }, startTransaction);
+  }
+
+  public Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = false;
+    foreach (TEntity entity in entities)
+    {
+      if (ShouldStartTransaction(model, entity))
+      {
+        startTransaction = true;
+        break;
+      }
+    }
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      await using TDbCommand command = CreateCommand(OperationType.InsertMany, connection);
+
+      command.Transaction = transaction;
+      await _executor.ExecuteInsertManyAsync(command, entities, model, cancellationToken);
+    }, startTransaction, cancellationToken);
+  }
+
+  public void Update<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.Update, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteUpdate(command, entity, model);
+
+      return Task.CompletedTask;
+    }, startTransaction);
   }
 
   public Task UpdateAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -95,11 +219,71 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Update, Connection);
+      await using TDbCommand command = CreateCommand(OperationType.Update, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteUpdateAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
+  }
+
+  public void UpdateMany<TEntity, TKey>(IEnumerable<TEntity> entities)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.UpdateMany, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteUpdateMany(command, entities, model);
+
+      return Task.CompletedTask;
+    }, true);
+  }
+
+  public Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
+    {
+      await using TDbCommand command = CreateCommand(OperationType.UpdateMany, connection);
+
+      command.Transaction = transaction;
+      await _executor.ExecuteUpdateManyAsync(command, entities, model, cancellationToken);
+    }, true, cancellationToken);
+  }
+
+  public void Upsert<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    bool startTransaction = ShouldStartTransaction(model, entity);
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.Upsert, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteUpsert(command, entity, model);
+
+      return Task.CompletedTask;
+    }, startTransaction);
   }
 
   public Task UpsertAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -115,11 +299,31 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Upsert, Connection);
+      await using TDbCommand command = CreateCommand(OperationType.Upsert, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteUpsertAsync(command, entity, model, cancellationToken);
     }, startTransaction, cancellationToken);
+  }
+
+  public void Remove<TEntity, TKey>(TEntity entity)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.Remove, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteRemove(command, entity, model);
+
+      return Task.CompletedTask;
+    }, false);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TEntity entity, CancellationToken cancellationToken = default)
@@ -133,11 +337,28 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+      await using TDbCommand command = CreateCommand(OperationType.Remove, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteRemoveAsync(command, entity, model, cancellationToken);
     }, false, cancellationToken);
+  }
+
+  public void Remove<TEntity, TKey>(TKey key)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    IEntityModel<TEntity, TKey> model = EnsureEntity<TEntity, TKey>();
+
+    _stateManager.Execute((connection, transaction, cancellationToken) =>
+    {
+      using TDbCommand command = CreateCommand(OperationType.Remove, connection);
+
+      command.Transaction = transaction;
+      _executor.ExecuteRemove(command, key, model);
+
+      return Task.CompletedTask;
+    }, false);
   }
 
   public Task RemoveAsync<TEntity, TKey>(TKey key, CancellationToken cancellationToken = default)
@@ -148,11 +369,19 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
 
     return _stateManager.ExecuteAsync(async (connection, transaction, cancellationToken) =>
     {
-      TDbCommand command = CreateCommand(OperationType.Remove, Connection);
+      await using TDbCommand command = CreateCommand(OperationType.Remove, connection);
 
       command.Transaction = transaction;
       await _executor.ExecuteRemoveAsync(command, key, model, cancellationToken);
     }, false, cancellationToken);
+  }
+
+  public void BatchExecute(Execution<TDbConnection, DbTransaction> execution, bool startTransaction)
+  {
+    if (execution is null)
+      throw new ArgumentNullException(nameof(execution));
+
+    _stateManager.Execute(execution, startTransaction);
   }
 
   public Task BatchExecuteAsync(Execution<TDbConnection, DbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
@@ -161,6 +390,14 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       throw new ArgumentNullException(nameof(execution));
 
     return _stateManager.ExecuteAsync(execution, startTransaction, cancellationToken);
+  }
+
+  public void BatchExecute(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction)
+  {
+    if (execution is null)
+      throw new ArgumentNullException(nameof(execution));
+
+    _stateManager.Execute(execution, startTransaction);
   }
 
   public Task BatchExecuteAsync(Execution<IDbConnection, IDbTransaction> execution, bool startTransaction, CancellationToken cancellationToken = default)
@@ -180,12 +417,21 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       throw new ArgumentNullException(nameof(callback));
 
     IEntityModel model = EnsureEntity<TEntity>();
-
-    callback(entity, model, default, state);
-    _executor.VisitGraph(entity, model, state, callback);
+    Graph.Visit(entity, model, state, callback);
   }
 
-  public async Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
+  public void VisitGraph<TEntity>(TEntity entity, IGraphVisitor visitor) where TEntity : class
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (visitor is null)
+      throw new ArgumentNullException(nameof(visitor));
+
+    IEntityModel model = EnsureEntity<TEntity>();
+    Graph.Visit(entity, model, visitor);
+  }
+
+  public Task VisitGraphAsync<TEntity, TState>(TEntity entity, TState state, AsyncVisitNodeCallback<TState> callback, CancellationToken cancellationToken)
     where TEntity : class
   {
     if (entity is null)
@@ -194,9 +440,18 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
       throw new ArgumentNullException(nameof(callback));
 
     IEntityModel model = EnsureEntity<TEntity>();
+    return Graph.VisitAsync(entity, model, state, callback, cancellationToken);
+  }
 
-    await callback(entity, model, default, state, cancellationToken);
-    await _executor.VisitGraphAsync(entity, model, state, callback, cancellationToken);
+  public Task VisitGraphAsync<TEntity>(TEntity entity, IAsyncGraphVisitor visitor, CancellationToken cancellationToken) where TEntity : class
+  {
+    if (entity is null)
+      throw new ArgumentNullException(nameof(entity));
+    if (visitor is null)
+      throw new ArgumentNullException(nameof(visitor));
+
+    IEntityModel model = EnsureEntity<TEntity>();
+    return Graph.VisitAsync(entity, model, visitor, cancellationToken);
   }
 
   public string IncludeNavigations<TEntity, TKey>(string query, IncludeAction<TEntity> includeAction)
@@ -213,11 +468,29 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     return (TDbCommand)connection.CreateCommand();
   }
 
+  private TEntity? FindCore<TEntity, TKey>(TKey key, INavigationRoot<TEntity, TKey> root)
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+  {
+    using TDbCommand command = CreateCommand(OperationType.Find, Connection);
+
+    Connection.Open();
+
+    try
+    {
+      return _executor.ExecuteFind(command, key, root);
+    }
+    finally
+    {
+      Connection.Close();
+    }
+  }
+
   private async Task<TEntity?> FindAsyncCore<TEntity, TKey>(TKey key, INavigationRoot<TEntity, TKey> root, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    TDbCommand command = CreateCommand(OperationType.Find, Connection);
+    await using TDbCommand command = CreateCommand(OperationType.Find, Connection);
 
     await Connection.OpenAsync(cancellationToken);
 
@@ -227,8 +500,7 @@ internal class DataContext<TDbConnection, TDbCommand> : IDataContext<TDbConnecti
     }
     finally
     {
-      command.Dispose();
-      Connection.Close();
+      await Connection.CloseAsync();
     }
   }
 

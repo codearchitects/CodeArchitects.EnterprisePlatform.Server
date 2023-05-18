@@ -18,7 +18,7 @@ internal class InstructionVerifier : ILVerifier
   public void VerifyComplete()
   {
     if (Index != _instructions.Count)
-      throw new Exception($"Remaining {_instructions.Count - Index} instructions were not verified.");
+      throw new InvalidOperationException($"Remaining {_instructions.Count - Index} instructions were not verified.");
   }
 
   public override ILVerifier Br(string label)

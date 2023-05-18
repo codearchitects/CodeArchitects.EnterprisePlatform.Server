@@ -5,12 +5,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 
 internal class JoinColumnMemberComponent : AccessibleMemberComponent<object?>
 {
-  private static readonly MemberInfo s_member;
-
-  static JoinColumnMemberComponent()
-  {
-    s_member = typeof(Dictionary<string, object>).GetDefaultMembers()[0];
-  }
+  private static readonly MemberInfo s_member = typeof(Dictionary<string, object>).GetDefaultMembers()[0];
 
   public JoinColumnMemberComponent(string name, Type type, Getter<object?> getValue, Setter<object?> setValue)
     : base(getValue, setValue)

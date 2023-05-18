@@ -23,7 +23,7 @@ internal class DaprMessageHandlerTypeBuilder : MessageHandlerTypeBuilder
       handlerInterfaceType,
       idType.UnderlyingSystemType);
 
-    TypeBuilder type = DefineType(actor.ActorType, baseType, Type.EmptyTypes);
+    TypeBuilder type = DefineType(actor.ActorType, baseType);
 
     BuildMessageHandlerAttribute(type);
     BuildHandlerConstructor(type);

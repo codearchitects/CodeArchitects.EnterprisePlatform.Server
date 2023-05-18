@@ -206,7 +206,7 @@ internal class ActorHostTypeBuilder
 
   private delegate string MethodNameProvider(IMethodDescriptor descriptor);
 
-  private class ActorMethodBuilder : IMethodDescriptorVisitor
+  private sealed class ActorMethodBuilder : IMethodDescriptorVisitor
   {
     private readonly IILGeneratorProvider _ilProvider;
     private readonly TypeBuilder _interfaceType;

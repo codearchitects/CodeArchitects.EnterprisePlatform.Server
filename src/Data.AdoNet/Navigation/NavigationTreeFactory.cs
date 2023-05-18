@@ -8,7 +8,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 internal class NavigationTreeFactory : INavigationTreeFactory
 {
   private readonly IMemoryCache _cache;
-  private readonly ConcurrentDictionary<object, object> _locks = new();
+  private readonly ConcurrentDictionary<object, object> _locks;
 
   public NavigationTreeFactory(IMemoryCache cache)
   {

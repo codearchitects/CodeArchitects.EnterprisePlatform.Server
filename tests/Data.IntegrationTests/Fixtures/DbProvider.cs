@@ -4,5 +4,6 @@ public enum DbProvider
 {
   SqlServer,
   Postgres,
-  Oracle
+  Oracle,
+  MariaDb
 }

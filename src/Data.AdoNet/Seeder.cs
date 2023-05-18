@@ -1,8 +1,7 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
-using CodeArchitects.Platform.Data.AdoNet.Executor;
 using CodeArchitects.Platform.Data.AdoNet.Model;
+using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
 
@@ -10,19 +9,13 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
   where TDbConnection : DbConnection
   where TDbCommand : DbCommand
 {
-  private readonly IExecutor<TDbCommand> _executor;
   private readonly IStateManager<TDbConnection> _stateManager;
   private readonly ICommandBuilder<TDbCommand> _commandBuilder;
   private readonly IDataModel _model;
-  private readonly List<(object Entity, IEntityModel Model, NavigationContext NavigationContext)> _entries;
+  private readonly List<SeedEntry> _entries;
 
-  public Seeder(
-    IExecutor<TDbCommand> executor,
-    IStateManager<TDbConnection> stateManager,
-    ICommandBuilder<TDbCommand> commandBuilder,
-    IDataModel model)
+  public Seeder(IStateManager<TDbConnection> stateManager, ICommandBuilder<TDbCommand> commandBuilder, IDataModel model)
   {
-    _executor = executor;
     _stateManager = stateManager;
     _commandBuilder = commandBuilder;
     _model = model;
@@ -45,7 +38,7 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
       }, true);
     }
 
-    _stateManager.SaveAsync(CancellationToken.None).GetAwaiter().GetResult();
+    _stateManager.Save();
     _entries.Clear();
   }
 
@@ -59,38 +52,43 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
 
     foreach (TEntity entity in entities)
     {
-      if (!_entries.Contains((entity, entityModel, default), EntryEqualityComparer.Instance))
+      SeedEntry rootEntry = new(entity, entityModel, default);
+      if (!_entries.Contains(rootEntry, EntryEqualityComparer.Instance))
       {
-        _entries.Add((entity, entityModel, default));
+        _entries.Add(rootEntry);
       }
 
-      _executor.VisitGraph(entity, entityModel, null as object, (node, model, navigation, _) =>
+      Graph.Visit(entity, entityModel, null as object, (node, model, navigation, _) =>
       {
+        if (navigation == default)
+          return true;
+
         if (navigation.NavigationModel.From == navigation.NavigationModel.To)
           throw new InvalidOperationException("Seeding entities with self reference is not supported.");
 
-        int index = _entries.FindIndex(entry => entry == (node, model, default));
+        int index = _entries.FindIndex(entry => entry.Entity == node && entry.Model == model && entry.NavigationContext == default);
         if (index != -1)
         {
           _entries.RemoveAt(index);
         }
 
-        if (_entries.Contains((node, model, navigation), EntryEqualityComparer.Instance))
+        SeedEntry entry = new(node, model, navigation);
+        if (_entries.Contains(entry, EntryEqualityComparer.Instance))
           return false;
 
         if (navigation.NavigationModel.IsOnDependent)
         {
-          AddTop(_entries, (node, model, navigation));
+          _entries.Insert(0, entry);
         }
         else
         {
-          AddBottom(_entries, (node, model, navigation));
+          _entries.Add(entry);
         }
 
         if (navigation.NavigationModel is ISkipNavigationModel skipNavigation)
         {
           object junction = skipNavigation.CreateJunction(navigation.Parent, node);
-          _entries.Add((junction, skipNavigation.JunctionEntity, navigation));
+          _entries.Add(new (junction, skipNavigation.JunctionEntity, navigation));
         }
 
         return true;
@@ -116,33 +114,20 @@ internal class Seeder<TDbConnection, TDbCommand> : ISeeder
     }
   }
 
-  private static void AddTop<T>(List<T> list, T element) // yuck
+  private sealed class EntryEqualityComparer : IEqualityComparer<SeedEntry>
   {
-    list.Add(element);
-    for (int i = list.Count - 1; i > 0; i--)
+    public static readonly EntryEqualityComparer Instance = new();
+
+    public bool Equals(SeedEntry x, SeedEntry y)
     {
-      list[i] = list[i - 1];
-    }
-    list[0] = element;
-  }
-
-  private static void AddBottom<T>(List<T> list, T element)
-  {
-    list.Add(element);
-  }
-
-  private class EntryEqualityComparer : IEqualityComparer<(object, IEntityModel, NavigationContext)>
-  {
-    public static readonly EntryEqualityComparer Instance = new EntryEqualityComparer();
-
-    public bool Equals([AllowNull] (object, IEntityModel, NavigationContext) x, [AllowNull] (object, IEntityModel, NavigationContext) y)
-    {
-      return (x.Item1, x.Item2) == (y.Item1, y.Item2);
+      return (x.Entity, x.Model) == (y.Entity, y.Model);
     }
 
-    public int GetHashCode([DisallowNull] (object, IEntityModel, NavigationContext) obj)
+    public int GetHashCode(SeedEntry obj)
     {
-      return HashCode.Combine(obj.Item1, obj.Item2);
+      return HashCode.Combine(obj.Entity, obj.Model);
     }
   }
+
+  private readonly record struct SeedEntry(object Entity, IEntityModel Model, NavigationContext NavigationContext);
 }

@@ -3,8 +3,13 @@
 /// <summary>
 /// Represents a unit of work for managing changes to entities.
 /// </summary>
-public interface IUnitOfWork : IAsyncDisposable
+public interface IUnitOfWork : IAsyncDisposable, IDisposable
 {
+  /// <summary>
+  /// Persists all changes made to entities in scope of the unit of work to the data store.
+  /// </summary>
+  void Save();
+
   /// <summary>
   /// Persists all changes made to entities in scope of the unit of work to the data store.
   /// </summary>

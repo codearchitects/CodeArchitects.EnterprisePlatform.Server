@@ -34,7 +34,7 @@ public class StateTypeBuilderTests
     IActorDescriptor actor = StandardActorFixture.Descriptor;
     Type actorType = actor.ActorType;
 
-    StateTypeBuilder sut = new StateTypeBuilder(_module, ilProvider);
+    StateTypeBuilder sut = new(_module, ilProvider);
 
     // Act
     Type stateType = sut.Build(actorType, stateComponents, false);

@@ -22,6 +22,12 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public override bool IsForeignKey => true;
 
+  public override bool IsConcurrencyToken
+  {
+    get => false;
+    set => throw new ModelConfigurationException("Primary keys and foreign keys cannot be used as concurrency tokens.");
+  }
+
   public short ForeignKeyIndex { get; }
 
   public IPrimaryKeyColumnModel PrimaryKeyColumn => _navigation.PrimaryKey.Columns[ForeignKeyIndex];
@@ -41,12 +47,12 @@ internal class PrimaryAndForeignKeyColumnModel : ColumnModel, IPrimaryAndForeign
 
   public new Setter<object?> SetValue => _memberComponent.SetValue;
 
-  public override TResult Accept<TVisitor, TResult>(in TVisitor visitor)
+  public override TResult Accept<TResult>(IColumnModelVisitor<TResult> visitor)
   {
     return visitor.VisitPrimaryAndForeignKey(this);
   }
 
-  public override TResult Accept<TVisitor, TResult, TState>(in TVisitor visitor, in TState state)
+  public override TResult Accept<TResult, TState>(IColumnModelVisitor<TResult, TState> visitor, in TState state)
   {
     return visitor.VisitPrimaryAndForeignKey(this, in state);
   }

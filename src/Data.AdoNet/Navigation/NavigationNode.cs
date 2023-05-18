@@ -9,7 +9,7 @@ internal abstract class NavigationNode
 {
   private readonly Dictionary<int, INavigation> _children;
 
-  public NavigationNode()
+  protected NavigationNode()
   {
     _children = new();
   }

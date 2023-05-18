@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Interceptors;
+using CodeArchitects.Platform.Data.Features.Concurrency;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -13,6 +14,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
   public AdoNetConfigurationBuilder()
   {
     _commandInterceptorTypes = new();
+    ConcurrencyTokenProviderDescriptor = new(typeof(IConcurrencyTokenProvider), typeof(ConcurrencyTokenProvider), ServiceLifetime.Singleton);
   }
 
   public DatabaseProvider Provider => _provider ?? throw new InvalidOperationException("No database provider was specified.");
@@ -22,6 +24,8 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
   public IReadOnlyCollection<Type> CommandInterceptorTypes => _commandInterceptorTypes;
 
   public Type? SeedType { get; private set; }
+
+  public ServiceDescriptor ConcurrencyTokenProviderDescriptor { get; private set; }
 
   public IAdoNetConfigurationBuilderWithProvider UseProvider<TProvider>(Action<TProvider> configureAction)
     where TProvider : DatabaseProvider, new()
@@ -76,6 +80,26 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     return this;
   }
 
+  public IAdoNetConfigurationBuilderWithProvider UseConcurrencyTokenProvider(Type tokenProviderType, ServiceLifetime tokenProviderLifetime = ServiceLifetime.Singleton)
+  {
+    if (tokenProviderType is null)
+      throw new ArgumentNullException(nameof(tokenProviderType));
+    if (typeof(IConcurrencyTokenProvider).IsAssignableFrom(tokenProviderType) || !tokenProviderType.IsClass || tokenProviderType.IsAbstract)
+      throw new ArgumentException($"'{nameof(tokenProviderType)}' should be a concrete class assignable to '{nameof(IConcurrencyTokenProvider)}'.", nameof(tokenProviderType));
+
+    ConcurrencyTokenProviderDescriptor = new ServiceDescriptor(typeof(IConcurrencyTokenProvider), tokenProviderType, tokenProviderLifetime);
+    return this;
+  }
+
+  public IAdoNetConfigurationBuilderWithProvider UseConcurrencyTokenProvider(IConcurrencyTokenProvider tokenProvider)
+  {
+    if (tokenProvider is null)
+      throw new ArgumentNullException(nameof(tokenProvider));
+
+    ConcurrencyTokenProviderDescriptor = new ServiceDescriptor(typeof(IConcurrencyTokenProvider), tokenProvider);
+    return this;
+  }
+
   public IAdoNetConfigurationBuilderWithProvider ScanAssemblyForServices(Assembly assembly, AdoNetServiceTypes serviceTypes = AdoNetServiceTypes.All)
   {
     if (assembly is null)
@@ -98,6 +122,11 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       AddDataSeed();
     }
 
+    if (serviceTypes.HasFlag(AdoNetServiceTypes.ConcurrencyTokenProvider))
+    {
+      AddConcurrencyTokenProvider();
+    }
+
     return this;
 
     void AddModelConfiguration()
@@ -105,7 +134,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       Type? modelConfigurationType;
       try
       {
-        modelConfigurationType = types.SingleOrDefault(type => typeof(ModelConfiguration).IsAssignableFrom(type));
+        modelConfigurationType = types.SingleOrDefault(type => !type.IsAbstract && typeof(ModelConfiguration).IsAssignableFrom(type));
       }
       catch (InvalidOperationException)
       {
@@ -119,7 +148,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
     void AddCommandInterceptors()
     {
       Type commandInterceptorInterfaceType = Provider.MakeGenericType(typeof(ICommandInterceptor<>));
-      _commandInterceptorTypes.AddRange(types.Where(type => commandInterceptorInterfaceType.IsAssignableFrom(type)));
+      _commandInterceptorTypes.AddRange(types.Where(type => !type.IsAbstract && commandInterceptorInterfaceType.IsAssignableFrom(type)));
     }
 
     void AddDataSeed()
@@ -127,7 +156,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       Type? seedType;
       try
       {
-        seedType = types.SingleOrDefault(type => typeof(DataSeed).IsAssignableFrom(type));
+        seedType = types.SingleOrDefault(type => !type.IsAbstract && typeof(DataSeed).IsAssignableFrom(type));
       }
       catch (InvalidOperationException)
       {
@@ -135,6 +164,21 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
       }
 
       SeedType = seedType;
+    }
+
+    void AddConcurrencyTokenProvider()
+    {
+      Type? tokenProviderType;
+      try
+      {
+        tokenProviderType = types.SingleOrDefault(type => !type.IsAbstract && type.IsClass && typeof(IConcurrencyTokenProvider).IsAssignableFrom(type));
+      }
+      catch (InvalidOperationException)
+      {
+        throw new InvalidOperationException($"Found more than one class implementing '{nameof(IConcurrencyTokenProvider)}' in the provided assembly.");
+      }
+
+      ConcurrencyTokenProviderDescriptor = new ServiceDescriptor(typeof(IConcurrencyTokenProvider), tokenProviderType, ServiceLifetime.Singleton);
     }
   }
 }

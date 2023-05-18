@@ -18,7 +18,7 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier MarkLabel(string name)
   {
-    if (_labels.Find(label => label.Position == Index) is not { } label)
+    if (!_labels.Any(label => label.Position == Index))
       throw Error($"No label was marked before instruction #{Index}.");
 
     _markedLabels.Add(Index, name);

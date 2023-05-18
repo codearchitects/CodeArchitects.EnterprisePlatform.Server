@@ -9,21 +9,16 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy
 /// </summary>
 public static class MultitenancyQueryableExtensions
 {
-  internal static readonly MethodInfo s_asNoMultitenancyMethodInfo;
-  internal static readonly MethodInfo s_asMultitenancyMethodInfo;
+  internal static readonly MethodInfo s_asNoMultitenancyMethodInfo = typeof(MultitenancyQueryableExtensions).GetRequiredMethod(
+    name: nameof(AsNoMultitenancy),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
+  
+  internal static readonly MethodInfo s_asMultitenancyMethodInfo = typeof(MultitenancyQueryableExtensions).GetRequiredMethod(
+    name: nameof(AsMultitenancy),
+    bindingAttr: BindingFlags.Static | BindingFlags.Public,
+    types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
 
-  static MultitenancyQueryableExtensions()
-  {
-    s_asNoMultitenancyMethodInfo = typeof(MultitenancyQueryableExtensions).GetRequiredMethod(
-      name: nameof(AsNoMultitenancy),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
-
-    s_asMultitenancyMethodInfo = typeof(MultitenancyQueryableExtensions).GetRequiredMethod(
-      name: nameof(AsMultitenancy),
-      bindingAttr: BindingFlags.Static | BindingFlags.Public,
-      types: new[] { typeof(IQueryable<>).MakeGenericType(Type.MakeGenericMethodParameter(0)) });
-  }
 
   /// <summary>
   /// Disables the multitenancy filter for the query.

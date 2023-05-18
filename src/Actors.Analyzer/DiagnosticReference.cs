@@ -33,7 +33,7 @@ internal sealed record DiagnosticReference(
 
   public override string ToString()
   {
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new();
     ToString(sb);
     return sb.ToString();
   }

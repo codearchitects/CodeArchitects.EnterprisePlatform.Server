@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
+using System.Data;
 using System.Data.Common;
 
 namespace CodeArchitects.Platform.Data.AdoNet;
@@ -7,14 +8,16 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
   where TDbConnection : DbConnection
 {
   private readonly IConnectionFactory<TDbConnection> _connectionFactory;
+  private readonly IConcurrencyContext _concurrencyContext;
   private readonly List<Execution<TDbConnection, DbTransaction>> _executions;
   private bool _startTransaction;
   private TDbConnection? _connection;
   private bool _isDisposed;
 
-  public StateManager(IConnectionFactory<TDbConnection> connectionFactory)
+  public StateManager(IConnectionFactory<TDbConnection> connectionFactory, IConcurrencyContext concurrencyContext)
   {
     _connectionFactory = connectionFactory;
+    _concurrencyContext = concurrencyContext;
     _executions = new(2);
   }
 
@@ -48,10 +51,49 @@ internal class StateManager<TDbConnection> : StateManager, IStateManager<TDbConn
       {
         await transaction.CommitAsync(cancellationToken);
       }
+
+      _concurrencyContext.Accept();
     }
     catch when (transaction is not null)
     {
       await transaction.RollbackAsync(cancellationToken);
+      throw;
+    }
+    finally
+    {
+      if (transaction is not null)
+      {
+        await transaction.DisposeAsync();
+      }
+      await Connection.CloseAsync();
+      _startTransaction = false;
+      _executions.Clear();
+      _concurrencyContext.Clear();
+    }
+  }
+
+  protected override void SaveCore()
+  {
+    EnsureNotDisposed();
+
+    Connection.Open();
+
+    DbTransaction? transaction = _startTransaction || _executions.Count > 1
+      ? Connection.BeginTransaction(IsolationLevel.Unspecified)
+      : null;
+
+    try
+    {
+      foreach (var execution in _executions)
+      {
+        execution(Connection, transaction, CancellationToken.None).GetAwaiter().GetResult();
+      }
+
+      transaction?.Commit();
+    }
+    catch when (transaction is not null)
+    {
+      transaction.Rollback();
       throw;
     }
     finally
