@@ -3,27 +3,6 @@
 namespace CodeArchitects.Platform.Common.Utils;
 
 using System.Reflection;
-
-#if NET7_0_OR_GREATER
-
-internal static class Parsable<TParsable>
-  where TParsable : IParsable<TParsable>
-{
-  public static readonly Parse<TParsable> Parse;
-
-  static Parsable()
-  {
-    Parse = s => TParsable.Parse(s, null);
-  }
-
-  public static void EnsureInitialized()
-  {
-    // This just triggers the static constructor
-  }
-}
-
-#else
-
 using CodeArchitects.Platform.Common.Exceptions;
 using System.Linq.Expressions;
 
@@ -74,8 +53,6 @@ internal static class Parsable<TParsable>
     // This just triggers the static constructor
   }
 }
-
-#endif
 
 internal static class Parsable
 {
