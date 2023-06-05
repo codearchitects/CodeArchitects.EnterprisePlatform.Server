@@ -31,11 +31,11 @@ public static class ApplicationServiceCollectionExtensions
   /// <returns>The service collection.</returns>
   public static IServiceCollection AddIdentityProfile<TUserId>(this IServiceCollection services)
     where TUserId : IEquatable<TUserId>
-#if NET7_0_OR_GREATER
-      , IParsable<TUserId>
-#endif
   {
-    Parsable<TUserId>.EnsureInitialized();
+    if (typeof(TUserId) != typeof(string))
+    {
+      Parsable.EnsureInitialized(typeof(TUserId));
+    }
 
     return services
       .AddHttpContextAccessor()
@@ -77,7 +77,10 @@ public static class ApplicationServiceCollectionExtensions
     }
 
     Type userIdType = identityProfileType.GetGenericArguments()[0];
-    Parsable.EnsureInitialized(userIdType);
+    if (userIdType != typeof(string))
+    {
+      Parsable.EnsureInitialized(userIdType);
+    }
 
     services
       .AddHttpContextAccessor()
