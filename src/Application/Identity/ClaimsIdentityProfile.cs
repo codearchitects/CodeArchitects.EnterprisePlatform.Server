@@ -12,11 +12,10 @@ namespace CodeArchitects.Platform.Application.Identity;
 /// </summary>
 public class ClaimsIdentityProfile<TUserId> : IIdentityProfile<TUserId>
   where TUserId : IEquatable<TUserId>
-#if NET7_0_OR_GREATER
-  , IParsable<TUserId>
-#endif
 {
-  private static readonly Parse<TUserId> s_parseUserId = Parsable<TUserId>.Parse;
+  private static readonly Parse<TUserId> s_parseUserId = typeof(TUserId) == typeof(string)
+    ? (Parse<TUserId>)(Delegate)(new Parse<string>(s => s))
+    : Parsable<TUserId>.Parse;
 
   /// <summary>
   /// Creates a new <see cref="ClaimsIdentityProfile{TUserId}"/> instance.
