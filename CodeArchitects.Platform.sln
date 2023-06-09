@@ -135,9 +135,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.MongoDB.IntegrationTests", "tests\Data.MongoDB.IntegrationTests\CodeArchitects.Platform.Data.MongoDB.IntegrationTests.csproj", "{0A3D00CF-DA61-427C-9C49-EB57E8906731}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Data.MongoDB.DependencyInjection", "src\Data.MongoDB.DependencyInjection\CodeArchitects.Platform.Data.MongoDB.DependencyInjection.csproj", "{3741E062-BECB-4B36-ACF4-175903413842}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.MongoDB.DependencyInjection", "src\Data.MongoDB.DependencyInjection\CodeArchitects.Platform.Data.MongoDB.DependencyInjection.csproj", "{3741E062-BECB-4B36-ACF4-175903413842}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Data.AdoNet.MySQL", "src\Data.AdoNet.MySQL\CodeArchitects.Platform.Data.AdoNet.MySQL.csproj", "{41B066D6-77B1-44C2-8C7C-10AF9D782001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL", "src\GraphQL\CodeArchitects.Platform.GraphQL.csproj", "{DBA19CAA-D817-4684-94D4-A447EB52A5B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL.Analyzer", "src\GraphQL.Analyzer\CodeArchitects.Platform.GraphQL.Analyzer.csproj", "{FE36CC98-A656-4C5D-BF2D-ABAF02121535}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL.UnitTests", "tests\GraphQL.UnitTests\CodeArchitects.Platform.GraphQL.UnitTests.csproj", "{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL.Analyzer.FunctionalTests", "tests\GraphQL.Analyzer.FunctionalTests\CodeArchitects.Platform.GraphQL.Analyzer.FunctionalTests.csproj", "{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{80AD5D6F-E49F-4E13-B635-7C0C8264BE94}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL.Benchmarks", "benchmarks\CodeArchitects.Platform.GraphQL.Benchmarks\CodeArchitects.Platform.GraphQL.Benchmarks.csproj", "{9FE314F4-6070-4D57-88F1-F02C7353D3F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -385,6 +397,26 @@ Global
 		{41B066D6-77B1-44C2-8C7C-10AF9D782001}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41B066D6-77B1-44C2-8C7C-10AF9D782001}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41B066D6-77B1-44C2-8C7C-10AF9D782001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBA19CAA-D817-4684-94D4-A447EB52A5B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA19CAA-D817-4684-94D4-A447EB52A5B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA19CAA-D817-4684-94D4-A447EB52A5B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA19CAA-D817-4684-94D4-A447EB52A5B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE36CC98-A656-4C5D-BF2D-ABAF02121535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE36CC98-A656-4C5D-BF2D-ABAF02121535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE36CC98-A656-4C5D-BF2D-ABAF02121535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE36CC98-A656-4C5D-BF2D-ABAF02121535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FE314F4-6070-4D57-88F1-F02C7353D3F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FE314F4-6070-4D57-88F1-F02C7353D3F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FE314F4-6070-4D57-88F1-F02C7353D3F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FE314F4-6070-4D57-88F1-F02C7353D3F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -444,6 +476,10 @@ Global
 		{0A3D00CF-DA61-427C-9C49-EB57E8906731} = {AE6B4AEB-0C5A-404B-A5BE-6BAED09F6A3C}
 		{3741E062-BECB-4B36-ACF4-175903413842} = {9B8AE08D-7A27-45A1-8E11-74E23BC55E2E}
 		{41B066D6-77B1-44C2-8C7C-10AF9D782001} = {9B8AE08D-7A27-45A1-8E11-74E23BC55E2E}
+		{FE36CC98-A656-4C5D-BF2D-ABAF02121535} = {646C726C-D374-4213-B169-EB07E0130DEF}
+		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A} = {6FFB7182-83ED-44D9-BE34-6D86E215D501}
+		{9FE314F4-6070-4D57-88F1-F02C7353D3F6} = {80AD5D6F-E49F-4E13-B635-7C0C8264BE94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}
