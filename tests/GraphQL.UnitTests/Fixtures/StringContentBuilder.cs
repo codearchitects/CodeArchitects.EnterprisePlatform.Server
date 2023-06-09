@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Fixtures;
 
-internal class StringContentBuilder : IContentBuilder<string>, IKeywords<string>, IPunctuators<string>, ITrivias<string>
+internal class StringContentBuilder : IDocumentContentBuilder<string>, IKeywords<string>, IPunctuators<string>, ITrivias<string>
 {
   private readonly StringBuilder _sb;
 
@@ -23,6 +23,12 @@ internal class StringContentBuilder : IContentBuilder<string>, IKeywords<string>
   public IPunctuators<string> Punctuators => this;
 
   public ITrivias<string> Trivias => this;
+
+  public string Query => "query";
+
+  public string Mutation => "mutation";
+
+  public string Subscription => "subscription";
 
   public string Null => "null";
 
@@ -54,19 +60,13 @@ internal class StringContentBuilder : IContentBuilder<string>, IKeywords<string>
 
   public string Comma => ",";
 
-  public IContentBuilder<string> Append(string s)
+  public IDocumentContentBuilder<string> Append(string @string)
   {
-    _sb.Append(s);
+    _sb.Append(@string);
     return this;
   }
 
-  public IContentBuilder<string> Append(ReadOnlySpan<char> s)
-  {
-    _sb.Append(s);
-    return this;
-  }
-
-  public IContentBuilder<string> Append(string symbol, int repeatCount)
+  public IDocumentContentBuilder<string> Append(string symbol, int repeatCount)
   {
     for (int i = 0; i < repeatCount; i++)
     {
@@ -75,53 +75,35 @@ internal class StringContentBuilder : IContentBuilder<string>, IKeywords<string>
     return this;
   }
 
-  public IContentBuilder<string> Append(OperationType operationType)
+  public IDocumentContentBuilder<string> AppendCamelized(string @string)
   {
-    switch (operationType)
-    {
-      case OperationType.Query:
-        _sb.Append("query");
-        return this;
-      case OperationType.Mutation:
-        _sb.Append("mutation");
-        return this;
-      case OperationType.Subscription:
-        _sb.Append("subscription");
-        return this;
-    }
-
-    throw new ArgumentException("Invalid operation", nameof(operationType));
-  }
-
-  public IContentBuilder<string> AppendCamelized(string s)
-  {
-    _sb.AppendCamelized(s);
+    _sb.AppendCamelized(@string);
     return this;
   }
 
-  public IContentBuilder<string> AppendLine()
+  public IDocumentContentBuilder<string> AppendLine()
   {
     _sb.AppendLine();
     return this;
   }
 
-  public IContentBuilder<string> AppendLiteral(double d)
+  public IDocumentContentBuilder<string> AppendLiteral(float number)
   {
-    _sb.Append(d.ToString(CultureInfo.InvariantCulture));
+    _sb.Append(number.ToString(CultureInfo.InvariantCulture));
     return this;
   }
 
-  public IContentBuilder<string> AppendLiteral(long l)
+  public IDocumentContentBuilder<string> AppendLiteral(int number)
   {
-    _sb.Append(l);
+    _sb.Append(number);
     return this;
   }
 
-  public IContentBuilder<string> AppendLiteral(string s)
+  public IDocumentContentBuilder<string> AppendLiteral(string @string)
   {
     _sb
       .Append('"')
-      .Append(s)
+      .Append(@string)
       .Append('"');
     return this;
   }

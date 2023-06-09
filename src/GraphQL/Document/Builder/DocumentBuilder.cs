@@ -13,9 +13,9 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilde
   private readonly INodeContext _nodeContext;
   private readonly IModel _model;
   private readonly DocumentBuilderOptions _options;
-  private readonly ObjectPool<IContentBuilder<TSymbol>> _contentBuilderPool;
+  private readonly ObjectPool<IDocumentContentBuilder<TSymbol>> _contentBuilderPool;
 
-  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<IContentBuilder<TSymbol>> contentBuilderPool)
+  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<IDocumentContentBuilder<TSymbol>> contentBuilderPool)
   {
     _nodeContext = nodeContext;
     _model = model;
@@ -59,9 +59,9 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilde
 
   private GraphDocument<TResult> BuildDocument<TResult>(IOperationDefinitionNode operationDefinition)
   {
-    IContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
-    DocumentContentBuilder<TSymbol> builder = new(contentBuilder, _options);
-    builder.AppendOperationDefinition(operationDefinition);
+    IDocumentContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
+    OperationAppender<TSymbol> appender = new(contentBuilder, _options);
+    appender.AppendOperationDefinition(operationDefinition);
 
     GraphDocument<TResult> document = contentBuilder.GetDocument<TResult>();
     _contentBuilderPool.Return(contentBuilder);
@@ -72,9 +72,9 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilde
   private GraphDocument<TResult, TVariables> BuildDocument<TResult, TVariables>(IOperationDefinitionNode operationDefinition)
     where TVariables : notnull
   {
-    IContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
-    DocumentContentBuilder<TSymbol> builder = new(contentBuilder, _options);
-    builder.AppendOperationDefinition(operationDefinition);
+    IDocumentContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
+    OperationAppender<TSymbol> appender = new(contentBuilder, _options);
+    appender.AppendOperationDefinition(operationDefinition);
 
     GraphDocument<TResult, TVariables> document = contentBuilder.GetDocument<TResult, TVariables>();
     _contentBuilderPool.Return(contentBuilder);

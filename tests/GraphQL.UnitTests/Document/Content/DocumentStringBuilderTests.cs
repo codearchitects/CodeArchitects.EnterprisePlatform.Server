@@ -16,7 +16,7 @@ public class DocumentStringBuilderTests
 
   private readonly StringContentBuilder _contentBuilder;
   private readonly DocumentBuilderOptions _options;
-  private readonly DocumentContentBuilder<string> _sut;
+  private readonly OperationAppender<string> _sut;
 
   public DocumentStringBuilderTests()
   {

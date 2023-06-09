@@ -4,16 +4,16 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Content;
 
-internal struct DocumentContentBuilder<TSymbol>
+internal struct OperationAppender<TSymbol>
 {
-  private delegate void AppendAction<T>(ref DocumentContentBuilder<TSymbol> self, T current);
-  private delegate void SeparatorCallback(ref DocumentContentBuilder<TSymbol> self);
+  private delegate void AppendAction<T>(ref OperationAppender<TSymbol> self, T current);
+  private delegate void SeparatorCallback(ref OperationAppender<TSymbol> self);
 
-  private readonly IContentBuilder<TSymbol> _content;
+  private readonly IDocumentContentBuilder<TSymbol> _content;
   private readonly DocumentBuilderOptions _options;
   private int _indent;
 
-  public DocumentContentBuilder(IContentBuilder<TSymbol> content, DocumentBuilderOptions options)
+  public OperationAppender(IDocumentContentBuilder<TSymbol> content, DocumentBuilderOptions options)
   {
     _content = content;
     _options = options;
@@ -21,7 +21,7 @@ internal struct DocumentContentBuilder<TSymbol>
 
   public void AppendOperationDefinition(IOperationDefinitionNode operationDefinition)
   {
-    _content.Append(operationDefinition.OperationType);
+    operationDefinition.OperationType.Append(_content);
 
     if (operationDefinition.Name is string name)
     {
@@ -45,7 +45,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     using (new ArgumentScope(_content))
     {
-      AppendSeparated(variables, static (ref DocumentContentBuilder<TSymbol> self, IVariable variable)
+      AppendSeparated(variables, static (ref OperationAppender<TSymbol> self, IVariable variable)
         => self.AppendVariable(variable));
     }
   }
@@ -62,7 +62,7 @@ internal struct DocumentContentBuilder<TSymbol>
 
   private void AppendDirectives(IEnumerable<IDirectiveNode> directives)
   {
-    AppendSpaced(directives, static (ref DocumentContentBuilder<TSymbol> self, IDirectiveNode directive)
+    AppendSpaced(directives, static (ref OperationAppender<TSymbol> self, IDirectiveNode directive)
       => self.AppendDirective(directive));
   }
 
@@ -90,7 +90,7 @@ internal struct DocumentContentBuilder<TSymbol>
 
   private void AppendSelections(IEnumerable<ISelectionNode> selections)
   {
-    AppendLines(selections, static (ref DocumentContentBuilder<TSymbol> self, ISelectionNode selection)
+    AppendLines(selections, static (ref OperationAppender<TSymbol> self, ISelectionNode selection)
       => self.AppendSelection(selection));
   }
 
@@ -100,7 +100,8 @@ internal struct DocumentContentBuilder<TSymbol>
     {
       _content
         .AppendCamelized(alias)
-        .Append(": ");
+        .Append(_content.Punctuators.Colon)
+        .Append(_content.Trivias.Space);
     }
 
     _content.AppendCamelized(selection.FieldName);
@@ -123,7 +124,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     using (new ArgumentScope(_content))
     {
-      AppendSeparated(arguments, static (ref DocumentContentBuilder<TSymbol> self, IArgumentNode argument)
+      AppendSeparated(arguments, static (ref OperationAppender<TSymbol> self, IArgumentNode argument)
         => self.AppendArgument(argument));
     }
   }
@@ -149,11 +150,11 @@ internal struct DocumentContentBuilder<TSymbol>
     switch (Convert.GetTypeCode(value))
     {
       case >= TypeCode.SByte and <= TypeCode.UInt64:
-        _content.AppendLiteral(Convert.ToInt64(value));
+        _content.AppendLiteral(Convert.ToInt32(value));
         return;
 
       case >= TypeCode.Single and <= TypeCode.Decimal:
-        _content.AppendLiteral(Convert.ToDouble(value));
+        _content.AppendLiteral(Convert.ToSingle(value));
         return;
 
       case TypeCode.String:
@@ -196,7 +197,7 @@ internal struct DocumentContentBuilder<TSymbol>
       .Append(_content.Punctuators.LeftBrace)
       .Append(_content.Trivias.Space);
 
-    AppendSeparated(objectValue.Fields, static (ref DocumentContentBuilder<TSymbol> self, IObjectFieldNode field)
+    AppendSeparated(objectValue.Fields, static (ref OperationAppender<TSymbol> self, IObjectFieldNode field)
       => self.AppendObjectField(field));
 
     _content
@@ -218,7 +219,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     _content.Append(_content.Punctuators.LeftBracket);
 
-    AppendSeparated(listValue.Values, static (ref DocumentContentBuilder<TSymbol> self, object? value)
+    AppendSeparated(listValue.Values, static (ref OperationAppender<TSymbol> self, object? value)
       => self.AppendValue(value));
 
     _content.Append(_content.Punctuators.RightBracket);
@@ -233,7 +234,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     AppendJoin(values, AppendLine, append);
 
-    static void AppendLine(ref DocumentContentBuilder<TSymbol> self)
+    static void AppendLine(ref OperationAppender<TSymbol> self)
       => self.AppendLine();
   }
 
@@ -241,7 +242,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     AppendJoin(values, AppendSeparator, append);
 
-    static void AppendSeparator(ref DocumentContentBuilder<TSymbol> self)
+    static void AppendSeparator(ref OperationAppender<TSymbol> self)
       => self._options.Separator.Append(self._content);
   }
 
@@ -249,7 +250,7 @@ internal struct DocumentContentBuilder<TSymbol>
   {
     AppendJoin(values, AppendSpace, append);
 
-    static void AppendSpace(ref DocumentContentBuilder<TSymbol> self)
+    static void AppendSpace(ref OperationAppender<TSymbol> self)
       => self._content.Append(self._content.Trivias.Space);
   }
 
@@ -271,10 +272,10 @@ internal struct DocumentContentBuilder<TSymbol>
 
   private readonly ref struct ArgumentScope
   {
-    private readonly IContentBuilder<TSymbol> _content;
+    private readonly IDocumentContentBuilder<TSymbol> _content;
     private readonly int _length;
 
-    public ArgumentScope(IContentBuilder<TSymbol> content)
+    public ArgumentScope(IDocumentContentBuilder<TSymbol> content)
     {
       _content = content;
 
@@ -297,10 +298,10 @@ internal struct DocumentContentBuilder<TSymbol>
 
   private readonly ref struct SpaceScope
   {
-    private readonly IContentBuilder<TSymbol> _content;
+    private readonly IDocumentContentBuilder<TSymbol> _content;
     private readonly int _length;
 
-    public SpaceScope(IContentBuilder<TSymbol> content)
+    public SpaceScope(IDocumentContentBuilder<TSymbol> content)
     {
       _content = content;
 

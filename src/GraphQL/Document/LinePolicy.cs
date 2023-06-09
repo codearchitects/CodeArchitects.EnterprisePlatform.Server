@@ -4,13 +4,15 @@ namespace CodeArchitects.Platform.GraphQL.Document;
 
 internal abstract class LinePolicy
 {
+  private LinePolicy() { }
+
   public static readonly LinePolicy Default = new IndentPolicy(2);
 
   public static LinePolicy Indent(int indentSize) => new IndentPolicy(indentSize);
 
   public static LinePolicy Space(int spaceSize) => new SpacePolicy(spaceSize);
 
-  internal abstract void Append<TSymbol>(IContentBuilder<TSymbol> content, int indent);
+  internal abstract void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent);
 
   private sealed class IndentPolicy : LinePolicy
   {
@@ -24,7 +26,7 @@ internal abstract class LinePolicy
       _indentSize = indentSize;
     }
 
-    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content, int indent)
+    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
     {
       content.AppendLine();
       content.Append(content.Trivias.Space, indent * _indentSize);
@@ -43,7 +45,7 @@ internal abstract class LinePolicy
       _spaceSize = spaceSize;
     }
 
-    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content, int indent)
+    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
     {
       content.Append(content.Trivias.Space, _spaceSize);
     }

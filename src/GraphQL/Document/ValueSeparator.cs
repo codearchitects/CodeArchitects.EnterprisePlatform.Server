@@ -4,14 +4,16 @@ namespace CodeArchitects.Platform.GraphQL.Document;
 
 internal abstract class ValueSeparator
 {
+  private ValueSeparator() { }
+
   public static readonly ValueSeparator Comma = new CommaSeparator();
   public static readonly ValueSeparator Space = new SpaceSeparator();
 
-  internal abstract void Append<TSymbol>(IContentBuilder<TSymbol> content);
+  internal abstract void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content);
 
   private sealed class CommaSeparator : ValueSeparator
   {
-    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content)
+    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content)
     {
       content.Append(content.Trivias.Comma);
       content.Append(content.Trivias.Space);
@@ -20,7 +22,7 @@ internal abstract class ValueSeparator
 
   private sealed class SpaceSeparator : ValueSeparator
   {
-    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content)
+    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content)
     {
       content.Append(content.Trivias.Space);
     }
