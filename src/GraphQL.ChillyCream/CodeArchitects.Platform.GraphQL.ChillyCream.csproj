@@ -17,4 +17,8 @@
     <ProjectReference Include="..\GraphQL\CodeArchitects.Platform.GraphQL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Document\Builder\" />
+  </ItemGroup>
+
 </Project>

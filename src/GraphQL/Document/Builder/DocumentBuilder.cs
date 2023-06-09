@@ -1,6 +1,6 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Content;
-using CodeArchitects.Platform.GraphQL.Document.Builder.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Builder.Nodes;
+﻿using CodeArchitects.Platform.GraphQL.Document.Content;
+using CodeArchitects.Platform.GraphQL.Document.Expressions;
+using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 using Microsoft.Extensions.ObjectPool;
 using System.Linq.Expressions;

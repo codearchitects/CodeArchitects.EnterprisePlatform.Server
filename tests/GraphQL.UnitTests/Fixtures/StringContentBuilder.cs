@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document;
-using CodeArchitects.Platform.GraphQL.Document.Builder.Content;
+using CodeArchitects.Platform.GraphQL.Document.Content;
 using System.Globalization;
 using System.Text;
 

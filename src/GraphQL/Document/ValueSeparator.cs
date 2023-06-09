@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Content;
+﻿using CodeArchitects.Platform.GraphQL.Document.Content;
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
