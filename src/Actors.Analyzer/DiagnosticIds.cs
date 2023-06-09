@@ -22,6 +22,7 @@ internal static class DiagnosticIds
   public const string CAEPACTR303 = nameof(CAEPACTR303); // Multiple id members
   public const string CAEPACTR304 = nameof(CAEPACTR304); // Invalid id type
   public const string CAEPACTR305 = nameof(CAEPACTR305); // Invalid id member
+  public const string CAEPACTR306 = nameof(CAEPACTR306); // Null default value
 
   // Method or constructor errors (400-599)
   public const string CAEPACTR400 = nameof(CAEPACTR400); // State component name mismatch

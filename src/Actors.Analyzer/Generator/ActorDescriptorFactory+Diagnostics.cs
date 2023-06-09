@@ -198,6 +198,21 @@ internal readonly ref partial struct ActorDescriptorFactory
     _diagnostics.Add(diagnostic);
   }
 
+  private void NullDefaultValue(IFieldSymbol stateField, AttributeData stateAttribute)
+  {
+    if (_disableActorDiagnostics)
+      return;
+
+    ISymbol stateMember = stateField.AssociatedSymbol ?? stateField;
+
+    DiagnosticSeverity? severity = _treatNullableAsError
+      ? DiagnosticSeverity.Error
+      : null;
+
+    DiagnosticReference diagnostic = DiagnosticReference.Create(DiagnosticIds.CAEPACTR306, severity, stateAttribute.GetLocation(), stateMember.Name);
+    _diagnostics.Add(diagnostic);
+  }
+
 
   // Method or constructor errors (400-599)
 

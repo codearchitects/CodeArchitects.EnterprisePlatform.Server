@@ -283,37 +283,50 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     }
     else if (IsExplicitVirtual)
     {
-      TState defaultStateValue = new();
-      IReadOnlyList<FieldInfo> stateTypeFields = state.Fields;
-
-      foreach (StateComponentMetadata<TActor> component in StateComponents)
-      {
-        FieldInfo stateField = stateTypeFields[component.Index];
-
-        if (!component.HasDefaultValue(out object? defaultComponentValue))
-        {
-          try
-          {
-            defaultComponentValue = Activator.CreateInstance(stateField.FieldType);
-          }
-          catch
-          {
-            throw InvalidActorException.ActorCannotBeVirtual(ActorType);
-          }
-        }
-        else
-        {
-          if (!component.Type.IsInstanceOfType(defaultComponentValue))
-            throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
-        }
-
-        stateField.SetValue(defaultStateValue, defaultComponentValue);
-      }
-
-      state.DefaultValue = defaultStateValue;
+      state.DefaultValue = CreateVirtualStateValue<TState>(state.Fields);
     }
 
     return state;
+  }
+
+  private TState CreateVirtualStateValue<TState>(IReadOnlyList<FieldInfo> stateTypeFields)
+    where TState : ActorState, new()
+  {
+    TState defaultStateValue = new();
+
+    foreach (StateComponentMetadata<TActor> component in StateComponents)
+    {
+      FieldInfo stateField = stateTypeFields[component.Index];
+
+      if (!component.HasDefaultValue(out object? defaultComponentValue))
+      {
+        try
+        {
+          defaultComponentValue = Activator.CreateInstance(stateField.FieldType);
+        }
+        catch
+        {
+          throw InvalidActorException.ActorCannotBeVirtual(ActorType);
+        }
+      }
+      else
+      {
+        if (defaultComponentValue is null)
+        {
+          if (component.Type.IsValueType)
+            throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
+
+          continue;
+        }
+
+        if (!component.Type.IsInstanceOfType(defaultComponentValue))
+          throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
+      }
+
+      stateField.SetValue(defaultStateValue, defaultComponentValue);
+    }
+
+    return defaultStateValue;
   }
 
   private IActorIdDescriptor<TState> CreateId<TState>(IReadOnlyList<FieldInfo> stateFields)

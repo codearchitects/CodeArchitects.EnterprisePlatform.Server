@@ -7,6 +7,7 @@ internal readonly ref partial struct ActorDescriptorFactory
 {
   private readonly bool _disableActorFactoryGeneration;
   private readonly bool _disableActorDiagnostics;
+  private readonly bool _treatNullableAsError;
   private readonly ICollection<ActorDescriptor> _descriptors;
   private readonly ICollection<DiagnosticReference> _diagnostics;
   private readonly Dictionary<ITypeSymbol, ActorEntry> _entries;
@@ -16,6 +17,7 @@ internal readonly ref partial struct ActorDescriptorFactory
   {
     _disableActorFactoryGeneration = options.ShouldDisableActorFactoryGeneration();
     _disableActorDiagnostics = options.ShouldDisableActorDiagnostics();
+    _treatNullableAsError = options.ShouldTreatNullableAsError();
 
     _descriptors = _disableActorFactoryGeneration
       ? Array.Empty<ActorDescriptor>()
