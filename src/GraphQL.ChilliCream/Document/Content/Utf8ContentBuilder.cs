@@ -112,7 +112,7 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 
   public void Pop()
   {
-    _ms.Position--;
+    _ms.SetLength(_ms.Length - 1);
   }
 
   private IDocumentContentBuilder<Symbol> Append(ReadOnlySpan<char> @string)
