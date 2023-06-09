@@ -1,11 +1,11 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document;
 using System.Text;
 
-namespace CodeArchitects.Platform.GraphQL.ChillyCream.Document;
+namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 
-internal class ChillyCreamGraphDocument<TResult> : GraphDocument<TResult>
+internal class ChilliCreamGraphDocument<TResult> : GraphDocument<TResult>
 {
-  public ChillyCreamGraphDocument(byte[] content)
+  public ChilliCreamGraphDocument(byte[] content)
   {
     Content = content;
   }
@@ -15,10 +15,10 @@ internal class ChillyCreamGraphDocument<TResult> : GraphDocument<TResult>
   protected override string GetContent() => Encoding.UTF8.GetString(Content);
 }
 
-internal class ChillyCreamGraphDocument<TResult, TVariables> : GraphDocument<TResult, TVariables>
+internal class ChilliCreamGraphDocument<TResult, TVariables> : GraphDocument<TResult, TVariables>
   where TVariables : notnull
 {
-  public ChillyCreamGraphDocument(byte[] content)
+  public ChilliCreamGraphDocument(byte[] content)
   {
     Content = content;
   }

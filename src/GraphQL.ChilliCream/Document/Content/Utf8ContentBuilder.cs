@@ -5,7 +5,7 @@ using System.Buffers.Text;
 using System.Diagnostics;
 using System.Text;
 
-namespace CodeArchitects.Platform.GraphQL.ChillyCream.Document.Content;
+namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document.Content;
 
 internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 {
@@ -101,13 +101,13 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 
   public GraphDocument<TResult> GetDocument<TResult>()
   {
-    return new ChillyCreamGraphDocument<TResult>(_ms.ToArray());
+    return new ChilliCreamGraphDocument<TResult>(_ms.ToArray());
   }
 
   public GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
     where TVariables : notnull
   {
-    return new ChillyCreamGraphDocument<TResult, TVariables>(_ms.ToArray());
+    return new ChilliCreamGraphDocument<TResult, TVariables>(_ms.ToArray());
   }
 
   public void Pop()

@@ -1,7 +1,7 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Content;
 using System.Text;
 
-namespace CodeArchitects.Platform.GraphQL.ChillyCream.Document.Content;
+namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document.Content;
 
 internal class Symbols : IKeywords<Symbol>, IPunctuators<Symbol>, ITrivias<Symbol>
 {

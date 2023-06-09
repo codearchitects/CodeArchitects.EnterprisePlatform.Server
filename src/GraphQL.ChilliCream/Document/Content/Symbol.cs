@@ -1,4 +1,4 @@
-﻿namespace CodeArchitects.Platform.GraphQL.ChillyCream.Document.Content;
+﻿namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document.Content;
 
 internal abstract class Symbol
 {
