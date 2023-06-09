@@ -1,4 +1,6 @@
-﻿namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
+﻿using CodeArchitects.Platform.Common.Collections;
+
+namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationCollectionEqualityComparer : IEqualityComparer<IReadOnlyCollection<INavigation>>
 {
@@ -23,7 +25,7 @@ internal class NavigationCollectionEqualityComparer : IEqualityComparer<IReadOnl
     using IEnumerator<INavigation> xEnumerator = x.GetEnumerator();
     using IEnumerator<INavigation> yEnumerator = y.GetEnumerator();
 
-    while (xEnumerator.MoveNext() | yEnumerator.MoveNext()) // '|' on purpose
+    while (Enumerate.MoveNext(xEnumerator, yEnumerator))
     {
       INavigation xCurrent = xEnumerator.Current;
       INavigation yCurrent = yEnumerator.Current;

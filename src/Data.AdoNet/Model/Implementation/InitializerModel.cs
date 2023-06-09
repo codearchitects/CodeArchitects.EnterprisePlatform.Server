@@ -20,7 +20,7 @@ internal class InitializerModel : IInitializerModel
 
   public IReadOnlyCollection<IAccessibleColumnModel> InitializerProperties => _initializerProperties;
 
-  public void AddConstructorProperty(IAccessibleColumnModel column)
+  public void AddConstructorProperty(IAccessibleColumnModel column) // TODO: The list of constructor properties is never checked against the constructor's parameters
   {
     _constructorProperties.Add(column);
   }

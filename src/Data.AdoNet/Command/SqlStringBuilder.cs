@@ -6,11 +6,11 @@ using System.Text;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
-internal delegate void AppendAction<in T>(in SqlStringBuilder stringBuilder, T current);
-internal delegate void AppendAction<TState, in T>(in SqlStringBuilder stringBuilder, TState state, T current);
-
 internal readonly struct SqlStringBuilder
 {
+  internal delegate void AppendAction<in T>(in SqlStringBuilder stringBuilder, T current);
+  internal delegate void AppendAction<TState, in T>(in SqlStringBuilder stringBuilder, in TState state, T current);
+
   private const string s_tableAlias = "t";
 
   private readonly StringBuilder _stringBuilder;
@@ -160,9 +160,9 @@ internal readonly struct SqlStringBuilder
 
   public void AppendParameters(IEnumerable<IColumnModel> columns, int offset = 0)
   {
-    AppendJoin(", ", offset, columns, AppendParameter);
+    AppendJoin(", ", in offset, columns, AppendParameter);
 
-    static void AppendParameter(in SqlStringBuilder stringBuilder, int offset, IColumnModel column)
+    static void AppendParameter(in SqlStringBuilder stringBuilder, in int offset, IColumnModel column)
     {
       stringBuilder.AppendParameter(column, offset);
     }
@@ -278,16 +278,16 @@ internal readonly struct SqlStringBuilder
   {
     IndexPair indexPair = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", indexPair, navigation.Target.Columns, AppendColumn);
+    AppendJoin(", ", in indexPair, navigation.Target.Columns, AppendColumn);
     Append(", ");
-    AppendJoin(", ", index, navigation.Children, AppendChildrenColumns);
+    AppendJoin(", ", in index, navigation.Children, AppendChildrenColumns);
 
-    static void AppendColumn(in SqlStringBuilder stringBuilder, IndexPair indexPair, IColumnModel column)
+    static void AppendColumn(in SqlStringBuilder stringBuilder, in IndexPair indexPair, IColumnModel column)
     {
       stringBuilder.AppendColumn(column, indexPair.Index, indexPair.NavigationIndex);
     }
 
-    static void AppendChildrenColumns(in SqlStringBuilder stringBuilder, int index, INavigation child)
+    static void AppendChildrenColumns(in SqlStringBuilder stringBuilder, in int index, INavigation child)
     {
       stringBuilder.AppendNavigationUnaliasedColumns(child, index);
     }
@@ -297,9 +297,9 @@ internal readonly struct SqlStringBuilder
   {
     IndexPair indexPair = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", indexPair, navigation.Target.Columns, AppendTargetAliasedColumn);
+    AppendJoin(", ", in indexPair, navigation.Target.Columns, AppendTargetAliasedColumn);
 
-    static void AppendTargetAliasedColumn(in SqlStringBuilder stringBuilder, IndexPair indexPair, IColumnModel column)
+    static void AppendTargetAliasedColumn(in SqlStringBuilder stringBuilder, in IndexPair indexPair, IColumnModel column)
     {
       stringBuilder.AppendColumn(column, indexPair.Index);
       stringBuilder.Append(" AS ");
@@ -311,9 +311,9 @@ internal readonly struct SqlStringBuilder
   {
     IndexPair indexPair = new(index, navigation.Model.Id);
 
-    AppendJoin(", ", indexPair, navigation.Target.Columns, AppendColumn);
+    AppendJoin(", ", in indexPair, navigation.Target.Columns, AppendColumn);
 
-    static void AppendColumn(in SqlStringBuilder stringBuilder, IndexPair indexPair, IColumnModel column)
+    static void AppendColumn(in SqlStringBuilder stringBuilder, in IndexPair indexPair, IColumnModel column)
     {
       stringBuilder.AppendColumn(column, indexPair.Index, indexPair.NavigationIndex);
     }

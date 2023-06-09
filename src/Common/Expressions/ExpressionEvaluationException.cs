@@ -9,23 +9,26 @@ namespace CodeArchitects.Platform.Common.Expressions;
 [Serializable]
 public sealed class ExpressionEvaluationException : Exception
 {
-  /// <summary>
-  /// Creates a new <see cref="ExpressionEvaluationException"/> providing the expression that could not be evaluated.
-  /// </summary>
-  /// <param name="expression">The expression.</param>
   internal ExpressionEvaluationException(Expression expression)
     : base($"Could not evaluate expression '{expression}'.")
   {
     Expression = expression;
   }
 
-  /// <summary>
-  /// Creates a new <see cref="ExpressionEvaluationException"/> providing the expression that could not be evaluated and the exception that caused the error.
-  /// </summary>
-  /// <param name="expression">The expression.</param>
-  /// <param name="inner">The exception that caused the error.</param>
+  internal ExpressionEvaluationException(string message, Expression expression)
+    : base(message)
+  {
+    Expression = expression;
+  }
+
   internal ExpressionEvaluationException(Expression expression, Exception? inner)
     : base($"Could not evaluate expression '{expression}'.", inner)
+  {
+    Expression = expression;
+  }
+
+  internal ExpressionEvaluationException(string message, Expression expression, Exception? inner)
+    : base(message, inner)
   {
     Expression = expression;
   }

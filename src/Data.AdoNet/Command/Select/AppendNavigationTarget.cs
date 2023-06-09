@@ -31,7 +31,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
@@ -54,7 +54,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, ISimpleNavigationNode navigation, IColumnModel column)
+    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, in ISimpleNavigationNode navigation, IColumnModel column)
     {
       stringBuilder.AppendColumn(column);
       stringBuilder.Append(" AS ");
@@ -66,9 +66,9 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
   {
     _stringBuilder.AppendLine("(");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.Append(", ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Model.JunctionEntity.TableName);
@@ -78,23 +78,23 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendEscaped(navigation.Target.TableName);
     _stringBuilder.AppendTableAlias(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IColumnModel column)
+    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, in ISkipNavigationLeaf navigation, IColumnModel column)
     {
       stringBuilder.AppendColumn(column, navigation.Model.Id);
     }
 
-    static void AppendKey(in SqlStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
+    static void AppendKey(in SqlStringBuilder stringBuilder, in ISkipNavigationLeaf navigation, IKeyPair pair)
     {
       stringBuilder.AppendColumn(pair.ToColumn);
     }
 
-    static void AppendJoinCondition(in SqlStringBuilder stringBuilder, ISkipNavigationLeaf navigation, IKeyPair pair)
+    static void AppendJoinCondition(in SqlStringBuilder stringBuilder, in ISkipNavigationLeaf navigation, IKeyPair pair)
     {
       stringBuilder.AppendColumn(pair.FromColumn);
       stringBuilder.Append(" = ");
@@ -108,7 +108,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append("SELECT ");
     _stringBuilder.AppendNodeColumns(navigation.Model.Id, navigation);
     _stringBuilder.Append(", ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.FromKeyPairs, AppendKey);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.FromKeyPairs, AppendKey);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
     _stringBuilder.AppendEscaped(navigation.Model.JunctionEntity.TableName);
@@ -116,7 +116,7 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.AppendLine();
     _stringBuilder.AppendLine("INNER JOIN (");
     _stringBuilder.Append("SELECT ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Target.Columns, AppendTargetColumn);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Target.Columns, AppendTargetColumn);
     _stringBuilder.AppendChildrenColumns(navigation.Children);
     _stringBuilder.AppendLine();
     _stringBuilder.Append("FROM ");
@@ -137,25 +137,25 @@ internal readonly struct AppendNavigationTarget : INavigationVisitor<VoidResult>
     _stringBuilder.Append(')');
     _stringBuilder.AppendTableAlias(navigation.Model.Id);
     _stringBuilder.Append(" ON ");
-    _stringBuilder.AppendJoin(", ", navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
+    _stringBuilder.AppendJoin(", ", in navigation, navigation.Model.ToKeyPairs, AppendJoinCondition);
     _stringBuilder.AppendLine();
     _stringBuilder.Append(")");
 
     return VoidResult.Instance;
 
-    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, ISkipNavigationNode navigation, IColumnModel column)
+    static void AppendTargetColumn(in SqlStringBuilder stringBuilder, in ISkipNavigationNode navigation, IColumnModel column)
     {
       stringBuilder.AppendColumn(column);
       stringBuilder.Append(" AS ");
       stringBuilder.AppendEscapedWithIndex(column.Name, navigation.Model.Id);
     }
 
-    static void AppendKey(in SqlStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
+    static void AppendKey(in SqlStringBuilder stringBuilder, in ISkipNavigationNode navigation, IKeyPair pair)
     {
       stringBuilder.AppendColumn(pair.ToColumn);
     }
 
-    static void AppendJoinCondition(in SqlStringBuilder stringBuilder, ISkipNavigationNode navigation, IKeyPair pair)
+    static void AppendJoinCondition(in SqlStringBuilder stringBuilder, in ISkipNavigationNode navigation, IKeyPair pair)
     {
       stringBuilder.AppendColumn(pair.FromColumn);
       stringBuilder.Append(" = ");
