@@ -2,7 +2,7 @@
 
 internal abstract class Symbol
 {
-  public abstract void Append(Utf8ContentBuilder content);
+  public abstract void AppendOn(Utf8ContentBuilder content);
 
-  public abstract void Append(Utf8ContentBuilder content, int repeatCount);
+  public abstract void AppendOn(Utf8ContentBuilder content, int repeatCount);
 }

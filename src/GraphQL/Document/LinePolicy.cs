@@ -12,7 +12,7 @@ internal abstract class LinePolicy
 
   public static LinePolicy Space(int spaceSize) => new SpacePolicy(spaceSize);
 
-  internal abstract void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent);
+  internal abstract void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent);
 
   private sealed class IndentPolicy : LinePolicy
   {
@@ -26,7 +26,7 @@ internal abstract class LinePolicy
       _indentSize = indentSize;
     }
 
-    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
+    internal override void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
     {
       content.AppendLine();
       content.Append(content.Trivias.Space, indent * _indentSize);
@@ -45,7 +45,7 @@ internal abstract class LinePolicy
       _spaceSize = spaceSize;
     }
 
-    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
+    internal override void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content, int indent)
     {
       content.Append(content.Trivias.Space, _spaceSize);
     }

@@ -21,7 +21,7 @@ internal struct OperationAppender<TSymbol>
 
   public void AppendOperationDefinition(IOperationDefinitionNode operationDefinition)
   {
-    operationDefinition.OperationType.Append(_content);
+    operationDefinition.OperationType.AppendOn(_content);
 
     if (operationDefinition.Name is string name)
     {
@@ -227,7 +227,7 @@ internal struct OperationAppender<TSymbol>
 
   private void AppendLine()
   {
-    _options.LinePolicy.Append(_content, _indent);
+    _options.LinePolicy.AppendOn(_content, _indent);
   }
 
   private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> append)
@@ -243,7 +243,7 @@ internal struct OperationAppender<TSymbol>
     AppendJoin(values, AppendSeparator, append);
 
     static void AppendSeparator(ref OperationAppender<TSymbol> self)
-      => self._options.Separator.Append(self._content);
+      => self._options.Separator.AppendOn(self._content);
   }
 
   private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> append)

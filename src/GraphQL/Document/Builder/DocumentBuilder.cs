@@ -64,7 +64,7 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilde
     OperationAppender<TSymbol> appender = new(contentBuilder, _options);
     appender.AppendOperationDefinition(operationDefinition);
 
-    GraphDocument<TResult, TVariables> document = contentBuilder.GetDocument<TResult, TVariables>();
+    GraphDocument<TResult, TVariables> document = contentBuilder.CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name);
     _contentBuilderPool.Return(contentBuilder);
 
     return document;

@@ -150,12 +150,12 @@ internal class Symbols : IKeywords<Symbol>, IPunctuators<Symbol>, ITrivias<Symbo
   {
     protected abstract ReadOnlySpan<byte> Bytes { get; }
 
-    public sealed override void Append(Utf8ContentBuilder content)
+    public sealed override void AppendOn(Utf8ContentBuilder content)
     {
       content.Append(Bytes);
     }
 
-    public sealed override void Append(Utf8ContentBuilder content, int repeatCount)
+    public sealed override void AppendOn(Utf8ContentBuilder content, int repeatCount)
     {
       throw new InvalidOperationException($"Cannot append '{GetType().Name}' repeatedly.");
     }
@@ -171,12 +171,12 @@ internal class Symbols : IKeywords<Symbol>, IPunctuators<Symbol>, ITrivias<Symbo
       _bytes = Encoding.UTF8.GetBytes(new string(' ', s_repeatCount));
     }
 
-    public override void Append(Utf8ContentBuilder content)
+    public override void AppendOn(Utf8ContentBuilder content)
     {
       content.Append(_bytes[..1]);
     }
 
-    public override void Append(Utf8ContentBuilder content, int repeatCount)
+    public override void AppendOn(Utf8ContentBuilder content, int repeatCount)
     {
       while (repeatCount > s_repeatCount)
       {

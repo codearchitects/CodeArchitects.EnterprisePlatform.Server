@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document;
 using CodeArchitects.Platform.GraphQL.Document.Content;
+using StrawberryShake;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
@@ -39,14 +40,14 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 
   public IDocumentContentBuilder<Symbol> Append(Symbol symbol)
   {
-    symbol.Append(this);
+    symbol.AppendOn(this);
 
     return this;
   }
 
   public IDocumentContentBuilder<Symbol> Append(Symbol symbol, int repeatCount)
   {
-    symbol.Append(this, repeatCount);
+    symbol.AppendOn(this, repeatCount);
 
     return this;
   }
@@ -61,7 +62,7 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 
   public IDocumentContentBuilder<Symbol> AppendLine()
   {
-    Symbols.Instance.NewLine.Append(this);
+    Symbols.Instance.NewLine.AppendOn(this);
 
     return this;
   }
@@ -92,17 +93,22 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
 
   public IDocumentContentBuilder<Symbol> AppendLiteral(string @string)
   {
-    Symbols.Instance.DoubleQuotes.Append(this);
+    Symbols.Instance.DoubleQuotes.AppendOn(this);
     Append(@string.AsSpan());
-    Symbols.Instance.DoubleQuotes.Append(this);
+    Symbols.Instance.DoubleQuotes.AppendOn(this);
 
     return this;
   }
 
-  public GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
+  public GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType operationType, string? name)
     where TVariables : notnull
   {
-    return new ChilliCreamGraphDocument<TResult, TVariables>(_ms.ToArray());
+    OperationKind kind = operationType.Match(
+      static () => OperationKind.Query,
+      static () => OperationKind.Mutation,
+      static () => OperationKind.Subscription);
+
+    return ChilliCreamGraphDocument<TResult, TVariables>.Create(kind, name, _ms.ToArray());
   }
 
   public void Pop()

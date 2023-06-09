@@ -12,15 +12,15 @@ internal abstract class OperationType : IEquatable<OperationType>
 
   protected abstract int Value { get; }
 
-  internal abstract void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content);
+  internal abstract void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content);
+
+  internal abstract T Match<T>(Func<T> whenQuery, Func<T> whenMutation, Func<T> whenSubscription);
 
   public bool Equals(OperationType other) => other.Value == Value;
 
   public sealed override bool Equals(object obj) => obj is OperationType other && Equals(other);
 
   public sealed override int GetHashCode() => Value;
-
-  public abstract override string ToString();
 
   public static bool operator ==(OperationType left, OperationType right) => left.Equals(right);
 
@@ -33,8 +33,13 @@ internal abstract class OperationType : IEquatable<OperationType>
 
     public override string ToString() => "query";
 
-    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content)
+    internal override void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content)
       => content.Append(content.Keywords.Query);
+
+    internal override T Match<T>(Func<T> whenQuery, Func<T> whenMutation, Func<T> whenSubscription)
+    {
+      return whenQuery();
+    }
   }
 
   private sealed class MutationOperation : OperationType
@@ -43,8 +48,13 @@ internal abstract class OperationType : IEquatable<OperationType>
 
     public override string ToString() => "mutation";
 
-    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content)
+    internal override void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content)
       => content.Append(content.Keywords.Mutation);
+
+    internal override T Match<T>(Func<T> whenQuery, Func<T> whenMutation, Func<T> whenSubscription)
+    {
+      return whenMutation();
+    }
   }
 
   private sealed class SubscriptionOperation : OperationType
@@ -53,7 +63,12 @@ internal abstract class OperationType : IEquatable<OperationType>
 
     public override string ToString() => "subscription";
 
-    internal override void Append<TSymbol>(IDocumentContentBuilder<TSymbol> content)
+    internal override void AppendOn<TSymbol>(IDocumentContentBuilder<TSymbol> content)
       => content.Append(content.Keywords.Subscription);
+
+    internal override T Match<T>(Func<T> whenQuery, Func<T> whenMutation, Func<T> whenSubscription)
+    {
+      return whenSubscription();
+    }
   }
 }

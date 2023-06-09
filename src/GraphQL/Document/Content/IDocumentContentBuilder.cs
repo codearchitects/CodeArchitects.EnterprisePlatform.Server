@@ -11,7 +11,7 @@ internal interface IDocumentContentBuilder<TSymbol>
   IPunctuators<TSymbol> Punctuators { get; }
   ITrivias<TSymbol> Trivias { get; }
 
-  GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
+  GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType operationType, string? name)
     where TVariables : notnull;
 
   IDocumentContentBuilder<TSymbol> Append(string @string);

@@ -9,7 +9,7 @@ internal interface IGraphClient<TDocumentRoot>
   IGraphRequest<TResult> Request<TResult>(IGraphDocument<TResult> document)
     where TResult : class;
 
-  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(GraphDocument<TResult, TVariables> document)
+  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(IGraphDocument<TResult, TVariables> document)
     where TResult : class
     where TVariables : class;
 
