@@ -1,4 +1,5 @@
-﻿using Verifier = CodeArchitects.Platform.Actors.Analyzer.Fixtures.ActorAnalyzerVerifier;
+﻿using Microsoft.CodeAnalysis;
+using Verifier = CodeArchitects.Platform.Actors.Analyzer.Fixtures.ActorAnalyzerVerifier;
 
 namespace CodeArchitects.Platform.Actors.Analyzer;
 
@@ -868,6 +869,39 @@ public partial class ActorDiagnosticAnalyzerTests
   }
 
   [Fact]
+  public async Task ShouldTriggerCAEPACTR301_WhenValueTypeStateHasNullDefaultValue()
+  {
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests;
+      
+      public interface IMyActor
+      {
+      }
+      
+      [Actor]
+      public class MyActor : IMyActor
+      {
+          [State(Default = null)] private int _state;
+          
+          public MyActor(int state)
+          {
+              _state = state;
+          }
+      }
+      """;
+
+    var diagnostic = Verifier
+      .Diagnostic(DiagnosticDescriptors.CAEPACTR301)
+      .WithArguments("_state")
+      .WithSpan(12, 6, 12, 27);
+
+    await Verifier.Verify(verifier => verifier
+      .AddSource(source, diagnostic));
+  }
+
+  [Fact]
   public async Task ShouldTriggerCAEPACTR302_WhenImplementationDefinesState()
   {
     string source = """
@@ -1137,7 +1171,7 @@ public partial class ActorDiagnosticAnalyzerTests
   }
 
   [Fact]
-  public async Task ShouldNotTriggerCAEPACTR306_WhenStateComponentActorIdIsOfCorrectType()
+  public async Task ShouldNotTriggerCAEPACTR305_WhenStateComponentActorIdIsOfCorrectType()
   {
     string source = """
       using CodeArchitects.Platform.Actors;
@@ -1154,6 +1188,134 @@ public partial class ActorDiagnosticAnalyzerTests
           [State, ActorId] private int _state;
           
           public MyActor(int state)
+          {
+              _state = state;
+          }
+      }
+      """;
+
+    await Verifier.Verify(verifier => verifier.AddSource(source));
+  }
+
+  [Fact]
+  public async Task ShouldTriggerCAEPACTR306_WhenNonNullableReferenceTypeStateComponentHasNullDefaultValue()
+  {
+    string source = """
+      #nullable enable
+
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests;
+      
+      public interface IMyActor
+      {
+      }
+      
+      [Actor]
+      public class MyActor : IMyActor
+      {
+          [State(Default = null)] private string _state;
+          
+          public MyActor(string state)
+          {
+              _state = state;
+          }
+      }
+      """;
+
+    var diagnostic = Verifier
+      .Diagnostic(DiagnosticDescriptors.CAEPACTR306)
+      .WithArguments("_state")
+      .WithSpan(14, 6, 14, 27);
+
+    await Verifier.Verify(verifier => verifier
+      .AddSource(source, diagnostic));
+  }
+
+  [Fact]
+  public async Task ShouldTriggerCAEPACTR306AsError_WhenNonNullableReferenceTypeStateComponentHasNullDefaultValue()
+  {
+    string source = """
+      #nullable enable
+
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests;
+      
+      public interface IMyActor
+      {
+      }
+      
+      [Actor]
+      public class MyActor : IMyActor
+      {
+          [State(Default = null)] private string _state;
+          
+          public MyActor(string state)
+          {
+              _state = state;
+          }
+      }
+      """;
+
+    var diagnostic = Verifier
+      .Diagnostic(DiagnosticIds.CAEPACTR306, DiagnosticSeverity.Error)
+      .WithArguments("_state")
+      .WithSpan(14, 6, 14, 27);
+
+    await Verifier.Verify(verifier => verifier
+      .ModifyCompilationOptions(options => options
+        .WithSpecificDiagnosticOptions(options.SpecificDiagnosticOptions.Add("CS8600", ReportDiagnostic.Error)))
+      .AddSource(source, diagnostic));
+  }
+
+  [Fact]
+  public async Task ShouldNotTriggerCAEPACTR306_WhenNullableReferenceTypeStateComponentHasNullDefaultValue()
+  {
+    string source = """
+      #nullable enable
+
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests;
+      
+      public interface IMyActor
+      {
+      }
+      
+      [Actor]
+      public class MyActor : IMyActor
+      {
+          [State(Default = null)] private string? _state;
+          
+          public MyActor(string? state)
+          {
+              _state = state;
+          }
+      }
+      """;
+
+    await Verifier.Verify(verifier => verifier.AddSource(source));
+  }
+
+  [Fact]
+  public async Task ShouldNotTriggerCAEPACTR306_WhenNonNullableReferenceTypeStateComponentHasNullDefaultValueAndNullableDisabled()
+  {
+    string source = """
+      using CodeArchitects.Platform.Actors;
+
+      namespace Actors.Tests;
+      
+      public interface IMyActor
+      {
+      }
+      
+      [Actor]
+      public class MyActor : IMyActor
+      {
+          [State(Default = null)] private string _state;
+          
+          public MyActor(string state)
           {
               _state = state;
           }

@@ -152,4 +152,25 @@ public class ActorMetadataBuilderTests
     // Assert
     InjectedStringIdActorFixture.AssertValidDescriptor(descriptor);
   }
+
+  [Fact]
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForNullDefaultStateActor()
+  {
+    // Arrange
+    NullDefaultStateActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+
+    ActorMetadataBuilder<NullDefaultStateActor> sut = new(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object);
+
+    sut.AsBuilder()
+      .IsVirtual()
+      .HasFactoryType<INullDefaultStateActorFactory>()
+      .HasState<string>("_state", state => state
+        .HasDefaultValue(null!));
+
+    // Act
+    IActorDescriptor descriptor = sut.CreateDescriptor();
+
+    // Assert
+    NullDefaultStateActorFixture.AssertValidDescriptor(descriptor);
+  }
 }

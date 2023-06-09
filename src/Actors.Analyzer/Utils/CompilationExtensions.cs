@@ -29,6 +29,11 @@ internal static class CompilationExtensions
       }
     }
 
+    if (compilation.Options.SpecificDiagnosticOptions.TryGetValue("CS8600", out ReportDiagnostic nullableReportDiagnostic) && nullableReportDiagnostic == ReportDiagnostic.Error)
+    {
+      options |= ActorAnalyzerOptions.TreatNullableAsError;
+    }
+
     return options;
   }
 }

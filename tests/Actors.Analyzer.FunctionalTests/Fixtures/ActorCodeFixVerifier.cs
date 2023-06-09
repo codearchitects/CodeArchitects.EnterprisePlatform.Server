@@ -40,6 +40,12 @@ internal class ActorCodeFixVerifier
     return this;
   }
 
+  public ActorCodeFixVerifier ModifyCompilationOptions(Func<CompilationOptions, CompilationOptions> optionsTransform)
+  {
+    _test.ModifyCompilationOptions(optionsTransform);
+    return this;
+  }
+
   private static void AddSource(SolutionState state, string source, DiagnosticResult[] diagnostics, string? fileName = null)
   {
     if (fileName is not null)

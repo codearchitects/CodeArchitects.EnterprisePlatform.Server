@@ -10,6 +10,7 @@ namespace CodeArchitects.Platform.Actors.Analyzer;
 [DebuggerDisplay("{ToString(),nq}")]
 internal sealed record DiagnosticReference(
   string DiagnosticId,
+  DiagnosticSeverity? Severity,
   string FilePath,
   TextSpan TextSpan,
   RecordList<string> Properties,
@@ -44,6 +45,11 @@ internal sealed record DiagnosticReference(
     int propertyCount = Properties.Count;
 
     stringBuilder.Append(DiagnosticId);
+    if (Severity.HasValue)
+    {
+      stringBuilder.Append('@');
+      stringBuilder.Append((int)Severity.Value);
+    }
     stringBuilder.Append('|');
     stringBuilder.Append(FilePath);
     stringBuilder.Append('|');
@@ -70,12 +76,22 @@ internal sealed record DiagnosticReference(
 
   public static DiagnosticReference Create(string diagnosticId, Location location, params string[] args)
   {
-    return new DiagnosticReference(diagnosticId, location.GetLineSpan().Path, location.SourceSpan, RecordList<string>.Empty, new RecordList<string>(args));
+    return new DiagnosticReference(diagnosticId, null, location.GetLineSpan().Path, location.SourceSpan, RecordList<string>.Empty, new RecordList<string>(args));
   }
 
   public static DiagnosticReference Create(string diagnosticId, Location location, string[] properties, params string[] args)
   {
-    return new DiagnosticReference(diagnosticId, location.GetLineSpan().Path, location.SourceSpan, new RecordList<string>(properties), new RecordList<string>(args));
+    return new DiagnosticReference(diagnosticId, null, location.GetLineSpan().Path, location.SourceSpan, new RecordList<string>(properties), new RecordList<string>(args));
+  }
+
+  public static DiagnosticReference Create(string diagnosticId, DiagnosticSeverity? severity, Location location, params string[] args)
+  {
+    return new DiagnosticReference(diagnosticId, severity, location.GetLineSpan().Path, location.SourceSpan, RecordList<string>.Empty, new RecordList<string>(args));
+  }
+
+  public static DiagnosticReference Create(string diagnosticId, DiagnosticSeverity? severity, Location location, string[] properties, params string[] args)
+  {
+    return new DiagnosticReference(diagnosticId, severity, location.GetLineSpan().Path, location.SourceSpan, new RecordList<string>(properties), new RecordList<string>(args));
   }
 
   public static DiagnosticReference Parse(string text)
@@ -110,7 +126,16 @@ internal sealed record DiagnosticReference(
     }
 
     TextSpan textSpan = new(spanStart, spanLength);
-    return new DiagnosticReference(diagnosticId, filePath, textSpan, new RecordList<string>(properties), new RecordList<string>(args));
+
+    DiagnosticSeverity? severity = null;
+    int severityIndex = diagnosticId.IndexOf('@');
+    if (severityIndex != -1)
+    {
+      severity = (DiagnosticSeverity)int.Parse(diagnosticId[(severityIndex + 1)..]);
+      diagnosticId = diagnosticId[0..severityIndex];
+    }
+
+    return new DiagnosticReference(diagnosticId, severity, filePath, textSpan, new RecordList<string>(properties), new RecordList<string>(args));
     
     static string GetNextSegment(string text, ref int cursor)
     {

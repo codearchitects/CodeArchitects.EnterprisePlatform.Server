@@ -26,6 +26,12 @@ internal class ActorAnalyzerVerifier
     return this;
   }
 
+  public ActorAnalyzerVerifier ModifyCompilationOptions(Func<CompilationOptions, CompilationOptions> optionsTransform)
+  {
+    _test.ModifyCompilationOptions(optionsTransform);
+    return this;
+  }
+
   public static Task Verify(Action<ActorAnalyzerVerifier> specification, CancellationToken cancellationToken = default)
   {
     ActorAnalyzerTest test = new();

@@ -178,4 +178,31 @@ public class ReflectionActorDescriptorFactoryTests
     // Assert
     InjectedStringIdActorFixture.AssertValidDescriptor(descriptor);
   }
+
+  [Fact]
+  public void CreateDescriptor_ShouldCreateCorrectDescriptor_ForNullDefaultStateActor()
+  {
+    // Arrange
+    NullDefaultStateActorFixture.SetupMocks(_stateTypeBuilderMock, _activityTypeBuilderMock);
+
+    _contextMock
+      .Setup(x => x.GetFactoryType(typeof(NullDefaultStateActor)))
+      .Returns(typeof(INullDefaultStateActorFactory));
+    _contextMock
+      .Setup(x => x.GetImplementationTypes(typeof(NullDefaultStateActor)))
+      .Returns(Enumerable.Empty<Type>());
+
+    ReflectionActorDescriptorFactory<NullDefaultStateActor> sut = new(
+      _stateTypeBuilderMock.Object,
+      _activityTypeBuilderMock.Object,
+      _contextMock.Object,
+      new ActorAttribute<INullDefaultStateActor>(),
+      null);
+
+    // Act
+    IActorDescriptor descriptor = sut.CreateDescriptor();
+
+    // Assert
+    NullDefaultStateActorFixture.AssertValidDescriptor(descriptor);
+  }
 }
