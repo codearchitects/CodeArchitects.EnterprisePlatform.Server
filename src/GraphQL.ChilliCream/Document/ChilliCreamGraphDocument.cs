@@ -37,13 +37,4 @@ internal class ChilliCreamGraphDocument<TResult, TVariables> : GraphDocument<TRe
   }
 
   public override string ToString() => Encoding.UTF8.GetString(_content);
-
-  public static ChilliCreamGraphDocument<TResult, TVariables> Create(OperationKind kind, string? name, byte[] content)
-  {
-    return new(
-      kind,
-      name ?? string.Empty,
-      content,
-      Guid.NewGuid().ToString("N"));
-  }
 }

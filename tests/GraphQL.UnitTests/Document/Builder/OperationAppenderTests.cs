@@ -1,31 +1,31 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
-using CodeArchitects.Platform.GraphQL.Fixtures;
 using CodeArchitects.Platform.GraphQL.Fixtures.Model;
 using CodeArchitects.Platform.GraphQL.Model;
 using CodeArchitects.Platform.GraphQL.Model.FluentMock;
 using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
 using System.Reflection;
+using System.Text;
 
-namespace CodeArchitects.Platform.GraphQL.Document.Content;
+namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-public class DocumentStringBuilderTests
+public class OperationAppenderTests : IDisposable
 {
   private const string s_queryName = "GetBlogs";
 
-  private readonly StringContentBuilder _contentBuilder;
+  private readonly MemoryStream _ms;
   private readonly DocumentBuilderOptions _options;
-  private readonly OperationAppender<string> _sut;
+  private readonly OperationAppender _sut;
 
-  public DocumentStringBuilderTests()
+  public OperationAppenderTests()
   {
-    _contentBuilder = new();
+    _ms = new();
     _options = new();
-    _sut = new(_contentBuilder, _options);
+    _sut = new(_ms, _options);
   }
 
-  private string Content => _contentBuilder.Content;
+  private string Content => Encoding.UTF8.GetString(_ms.ToArray());
 
   [Fact]
   public void QueryBlogFieldWithoutVariables_ShouldProduceCorrectDocument()
@@ -399,5 +399,10 @@ public class DocumentStringBuilderTests
 
     // Assert
     Content.Should().Be("query GetBlogs { blogs { edges { cursor } pageInfo } }");
+  }
+
+  public void Dispose()
+  {
+    ((IDisposable)_ms).Dispose();
   }
 }

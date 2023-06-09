@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal partial class DocumentBuilder<TDocumentRoot, TSymbol>
+internal partial class DocumentBuilder<TDocumentRoot>
 {
   public IGraphDocument<TResult> Mutation<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {

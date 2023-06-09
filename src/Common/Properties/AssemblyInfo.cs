@@ -18,6 +18,7 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.MongoDB.DependencyInjection")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Emit")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL.ChilliCream")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore")]

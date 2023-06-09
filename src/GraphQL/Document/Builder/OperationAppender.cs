@@ -2,74 +2,74 @@
 using CodeArchitects.Platform.GraphQL.Model;
 using System.Reflection;
 
-namespace CodeArchitects.Platform.GraphQL.Document.Content;
+namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal struct OperationAppender<TSymbol>
+internal struct OperationAppender
 {
-  private delegate void AppendAction<T>(ref OperationAppender<TSymbol> self, T current);
-  private delegate void SeparatorCallback(ref OperationAppender<TSymbol> self);
+  private delegate void AppendAction<T>(ref OperationAppender self, T current);
+  private delegate void SeparatorCallback(ref OperationAppender self);
 
-  private readonly IDocumentContentBuilder<TSymbol> _content;
+  private readonly Utf8StringBuilder _sb;
   private readonly DocumentBuilderOptions _options;
   private int _indent;
 
-  public OperationAppender(IDocumentContentBuilder<TSymbol> content, DocumentBuilderOptions options)
+  public OperationAppender(MemoryStream ms, DocumentBuilderOptions options)
   {
-    _content = content;
+    _sb = new Utf8StringBuilder(ms);
     _options = options;
   }
 
   public void AppendOperationDefinition(IOperationDefinitionNode operationDefinition)
   {
-    operationDefinition.OperationType.AppendOn(_content);
+    _sb.AppendOperationType(operationDefinition.OperationType);
 
     if (operationDefinition.Name is string name)
     {
-      _content
-        .Append(_content.Trivias.Space)
+      _sb
+        .AppendSpace()
         .Append(name);
     }
 
     AppendVariables(operationDefinition.Variables);
 
-    using (new SpaceScope(_content))
+    using (new SpaceScope(_sb))
     {
       AppendDirectives(operationDefinition.Directives);
     }
 
-    _content.Append(_content.Trivias.Space);
+    _sb.AppendSpace();
     AppendSelectionSet(operationDefinition.SelectionSet);
   }
 
   private void AppendVariables(IEnumerable<IVariable> variables)
   {
-    using (new ArgumentScope(_content))
+    using (new ArgumentScope(_sb))
     {
-      AppendSeparated(variables, static (ref OperationAppender<TSymbol> self, IVariable variable)
+      AppendSeparated(variables, static (ref OperationAppender self, IVariable variable)
         => self.AppendVariable(variable));
     }
   }
 
   private void AppendVariable(IVariable variable)
   {
-    _content
-      .Append(_content.Punctuators.DollarSign)
+    _sb
+      .AppendVariablePrefix()
       .AppendCamelized(variable.Name)
-      .Append(_content.Punctuators.Colon)
-      .Append(_content.Trivias.Space)
+      .AppendColon()
+      .AppendSpace()
       .Append(variable.Type.Name);
   }
 
   private void AppendDirectives(IEnumerable<IDirectiveNode> directives)
   {
-    AppendSpaced(directives, static (ref OperationAppender<TSymbol> self, IDirectiveNode directive)
+    AppendSpaced(directives, static (ref OperationAppender self, IDirectiveNode directive)
       => self.AppendDirective(directive));
   }
 
   private void AppendDirective(IDirectiveNode directive)
   {
-    _content
-      .Append(_content.Punctuators.AtSign)
+    _sb
+      .AppendDirectivePrefix()
       .Append(directive.Name);
 
     AppendArguments(directive.Arguments);
@@ -77,7 +77,7 @@ internal struct OperationAppender<TSymbol>
 
   private void AppendSelectionSet(ISelectionSetNode selectionSet)
   {
-    _content.Append(_content.Punctuators.LeftBrace);
+    _sb.AppendLeftBrace();
     _indent++;
     AppendLine();
 
@@ -85,12 +85,12 @@ internal struct OperationAppender<TSymbol>
 
     _indent--;
     AppendLine();
-    _content.Append(_content.Punctuators.RightBrace);
+    _sb.AppendRightBrace();
   }
 
   private void AppendSelections(IEnumerable<ISelectionNode> selections)
   {
-    AppendLines(selections, static (ref OperationAppender<TSymbol> self, ISelectionNode selection)
+    AppendLines(selections, static (ref OperationAppender self, ISelectionNode selection)
       => self.AppendSelection(selection));
   }
 
@@ -98,43 +98,43 @@ internal struct OperationAppender<TSymbol>
   {
     if (selection.Alias is string alias)
     {
-      _content
+      _sb
         .AppendCamelized(alias)
-        .Append(_content.Punctuators.Colon)
-        .Append(_content.Trivias.Space);
+        .AppendColon()
+        .AppendSpace();
     }
 
-    _content.AppendCamelized(selection.FieldName);
+    _sb.AppendCamelized(selection.FieldName);
 
     AppendArguments(selection.Arguments);
 
-    using (new SpaceScope(_content))
+    using (new SpaceScope(_sb))
     {
       AppendDirectives(selection.Directives);
     }
 
     if (selection.SelectionSet is ISelectionSetNode selectionSet)
     {
-      _content.Append(_content.Trivias.Space);
+      _sb.AppendSpace();
       AppendSelectionSet(selectionSet);
     }
   }
 
   private void AppendArguments(IEnumerable<IArgumentNode> arguments)
   {
-    using (new ArgumentScope(_content))
+    using (new ArgumentScope(_sb))
     {
-      AppendSeparated(arguments, static (ref OperationAppender<TSymbol> self, IArgumentNode argument)
+      AppendSeparated(arguments, static (ref OperationAppender self, IArgumentNode argument)
         => self.AppendArgument(argument));
     }
   }
 
   private void AppendArgument(IArgumentNode argument)
   {
-    _content
+    _sb
       .AppendCamelized(argument.Name)
-      .Append(_content.Punctuators.Colon)
-      .Append(_content.Trivias.Space);
+      .AppendColon()
+      .AppendSpace();
 
     AppendValue(argument.Value);
   }
@@ -143,28 +143,26 @@ internal struct OperationAppender<TSymbol>
   {
     if (value is null)
     {
-      _content.Append(_content.Keywords.Null);
+      _sb.AppendNullKeyword();
       return;
     }
 
     switch (Convert.GetTypeCode(value))
     {
       case >= TypeCode.SByte and <= TypeCode.UInt64:
-        _content.AppendLiteral(Convert.ToInt32(value));
+        _sb.AppendLiteral(Convert.ToInt32(value));
         return;
 
       case >= TypeCode.Single and <= TypeCode.Decimal:
-        _content.AppendLiteral(Convert.ToSingle(value));
+        _sb.AppendLiteral(Convert.ToSingle(value));
         return;
 
       case TypeCode.String:
-        _content.AppendLiteral(Convert.ToString(value));
+        _sb.AppendLiteral(Convert.ToString(value));
         return;
 
       case TypeCode.Boolean:
-        _content.Append(Convert.ToBoolean(value)
-          ? _content.Keywords.True
-          : _content.Keywords.False);
+        _sb.AppendLiteral(Convert.ToBoolean(value));
         return;
 
       case TypeCode.DateTime:
@@ -174,8 +172,8 @@ internal struct OperationAppender<TSymbol>
     switch (value)
     {
       case MemberInfo member:
-        _content
-          .Append(_content.Punctuators.DollarSign)
+        _sb
+          .AppendVariablePrefix()
           .AppendCamelized(member.Name);
         return;
 
@@ -193,48 +191,48 @@ internal struct OperationAppender<TSymbol>
 
   private void AppendObjectValue(IObjectValueNode objectValue)
   {
-    _content
-      .Append(_content.Punctuators.LeftBrace)
-      .Append(_content.Trivias.Space);
+    _sb
+      .AppendLeftBrace()
+      .AppendSpace();
 
-    AppendSeparated(objectValue.Fields, static (ref OperationAppender<TSymbol> self, IObjectFieldNode field)
+    AppendSeparated(objectValue.Fields, static (ref OperationAppender self, IObjectFieldNode field)
       => self.AppendObjectField(field));
 
-    _content
-      .Append(_content.Trivias.Space)
-      .Append(_content.Punctuators.RightBrace);
+    _sb
+      .AppendSpace()
+      .AppendRightBrace();
   }
 
   private void AppendObjectField(IObjectFieldNode field)
   {
-    _content
+    _sb
       .AppendCamelized(field.Name)
-      .Append(_content.Punctuators.Colon)
-      .Append(_content.Trivias.Space);
+      .AppendColon()
+      .AppendSpace();
 
     AppendValue(field.Value);
   }
 
   private void AppendListValue(IListValueNode listValue)
   {
-    _content.Append(_content.Punctuators.LeftBracket);
+    _sb.AppendLeftBracket();
 
-    AppendSeparated(listValue.Values, static (ref OperationAppender<TSymbol> self, object? value)
+    AppendSeparated(listValue.Values, static (ref OperationAppender self, object? value)
       => self.AppendValue(value));
 
-    _content.Append(_content.Punctuators.RightBracket);
+    _sb.AppendRightBracket();
   }
 
   private void AppendLine()
   {
-    _options.LinePolicy.AppendOn(_content, _indent);
+    _options.LinePolicy.AppendOn(_sb, _indent);
   }
 
   private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> append)
   {
     AppendJoin(values, AppendLine, append);
 
-    static void AppendLine(ref OperationAppender<TSymbol> self)
+    static void AppendLine(ref OperationAppender self)
       => self.AppendLine();
   }
 
@@ -242,16 +240,16 @@ internal struct OperationAppender<TSymbol>
   {
     AppendJoin(values, AppendSeparator, append);
 
-    static void AppendSeparator(ref OperationAppender<TSymbol> self)
-      => self._options.Separator.AppendOn(self._content);
+    static void AppendSeparator(ref OperationAppender self)
+      => self._options.Separator.AppendOn(self._sb);
   }
 
   private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> append)
   {
     AppendJoin(values, AppendSpace, append);
 
-    static void AppendSpace(ref OperationAppender<TSymbol> self)
-      => self._content.Append(self._content.Trivias.Space);
+    static void AppendSpace(ref OperationAppender self)
+      => self._sb.AppendSpace();
   }
 
   private void AppendJoin<T>(IEnumerable<T> values, SeparatorCallback separatorCallback, AppendAction<T> append)
@@ -272,48 +270,48 @@ internal struct OperationAppender<TSymbol>
 
   private readonly ref struct ArgumentScope
   {
-    private readonly IDocumentContentBuilder<TSymbol> _content;
-    private readonly int _length;
+    private readonly Utf8StringBuilder _sb;
+    private readonly long _length;
 
-    public ArgumentScope(IDocumentContentBuilder<TSymbol> content)
+    public ArgumentScope(Utf8StringBuilder sb)
     {
-      _content = content;
+      _sb = sb;
 
-      _content.Append(_content.Punctuators.LeftParenthesis);
-      _length = content.Length;
+      _sb.AppendLeftParenthesis();
+      _length = sb.Length;
     }
 
     public void Dispose()
     {
-      if (_content.Length == _length)
+      if (_sb.Length == _length)
       {
-        _content.Pop();
+        _sb.Pop();
       }
       else
       {
-        _content.Append(_content.Punctuators.RightParenthesis);
+        _sb.AppendRightParenthesis();
       }
     }
   }
 
   private readonly ref struct SpaceScope
   {
-    private readonly IDocumentContentBuilder<TSymbol> _content;
-    private readonly int _length;
+    private readonly Utf8StringBuilder _sb;
+    private readonly long _length;
 
-    public SpaceScope(IDocumentContentBuilder<TSymbol> content)
+    public SpaceScope(Utf8StringBuilder sb)
     {
-      _content = content;
+      _sb = sb;
 
-      _content.Append(_content.Trivias.Space);
-      _length = content.Length;
+      _sb.AppendSpace();
+      _length = sb.Length;
     }
 
     public void Dispose()
     {
-      if (_content.Length == _length)
+      if (_sb.Length == _length)
       {
-        _content.Pop();
+        _sb.Pop();
       }
     }
   }

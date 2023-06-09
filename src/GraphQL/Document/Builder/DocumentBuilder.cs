@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Content;
-using CodeArchitects.Platform.GraphQL.Document.Expressions;
+﻿using CodeArchitects.Platform.GraphQL.Document.Expressions;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 using Microsoft.Extensions.ObjectPool;
@@ -7,21 +6,24 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilder<TDocumentRoot>
+internal abstract partial class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
   where TDocumentRoot : notnull
 {
   private readonly INodeContext _nodeContext;
   private readonly IModel _model;
   private readonly DocumentBuilderOptions _options;
-  private readonly ObjectPool<IDocumentContentBuilder<TSymbol>> _contentBuilderPool;
+  private readonly ObjectPool<MemoryStream> _memoryStreamPool;
 
-  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<IDocumentContentBuilder<TSymbol>> contentBuilderPool)
+  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<MemoryStream> memoryStreamPool)
   {
     _nodeContext = nodeContext;
     _model = model;
     _options = options;
-    _contentBuilderPool = contentBuilderPool;
+    _memoryStreamPool = memoryStreamPool;
   }
+
+  protected abstract GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType type, string? name, byte[] content)
+    where TVariables : notnull;
 
   private IGraphDocument<TResult> BuildQuery<TResult>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
@@ -60,12 +62,12 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilde
   private GraphDocument<TResult, TVariables> BuildDocument<TResult, TVariables>(IOperationDefinitionNode operationDefinition)
     where TVariables : notnull
   {
-    IDocumentContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
-    OperationAppender<TSymbol> appender = new(contentBuilder, _options);
+    MemoryStream ms = _memoryStreamPool.Get();
+    OperationAppender appender = new(ms, _options);
     appender.AppendOperationDefinition(operationDefinition);
 
-    GraphDocument<TResult, TVariables> document = contentBuilder.CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name);
-    _contentBuilderPool.Return(contentBuilder);
+    GraphDocument<TResult, TVariables> document = CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name, ms.ToArray());
+    _memoryStreamPool.Return(ms);
 
     return document;
   }
