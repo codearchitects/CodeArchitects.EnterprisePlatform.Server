@@ -11,4 +11,9 @@ internal static class ActorAnalyzerOptionsExtensions
   {
     return (options & ActorAnalyzerOptions.DisableActorFactoryGeneration) != 0;
   }
+
+  public static bool ShouldTreatNullableAsError(this ActorAnalyzerOptions options)
+  {
+    return (options & ActorAnalyzerOptions.TreatNullableAsError) != 0;
+  }
 }

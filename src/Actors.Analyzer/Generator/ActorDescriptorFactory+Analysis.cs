@@ -352,6 +352,10 @@ internal readonly ref partial struct ActorDescriptorFactory
       {
         InvalidDefaultValue(stateField, stateAttribute);
       }
+      else if (stateField.Type.NullableAnnotation is NullableAnnotation.NotAnnotated)
+      {
+        NullDefaultValue(stateField, stateAttribute);
+      }
     }
     else if (defaultValue.Type is { } type && !SymbolEqualityComparer.Default.Equals(type, stateField.Type))
     {

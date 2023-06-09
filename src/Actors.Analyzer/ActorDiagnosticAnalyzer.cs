@@ -73,8 +73,10 @@ internal class ActorDiagnosticAnalyzer : DiagnosticAnalyzer
           foundStart |= line is "#if false";
           continue;
         }
+
         if (!foundStart)
           continue;
+        
         if (line is "#endif")
           yield break;
 
@@ -95,7 +97,19 @@ internal class ActorDiagnosticAnalyzer : DiagnosticAnalyzer
         object[] args = reference.Args.ToArray();
         ImmutableDictionary<string, string?>? properties = reference.GetPropertyDictionary();
         
-        Diagnostic diagnostic = Diagnostic.Create(descriptor, location, properties, args);
+        Diagnostic diagnostic = reference.Severity.HasValue
+          ? Diagnostic.Create(
+              descriptor: descriptor,
+              location: location,
+              effectiveSeverity: reference.Severity.Value,
+              additionalLocations: null,
+              properties: properties,
+              messageArgs: args)
+          : Diagnostic.Create(
+              descriptor: descriptor,
+              location: location,
+              properties: properties,
+              messageArgs: args);
         context.ReportDiagnostic(diagnostic);
       }
     }

@@ -159,6 +159,14 @@ internal static class DiagnosticDescriptors
     DiagnosticSeverity.Error,
     isEnabledByDefault: true);
 
+  public static readonly DiagnosticDescriptor CAEPACTR306 = new(
+    DiagnosticIds.CAEPACTR306,
+    "Null default value",
+    "A null literal default value was specified for non-nullable state member '{0}'",
+    "Actors",
+    DiagnosticSeverity.Warning,
+    isEnabledByDefault: true);
+
 
   // Method or constructor errors (400-599)
 
