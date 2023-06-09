@@ -11,8 +11,6 @@ internal interface IDocumentContentBuilder<TSymbol>
   IPunctuators<TSymbol> Punctuators { get; }
   ITrivias<TSymbol> Trivias { get; }
 
-  GraphDocument<TResult> GetDocument<TResult>();
-
   GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
     where TVariables : notnull;
 

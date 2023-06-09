@@ -4,7 +4,7 @@ namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
 internal partial class DocumentBuilder<TDocumentRoot, TSymbol>
 {
-  public GraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  public IGraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
     if (expansion is null)
       throw new ArgumentNullException(nameof(expansion));
@@ -12,7 +12,7 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol>
     return BuildQuery(null, expansion);
   }
 
-  public GraphDocument<TResult, TVariables> Query<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+  public IGraphDocument<TResult, TVariables> Query<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
     if (expansion is null)
@@ -21,7 +21,7 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol>
     return BuildQuery(null, expansion);
   }
 
-  public GraphDocument<TResult> Query<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  public IGraphDocument<TResult> Query<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
     if (string.IsNullOrWhiteSpace(name))
       throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
@@ -31,7 +31,7 @@ internal partial class DocumentBuilder<TDocumentRoot, TSymbol>
     return BuildQuery(name, expansion);
   }
 
-  public GraphDocument<TResult, TVariables> Query<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+  public IGraphDocument<TResult, TVariables> Query<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
     if (string.IsNullOrWhiteSpace(name))

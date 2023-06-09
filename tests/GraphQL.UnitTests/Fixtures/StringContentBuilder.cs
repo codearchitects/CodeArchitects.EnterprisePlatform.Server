@@ -108,11 +108,6 @@ internal class StringContentBuilder : IDocumentContentBuilder<string>, IKeywords
     return this;
   }
 
-  public GraphDocument<TResult> GetDocument<TResult>()
-  {
-    return new StringGraphDocument<TResult>(_sb.ToString());
-  }
-
   public GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
     where TVariables : notnull
   {

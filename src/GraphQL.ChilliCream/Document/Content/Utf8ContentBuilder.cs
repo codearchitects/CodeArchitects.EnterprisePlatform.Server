@@ -99,11 +99,6 @@ internal class Utf8ContentBuilder : IDocumentContentBuilder<Symbol>
     return this;
   }
 
-  public GraphDocument<TResult> GetDocument<TResult>()
-  {
-    return new ChilliCreamGraphDocument<TResult>(_ms.ToArray());
-  }
-
   public GraphDocument<TResult, TVariables> GetDocument<TResult, TVariables>()
     where TVariables : notnull
   {
