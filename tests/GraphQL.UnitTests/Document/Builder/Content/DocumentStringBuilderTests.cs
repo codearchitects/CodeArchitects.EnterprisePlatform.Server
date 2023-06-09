@@ -1,31 +1,31 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Nodes;
 using CodeArchitects.Platform.GraphQL.Document.Builder.Nodes.FluentMock;
+using CodeArchitects.Platform.GraphQL.Fixtures;
 using CodeArchitects.Platform.GraphQL.Fixtures.Model;
 using CodeArchitects.Platform.GraphQL.Model;
 using CodeArchitects.Platform.GraphQL.Model.FluentMock;
 using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
 using System.Reflection;
-using System.Text;
 
-namespace CodeArchitects.Platform.GraphQL.Document.Builder;
+namespace CodeArchitects.Platform.GraphQL.Document.Builder.Content;
 
 public class DocumentStringBuilderTests
 {
   private const string s_queryName = "GetBlogs";
 
-  private readonly StringBuilder _sb;
+  private readonly StringContentBuilder _contentBuilder;
   private readonly DocumentBuilderOptions _options;
-  private readonly DocumentStringBuilder _sut;
+  private readonly DocumentContentBuilder<string> _sut;
 
   public DocumentStringBuilderTests()
   {
-    _sb = new();
+    _contentBuilder = new();
     _options = new();
-    _sut = new(_sb, _options);
+    _sut = new(_contentBuilder, _options);
   }
 
-  private string Content => _sb.ToString();
+  private string Content => _contentBuilder.Content;
 
   [Fact]
   public void QueryBlogFieldWithoutVariables_ShouldProduceCorrectDocument()

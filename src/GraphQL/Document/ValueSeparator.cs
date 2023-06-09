@@ -1,26 +1,28 @@
-﻿namespace CodeArchitects.Platform.GraphQL.Document;
+﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Content;
 
-internal sealed class ValueSeparator : IEquatable<ValueSeparator>
+namespace CodeArchitects.Platform.GraphQL.Document;
+
+internal abstract class ValueSeparator
 {
-  public static readonly ValueSeparator Comma = new(", ");
-  public static readonly ValueSeparator Space = new(" ");
+  public static readonly ValueSeparator Comma = new CommaSeparator();
+  public static readonly ValueSeparator Space = new SpaceSeparator();
 
-  private readonly string _separator;
+  internal abstract void Append<TSymbol>(IContentBuilder<TSymbol> content);
 
-  public ValueSeparator(string separator)
+  private sealed class CommaSeparator : ValueSeparator
   {
-    _separator = separator;
+    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content)
+    {
+      content.Append(content.Trivias.Comma);
+      content.Append(content.Trivias.Space);
+    }
   }
 
-  public bool Equals(ValueSeparator other) => other._separator == _separator;
-
-  public override bool Equals(object obj) => obj is ValueSeparator other && Equals(other);
-
-  public override int GetHashCode() => _separator.GetHashCode();
-
-  public override string ToString() => _separator;
-
-  public static bool operator ==(ValueSeparator left, ValueSeparator right) => left.Equals(right);
-
-  public static bool operator !=(ValueSeparator left, ValueSeparator right) => !(left == right);
+  private sealed class SpaceSeparator : ValueSeparator
+  {
+    internal override void Append<TSymbol>(IContentBuilder<TSymbol> content)
+    {
+      content.Append(content.Trivias.Space);
+    }
+  }
 }

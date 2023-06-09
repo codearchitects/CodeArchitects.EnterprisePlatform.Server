@@ -1,71 +1,84 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Expressions;
+﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Content;
+using CodeArchitects.Platform.GraphQL.Document.Builder.Expressions;
 using CodeArchitects.Platform.GraphQL.Document.Builder.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 using Microsoft.Extensions.ObjectPool;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal partial class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
+internal partial class DocumentBuilder<TDocumentRoot, TSymbol> : IDocumentBuilder<TDocumentRoot>
   where TDocumentRoot : notnull
 {
   private readonly INodeContext _nodeContext;
   private readonly IModel _model;
   private readonly DocumentBuilderOptions _options;
-  private readonly ObjectPool<StringBuilder> _stringBuilderPool;
+  private readonly ObjectPool<IContentBuilder<TSymbol>> _contentBuilderPool;
 
-  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<StringBuilder> stringBuilderPool)
+  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<IContentBuilder<TSymbol>> contentBuilderPool)
   {
     _nodeContext = nodeContext;
     _model = model;
     _options = options;
-    _stringBuilderPool = stringBuilderPool;
+    _contentBuilderPool = contentBuilderPool;
   }
 
-  private GraphDocument<TField> BuildQuery<TField>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TField>>> expansion)
+  private GraphDocument<TResult> BuildQuery<TResult>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
     IReadOnlyCollection<IVariable> variables = Array.Empty<IVariable>();
-    string content = BuildContent(new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body));
+    IOperationDefinitionNode operationDefinition = new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body);
 
-    return new GraphDocument<TField>(OperationType.Query, content);
+    return BuildDocument<TResult>(operationDefinition);
   }
 
-  private GraphDocument<TField, TVariables> BuildQuery<TField, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TField, TVariables>>> expansion)
+  private GraphDocument<TResult, TVariables> BuildQuery<TResult, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
     IReadOnlyCollection<IVariable> variables = _model.GetVariables(typeof(TVariables));
-    string content = BuildContent(new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body));
+    IOperationDefinitionNode operationDefinition = new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body);
 
-    return new GraphDocument<TField, TVariables>(OperationType.Query, content);
+    return BuildDocument<TResult, TVariables>(operationDefinition);
   }
 
-  private GraphDocument<TField> BuildMutation<TField>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TField>>> expansion)
+  private GraphDocument<TResult> BuildMutation<TResult>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
     IReadOnlyCollection<IVariable> variables = Array.Empty<IVariable>();
-    string content = BuildContent(new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body));
+    IOperationDefinitionNode operationDefinition = new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body);
 
-    return new GraphDocument<TField>(OperationType.Mutation, content);
+    return BuildDocument<TResult>(operationDefinition);
   }
 
-  private GraphDocument<TField, TVariables> BuildMutation<TField, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TField, TVariables>>> expansion)
+  private GraphDocument<TResult, TVariables> BuildMutation<TResult, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
     IReadOnlyCollection<IVariable> variables = _model.GetVariables(typeof(TVariables));
-    string content = BuildContent(new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body));
+    IOperationDefinitionNode operationDefinition = new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body);
 
-    return new GraphDocument<TField, TVariables>(OperationType.Mutation, content);
+    return BuildDocument<TResult, TVariables>(operationDefinition);
   }
 
-  private string BuildContent(IOperationDefinitionNode operationDefinition)
+  private GraphDocument<TResult> BuildDocument<TResult>(IOperationDefinitionNode operationDefinition)
   {
-    StringBuilder sb = _stringBuilderPool.Get();
-    DocumentStringBuilder documentStringBuilder = new(sb, _options);
-    documentStringBuilder.AppendOperationDefinition(operationDefinition);
+    IContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
+    DocumentContentBuilder<TSymbol> builder = new(contentBuilder, _options);
+    builder.AppendOperationDefinition(operationDefinition);
 
-    string content = sb.ToString();
-    _stringBuilderPool.Return(sb);
+    GraphDocument<TResult> document = contentBuilder.GetDocument<TResult>();
+    _contentBuilderPool.Return(contentBuilder);
 
-    return content;
+    return document;
+  }
+
+  private GraphDocument<TResult, TVariables> BuildDocument<TResult, TVariables>(IOperationDefinitionNode operationDefinition)
+    where TVariables : notnull
+  {
+    IContentBuilder<TSymbol> contentBuilder = _contentBuilderPool.Get();
+    DocumentContentBuilder<TSymbol> builder = new(contentBuilder, _options);
+    builder.AppendOperationDefinition(operationDefinition);
+
+    GraphDocument<TResult, TVariables> document = contentBuilder.GetDocument<TResult, TVariables>();
+    _contentBuilderPool.Return(contentBuilder);
+
+    return document;
   }
 }

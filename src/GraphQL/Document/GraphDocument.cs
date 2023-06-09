@@ -3,14 +3,18 @@
 namespace CodeArchitects.Platform.GraphQL.Document;
 
 [DebuggerDisplay("{ToString(),raw}")]
-internal readonly record struct GraphDocument<TResult>(OperationType Type, string Content)
+internal abstract class GraphDocument<TResult>
 {
-  public override string ToString() => Content;
+  protected abstract string GetContent();
+
+  public sealed override string ToString() => GetContent();
 }
 
 [DebuggerDisplay("{ToString(),raw}")]
-internal readonly record struct GraphDocument<TResult, TVariables>(OperationType Type, string Content)
+internal abstract class GraphDocument<TResult, TVariables>
   where TVariables : notnull
 {
-  public override string ToString() => Content;
+  protected abstract string GetContent();
+
+  public sealed override string ToString() => GetContent();
 }
