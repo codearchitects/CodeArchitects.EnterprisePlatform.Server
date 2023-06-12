@@ -3,7 +3,7 @@ using CodeArchitects.Platform.GraphQL.Document;
 using CodeArchitects.Platform.GraphQL.Document.Builder;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
-using Microsoft.Extensions.ObjectPool;
+using Microsoft.IO;
 using StrawberryShake;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
@@ -11,8 +11,8 @@ namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 internal class ChilliCreamDocumentBuilder<TDocumentRoot> : DocumentBuilder<TDocumentRoot>
   where TDocumentRoot : notnull
 {
-  public ChilliCreamDocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, ObjectPool<MemoryStream> memoryStreamPool)
-    : base(nodeContext, model, options, memoryStreamPool)
+  public ChilliCreamDocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, RecyclableMemoryStreamManager msManager)
+    : base(nodeContext, model, options, msManager)
   {
   }
 

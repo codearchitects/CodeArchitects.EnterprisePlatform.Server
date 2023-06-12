@@ -1,31 +1,31 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
+using CodeArchitects.Platform.GraphQL.Fixtures;
 using CodeArchitects.Platform.GraphQL.Fixtures.Model;
 using CodeArchitects.Platform.GraphQL.Model;
 using CodeArchitects.Platform.GraphQL.Model.FluentMock;
 using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
 using System.Reflection;
-using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-public class OperationAppenderTests : IDisposable
+public class DocumentRendererTests : IDisposable
 {
   private const string s_queryName = "GetBlogs";
 
-  private readonly MemoryStream _ms;
+  private readonly TestBufferWriter _writer;
   private readonly DocumentBuilderOptions _options;
-  private readonly OperationAppender _sut;
 
-  public OperationAppenderTests()
+  public DocumentRendererTests()
   {
-    _ms = new();
+    _writer = new();
     _options = new();
-    _sut = new(_ms, _options);
   }
 
-  private string Content => Encoding.UTF8.GetString(_ms.ToArray());
+  private string Content => _writer.ToString();
+
+  private DocumentRenderer CreateSut() => new DocumentRenderer(_writer, _options);
 
   [Fact]
   public void QueryBlogFieldWithoutVariables_ShouldProduceCorrectDocument()
@@ -45,8 +45,10 @@ public class OperationAppenderTests : IDisposable
             .SetArguments()
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -98,8 +100,10 @@ public class OperationAppenderTests : IDisposable
             .SetArguments()
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -137,8 +141,10 @@ public class OperationAppenderTests : IDisposable
                 .SetValue(value)))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be($$"""
@@ -172,8 +178,10 @@ public class OperationAppenderTests : IDisposable
                 .SetValue(typeof(GetBlogsVariables).GetRequiredProperty(nameof(GetBlogsVariables.Last)))))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -222,8 +230,10 @@ public class OperationAppenderTests : IDisposable
                         .SetValues(new object?[] { 1, 2, 3 })))))))))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -260,8 +270,10 @@ public class OperationAppenderTests : IDisposable
             .SetArguments()
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -289,8 +301,10 @@ public class OperationAppenderTests : IDisposable
             .SetArguments()
             .SetSelectionSet(null as ISelectionSetNode)))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -338,8 +352,10 @@ public class OperationAppenderTests : IDisposable
                   .SetArguments()
                   .SetSelectionSet(null as ISelectionSetNode))))))));
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
@@ -394,8 +410,10 @@ public class OperationAppenderTests : IDisposable
 
     _options.LinePolicy = LinePolicy.Space(1);
 
+    DocumentRenderer sut = CreateSut();
+    
     // Act
-    _sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("query GetBlogs { blogs { edges { cursor } pageInfo } }");
@@ -403,6 +421,6 @@ public class OperationAppenderTests : IDisposable
 
   public void Dispose()
   {
-    ((IDisposable)_ms).Dispose();
+    ((IDisposable)_writer).Dispose();
   }
 }

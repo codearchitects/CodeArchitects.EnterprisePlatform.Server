@@ -1,21 +1,27 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
+using System.Buffers;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal struct OperationAppender
+internal ref struct DocumentRenderer
 {
-  private delegate void AppendAction<T>(ref OperationAppender self, T current);
-  private delegate void SeparatorCallback(ref OperationAppender self);
+  private delegate void AppendAction<T>(ref DocumentRenderer self, T element);
+  private delegate void AppendAction(ref DocumentRenderer self);
+
+  private static readonly AppendAction s_appendNothing          = static (ref DocumentRenderer self) => { };
+  private static readonly AppendAction s_appendLeftParenthesis  = static (ref DocumentRenderer self) => self._sb.AppendLeftParenthesis();
+  private static readonly AppendAction s_appendRightParenthesis = static (ref DocumentRenderer self) => self._sb.AppendRightParenthesis();
+  private static readonly AppendAction s_appendSpace            = static (ref DocumentRenderer self) => self._sb.AppendSpace();
 
   private readonly Utf8StringBuilder _sb;
   private readonly DocumentBuilderOptions _options;
   private int _indent;
 
-  public OperationAppender(MemoryStream ms, DocumentBuilderOptions options)
+  public DocumentRenderer(IBufferWriter<byte> writer, DocumentBuilderOptions options)
   {
-    _sb = new Utf8StringBuilder(ms);
+    _sb = new Utf8StringBuilder(writer);
     _options = options;
   }
 
@@ -32,22 +38,18 @@ internal struct OperationAppender
 
     AppendVariables(operationDefinition.Variables);
 
-    using (new SpaceScope(_sb))
-    {
-      AppendDirectives(operationDefinition.Directives);
-    }
+    AppendDirectives(operationDefinition.Directives);
 
-    _sb.AppendSpace();
     AppendSelectionSet(operationDefinition.SelectionSet);
   }
 
   private void AppendVariables(IEnumerable<IVariable> variables)
   {
-    using (new ArgumentScope(_sb))
-    {
-      AppendSeparated(variables, static (ref OperationAppender self, IVariable variable)
-        => self.AppendVariable(variable));
-    }
+    AppendSeparated(
+      variables,
+      static (ref DocumentRenderer self, IVariable variable) => self.AppendVariable(variable),
+      s_appendLeftParenthesis,
+      s_appendRightParenthesis);
   }
 
   private void AppendVariable(IVariable variable)
@@ -62,8 +64,11 @@ internal struct OperationAppender
 
   private void AppendDirectives(IEnumerable<IDirectiveNode> directives)
   {
-    AppendSpaced(directives, static (ref OperationAppender self, IDirectiveNode directive)
-      => self.AppendDirective(directive));
+    AppendSpaced(
+      directives,
+      static (ref DocumentRenderer self, IDirectiveNode directive) => self.AppendDirective(directive),
+      s_appendSpace,
+      s_appendNothing);
   }
 
   private void AppendDirective(IDirectiveNode directive)
@@ -77,6 +82,8 @@ internal struct OperationAppender
 
   private void AppendSelectionSet(ISelectionSetNode selectionSet)
   {
+    _sb.AppendSpace();
+
     _sb.AppendLeftBrace();
     _indent++;
     AppendLine();
@@ -90,7 +97,7 @@ internal struct OperationAppender
 
   private void AppendSelections(IEnumerable<ISelectionNode> selections)
   {
-    AppendLines(selections, static (ref OperationAppender self, ISelectionNode selection)
+    AppendLines(selections, static (ref DocumentRenderer self, ISelectionNode selection)
       => self.AppendSelection(selection));
   }
 
@@ -108,25 +115,21 @@ internal struct OperationAppender
 
     AppendArguments(selection.Arguments);
 
-    using (new SpaceScope(_sb))
-    {
-      AppendDirectives(selection.Directives);
-    }
+    AppendDirectives(selection.Directives);
 
     if (selection.SelectionSet is ISelectionSetNode selectionSet)
     {
-      _sb.AppendSpace();
       AppendSelectionSet(selectionSet);
     }
   }
 
   private void AppendArguments(IEnumerable<IArgumentNode> arguments)
   {
-    using (new ArgumentScope(_sb))
-    {
-      AppendSeparated(arguments, static (ref OperationAppender self, IArgumentNode argument)
-        => self.AppendArgument(argument));
-    }
+    AppendSeparated(
+      arguments,
+      static (ref DocumentRenderer self, IArgumentNode argument) => self.AppendArgument(argument),
+      s_appendLeftParenthesis,
+      s_appendRightParenthesis);
   }
 
   private void AppendArgument(IArgumentNode argument)
@@ -195,8 +198,7 @@ internal struct OperationAppender
       .AppendLeftBrace()
       .AppendSpace();
 
-    AppendSeparated(objectValue.Fields, static (ref OperationAppender self, IObjectFieldNode field)
-      => self.AppendObjectField(field));
+    AppendSeparated(objectValue.Fields, static (ref DocumentRenderer self, IObjectFieldNode field) => self.AppendObjectField(field));
 
     _sb
       .AppendSpace()
@@ -217,8 +219,7 @@ internal struct OperationAppender
   {
     _sb.AppendLeftBracket();
 
-    AppendSeparated(listValue.Values, static (ref OperationAppender self, object? value)
-      => self.AppendValue(value));
+    AppendSeparated(listValue.Values, static (ref DocumentRenderer self, object? value) => self.AppendValue(value));
 
     _sb.AppendRightBracket();
   }
@@ -228,91 +229,64 @@ internal struct OperationAppender
     _options.LinePolicy.AppendOn(_sb, _indent);
   }
 
-  private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> append)
+  private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, AppendLine, append);
+    AppendJoin(values, appendElement, AppendLine, s_appendNothing, s_appendNothing);
 
-    static void AppendLine(ref OperationAppender self)
-      => self.AppendLine();
+    static void AppendLine(ref DocumentRenderer self) => self.AppendLine();
   }
 
-  private void AppendSeparated<T>(IEnumerable<T> values, AppendAction<T> append)
+  private void AppendSeparated<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, AppendSeparator, append);
+    AppendJoin(values, appendElement, AppendSeparator, s_appendNothing, s_appendNothing);
 
-    static void AppendSeparator(ref OperationAppender self)
-      => self._options.Separator.AppendOn(self._sb);
+    static void AppendSeparator(ref DocumentRenderer self) => self._options.Separator.AppendOn(self._sb);
   }
 
-  private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> append)
+  private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, AppendSpace, append);
+    AppendJoin(values, appendElement, AppendSpace, s_appendNothing, s_appendNothing);
 
-    static void AppendSpace(ref OperationAppender self)
-      => self._sb.AppendSpace();
+    static void AppendSpace(ref DocumentRenderer self) => self._sb.AppendSpace();
   }
 
-  private void AppendJoin<T>(IEnumerable<T> values, SeparatorCallback separatorCallback, AppendAction<T> append)
+  private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
+  {
+    AppendJoin(values, appendElement, AppendLine, appendBeforeFirst, appendAfterLast);
+
+    static void AppendLine(ref DocumentRenderer self) => self.AppendLine();
+  }
+
+  private void AppendSeparated<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
+  {
+    AppendJoin(values, appendElement, AppendSeparator, appendBeforeFirst, appendAfterLast);
+
+    static void AppendSeparator(ref DocumentRenderer self) => self._options.Separator.AppendOn(self._sb);
+  }
+
+  private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
+  {
+    AppendJoin(values, appendElement, AppendSpace, appendBeforeFirst, appendAfterLast);
+
+    static void AppendSpace(ref DocumentRenderer self) => self._sb.AppendSpace();
+  }
+
+  private void AppendJoin<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendSeparator, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
   {
     using IEnumerator<T> enumerator = values.GetEnumerator();
 
     if (!enumerator.MoveNext())
       return;
 
-    append(ref this, enumerator.Current);
+    appendBeforeFirst(ref this);
+    appendElement(ref this, enumerator.Current);
 
     while (enumerator.MoveNext())
     {
-      separatorCallback(ref this);
-      append(ref this, enumerator.Current);
-    }
-  }
-
-  private readonly ref struct ArgumentScope
-  {
-    private readonly Utf8StringBuilder _sb;
-    private readonly long _length;
-
-    public ArgumentScope(Utf8StringBuilder sb)
-    {
-      _sb = sb;
-
-      _sb.AppendLeftParenthesis();
-      _length = sb.Length;
+      appendSeparator(ref this);
+      appendElement(ref this, enumerator.Current);
     }
 
-    public void Dispose()
-    {
-      if (_sb.Length == _length)
-      {
-        _sb.Pop();
-      }
-      else
-      {
-        _sb.AppendRightParenthesis();
-      }
-    }
-  }
-
-  private readonly ref struct SpaceScope
-  {
-    private readonly Utf8StringBuilder _sb;
-    private readonly long _length;
-
-    public SpaceScope(Utf8StringBuilder sb)
-    {
-      _sb = sb;
-
-      _sb.AppendSpace();
-      _length = sb.Length;
-    }
-
-    public void Dispose()
-    {
-      if (_sb.Length == _length)
-      {
-        _sb.Pop();
-      }
-    }
+    appendAfterLast(ref this);
   }
 }
