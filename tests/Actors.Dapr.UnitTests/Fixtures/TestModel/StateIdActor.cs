@@ -16,7 +16,7 @@ internal interface IStateIdActorHost : IActor
 
 internal class StateIdActorHost : DaprActorHost<StateIdActor, StateIdActorState>, IStateIdActorHost
 {
-  public StateIdActorHost(ActorHost host, IManagerFactory<StateIdActor, StateIdActorState> factory)
+  public StateIdActorHost(ActorHost host, IActorManagerFactory<StateIdActor, StateIdActorState> factory)
     : base(host, factory)
   {
   }

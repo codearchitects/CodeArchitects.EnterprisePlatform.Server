@@ -9,13 +9,13 @@ public partial class ActorContextTests
 {
   private readonly Mock<IActorDescriptor<TestActor1, TestActor1State>> _descriptor1Mock;
   private readonly Mock<IActivityManager<TestActor1>> _activityManager1Mock;
-  private readonly Mock<IActorHost<TestActor1>> _host1Mock;
+  private readonly Mock<IActorHost<TestActor1, TestActor1State>> _host1Mock;
   private readonly TestActor1State _state1;
   private readonly ActorContext<TestActor1, TestActor1State> _sut1;
 
   private readonly Mock<IActorDescriptor<TestActor2, TestActor2State>> _descriptor2Mock;
   private readonly Mock<IActivityManager<TestActor2>> _activityManager2Mock;
-  private readonly Mock<IActorHost<TestActor2>> _host2Mock;
+  private readonly Mock<IActorHost<TestActor2, TestActor2State>> _host2Mock;
   private readonly TestActor2State _state2;
   private readonly ActorContext<TestActor2, TestActor2State> _sut2;
 
@@ -35,6 +35,9 @@ public partial class ActorContextTests
       .Setup(x => x.CreateInstance(It.IsAny<int>(), It.IsAny<IServiceProvider>(), It.IsAny<TestActor1State>(), It.IsAny<IActorContext<TestActor1>>()))
       .Returns(new TestActor1());
 
+    _descriptor1Mock
+      .Setup(x => x.UpdateState(It.IsAny<TestActor1>(), It.IsAny<TestActor1State>()));
+
     _descriptor2Mock
       .Setup(x => x.CreateInstance(It.IsAny<int>(), It.IsAny<IServiceProvider>(), It.IsAny<TestActor2State>(), It.IsAny<IActorContext<TestActor2>>()))
       .Returns(delegate (int implementationId, IServiceProvider services, TestActor2State state, IActorContext<TestActor2> context)
@@ -42,25 +45,32 @@ public partial class ActorContextTests
         return new TestActor2(state, context);
       });
 
+    _descriptor2Mock
+      .Setup(x => x.UpdateState(It.IsAny<TestActor2>(), It.IsAny<TestActor2State>()));
+
+    _host1Mock
+      .Setup(x => x.GetStateAsync(It.IsAny<CancellationToken>()))
+      .ReturnsAsync(_state1);
+
+    _host2Mock
+      .Setup(x => x.GetStateAsync(It.IsAny<CancellationToken>()))
+      .ReturnsAsync(_state2);
+
     _sut1 = new(
       Mock.Of<IServiceProvider>(MockBehavior.Strict),
       _descriptor1Mock.Object,
       _activityManager1Mock.Object,
-      _host1Mock.Object,
-      _state1,
-      0);
+      _host1Mock.Object);
 
     _sut2 = new(
       Mock.Of<IServiceProvider>(MockBehavior.Strict),
       _descriptor2Mock.Object,
       _activityManager2Mock.Object,
-      _host2Mock.Object,
-      _state2,
-      0);
+      _host2Mock.Object);
   }
 
   [Fact]
-  public void Become_ShouldSetImplementationIdOnState()
+  public async Task Become_ShouldSetImplementationIdOnState()
   {
     // Arrange
     int implementationId = 12;
@@ -70,6 +80,7 @@ public partial class ActorContextTests
       .Returns(implementationId);
 
     // Act
+    await _sut1.BeginMethodAsync(CancellationToken.None);
     _sut1.Become<TestActor1Impl>();
 
     // Assert
@@ -84,13 +95,13 @@ public partial class ActorContextTests
   public async Task ExecuteBindingsAsync_ShouldExecuteEnabledBindings(int initialValue, int finalValue, bool disableBinding, bool bindingExecuted, string because)
   {
     // Arrange
-    _sut2.Actor.State.Value = initialValue;
-    _sut2.OnMethodBegin();
-    _sut2.Actor.State.Value = finalValue;
-    _state2.EnabledBindings = disableBinding ? 0 : 1;
+    _state2.Value = initialValue;
 
     // Act
-    await _sut2.ExecuteBindingsAsync(CancellationToken.None);
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+    _state2.Value = finalValue;
+    _state2.EnabledBindings = disableBinding ? 0 : 1;
+    await _sut2.EndExecutionAsync(CancellationToken.None);
 
     // Assert
     _sut2.Actor.BindingExecuted.Should().Be(bindingExecuted, because);
@@ -100,11 +111,12 @@ public partial class ActorContextTests
   [InlineData(0, 1)]
   [InlineData(2, 4)]
   [InlineData(4, 16)]
-  public void EnableBinding_ShouldSetCorrectBitInState(int index, int expectedValue)
+  public async Task EnableBinding_ShouldSetCorrectBitInState(int index, int expectedValue)
   {
     // Arrange
 
     // Act
+    await _sut1.BeginMethodAsync(CancellationToken.None);
     _sut1.EnableBinding(new BindingId(index));
 
     // Assert
@@ -115,12 +127,13 @@ public partial class ActorContextTests
   [InlineData(0, ~1)]
   [InlineData(2, ~4)]
   [InlineData(4, ~16)]
-  public void DisableBinding_ShouldResetCorrectBitInState(int index, int expectedValue)
+  public async Task DisableBinding_ShouldResetCorrectBitInState(int index, int expectedValue)
   {
     // Arrange
     _state1.EnabledBindings = ~0;
 
     // Act
+    await _sut1.BeginMethodAsync(CancellationToken.None);
     _sut1.DisableBinding(new BindingId(index));
 
     // Assert

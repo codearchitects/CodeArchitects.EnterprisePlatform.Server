@@ -85,8 +85,7 @@ internal class DaprActorsOptionsBuilder : IDaprActorsOptionsBuilder
 
     IActorModel model = factory.CreateModel(DynamicAssembly.Module);
 
-    services.AddScoped(typeof(IManagerFactory<,>), typeof(ManagerFactory<,>));
-    services.AddSingleton(model);
+    services.AddScoped(typeof(IActorManagerFactory<,>), typeof(ActorManagerFactory<,>));
 
     HashSet<Assembly> actorAssemblies = new();
     List<Action<ActorRuntimeOptions>> actorRegistrations = new();
@@ -118,6 +117,7 @@ internal class DaprActorsOptionsBuilder : IDaprActorsOptionsBuilder
       Type activityManagerType = typeof(IActivityManager<>).MakeGenericType(actor.ActorType);
       object activityManager = CreateActivityManager(actor);
 
+      services.AddSingleton(typeof(IActorDescriptor<,>).MakeGenericType(actor.ActorType, actor.State.Type), actor);
       services.AddSingleton(activityManagerType, activityManager);
       services.AddSingleton(actor.Factory.FactoryType, actorFactoryType);
 

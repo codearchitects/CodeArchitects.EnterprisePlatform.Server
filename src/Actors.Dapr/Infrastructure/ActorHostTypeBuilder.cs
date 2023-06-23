@@ -107,7 +107,7 @@ internal class ActorHostTypeBuilder
 
   private void BuildConstructor(TypeBuilder hostType, IActorDescriptor actor)
   {
-    Type managerFactoryType = typeof(IManagerFactory<,>).MakeGenericType(
+    Type managerFactoryType = typeof(IActorManagerFactory<,>).MakeGenericType(
       actor.ActorType.UnderlyingSystemType,
       actor.State.Type.UnderlyingSystemType);
 

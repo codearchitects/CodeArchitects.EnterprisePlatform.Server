@@ -96,15 +96,13 @@ public class DaprActorHostTests
     fixture.ManagerMock
       .Setup(x => x.JsonSerializerOptions)
       .Returns(StandardActorFixture.Descriptor.JsonSerializerOptions);
-    fixture.FactoryMock
-      .Setup(x => x.Create(It.IsAny<IActorHost<StandardActor>>(), It.IsAny<StandardActorState>(), It.IsAny<int>()))
-      .Returns(fixture.ManagerMock.Object);
 
     fixture.ManagerMock
       .Setup(x => x.Actor)
       .Returns(actorMock.Object);
     fixture.ManagerMock
-      .Setup(x => x.OnActivityBegin());
+      .Setup(x => x.BeginActivityAsync(It.IsAny<Activity<StandardActor>>(), It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
 
     // Act
     await sut.ReceiveReminderAsync("", payload, TimeSpan.Zero, TimeSpan.Zero);

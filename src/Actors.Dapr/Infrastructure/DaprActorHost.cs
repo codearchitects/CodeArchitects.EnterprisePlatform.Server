@@ -5,23 +5,21 @@ using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
 
-internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemindable
+internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>, IRemindable
   where TActor : class
   where TState : ActorState
 {
-  private readonly IManagerFactory<TActor, TState> _factory;
+  private readonly IActorManager<TActor> _manager;
 
-  protected DaprActorHost(ActorHost host, IManagerFactory<TActor, TState> factory)
+  protected DaprActorHost(ActorHost host, IActorManagerFactory<TActor, TState> managerFactory)
     : base(host)
   {
-    _factory = factory;
+    _manager = managerFactory.CreateManager(this);
   }
-
-  public IActorManager<TActor, TState> Manager { get; set; } = default!;
 
   public string ActorId => Id.GetId();
 
-  protected TActor Actor => Manager.Actor;
+  protected TActor Actor => _manager.Actor;
 
   protected override async Task OnPreActorMethodAsync(ActorMethodContext actorMethodContext)
   {
@@ -30,9 +28,7 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemin
     if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
       return;
 
-    TState? state = await GetStateAsync(CancellationToken.None);
-    Manager = _factory.Create(this, state);
-    Manager.OnMethodBegin();
+    await _manager.BeginMethodAsync(CancellationToken.None);
   }
 
   protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
@@ -40,21 +36,19 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemin
     if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
       return;
 
-    await Manager.ExecuteBindingsAsync(CancellationToken.None);
-    Manager.OnExecutionEnd();
-    await StateManager.SetStateAsync(Constants.ActorStateName, Manager.State, CancellationToken.None);
+    await _manager.EndExecutionAsync(CancellationToken.None);
   }
 
   protected Task InitAsync(byte[] payload, CancellationToken cancellationToken)
   {
     TState state = JsonSerializer.Deserialize<TState>(payload)!;
-    _factory.InitializeState(state);
+    _manager.InitializeState(state);
     return StateManager.AddStateAsync(Constants.ActorStateName, state, cancellationToken);
   }
 
   public Task ScheduleAsync(ScheduleId id, Activity<TActor> activity, SchedulingOptions options, CancellationToken cancellationToken)
   {
-    byte[] payload = JsonSerializer.SerializeToUtf8Bytes(activity, Manager.ActivityType, Manager.JsonSerializerOptions);
+    byte[] payload = JsonSerializer.SerializeToUtf8Bytes(activity, _manager.ActivityType, _manager.JsonSerializerOptions);
 
     return RegisterReminderAsync(id, payload, options.Timer, options.Period);
   }
@@ -66,16 +60,13 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemin
 
   public async Task ReceiveReminderAsync(string reminderName, byte[] payload, TimeSpan dueTime, TimeSpan period)
   {
-    Activity<TActor> activity = (Activity<TActor>)JsonSerializer.Deserialize(payload, Manager.ActivityType, Manager.JsonSerializerOptions)!;
+    Activity<TActor> activity = (Activity<TActor>)JsonSerializer.Deserialize(payload, _manager.ActivityType, _manager.JsonSerializerOptions)!;
 
-    TState? state = await GetStateAsync(CancellationToken.None);
-    Manager = _factory.Create(this, state, activity.ImplementationId);
-    Manager.OnActivityBegin();
-
-    await activity.ExecuteAsync(Manager.Actor, CancellationToken.None);
+    await _manager.BeginActivityAsync(activity, CancellationToken.None);
+    await activity.ExecuteAsync(_manager.Actor, CancellationToken.None);
   }
 
-  private async Task<TState?> GetStateAsync(CancellationToken cancellationToken)
+  public async Task<TState?> GetStateAsync(CancellationToken cancellationToken)
   {
     ConditionalValue<TState> state = await StateManager.TryGetStateAsync<TState>(Constants.ActorStateName, cancellationToken);
 
@@ -83,5 +74,10 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor>, IRemin
       return state.Value;
 
     return null;
+  }
+
+  public async Task SetStateAsync(TState state, CancellationToken cancellationToken)
+  {
+    await StateManager.SetStateAsync(Constants.ActorStateName, state, CancellationToken.None);
   }
 }
