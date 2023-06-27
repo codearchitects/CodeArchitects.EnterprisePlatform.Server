@@ -14,7 +14,7 @@ public static class QueryHelpers
 {
   private delegate void QueryDelegate(StringBuilder url, object? queryObject);
 
-  private static readonly ConcurrentDictionary<Type, QueryDelegate> s_queryDelegates = new ConcurrentDictionary<Type, QueryDelegate>();
+  private static readonly ConcurrentDictionary<Type, QueryDelegate> s_queryDelegates = new();
   
   private static readonly MethodInfo s_appendSingleMethod = typeof(QueryHelpers).GetRequiredMethod(
     name: nameof(AppendSingle),

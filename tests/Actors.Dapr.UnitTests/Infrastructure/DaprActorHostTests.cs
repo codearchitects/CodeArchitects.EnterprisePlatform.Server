@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Infrastructure;
-using CodeArchitects.Platform.Actors.Scheduling;
+﻿using CodeArchitects.Platform.Actors.Scheduling;
 using CodeArchitects.Platform.Actors.TestModel;
 using Dapr.Actors.Runtime;
 using System.Text;
