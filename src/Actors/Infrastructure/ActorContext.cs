@@ -261,7 +261,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   public async Task BeginMethodAsync(CancellationToken cancellationToken)
   {
     _state = await GetStateAsync(cancellationToken);
-    
+
     InitActor(_state, _state.ImplementationId);
     VerifyBindingPreconditions(_actor);
 
@@ -272,7 +272,13 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   {
     _state = await GetStateAsync(cancellationToken);
 
-    InitActor(_state, activity.ImplementationId);
+    int implementationId = activity.ImplementationId;
+    if (implementationId == 0)
+    {
+      implementationId = _state.ImplementationId;
+    }
+
+    InitActor(_state, implementationId);
     VerifyBindingPreconditions(_actor);
 
     _section = ExecutionSection.Activity;
@@ -287,6 +293,8 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     await ExecuteBindingsAsync(cancellationToken);
 
     _descriptor.UpdateState(_actor, _state);
+
+    await _host.SetStateAsync(_state, cancellationToken);
   }
 
   public void InitializeState(ActorState state)

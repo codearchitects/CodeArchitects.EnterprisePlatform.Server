@@ -52,9 +52,17 @@ public partial class ActorContextTests
       .Setup(x => x.GetStateAsync(It.IsAny<CancellationToken>()))
       .ReturnsAsync(_state1);
 
+    _host1Mock
+      .Setup(x => x.SetStateAsync(It.IsAny<TestActor1State>(), It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
+
     _host2Mock
       .Setup(x => x.GetStateAsync(It.IsAny<CancellationToken>()))
       .ReturnsAsync(_state2);
+
+    _host2Mock
+      .Setup(x => x.SetStateAsync(It.IsAny<TestActor2State>(), It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
 
     _sut1 = new(
       Mock.Of<IServiceProvider>(MockBehavior.Strict),

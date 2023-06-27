@@ -24,9 +24,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     PolymorphicResult? result = await _http.GetFromJsonAsync<PolymorphicResult>($"/virtual-actor/polymorphic-method?implementation={implementation}");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.Implementation.Should().Be(expectedImplementation);
   }
 
@@ -42,9 +42,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     await Task.Delay(6000);
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult.Id}/output");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.Output.Should().Be(output);
   }
 
@@ -55,9 +55,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-enabler");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.Output.Should().Be("binding");
   }
 
@@ -68,9 +68,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-disabler");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.Output.Should().Be("no binding");
   }
 
@@ -86,9 +86,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     await Task.Delay(1000);
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult.Id}/output");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.Output.Should().Be(output);
   }
 
@@ -104,9 +104,9 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     await Task.Delay(1000);
     StateResult? result = await _http.GetFromJsonAsync<StateResult>($"/test-actor/{idResult.Id}/state");
+    CheckResult(result);
 
     // Assert
-    CheckResult(result);
     result.State.Should().Be(state);
   }
 
