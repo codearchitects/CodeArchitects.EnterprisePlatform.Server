@@ -9,7 +9,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.MySQL;
 /// </summary>
 public class MySQLProvider : DatabaseProvider<MySqlConnection, MySqlCommand>
 {
-  private protected override ISyntaxProvider CreateSyntaxProvider() => new MySQLSyntaxProvider();
+  internal override ISyntaxProvider CreateSyntaxProvider() => new MySQLSyntaxProvider();
 
   /// <summary>
   /// Specifies the connection string to the database.

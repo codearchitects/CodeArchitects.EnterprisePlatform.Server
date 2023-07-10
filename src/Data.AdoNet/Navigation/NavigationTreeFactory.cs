@@ -1,19 +1,19 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.Navigation;
 using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Concurrent;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 
 internal class NavigationTreeFactory : INavigationTreeFactory
 {
+  private readonly Synchronizer _synchronizer;
   private readonly IMemoryCache _cache;
-  private readonly ConcurrentDictionary<object, object> _locks;
 
-  public NavigationTreeFactory(IMemoryCache cache)
+  public NavigationTreeFactory(Synchronizer synchronizer, IMemoryCache cache)
   {
+    _synchronizer = synchronizer;
     _cache = cache;
-    _locks = new();
   }
 
   public INavigationRoot<TEntity, TKey> Create<TEntity, TKey>(IEntityModel<TEntity, TKey> entityModel, IncludeAction<TEntity> include)
@@ -23,26 +23,18 @@ internal class NavigationTreeFactory : INavigationTreeFactory
     if (_cache.TryGetValue(include, out INavigationRoot<TEntity, TKey> root))
       return root;
 
-    object navigationLock = _locks.GetOrAdd(entityModel, _ => new object());
-    try
+    using (_synchronizer.Lock(include))
     {
-      lock (navigationLock)
-      {
-        if (_cache.TryGetValue(include, out root))
-          return root;
+      if (_cache.TryGetValue(include, out root))
+        return root;
 
-        RootIncluder<TEntity, TKey> includer = new(entityModel);
-        include(includer);
-        root = includer.Root;
+      RootIncluder<TEntity, TKey> includer = new(entityModel);
+      include(includer);
+      root = includer.Root;
 
-        using ICacheEntry entry = _cache.CreateEntry(include);
-        entry.Value = root;
-        entry.Size = ComputeEntrySize(root);
-      }
-    }
-    finally
-    {
-      _locks.Remove(navigationLock, out _);
+      using ICacheEntry entry = _cache.CreateEntry(include);
+      entry.Value = root;
+      entry.Size = ComputeEntrySize(root);
     }
 
     return root;

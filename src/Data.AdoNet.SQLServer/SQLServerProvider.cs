@@ -9,7 +9,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.SQLServer;
 /// </summary>
 public class SQLServerProvider : DatabaseProvider<SqlConnection, SqlCommand>
 {
-  private protected override ISyntaxProvider CreateSyntaxProvider() => new SQLServerSyntaxProvider();
+  internal override ISyntaxProvider CreateSyntaxProvider() => new SQLServerSyntaxProvider();
 
   /// <summary>
   /// Specifies the connection string to the database.

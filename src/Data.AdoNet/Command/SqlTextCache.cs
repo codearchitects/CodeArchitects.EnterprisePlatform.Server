@@ -1,19 +1,19 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Navigation;
 using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Concurrent;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Command;
 
 internal class SqlTextCache : ISqlTextCache
 {
+  private readonly Synchronizer _synchronizer;
   private readonly IMemoryCache _cache;
-  private readonly ConcurrentDictionary<object, object> _locks;
 
-  public SqlTextCache(IMemoryCache cache)
+  public SqlTextCache(Synchronizer synchronizer, IMemoryCache cache)
   {
+    _synchronizer = synchronizer;
     _cache = cache;
-    _locks = new();
   }
 
   public string GetOrAddFindText(INavigationRoot root, SqlTextBuilder sqlBuilder, Func<INavigationRoot, SqlTextBuilder, string> queryCompiler)
@@ -21,23 +21,15 @@ internal class SqlTextCache : ISqlTextCache
     if (_cache.TryGetValue(root, out string text))
       return text;
 
-    object compilationLock = _locks.GetOrAdd(root, _ => new object());
-    try
+    using (_synchronizer.Lock(root))
     {
-      lock (compilationLock)
-      {
-        if (_cache.TryGetValue(root, out text))
-          return text;
+      if (_cache.TryGetValue(root, out text))
+        return text;
 
-        text = queryCompiler(root, sqlBuilder);
-        using ICacheEntry entry = _cache.CreateEntry(root);
-        entry.Value = text;
-        entry.Size = text.Length / 4;
-      }
-    }
-    finally
-    {
-      _locks.TryRemove(root, out _);
+      text = queryCompiler(root, sqlBuilder);
+      using ICacheEntry entry = _cache.CreateEntry(root);
+      entry.Value = text;
+      entry.Size = text.Length / 4;
     }
 
     return text;
@@ -70,24 +62,15 @@ internal class SqlTextCache : ISqlTextCache
     if (_cache.TryGetValue(key, out string text))
       return text;
 
-
-    object compilationLock = _locks.GetOrAdd(key, _ => new object());
-    try
+    using (_synchronizer.Lock(key))
     {
-      lock (compilationLock)
-      {
-        if (_cache.TryGetValue(key, out text))
-          return text;
+      if (_cache.TryGetValue(key, out text))
+        return text;
 
-        text = queryCompiler(entityModel, sqlBuilder);
-        using ICacheEntry entry = _cache.CreateEntry(key);
-        entry.Value = text;
-        entry.Size = text.Length / 4;
-      }
-    }
-    finally
-    {
-      _locks.TryRemove(key, out _);
+      text = queryCompiler(entityModel, sqlBuilder);
+      using ICacheEntry entry = _cache.CreateEntry(key);
+      entry.Value = text;
+      entry.Size = text.Length / 4;
     }
 
     return text;
