@@ -10,9 +10,9 @@ namespace CodeArchitects.Platform.Data.AdoNet.Oracle;
 /// </summary>
 public class OracleProvider : DatabaseProvider<OracleConnection, OracleCommand>
 {
-  private protected override ISyntaxProvider CreateSyntaxProvider() => new OracleSyntaxProvider();
+  internal override ISyntaxProvider CreateSyntaxProvider() => new OracleSyntaxProvider();
 
-  private protected override CommandBuilder<OracleCommand> CreateCommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
+  private protected override CommandBuilder<OracleCommand> CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext)
   {
     return new Command.OracleCommandBuilder(sqlBuilder, concurrencyContext);
   }

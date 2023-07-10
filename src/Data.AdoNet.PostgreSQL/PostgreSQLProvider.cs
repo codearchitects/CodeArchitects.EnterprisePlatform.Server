@@ -9,7 +9,7 @@ namespace CodeArchitects.Platform.Data.AdoNet.PostgreSQL;
 /// </summary>
 public class PostgreSQLProvider : DatabaseProvider<NpgsqlConnection, NpgsqlCommand>
 {
-  private protected override ISyntaxProvider CreateSyntaxProvider() => new PostgreSQLSyntaxProvider();
+  internal override ISyntaxProvider CreateSyntaxProvider() => new PostgreSQLSyntaxProvider();
 
   /// <summary>
   /// Specifies the connection string to the database.
