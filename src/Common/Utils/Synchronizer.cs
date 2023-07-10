@@ -22,11 +22,18 @@ internal class Synchronizer
     _createToken = key => new SyncToken(this, key);
   }
 
-  public IDisposable Lock<T>(T key)
+  /// <summary>
+  /// Synchronizes the block of code inside the scope of the disposable using an equivalence key.
+  /// </summary>
+  /// <typeparam name="T">The type of the key.</typeparam>
+  /// <param name="key">The equivalence key used for synchronization.</param>
+  /// <returns>A synchronization token that signals the synchronized block of code as available when disposed.</returns>
+  /// <remarks>Do NOT use the await keyword inside the synchronized scope.</remarks>
+  public IDisposable Sync<T>(T key)
     where T : class
   {
     SyncToken token = _tokens.GetOrAdd(key, _createToken);
-    token.Enter();
+    token.Sync();
     return token;
   }
 
@@ -40,6 +47,7 @@ internal class Synchronizer
     private readonly Synchronizer _synchronizer;
     private readonly object _key;
     private bool _lockTaken;
+    private int _enteringCount;
 
     public SyncToken(Synchronizer synchronizer, object key)
     {
@@ -47,23 +55,32 @@ internal class Synchronizer
       _key = key;
     }
 
-    public void Enter()
+    public void Sync()
     {
       bool lockTaken = false;
+      Interlocked.Increment(ref _enteringCount);
       Monitor.Enter(this, ref lockTaken);
+
+      if (_lockTaken)
+        throw new InvalidOperationException("An async block of code was synchronized using a Synchronizer instance.");
 
       _lockTaken = lockTaken;
     }
 
     void IDisposable.Dispose()
     {
-      if (_lockTaken)
+      Interlocked.Decrement(ref _enteringCount);
+
+      if (_enteringCount == 0)
       {
-        Monitor.Exit(this);
+        _synchronizer.Release(_key);
       }
 
-      _synchronizer.Release(_key);
-      _lockTaken = false;
+      if (_lockTaken)
+      {
+        _lockTaken = false;
+        Monitor.Exit(this);
+      }
     }
   }
 }

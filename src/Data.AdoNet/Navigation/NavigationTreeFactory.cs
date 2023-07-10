@@ -23,7 +23,7 @@ internal class NavigationTreeFactory : INavigationTreeFactory
     if (_cache.TryGetValue(include, out INavigationRoot<TEntity, TKey> root))
       return root;
 
-    using (_synchronizer.Lock(include))
+    using (_synchronizer.Sync(include))
     {
       if (_cache.TryGetValue(include, out root))
         return root;

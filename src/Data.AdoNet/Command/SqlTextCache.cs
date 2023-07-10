@@ -21,7 +21,7 @@ internal class SqlTextCache : ISqlTextCache
     if (_cache.TryGetValue(root, out string text))
       return text;
 
-    using (_synchronizer.Lock(root))
+    using (_synchronizer.Sync(root))
     {
       if (_cache.TryGetValue(root, out text))
         return text;
@@ -62,7 +62,7 @@ internal class SqlTextCache : ISqlTextCache
     if (_cache.TryGetValue(key, out string text))
       return text;
 
-    using (_synchronizer.Lock(key))
+    using (_synchronizer.Sync(key))
     {
       if (_cache.TryGetValue(key, out text))
         return text;

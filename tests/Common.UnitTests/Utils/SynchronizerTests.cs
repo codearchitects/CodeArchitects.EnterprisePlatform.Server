@@ -3,38 +3,60 @@
 public class SynchronizerTests
 {
   [Fact]
-  public void Lock_ShouldSynchronizeWithoutLockingTheKey()
+  public void Sync_ShouldSynchronizeWithoutLockingTheKey_UsingThreads()
   {
     // Arrange
+    const int threadCount = 5;
     LocalLockUser user = new();
     object key = new();
+    OperationData data = new(user, key);
 
-    ParameterizedThreadStart threadStart = delegate (object? data)
+    ParameterizedThreadStart threadStart = delegate(object? data)
     {
-      ((ThreadData)data!).Deconstruct(out LocalLockUser user, out object key);
+      ((OperationData)data!).Deconstruct(out LocalLockUser user, out object key);
 
-      user.SynchronizedOperationAsync(key);
+      user.SynchronizedOperation(key);
     };
 
-    Thread thread1 = new Thread(threadStart);
-    Thread thread2 = new Thread(threadStart);
+    List<Thread> threads = Enumerable.Range(0, threadCount).Select(_ => new Thread(threadStart)).ToList();
 
     // Act
-    thread1.Start(new ThreadData(user, key));
-    thread2.Start(new ThreadData(user, key));
-
+    threads.ForEach(thread => thread.Start(data));
     bool isLocked = !Monitor.TryEnter(key);
-
-    thread1.Join();
-    thread2.Join();
+    threads.ForEach(thread => thread.Join());
 
     // Assert
     user.RaceConditionHappened.Should().BeFalse();
-    user.AccessCount.Should().Be(2);
+    user.AccessCount.Should().Be(threadCount);
     isLocked.Should().BeFalse();
   }
 
-  private record ThreadData(LocalLockUser User, object Key);
+  [Fact]
+  public async Task Sync_ShouldSynchronizeWithoutLockingTheKey_UsingTasks()
+  {
+    // Arrange
+    const int taskCount = 5;
+    LocalLockUser user = new();
+    object key = new();
+
+    Action taskAction = delegate()
+    {
+      user.SynchronizedOperation(key);
+    };
+
+    List<Task> tasks = Enumerable.Range(0, taskCount).Select(_ => Task.Run(taskAction)).ToList();
+
+    // Act
+    bool isLocked = !Monitor.TryEnter(key);
+    await Task.WhenAll(tasks);
+
+    // Assert
+    user.RaceConditionHappened.Should().BeFalse();
+    user.AccessCount.Should().Be(taskCount);
+    isLocked.Should().BeFalse();
+  }
+
+  private record OperationData(LocalLockUser User, object Key);
 
   private class LocalLockUser
   {
@@ -49,9 +71,9 @@ public class SynchronizerTests
     public int AccessCount { get; private set; }
     public bool RaceConditionHappened { get; private set; }
 
-    public void SynchronizedOperationAsync(object key)
+    public void SynchronizedOperation(object key)
     {
-      using (_synchronizer.Lock(key))
+      using (_synchronizer.Sync(key))
       {
         StartOperation();
         Thread.Sleep(2000);
