@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Data;
+﻿using CodeArchitects.Platform.Common.Utils;
+using CodeArchitects.Platform.Data;
 using CodeArchitects.Platform.Data.AdoNet;
 using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.DependencyInjection;
@@ -47,10 +48,13 @@ public static class DataAdoNetServiceCollectionExtensions
     }
 
     // Command
-    Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
-
+    services.AddSingleton<ISqlTextCache, SqlTextCache>();
+    services.AddSingleton(provider.CreateSyntaxProvider());
+    services.AddSingleton<ISqlTextBuilder, SqlTextBuilder>();
     services.TryAddSingleton<IMemoryCache>(_ => new MemoryCache(new MemoryCacheOptions { SizeLimit = 10240 }));
-    services.AddScoped(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<IMemoryCache>(), sp.GetRequiredService<IConcurrencyContext>()));
+
+    Type commandBuilderServiceType = provider.MakeGenericType(typeof(ICommandBuilder<>));
+    services.AddScoped(commandBuilderServiceType, sp => provider.CreateCommandBuilder(sp.GetRequiredService<ISqlTextBuilder>(), sp.GetRequiredService<IConcurrencyContext>()));
 
     // Materializer
     services.TryAddSingleton<IIdentityCollectionFactory>(IdentityCollectionFactory.Create());
@@ -126,6 +130,9 @@ public static class DataAdoNetServiceCollectionExtensions
 
     services.AddScoped(dataContextType, provider.DataContextType);
     services.AddScoped(sp => (IDataContext)sp.GetRequiredService(dataContextType));
+
+    // Utils
+    services.TryAddTransient<Synchronizer>();
 
     return services;
   }

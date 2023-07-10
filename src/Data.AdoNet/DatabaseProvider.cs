@@ -23,10 +23,6 @@ public abstract class DatabaseProvider
 
   internal Type? ConnectionFactoryType { get; private protected set; }
 
-  private protected abstract ISyntaxProvider CreateSyntaxProvider();
-
-  private protected abstract object CreateCommandBuilderCore(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext);
-
   public void ApplySeed(IServiceProvider services)
   {
     if (services is null)
@@ -40,14 +36,9 @@ public abstract class DatabaseProvider
 
   internal abstract void ApplySeed(IServiceProvider services, DataSeed seed);
 
-  internal object CreateCommandBuilder(IMemoryCache cache, IConcurrencyContext concurrencyContext)
-  {
-    SqlTextCache sqlCache = new(cache);
-    ISyntaxProvider syntaxProvider = CreateSyntaxProvider();
-    SqlTextBuilder sqlBuilder = new(sqlCache, syntaxProvider);
+  internal abstract ISyntaxProvider CreateSyntaxProvider();
 
-    return CreateCommandBuilderCore(sqlBuilder, concurrencyContext);
-  }
+  internal abstract object CreateCommandBuilder(ISqlTextBuilder sqlBuilder, IConcurrencyContext concurrencyContext);
 
   internal Type MakeGenericType(Type genericTypeDefinition)
   {

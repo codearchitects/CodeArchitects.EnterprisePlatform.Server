@@ -8,6 +8,7 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Dapr.AspNetCore")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.DependencyInjection")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.Oracle")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.PostgreSQL")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.SQLServer")]
