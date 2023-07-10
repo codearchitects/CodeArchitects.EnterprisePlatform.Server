@@ -19,7 +19,7 @@ internal ref struct DocumentRenderer
   private readonly DocumentBuilderOptions _options;
   private int _indent;
 
-  public DocumentRenderer(IBufferWriter<byte> writer, DocumentBuilderOptions options)
+  public DocumentRenderer(ArrayBufferWriter<byte> writer, DocumentBuilderOptions options)
   {
     _sb = new Utf8StringBuilder(writer);
     _options = options;

@@ -1,20 +1,21 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
-using CodeArchitects.Platform.GraphQL.Fixtures;
 using CodeArchitects.Platform.GraphQL.Fixtures.Model;
 using CodeArchitects.Platform.GraphQL.Model;
 using CodeArchitects.Platform.GraphQL.Model.FluentMock;
 using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
+using System.Buffers;
 using System.Reflection;
+using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-public class DocumentRendererTests : IDisposable
+public class DocumentRendererTests
 {
   private const string s_queryName = "GetBlogs";
 
-  private readonly TestBufferWriter _writer;
+  private readonly ArrayBufferWriter<byte> _writer;
   private readonly DocumentBuilderOptions _options;
 
   public DocumentRendererTests()
@@ -23,7 +24,7 @@ public class DocumentRendererTests : IDisposable
     _options = new();
   }
 
-  private string Content => _writer.ToString();
+  private string? Content => Encoding.UTF8.GetString(_writer.WrittenSpan);
 
   private DocumentRenderer CreateSut() => new DocumentRenderer(_writer, _options);
 
@@ -417,10 +418,5 @@ public class DocumentRendererTests : IDisposable
 
     // Assert
     Content.Should().Be("query GetBlogs { blogs { edges { cursor } pageInfo } }");
-  }
-
-  public void Dispose()
-  {
-    ((IDisposable)_writer).Dispose();
   }
 }

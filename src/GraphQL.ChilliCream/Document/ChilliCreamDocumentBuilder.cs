@@ -1,9 +1,9 @@
 ﻿using CodeArchitects.Platform.Common.Exceptions;
+using CodeArchitects.Platform.GraphQL.Buffers;
 using CodeArchitects.Platform.GraphQL.Document;
 using CodeArchitects.Platform.GraphQL.Document.Builder;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
-using Microsoft.IO;
 using StrawberryShake;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
@@ -11,8 +11,8 @@ namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 internal class ChilliCreamDocumentBuilder<TDocumentRoot> : DocumentBuilder<TDocumentRoot>
   where TDocumentRoot : notnull
 {
-  public ChilliCreamDocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, RecyclableMemoryStreamManager msManager)
-    : base(nodeContext, model, options, msManager)
+  public ChilliCreamDocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, IBufferProvider bufferProvider)
+    : base(nodeContext, model, options, bufferProvider)
   {
   }
 

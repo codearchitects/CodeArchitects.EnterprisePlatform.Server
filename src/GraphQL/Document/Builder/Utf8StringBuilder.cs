@@ -7,6 +7,7 @@ using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
+[DebuggerDisplay("{ToString(),nq}")]
 internal readonly ref struct Utf8StringBuilder
 {
   private const int s_maxIntFormatLength = 11;
@@ -16,11 +17,11 @@ internal readonly ref struct Utf8StringBuilder
   private static readonly byte[] s_newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
   private static readonly byte[] s_spaceBytes   = Encoding.UTF8.GetBytes(new string(' ', s_spaceBufferCharCount));
 
-  private readonly IBufferWriter<byte> _writer;
+  private readonly ArrayBufferWriter<byte> _writer;
 
-  public Utf8StringBuilder(IBufferWriter<byte> writer)
+  public Utf8StringBuilder(ArrayBufferWriter<byte> buffer)
   {
-    _writer = writer;
+    _writer = buffer;
   }
 
   public Utf8StringBuilder Append(string @string)
@@ -32,7 +33,7 @@ internal readonly ref struct Utf8StringBuilder
   {
     Append(stackalloc char[1] { char.ToLowerInvariant(@string[0]) });
     Append(@string.AsSpan()[1..]);
-
+    
     return this;
   }
 
@@ -126,6 +127,8 @@ internal readonly ref struct Utf8StringBuilder
 
   public Utf8StringBuilder AppendLine() => Append(s_newLineBytes);
 
+  public override string ToString() => Encoding.UTF8.GetString(_writer.WrittenSpan);
+
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private Utf8StringBuilder Append(ReadOnlySpan<byte> bytes)
   {
@@ -141,11 +144,15 @@ internal readonly ref struct Utf8StringBuilder
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private Utf8StringBuilder Append(ReadOnlySpan<char> @string)
   {
-    int length = Encoding.UTF8.GetByteCount(@string);
+    int maxLength = Encoding.UTF8.GetMaxByteCount(@string.Length);
+    int length = _writer.FreeCapacity >= maxLength
+      ? maxLength
+      : Encoding.UTF8.GetByteCount(@string);
+
     Span<byte> span = _writer.GetSpan(length);
 
-    Encoding.UTF8.GetBytes(@string, span);
-    _writer.Advance(length);
+    int bytesWritten = Encoding.UTF8.GetBytes(@string, span);
+    _writer.Advance(bytesWritten);
 
     return this;
   }

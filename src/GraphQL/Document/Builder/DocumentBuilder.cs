@@ -1,7 +1,8 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Expressions;
+﻿using CodeArchitects.Platform.GraphQL.Buffers;
+using CodeArchitects.Platform.GraphQL.Document.Expressions;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
-using Microsoft.IO;
+using System.Buffers;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
@@ -12,14 +13,14 @@ internal abstract partial class DocumentBuilder<TDocumentRoot> : IDocumentBuilde
   private readonly INodeContext _nodeContext;
   private readonly IModel _model;
   private readonly DocumentBuilderOptions _options;
-  private readonly RecyclableMemoryStreamManager _msManager;
+  private readonly IBufferProvider _bufferProvider;
 
-  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, RecyclableMemoryStreamManager msManager)
+  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, IBufferProvider bufferProvider)
   {
     _nodeContext = nodeContext;
     _model = model;
     _options = options;
-    _msManager = msManager;
+    _bufferProvider = bufferProvider;
   }
 
   protected abstract GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType type, string? name, byte[] content)
@@ -62,12 +63,19 @@ internal abstract partial class DocumentBuilder<TDocumentRoot> : IDocumentBuilde
   private GraphDocument<TResult, TVariables> BuildDocument<TResult, TVariables>(IOperationDefinitionNode operationDefinition)
     where TVariables : notnull
   {
-    using RecyclableMemoryStream ms = (RecyclableMemoryStream)_msManager.GetStream("DocumentBuilder", 512);
-    DocumentRenderer renderer = new(ms, _options);
-    renderer.AppendOperationDefinition(operationDefinition);
+    byte[] content;
 
-    GraphDocument<TResult, TVariables> document = CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name, ms.ToArray());
+    using (BufferOwner owner = _bufferProvider.GetBuffer())
+    {
+      ArrayBufferWriter<byte> writer = owner.Writer;
 
-    return document;
+      DocumentRenderer renderer = new(writer, _options);
+      renderer.AppendOperationDefinition(operationDefinition);
+
+      content = new byte[writer.WrittenCount];
+      writer.WrittenSpan.CopyTo(content);
+    }
+
+    return CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name, content);
   }
 }
