@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.AspNetCore;
@@ -23,9 +24,10 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     PolymorphicResult? result = await _http.GetFromJsonAsync<PolymorphicResult>($"/virtual-actor/polymorphic-method?implementation={implementation}");
+    CheckResult(result);
 
     // Assert
-    result!.Implementation.Should().Be(expectedImplementation);
+    result.Implementation.Should().Be(expectedImplementation);
   }
 
   [Fact]
@@ -36,11 +38,14 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/virtual-actor/schedule?output={output}");
+    CheckResult(idResult);
+
     await Task.Delay(6000);
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult!.Id}/output");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult.Id}/output");
+    CheckResult(result);
 
     // Assert
-    result!.Output.Should().Be(output);
+    result.Output.Should().Be(output);
   }
 
   [Fact]
@@ -50,9 +55,10 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-enabler");
+    CheckResult(result);
 
     // Assert
-    result!.Output.Should().Be("binding");
+    result.Output.Should().Be("binding");
   }
 
   [Fact]
@@ -62,9 +68,10 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/binding-disabler");
+    CheckResult(result);
 
     // Assert
-    result!.Output.Should().Be("no binding");
+    result.Output.Should().Be("no binding");
   }
 
   [Fact]
@@ -75,11 +82,14 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/virtual-actor/messaging?output={output}");
+    CheckResult(idResult);
+
     await Task.Delay(1000);
-    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult!.Id}/output");
+    OutputResult? result = await _http.GetFromJsonAsync<OutputResult>($"/virtual-actor/{idResult.Id}/output");
+    CheckResult(result);
 
     // Assert
-    result!.Output.Should().Be(output);
+    result.Output.Should().Be(output);
   }
 
   [Fact]
@@ -90,11 +100,14 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
 
     // Act
     IdResult? idResult = await _http.GetFromJsonAsync<IdResult>($"/test-actor/create?state={state}");
+    CheckResult(idResult);
+
     await Task.Delay(1000);
-    StateResult? result = await _http.GetFromJsonAsync<StateResult>($"/test-actor/{idResult!.Id}/state");
+    StateResult? result = await _http.GetFromJsonAsync<StateResult>($"/test-actor/{idResult.Id}/state");
+    CheckResult(result);
 
     // Assert
-    result!.State.Should().Be(state);
+    result.State.Should().Be(state);
   }
 
   public void Dispose()
@@ -102,23 +115,41 @@ public sealed class Tests : IClassFixture<TestFixture>, IDisposable
     _http.Dispose();
   }
 
-  private class PolymorphicResult
+  private static void CheckResult([NotNull] Result? result)
+  {
+    if (result is null)
+    {
+      Assert.Fail("Result was null.");
+    }
+
+    if (result.Error != null)
+    {
+      Assert.Fail(result.Error);
+    }
+  }
+
+  private class PolymorphicResult : Result
   {
     public int Implementation { get; set; }
   }
 
-  private class OutputResult
+  private class OutputResult : Result
   {
     public string? Output { get; set; }
   }
 
-  private class IdResult
+  private class IdResult : Result
   {
     public Guid Id { get; set; }
   }
 
-  private class StateResult
+  private class StateResult : Result
   {
     public int State { get; set; }
+  }
+
+  private class Result
+  {
+    public string? Error { get; set; }
   }
 }

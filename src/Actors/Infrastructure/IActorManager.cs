@@ -1,14 +1,12 @@
-﻿using System.Text.Json;
+﻿using CodeArchitects.Platform.Actors.Scheduling;
+using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
-internal interface IActorManager<TActor, TState>
+internal interface IActorManager<TActor>
   where TActor : class
-  where TState : ActorState
 {
   TActor Actor { get; }
-  
-  TState State { get; }
   
   int DefaultImplementationId { get; }
   
@@ -16,11 +14,11 @@ internal interface IActorManager<TActor, TState>
   
   Type ActivityType { get; }
 
-  void OnActivityBegin();
+  void InitializeState(ActorState state);
 
-  void OnMethodBegin();
+  Task BeginMethodAsync(CancellationToken cancellationToken);
 
-  void OnExecutionEnd();
+  Task BeginActivityAsync(Activity<TActor> activity, CancellationToken cancellationToken);
 
-  Task ExecuteBindingsAsync(CancellationToken cancellationToken);
+  Task EndExecutionAsync(CancellationToken cancellationToken);
 }
