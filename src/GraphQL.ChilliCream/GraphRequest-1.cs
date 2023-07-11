@@ -17,6 +17,6 @@ internal class GraphRequest<TResult> : GraphRequestBase<TResult>, IGraphRequest<
   public Task<TResult> ExecuteAsync(CancellationToken cancellationToken = default)
   {
     OperationRequest request = _document.CreateRequest(RequestStrategy.Default);
-    return base.ExecuteAsync(request, cancellationToken);
+    return ExecuteAsync(request, cancellationToken);
   }
 }

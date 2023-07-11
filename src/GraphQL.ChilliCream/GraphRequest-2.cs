@@ -22,6 +22,6 @@ internal class GraphRequest<TResult, TVariables> : GraphRequestBase<TResult>, IG
     (IReadOnlyDictionary<string, object?> variableDictionary, IReadOnlyDictionary<string, Upload?> fileDictionary) = _extract(variables);
     OperationRequest request = _document.CreateRequest(variableDictionary, fileDictionary, RequestStrategy.Default);
 
-    return base.ExecuteAsync(request, cancellationToken);
+    return ExecuteAsync(request, cancellationToken);
   }
 }

@@ -18,23 +18,29 @@ internal class GraphClient<TDocumentRoot> : IGraphClient<TDocumentRoot>
     _extractorProvider = extractorProvider;
   }
 
-  public IGraphRequest<TResult> Request<TResult>(IGraphDocument<TResult> document)
+  public IGraphRequest<TResult> Request<TResult>(GraphQL.Document.IGraphDocument<TResult> document)
     where TResult : class
   {
     if (document is null)
       throw new ArgumentNullException(nameof(document));
 
-    return RequestCore(document);
+    if (document is not IGraphDocument<TResult> chilliCreamDocument)
+      throw new ArgumentException($"'{nameof(document)}' should be a ChilliCream graph document.", nameof(document));
+
+    return RequestCore(chilliCreamDocument);
   }
 
-  public IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(IGraphDocument<TResult, TVariables> document)
+  public IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(GraphQL.Document.IGraphDocument<TResult, TVariables> document)
     where TResult : class
     where TVariables : notnull
   {
     if (document is null)
       throw new ArgumentNullException(nameof(document));
 
-    return RequestCore(document);
+    if (document is not IGraphDocument<TResult, TVariables> chilliCreamDocument)
+      throw new ArgumentException($"'{nameof(document)}' should be a ChilliCream graph document.", nameof(document));
+
+    return RequestCore(chilliCreamDocument);
   }
 
   public IGraphRequest<TResult> Request<TResult>(Func<IDocumentBuilder<TDocumentRoot>, GraphQL.Document.IGraphDocument<TResult>> buildDocument)
@@ -45,7 +51,7 @@ internal class GraphClient<TDocumentRoot> : IGraphClient<TDocumentRoot>
 
     GraphQL.Document.IGraphDocument<TResult> document = buildDocument(_documentBuilder);
     if (document is not IGraphDocument<TResult> chilliCreamDocument)
-      throw new ArgumentException("The build function should return a ChilliCream graph document.", nameof(buildDocument));
+      throw new ArgumentException($"'{nameof(buildDocument)}' should return a ChilliCream graph document.", nameof(buildDocument));
 
     return RequestCore(chilliCreamDocument);
   }
@@ -59,7 +65,7 @@ internal class GraphClient<TDocumentRoot> : IGraphClient<TDocumentRoot>
 
     GraphQL.Document.IGraphDocument<TResult, TVariables> document = buildDocument(_documentBuilder);
     if (document is not IGraphDocument<TResult, TVariables> chilliCreamDocument)
-      throw new ArgumentException("The build function should return a ChilliCream graph document.", nameof(buildDocument));
+      throw new ArgumentException($"'{nameof(buildDocument)}' should return a ChilliCream graph document.", nameof(buildDocument));
 
     return RequestCore(chilliCreamDocument);
   }

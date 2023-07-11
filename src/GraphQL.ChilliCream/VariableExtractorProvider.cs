@@ -85,11 +85,8 @@ internal class VariableExtractorProvider : IVariableExtractorProvider
 
     (List<IVariable> objectVariables, List<IVariable> uploadVariables) = GetVariables(variablesType);
 
-    DynamicMethod method = new($"<{variableTypeFullName}>Extract", s_dictionaryTupleType, new[] { typeof(TVariables) });
+    DynamicMethod method = new($"<{variableTypeFullName.Replace('.', '_')}>Extract", s_dictionaryTupleType, new[] { typeof(TVariables) });
     ILGenerator il = method.GetILGenerator();
-
-    il.DeclareLocal(typeof(IReadOnlyDictionary<string, object?>));
-    il.DeclareLocal(typeof(IReadOnlyDictionary<string, Upload?>));
 
     il.Emit(OpCodes.Newobj, s_objectDictionaryConstructor);            // Create $objectVars := new Dictionary<string, object?>() | Stack: $objectVars
     foreach (IVariable objectVariable in objectVariables)              //                                                         | 
