@@ -1,8 +1,6 @@
 ﻿using CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 using CodeArchitects.Platform.GraphQL.Document.Builder;
-using CodeArchitects.Platform.GraphQL.Model;
 using StrawberryShake;
-using System.Net.Http.Headers;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream;
 

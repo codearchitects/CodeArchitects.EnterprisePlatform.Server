@@ -3,7 +3,11 @@ using CodeArchitects.Platform.GraphQL.Document.Builder;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream;
 
-internal interface IGraphClient<TDocumentRoot>
+public interface IGraphClient : IGraphClient<GraphQL.Document.IDocumentRoot>
+{
+}
+
+public interface IGraphClient<TDocumentRoot>
   where TDocumentRoot : class
 {
   IGraphRequest<TResult> Request<TResult>(IGraphDocument<TResult> document)

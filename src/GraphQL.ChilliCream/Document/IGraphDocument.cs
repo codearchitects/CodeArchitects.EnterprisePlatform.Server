@@ -2,16 +2,13 @@
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 
-public interface IGraphDocument
+public interface IGraphDocument<TResult> : GraphQL.Document.IGraphDocument<TResult>
 {
-  OperationRequest CreateRequest(IReadOnlyDictionary<string, object?>? variables, IReadOnlyDictionary<string, Upload?>? files, RequestStrategy strategy);
+  OperationRequest CreateRequest(RequestStrategy strategy);
 }
 
-public interface IGraphDocument<TResult> : IGraphDocument, GraphQL.Document.IGraphDocument<TResult>
-{
-}
-
-public interface IGraphDocument<TResult, TVariables> : IGraphDocument, GraphQL.Document.IGraphDocument<TResult, TVariables>
+public interface IGraphDocument<TResult, TVariables> : GraphQL.Document.IGraphDocument<TResult, TVariables>
   where TVariables : notnull
 {
+  OperationRequest CreateRequest(IReadOnlyDictionary<string, object?> variables, IReadOnlyDictionary<string, Upload?> files, RequestStrategy strategy);
 }
