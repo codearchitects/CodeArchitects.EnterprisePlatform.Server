@@ -19,12 +19,16 @@ internal class MultitenancyCaepPlugin : ICaepExtensionPlugin
   {
     if (_descriptor.MultitenancyContextType is not null)
     {
-      services.AddScoped(typeof(IMultitenancyContext), _descriptor.MultitenancyContextType);
+      services.AddScoped(_descriptor.MultitenancyContextType);
+      services.AddScoped(sp => new MultitenancyContextWrapper((IMultitenancyContext)sp.GetRequiredService(_descriptor.MultitenancyContextType)));
     }
     else if (_descriptor.MultitenancyContextImplementationFactory is not null)
     {
-      services.AddScoped(typeof(IMultitenancyContext), _descriptor.MultitenancyContextImplementationFactory);
+      services.AddScoped(sp => new MultitenancyContextWrapper(_descriptor.MultitenancyContextImplementationFactory(sp)));
     }
+
+    services.AddScoped<IMultitenancyContext>(sp => sp.GetRequiredService<MultitenancyContextWrapper>());
+    services.AddScoped<IMultitenancyContextBypasser>(sp => sp.GetRequiredService<MultitenancyContextWrapper>());
 
     services.AddScoped<IInterceptor, SaveChangesInterceptor>();
 

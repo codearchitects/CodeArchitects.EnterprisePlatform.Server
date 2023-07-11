@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
@@ -14,9 +15,14 @@ internal class Seeder : ISeeder
 
   public void Apply(DataSeed seed)
   {
-    seed.Seed(this);
-    _context.SaveChanges();
-    _context.ChangeTracker.Clear();
+    IMultitenancyContextBypasser bypasser = _context.GetService<IMultitenancyContextBypasser>();
+
+    using (bypasser.BypassMultitenancy())
+    {
+      seed.Seed(this);
+      _context.SaveChanges();
+      _context.ChangeTracker.Clear();
+    }
   }
 
   public void Seed<TEntity>(IEnumerable<TEntity> entities)
