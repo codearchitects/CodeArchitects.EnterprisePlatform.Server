@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.GraphQL.Buffers;
 internal class PooledBufferPolicy : IPooledObjectPolicy<ArrayBufferWriter<byte>>
 {
   private const int s_initialCapacity = 256;
-  private const int s_maximumRetainedCapacity = 4 * 1024;
+  private const int s_maximumRetainedCapacity = 2 * 1024;
 
   public static readonly PooledBufferPolicy Instance = new();
 

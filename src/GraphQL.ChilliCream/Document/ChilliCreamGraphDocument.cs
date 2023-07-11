@@ -25,7 +25,7 @@ internal class ChilliCreamGraphDocument<TResult, TVariables> : GraphDocument<TRe
 
   public DocumentHash Hash => new DocumentHash("md5Hash", _id);
 
-  protected OperationRequest CreateRequest(IReadOnlyDictionary<string, object?>? variables, IReadOnlyDictionary<string, Upload?>? files, RequestStrategy strategy)
+  public OperationRequest CreateRequest(IReadOnlyDictionary<string, object?>? variables, IReadOnlyDictionary<string, Upload?>? files, RequestStrategy strategy)
   {
     return new OperationRequest(
       id: _id,
