@@ -5,6 +5,7 @@ namespace ActorApp.Controllers;
 
 [ApiController]
 [Route("test-actor")]
+[ErrorFilter]
 public class TestActorController : ControllerBase
 {
   private readonly ITestActorFactory _actorFactory;

@@ -16,8 +16,8 @@ public class DaprActorHostFixture
   internal DaprActorHostFixture(
     Mock<ActorTimerManager> timerManagerMock,
     Mock<IActorStateManager> stateManagerMock,
-    Mock<IActorManager<StandardActor, StandardActorState>> managerMock,
-    Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock)
+    Mock<IActorManager<StandardActor>> managerMock,
+    Mock<IActorManagerFactory<StandardActor, StandardActorState>> factoryMock)
   {
     TimerManagerMock = timerManagerMock;
     StateManagerMock = stateManagerMock;
@@ -27,8 +27,8 @@ public class DaprActorHostFixture
 
   internal Mock<ActorTimerManager> TimerManagerMock { get; }
   internal Mock<IActorStateManager> StateManagerMock { get; }
-  internal Mock<IActorManager<StandardActor, StandardActorState>> ManagerMock { get; }
-  internal Mock<IManagerFactory<StandardActor, StandardActorState>> FactoryMock { get; }
+  internal Mock<IActorManager<StandardActor>> ManagerMock { get; }
+  internal Mock<IActorManagerFactory<StandardActor, StandardActorState>> FactoryMock { get; }
 
   public class HostDataAttribute : DataAttribute
   {    
@@ -40,8 +40,12 @@ public class DaprActorHostFixture
 
       Mock<ActorTimerManager> timerManagerMock = new(MockBehavior.Strict);
       Mock<IActorStateManager> stateManagerMock = new(MockBehavior.Strict);
-      Mock<IActorManager<StandardActor, StandardActorState>> managerMock = new(MockBehavior.Strict);
-      Mock<IManagerFactory<StandardActor, StandardActorState>> factoryMock = new(MockBehavior.Strict);
+      Mock<IActorManager<StandardActor>> managerMock = new(MockBehavior.Strict);
+      Mock<IActorManagerFactory<StandardActor, StandardActorState>> managerFactoryMock = new(MockBehavior.Strict);
+
+      managerFactoryMock
+        .Setup(x => x.CreateManager(It.IsAny<IActorHost<StandardActor, StandardActorState>>()))
+        .Returns(managerMock.Object);
 
       ActorHost host = ActorHost.CreateForTest<StandardActorHost>(new ActorTestOptions
       {
@@ -49,18 +53,16 @@ public class DaprActorHostFixture
         TimerManager = timerManagerMock.Object
       });
 
-      StandardActorHost sut1 = new(host, factoryMock.Object);
+      StandardActorHost sut1 = new(host, managerFactoryMock.Object);
       stateManagerProperty.SetValue(sut1, stateManagerMock.Object);
-      sut1.Manager = managerMock.Object;
-      yield return new object?[] { new DaprActorHostFixture(timerManagerMock, stateManagerMock, managerMock, factoryMock), sut1 };
+      yield return new object?[] { new DaprActorHostFixture(timerManagerMock, stateManagerMock, managerMock, managerFactoryMock), sut1 };
 
       ActorHostTypeBuilder actorTypeBuilder = new(DynamicAssembly.NewModule(), new ReflectionILGeneratorProvider());
       ActorHostEmitResult emitResult = actorTypeBuilder.Build(StandardActorFixture.Descriptor, nameof(StandardActor));
 
-      var sut2 = (DaprActorHost<StandardActor, StandardActorState>)Activator.CreateInstance(emitResult.ClassType, new object?[] { host, factoryMock.Object })!;
-      sut2.Manager = managerMock.Object;
+      var sut2 = (DaprActorHost<StandardActor, StandardActorState>)Activator.CreateInstance(emitResult.ClassType, new object?[] { host, managerFactoryMock.Object })!;
       stateManagerProperty.SetValue(sut2, stateManagerMock.Object);
-      yield return new object?[] { new DaprActorHostFixture(timerManagerMock, stateManagerMock, managerMock, factoryMock), sut2 };
+      yield return new object?[] { new DaprActorHostFixture(timerManagerMock, stateManagerMock, managerMock, managerFactoryMock), sut2 };
     }
   }
 }

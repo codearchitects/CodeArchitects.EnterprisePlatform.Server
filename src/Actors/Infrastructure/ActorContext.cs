@@ -5,41 +5,48 @@ using CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Common.Expressions;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
-internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManager<TActor, TState>
+internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManager<TActor>
   where TActor : class
   where TState : ActorState
 {
+  private readonly IServiceProvider _services;
   private readonly IActorDescriptor<TActor, TState> _descriptor;
   private readonly IActivityManager<TActor> _activityManager;
-  private readonly IActorHost<TActor> _host;
+  private readonly IActorHost<TActor, TState> _host;
+
   private readonly List<IActorBinding<TActor>> _bindings;
   private ExecutionSection _section;
+  private TActor? _actor;
+  private TState? _state;
 
   public ActorContext(
     IServiceProvider services,
     IActorDescriptor<TActor, TState> descriptor,
     IActivityManager<TActor> activityManager,
-    IActorHost<TActor> host,
-    TState state,
-    int implementationId)
+    IActorHost<TActor, TState> host)
   {
+    _services = services;
     _descriptor = descriptor;
     _activityManager = activityManager;
     _host = host;
-    State = state;
     _bindings = new();
-
-    Actor = CreateInstance(services, descriptor, state, implementationId);
   }
 
-  public TActor Actor { get; }
-
-  public TState State { get; }
+  public TActor Actor
+  {
+    get
+    {
+      EnsureActorInitialized();
+      return _actor;
+    }
+  }
 
   public string ActorId => _host.ActorId;
 
@@ -52,9 +59,11 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
   public void Become<TImplementation>()
     where TImplementation : class, TActor
   {
+    EnsureStateInitialized();
+
     try
     {
-      State.ImplementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
+      _state.ImplementationId = _descriptor.GetImplementation(typeof(TImplementation)).Id;
     }
     catch (ArgumentException ex)
     {
@@ -64,7 +73,9 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 
   public void Become(Type implementationType)
   {
-    State.ImplementationId = _descriptor.GetImplementation(implementationType).Id;
+    EnsureStateInitialized();
+
+    _state.ImplementationId = _descriptor.GetImplementation(implementationType).Id;
   }
 
   public BindingId RegisterBinding(Func<IBindingBuilder<TActor>, IBindingResult> configure)
@@ -90,12 +101,16 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
 
   public void EnableBinding(BindingId id)
   {
-    EnableBindingCore(id._index);
+    EnsureStateInitialized();
+
+    EnableBindingCore(_state, id._index);
   }
 
   public void DisableBinding(BindingId id)
   {
-    DisableBindingCore(id._index);
+    EnsureStateInitialized();
+
+    DisableBindingCore(_state, id._index);
   }
 
   public Task ScheduleAsync(Expression<Func<TActor, Task>> activity, SchedulingOptions? options = null, CancellationToken cancellationToken = default)
@@ -219,44 +234,11 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     return _host.ScheduleAsync(id, activity, options ?? SchedulingOptions.Now, cancellationToken);
   }
 
-  public void OnActivityBegin()
-  {
-    VerifyBindingPreconditions();
-    _section = ExecutionSection.Activity;
-  }
-
-  public void OnMethodBegin()
-  {
-    VerifyBindingPreconditions();
-    _section = ExecutionSection.Method;
-  }
-
-  public void OnExecutionEnd()
-  {
-    _section = ExecutionSection.None;
-    _descriptor.UpdateState(Actor, State);
-  }
-
-  public async Task ExecuteBindingsAsync(CancellationToken cancellationToken)
-  {
-    _section = ExecutionSection.Bindings;
-
-    for (int index = 0; index < _bindings.Count; index++)
-    {
-      IActorBinding<TActor> binding = _bindings[index];
-
-      if (!State.IsBindingEnabled(index))
-        continue;
-
-      await binding.ExecuteAsync(Actor, cancellationToken);
-    }
-
-    _section = ExecutionSection.None;
-  }
-
-  public BindingId RegisterBindingCore<TImplementation>(ActorBinding<TActor, TImplementation> binding, Func<IBindingBuilder<TImplementation>, IBindingResult> configure)
+  private BindingId RegisterBindingCore<TImplementation>(ActorBinding<TActor, TImplementation> binding, Func<IBindingBuilder<TImplementation>, IBindingResult> configure)
     where TImplementation : class, TActor
   {
+    EnsureStateInitialized();
+
     int index = _bindings.Count;
     if (index >= 32)
       throw new InvalidOperationException("Exceeded the maximum number of bindings.");
@@ -266,41 +248,142 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     
     if (binding.IsEnabled)
     {
-      EnableBindingCore(index);
+      EnableBindingCore(_state, index);
     }
     else
     {
-      DisableBindingCore(index);
+      DisableBindingCore(_state, index);
     }
 
     return new BindingId(index);
   }
 
-  private TActor CreateInstance(IServiceProvider services, IActorDescriptor<TActor, TState> descriptor, TState state, int implementationId)
+  public async Task BeginMethodAsync(CancellationToken cancellationToken)
   {
-    _section = ExecutionSection.Constructor;
-    TActor instance = descriptor.CreateInstance(implementationId, services, state, this);
-    _section = ExecutionSection.None;
+    _state = await GetStateAsync(cancellationToken);
 
-    return instance;
+    InitActor(_state, _state.ImplementationId);
+    VerifyBindingPreconditions(_actor);
+
+    _section = ExecutionSection.Method;
   }
 
-  private void VerifyBindingPreconditions()
+  public async Task BeginActivityAsync(Activity<TActor> activity, CancellationToken cancellationToken)
   {
-    foreach (IActorBinding<TActor> binding in _bindings)
+    _state = await GetStateAsync(cancellationToken);
+
+    int implementationId = activity.ImplementationId;
+    if (implementationId == 0)
     {
-      binding.VerifyPreCondition(Actor);
+      implementationId = _state.ImplementationId;
+    }
+
+    InitActor(_state, implementationId);
+    VerifyBindingPreconditions(_actor);
+
+    _section = ExecutionSection.Activity;
+  }
+
+  public async Task EndExecutionAsync(CancellationToken cancellationToken)
+  {
+    EnsureActorInitialized();
+    EnsureStateInitialized();
+
+    _section = ExecutionSection.None;
+    await ExecuteBindingsAsync(cancellationToken);
+
+    _descriptor.UpdateState(_actor, _state);
+
+    await _host.SetStateAsync(_state, cancellationToken);
+  }
+
+  public void InitializeState(ActorState state)
+  {
+    if (_descriptor.IsPolymorphic)
+    {
+      state.ImplementationId = _descriptor.DefaultImplementation.Id;
     }
   }
 
-  private void EnableBindingCore(int index)
+  [MemberNotNull(nameof(_actor))]
+  private void InitActor(TState state, int implementationId)
   {
-    State.EnabledBindings |= (1 << index);
+    _section = ExecutionSection.Constructor;
+    _actor = _descriptor.CreateInstance(implementationId, _services, state, this);
+    _section = ExecutionSection.None;
   }
 
-  private void DisableBindingCore(int index)
+  private async Task<TState> GetStateAsync(CancellationToken cancellationToken)
   {
-    State.EnabledBindings &= ~(1 << index);
+    TState? state = await _host.GetStateAsync(cancellationToken);
+
+    if (state is not null)
+      return state;
+
+    if (!_descriptor.IsVirtual)
+      throw new UninitializedActorException(typeof(TActor));
+
+    TState defaultValue = _descriptor.State.DefaultValue!;
+    if (_descriptor.IsPolymorphic)
+    {
+      defaultValue.ImplementationId = _descriptor.DefaultImplementation.Id;
+    }
+    _descriptor.Id.SetId(defaultValue, _host.ActorId);
+
+    return defaultValue;
+  }
+
+  private async Task ExecuteBindingsAsync(CancellationToken cancellationToken)
+  {
+    EnsureActorInitialized();
+    EnsureStateInitialized();
+
+    ExecutionSection previousSection = _section;
+    _section = ExecutionSection.Bindings;
+
+    for (int index = 0; index < _bindings.Count; index++)
+    {
+      IActorBinding<TActor> binding = _bindings[index];
+
+      if (!_state.IsBindingEnabled(index))
+        continue;
+
+      await binding.ExecuteAsync(_actor, cancellationToken);
+    }
+
+    _section = previousSection;
+  }
+
+  private void VerifyBindingPreconditions(TActor actor)
+  {
+    foreach (IActorBinding<TActor> binding in _bindings)
+    {
+      binding.VerifyPreCondition(actor);
+    }
+  }
+
+  private void EnableBindingCore(TState state, int index)
+  {
+    state.EnabledBindings |= (1 << index);
+  }
+
+  private void DisableBindingCore(TState state, int index)
+  {
+    state.EnabledBindings &= ~(1 << index);
+  }
+
+  [Conditional("DEBUG")]
+  [MemberNotNull(nameof(_actor))]
+  private void EnsureActorInitialized()
+  {
+    Debug.Assert(_actor is not null, "Actor was not initialized.");
+  }
+
+  [Conditional("DEBUG")]
+  [MemberNotNull(nameof(_state))]
+  private void EnsureStateInitialized()
+  {
+    Debug.Assert(_state is not null, "Actor state was not initialized.");
   }
 
   private sealed class DynamicArgumentList : IReadOnlyList<object?>

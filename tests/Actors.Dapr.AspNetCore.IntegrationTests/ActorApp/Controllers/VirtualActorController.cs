@@ -6,6 +6,7 @@ namespace ActorApp.Controllers;
 
 [ApiController]
 [Route("virtual-actor")]
+[ErrorFilter]
 public class VirtualActorController : ControllerBase
 {
   private readonly IVirtualActorFactory _actorFactory;

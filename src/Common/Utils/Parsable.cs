@@ -2,9 +2,9 @@
 
 namespace CodeArchitects.Platform.Common.Utils;
 
-using System.Reflection;
 using CodeArchitects.Platform.Common.Exceptions;
 using System.Linq.Expressions;
+using System.Reflection;
 
 internal static class Parsable<TParsable>
 {

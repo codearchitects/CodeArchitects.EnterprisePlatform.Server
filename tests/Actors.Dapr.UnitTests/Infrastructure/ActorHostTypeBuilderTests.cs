@@ -81,7 +81,7 @@ public class ActorHostTypeBuilderTests
       .Ldarg_0()
       .Ldarg_1()
       .Ldarg_2()
-      .Call(baseType, ConstructorInfo.ConstructorName, new[] { typeof(ActorHost), typeof(IManagerFactory<StandardActor, StandardActorState>) })
+      .Call(baseType, ConstructorInfo.ConstructorName, new[] { typeof(ActorHost), typeof(IActorManagerFactory<StandardActor, StandardActorState>) })
       .Ret());
 
     taskMethodIL.VerifyNoLocals();

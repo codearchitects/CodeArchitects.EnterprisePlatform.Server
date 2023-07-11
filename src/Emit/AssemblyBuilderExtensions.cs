@@ -6,7 +6,7 @@ namespace CodeArchitects.Platform.Emit;
 
 internal static class AssemblyBuilderExtensions
 {
-  private static readonly ConcurrentDictionary<ModuleBuilder, ConstructorInfo> s_attributeConstructors = new ConcurrentDictionary<ModuleBuilder, ConstructorInfo>();
+  private static readonly ConcurrentDictionary<ModuleBuilder, ConstructorInfo> s_attributeConstructors = new();
 
   public static void IgnoreAccessChecksTo(this ModuleBuilder module, string assemblyName)
   {

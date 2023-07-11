@@ -31,7 +31,7 @@ internal interface IStandardActorMessageHandler : IActor
 
 internal class StandardActorHost : DaprActorHost<StandardActor, StandardActorState>, IStandardActorHost, IStandardActorMessageHandler
 {
-  public StandardActorHost(ActorHost host, IManagerFactory<StandardActor, StandardActorState> factory)
+  public StandardActorHost(ActorHost host, IActorManagerFactory<StandardActor, StandardActorState> factory)
     : base(host, factory)
   {
   }
