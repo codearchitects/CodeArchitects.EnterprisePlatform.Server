@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL;
 
-internal static class GQL
+public static class GQL
 {
   public static TResult ExpandRef<TSource, TResult>(TSource? source, Expression<Func<IFieldBuilder<TSource>, IBuildResult<TResult>>> expansion)
     where TSource : notnull

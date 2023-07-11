@@ -16,7 +16,7 @@ internal class ChilliCreamDocumentBuilder<TDocumentRoot> : DocumentBuilder<TDocu
   {
   }
 
-  protected override GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType type, string? name, byte[] content)
+  protected override GraphQL.Document.GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType type, string? name, byte[] content)
   {
     OperationKind kind = type switch
     {
@@ -26,7 +26,7 @@ internal class ChilliCreamDocumentBuilder<TDocumentRoot> : DocumentBuilder<TDocu
       _                          => throw Errors.Unreachable
     };
 
-    return new ChilliCreamGraphDocument<TResult, TVariables>(
+    return new GraphDocument<TResult, TVariables>(
       kind,
       name ?? string.Empty,
       content,

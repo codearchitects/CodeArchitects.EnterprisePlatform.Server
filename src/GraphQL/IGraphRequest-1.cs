@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.GraphQL;
 
-internal interface IGraphRequest<TResult>
+public interface IGraphRequest<TResult>
 {
   Task<TResult> ExecuteAsync(CancellationToken cancellationToken = default);
 }

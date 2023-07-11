@@ -69,4 +69,9 @@ internal static class NamingConventionExtensions
 
     return true;
   }
+
+  public static string Camelize(this string @str)
+  {
+    return char.ToLowerInvariant(@str[0]) + str[1..];
+  }
 }

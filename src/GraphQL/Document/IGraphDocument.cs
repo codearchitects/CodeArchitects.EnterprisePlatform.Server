@@ -1,10 +1,10 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal interface IGraphDocument<TResult>
+public interface IGraphDocument<TResult>
 {
 }
 
-internal interface IGraphDocument<TResult, TVariables>
+public interface IGraphDocument<TResult, TVariables>
   where TVariables : notnull
 {
 }

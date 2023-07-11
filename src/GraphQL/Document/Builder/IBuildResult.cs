@@ -1,10 +1,10 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IBuildResult<TField>
+public interface IBuildResult<TField>
 {
 }
 
-internal interface IBuildResult<TField, TVariables>
+public interface IBuildResult<TField, TVariables>
   where TVariables : notnull
 {
 }

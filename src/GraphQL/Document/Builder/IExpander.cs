@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IExpander
+public interface IExpander
 {
   TResult ExpandRef<TSource, TResult>(TSource? source, Expression<Func<IFieldBuilder<TSource>, IBuildResult<TResult>>> expansion)
     where TSource : notnull;
@@ -29,7 +29,7 @@ internal interface IExpander
     where TSource : notnull;
 }
 
-internal interface IExpander<TVariables>
+public interface IExpander<TVariables>
   where TVariables : notnull
 {
   TResult ExpandRef<TSource, TResult>(TSource? source, Expression<Func<IFieldBuilder<TSource, TVariables>, IBuildResult<TResult, TVariables>>> expansion)

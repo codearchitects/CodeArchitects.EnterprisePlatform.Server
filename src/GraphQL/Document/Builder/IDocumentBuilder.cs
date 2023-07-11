@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IDocumentBuilder<TDocumentRoot>
+public interface IDocumentBuilder<TDocumentRoot>
   where TDocumentRoot : notnull
 {
   IGraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion);

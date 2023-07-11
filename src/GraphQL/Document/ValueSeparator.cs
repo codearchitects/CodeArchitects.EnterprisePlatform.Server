@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal abstract class ValueSeparator
+public abstract class ValueSeparator
 {
   private ValueSeparator() { }
 

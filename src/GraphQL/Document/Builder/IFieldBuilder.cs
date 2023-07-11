@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IFieldBuilder<TField> : IBuildResult<TField>, IExpander, ISelector
+public interface IFieldBuilder<TField> : IBuildResult<TField>, IExpander, ISelector
 {
   IFieldBuilder<TField> WithArgument<TArg>(string name, TArg value);
 
@@ -13,7 +13,7 @@ internal interface IFieldBuilder<TField> : IBuildResult<TField>, IExpander, ISel
   IBuildResult<TResult> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-internal interface IFieldBuilderWithArguments<TField> : IBuildResult<TField>, IExpander, ISelector
+public interface IFieldBuilderWithArguments<TField> : IBuildResult<TField>, IExpander, ISelector
 {
   IFieldBuilderWithArguments<TField> WithDirective(string name);
 
@@ -22,7 +22,7 @@ internal interface IFieldBuilderWithArguments<TField> : IBuildResult<TField>, IE
   IBuildResult<TResult> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-internal interface IFieldBuilder<TField, TVariables> : IBuildResult<TField, TVariables>, IExpander<TVariables>, ISelector
+public interface IFieldBuilder<TField, TVariables> : IBuildResult<TField, TVariables>, IExpander<TVariables>, ISelector
   where TVariables : notnull
 {
   IFieldBuilder<TField, TVariables> WithArgument<TArg>(string name, TArg value);
@@ -38,7 +38,7 @@ internal interface IFieldBuilder<TField, TVariables> : IBuildResult<TField, TVar
   IBuildResult<TResult, TVariables> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-internal interface IFieldBuilderWithArguments<TField, TVariables> : IBuildResult<TField, TVariables>, IExpander<TVariables>, ISelector
+public interface IFieldBuilderWithArguments<TField, TVariables> : IBuildResult<TField, TVariables>, IExpander<TVariables>, ISelector
   where TVariables : notnull
 {
   IFieldBuilderWithArguments<TField, TVariables> WithDirective(string name);

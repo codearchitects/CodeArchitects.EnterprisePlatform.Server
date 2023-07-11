@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal abstract class LinePolicy
+public abstract class LinePolicy
 {
   private LinePolicy() { }
 
