@@ -27,8 +27,8 @@ internal class MultitenancyCaepPlugin : ICaepExtensionPlugin
       services.AddScoped(sp => new MultitenancyContextWrapper(_descriptor.MultitenancyContextImplementationFactory(sp)));
     }
 
-    services.AddScoped<IMultitenancyContext, MultitenancyContextWrapper>();
-    services.AddScoped<IMultitenancyContextBypasser, MultitenancyContextWrapper>();
+    services.AddScoped<IMultitenancyContext>(sp => sp.GetRequiredService<MultitenancyContextWrapper>());
+    services.AddScoped<IMultitenancyContextBypasser>(sp => sp.GetRequiredService<MultitenancyContextWrapper>());
 
     services.AddScoped<IInterceptor, SaveChangesInterceptor>();
 
