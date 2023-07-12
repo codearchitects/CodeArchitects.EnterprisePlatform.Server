@@ -1,28 +1,31 @@
-﻿using StrawberryShake;
+﻿using CodeArchitects.Platform.GraphQL.Document;
+using StrawberryShake;
 using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 
-internal class GraphDocument<TResult, TVariables> : GraphQL.Document.GraphDocument<TResult, TVariables>, IGraphDocument<TResult>, IGraphDocument<TResult, TVariables>, IDocument
-  where TVariables : notnull
+internal class ChilliCreamUtf8Document : IUtf8Document, IDocument
 {
+  private readonly OperationKind _kind;
   private readonly string _name;
   private readonly byte[] _content;
   private readonly string _id;
 
-  public GraphDocument(OperationKind kind, string name, byte[] content, string id)
+  public ChilliCreamUtf8Document(OperationKind kind, string name, byte[] content, string id)
   {
-    Kind = kind;
+    _kind = kind;
     _name = name;
     _content = content;
     _id = id;
   }
 
-  public OperationKind Kind { get; }
+  public byte[] Content => _content;
 
-  public ReadOnlySpan<byte> Body => _content;
+  OperationKind IDocument.Kind => _kind;
 
-  public DocumentHash Hash => new DocumentHash("md5Hash", _id);
+  ReadOnlySpan<byte> IDocument.Body => _content;
+
+  DocumentHash IDocument.Hash => new DocumentHash("md5Hash", _id);
 
   public OperationRequest CreateRequest(RequestStrategy strategy)
   {

@@ -16,10 +16,10 @@ internal ref struct DocumentRenderer
   private static readonly AppendAction s_appendSpace            = static (ref DocumentRenderer self) => self._sb.AppendSpace();
 
   private readonly Utf8StringBuilder _sb;
-  private readonly DocumentBuilderOptions _options;
+  private readonly DocumentSerializationOptions _options;
   private int _indent;
 
-  public DocumentRenderer(ArrayBufferWriter<byte> writer, DocumentBuilderOptions options)
+  public DocumentRenderer(ArrayBufferWriter<byte> writer, DocumentSerializationOptions options)
   {
     _sb = new Utf8StringBuilder(writer);
     _options = options;

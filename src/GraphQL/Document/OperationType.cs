@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal enum OperationType
+public enum OperationType
 {
   Query,
   Mutation,

@@ -16,7 +16,7 @@ public class DocumentRendererTests
   private const string s_queryName = "GetBlogs";
 
   private readonly ArrayBufferWriter<byte> _writer;
-  private readonly DocumentBuilderOptions _options;
+  private readonly DocumentSerializationOptions _options;
 
   public DocumentRendererTests()
   {

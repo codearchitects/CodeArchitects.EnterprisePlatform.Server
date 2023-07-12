@@ -10,17 +10,17 @@ public interface IGraphClient : IGraphClient<IDocumentRoot>
 public interface IGraphClient<TDocumentRoot>
   where TDocumentRoot : class
 {
-  IGraphRequest<TResult> Request<TResult>(IGraphDocument<TResult> document)
+  IGraphRequest<TResult> Request<TResult>(GraphDocument<TResult> document)
     where TResult : class;
 
-  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(IGraphDocument<TResult, TVariables> document)
+  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(GraphDocument<TResult, TVariables> document)
     where TResult : class
     where TVariables : notnull;
 
-  IGraphRequest<TResult> Request<TResult>(Func<IDocumentBuilder<TDocumentRoot>, IGraphDocument<TResult>> buildDocument)
+  IGraphRequest<TResult> Request<TResult>(Func<IDocumentBuilder<TDocumentRoot>, GraphDocument<TResult>> buildDocument)
     where TResult : class;
 
-  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(Func<IDocumentBuilder<TDocumentRoot>, IGraphDocument<TResult, TVariables>> buildDocument)
+  IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(Func<IDocumentBuilder<TDocumentRoot>, GraphDocument<TResult, TVariables>> buildDocument)
     where TResult : class
     where TVariables : notnull;
 }

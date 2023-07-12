@@ -1,81 +1,57 @@
-﻿using CodeArchitects.Platform.GraphQL.Buffers;
-using CodeArchitects.Platform.GraphQL.Document.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Nodes;
-using CodeArchitects.Platform.GraphQL.Model;
-using System.Buffers;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal abstract partial class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
-  where TDocumentRoot : notnull
+internal class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
+  where TDocumentRoot : class
 {
-  private readonly INodeContext _nodeContext;
-  private readonly IModel _model;
-  private readonly DocumentBuilderOptions _options;
-  private readonly IBufferProvider _bufferProvider;
+  public static readonly DocumentBuilder<TDocumentRoot> Instance = new();
 
-  public DocumentBuilder(INodeContext nodeContext, IModel model, DocumentBuilderOptions options, IBufferProvider bufferProvider)
+  private DocumentBuilder()
   {
-    _nodeContext = nodeContext;
-    _model = model;
-    _options = options;
-    _bufferProvider = bufferProvider;
   }
 
-  protected abstract GraphDocument<TResult, TVariables> CreateDocument<TResult, TVariables>(OperationType type, string? name, byte[] content)
-    where TVariables : notnull;
-
-  private IGraphDocument<TResult> BuildQuery<TResult>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  public GraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
-    IReadOnlyCollection<IVariable> variables = Array.Empty<IVariable>();
-    IOperationDefinitionNode operationDefinition = new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body);
-
-    return BuildDocument<TResult, EmptyVariables>(operationDefinition);
+    return new GraphQuery<TResult>(null, expansion.Body);
   }
 
-  private IGraphDocument<TResult, TVariables> BuildQuery<TResult, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+  public GraphDocument<TResult, TVariables> Query<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
-    IReadOnlyCollection<IVariable> variables = _model.GetVariables(typeof(TVariables));
-    IOperationDefinitionNode operationDefinition = new QueryDefinitionNode(_nodeContext, name, variables, expansion.Body);
-
-    return BuildDocument<TResult, TVariables>(operationDefinition);
+    return new GraphQuery<TResult, TVariables>(null, expansion.Body);
   }
 
-  private IGraphDocument<TResult> BuildMutation<TResult>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  public GraphDocument<TResult> Query<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
   {
-    IReadOnlyCollection<IVariable> variables = Array.Empty<IVariable>();
-    IOperationDefinitionNode operationDefinition = new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body);
-
-    return BuildDocument<TResult, EmptyVariables>(operationDefinition);
+    return new GraphQuery<TResult>(name, expansion.Body);
   }
 
-  private IGraphDocument<TResult, TVariables> BuildMutation<TResult, TVariables>(string? name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+  public GraphDocument<TResult, TVariables> Query<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
-    IReadOnlyCollection<IVariable> variables = _model.GetVariables(typeof(TVariables));
-    IOperationDefinitionNode operationDefinition = new MutationDefinitionNode(_nodeContext, name, variables, expansion.Body);
-
-    return BuildDocument<TResult, TVariables>(operationDefinition);
+    return new GraphQuery<TResult, TVariables>(name, expansion.Body);
   }
 
-  private GraphDocument<TResult, TVariables> BuildDocument<TResult, TVariables>(IOperationDefinitionNode operationDefinition)
+  public GraphDocument<TResult> Mutation<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  {
+    return new GraphMutation<TResult>(null, expansion.Body);
+  }
+
+  public GraphDocument<TResult, TVariables> Mutation<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TVariables : notnull
   {
-    byte[] content;
+    return new GraphMutation<TResult, TVariables>(null, expansion.Body);
+  }
 
-    using (BufferOwner owner = _bufferProvider.GetBuffer())
-    {
-      ArrayBufferWriter<byte> writer = owner.Writer;
+  public GraphDocument<TResult> Mutation<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+  {
+    return new GraphMutation<TResult>(name, expansion.Body);
+  }
 
-      DocumentRenderer renderer = new(writer, _options);
-      renderer.AppendOperationDefinition(operationDefinition);
-
-      content = new byte[writer.WrittenCount];
-      writer.WrittenSpan.CopyTo(content);
-    }
-
-    return CreateDocument<TResult, TVariables>(operationDefinition.OperationType, operationDefinition.Name, content);
+  public GraphDocument<TResult, TVariables> Mutation<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+    where TVariables : notnull
+  {
+    return new GraphMutation<TResult, TVariables>(name, expansion.Body);
   }
 }
