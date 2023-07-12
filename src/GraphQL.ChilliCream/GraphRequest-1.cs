@@ -6,9 +6,9 @@ namespace CodeArchitects.Platform.GraphQL.ChilliCream;
 internal class GraphRequest<TResult> : GraphRequestBase<TResult>, IGraphRequest<TResult>
   where TResult : class
 {
-  private readonly IGraphDocument<TResult> _document;
+  private readonly Utf8Document _document;
 
-  public GraphRequest(IOperationExecutor<TResult> executor, IGraphDocument<TResult> document)
+  public GraphRequest(IOperationExecutor<TResult> executor, Utf8Document document)
     : base(executor)
   {
     _document = document;

@@ -7,10 +7,10 @@ internal class GraphRequest<TResult, TVariables> : GraphRequestBase<TResult>, IG
   where TResult : class
   where TVariables : notnull
 {
-  private readonly IGraphDocument<TResult, TVariables> _document;
+  private readonly Utf8Document _document;
   private readonly VariableExtractor<TVariables> _extract;
 
-  public GraphRequest(IOperationExecutor<TResult> executor, IGraphDocument<TResult, TVariables> document, VariableExtractor<TVariables> extract)
+  public GraphRequest(IOperationExecutor<TResult> executor, Utf8Document document, VariableExtractor<TVariables> extract)
     : base(executor)
   {
     _document = document;

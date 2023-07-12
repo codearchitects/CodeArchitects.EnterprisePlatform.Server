@@ -37,7 +37,7 @@ public abstract class GraphDocument
 
 public abstract class GraphDocument<TResult> : GraphDocument
 {
-  internal GraphDocument(string? name, Expression expression)
+  private GraphDocument(string? name, Expression expression)
     : base(name, expression)
   {
   }
@@ -48,12 +48,38 @@ public abstract class GraphDocument<TResult> : GraphDocument
   {
     return CreateOperationDefinition(nodeContext);
   }
+
+  internal sealed class Query : GraphDocument<TResult>
+  {
+    public Query(string? name, Expression expression)
+      : base(name, expression)
+    {
+    }
+
+    public override OperationType OperationType => OperationType.Query;
+
+    private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext)
+      => CreateQueryDefinition(nodeContext, Enumerable.Empty<IVariable>());
+  }
+
+  internal sealed class Mutation : GraphDocument<TResult>
+  {
+    public Mutation(string? name, Expression expression)
+      : base(name, expression)
+    {
+    }
+
+    public override OperationType OperationType => OperationType.Mutation;
+
+    private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext)
+      => CreateMutationDefinition(nodeContext, Enumerable.Empty<IVariable>());
+  }
 }
 
 public abstract class GraphDocument<TResult, TVariables> : GraphDocument
   where TVariables : notnull
 {
-  internal GraphDocument(string? name, Expression expression)
+  private GraphDocument(string? name, Expression expression)
     : base(name, expression)
   {
   }
@@ -66,58 +92,30 @@ public abstract class GraphDocument<TResult, TVariables> : GraphDocument
 
     return CreateOperationDefinition(nodeContext, variables);
   }
-}
 
-internal sealed class GraphQuery<TResult> : GraphDocument<TResult>
-{
-  public GraphQuery(string? name, Expression expression)
-    : base(name, expression)
+  internal sealed class Query : GraphDocument<TResult, TVariables>
   {
+    public Query(string? name, Expression expression)
+      : base(name, expression)
+    {
+    }
+
+    public override OperationType OperationType => OperationType.Query;
+
+    private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext, IEnumerable<IVariable> variables)
+      => CreateQueryDefinition(nodeContext, variables);
   }
 
-  public override OperationType OperationType => OperationType.Query;
-
-  private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext)
-    => CreateQueryDefinition(nodeContext, Enumerable.Empty<IVariable>());
-}
-
-internal sealed class GraphMutation<TResult> : GraphDocument<TResult>
-{
-  public GraphMutation(string? name, Expression expression)
-    : base(name, expression)
+  internal sealed class Mutation : GraphDocument<TResult, TVariables>
   {
+    public Mutation(string? name, Expression expression)
+      : base(name, expression)
+    {
+    }
+
+    public override OperationType OperationType => OperationType.Mutation;
+
+    private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext, IEnumerable<IVariable> variables)
+      => CreateMutationDefinition(nodeContext, variables);
   }
-
-  public override OperationType OperationType => OperationType.Mutation;
-
-  private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext)
-    => CreateMutationDefinition(nodeContext, Enumerable.Empty<IVariable>());
-}
-
-internal sealed class GraphQuery<TResult, TVariables> : GraphDocument<TResult, TVariables>
-  where TVariables : notnull
-{
-  public GraphQuery(string? name, Expression expression)
-    : base(name, expression)
-  {
-  }
-
-  public override OperationType OperationType => OperationType.Query;
-
-  private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext, IEnumerable<IVariable> variables)
-    => CreateQueryDefinition(nodeContext, variables);
-}
-
-internal sealed class GraphMutation<TResult, TVariables> : GraphDocument<TResult, TVariables>
-  where TVariables : notnull
-{
-  public GraphMutation(string? name, Expression expression)
-    : base(name, expression)
-  {
-  }
-
-  public override OperationType OperationType => OperationType.Mutation;
-
-  private protected override IOperationDefinitionNode CreateOperationDefinition(INodeContext nodeContext, IEnumerable<IVariable> variables)
-    => CreateMutationDefinition(nodeContext, variables);
 }

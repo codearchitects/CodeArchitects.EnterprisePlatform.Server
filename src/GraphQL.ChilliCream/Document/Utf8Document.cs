@@ -4,14 +4,14 @@ using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 
-internal class ChilliCreamUtf8Document : IUtf8Document, IDocument
+internal class Utf8Document : IUtf8Document, IDocument
 {
   private readonly OperationKind _kind;
   private readonly string _name;
   private readonly byte[] _content;
   private readonly string _id;
 
-  public ChilliCreamUtf8Document(OperationKind kind, string name, byte[] content, string id)
+  public Utf8Document(OperationKind kind, string name, byte[] content, string id)
   {
     _kind = kind;
     _name = name;

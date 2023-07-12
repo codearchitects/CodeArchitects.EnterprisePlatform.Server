@@ -18,9 +18,11 @@ internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient
     _compileDocument = compileDocument;
   }
 
-  protected abstract IGraphRequest<TResult> CreateRequest<TResult>(TUtf8Document utf8Document);
+  protected abstract IGraphRequest<TResult> CreateRequest<TResult>(TUtf8Document utf8Document)
+    where TResult : class;
 
   protected abstract IGraphRequest<TResult, TVariables> CreateRequest<TResult, TVariables>(TUtf8Document utf8Document)
+    where TResult : class
     where TVariables : notnull;
 
   public IGraphRequest<TResult> Request<TResult>(GraphDocument<TResult> document)
