@@ -250,12 +250,13 @@ public static class QueryHelpers
   private static bool IsSimpleType(Type type, int nesting)
   {
     bool isSimpleType =
-      type.IsPrimitive         ||
-      type == typeof(string)   ||
-      type == typeof(decimal)  ||
-      type == typeof(Guid)     ||
-      type == typeof(DateTime) ||
-      type == typeof(DateTimeOffset);
+      type.IsPrimitive               ||
+      type == typeof(string)         ||
+      type == typeof(decimal)        ||
+      type == typeof(Guid)           ||
+      type == typeof(DateTime)       ||
+      type == typeof(DateTimeOffset) ||
+      type.IsNullable(out _);
 
     if (isSimpleType)
       return true;

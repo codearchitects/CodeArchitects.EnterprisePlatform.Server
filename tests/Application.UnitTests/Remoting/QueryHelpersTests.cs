@@ -156,4 +156,42 @@ public class QueryHelpersTests
     // Assert
     url.Should().Be($"{baseUrl}{expectedQuery}");
   }
+
+  [Theory]
+  [InlineData("12", "?Value=12")]
+  [InlineData(null, "?")]
+  public void AddQueryToUrl_ShouldEncodeNullableReferenceType(string? value, string expectedQuery)
+  {
+    // Arrange
+    const string baseUrl = "https://www.codearchitects.com";
+    var query = new
+    {
+      Value = value
+    };
+
+    // Act
+    string url = QueryHelpers.AddQueryToUrl(baseUrl, query);
+
+    // Assert
+    url.Should().Be($"{baseUrl}{expectedQuery}");
+  }
+
+  [Theory]
+  [InlineData(12, "?Value=12")]
+  [InlineData(null, "?")]
+  public void AddQueryToUrl_ShouldEncodeNullableValueType(int? value, string expectedQuery)
+  {
+    // Arrange
+    const string baseUrl = "https://www.codearchitects.com";
+    var query = new
+    {
+      Value = value
+    };
+
+    // Act
+    string url = QueryHelpers.AddQueryToUrl(baseUrl, query);
+
+    // Assert
+    url.Should().Be($"{baseUrl}{expectedQuery}");
+  }
 }
