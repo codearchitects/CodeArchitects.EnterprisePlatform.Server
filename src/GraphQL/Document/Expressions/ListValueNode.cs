@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using CodeArchitects.Platform.GraphQL.Document.Nodes;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 

@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using System.Linq.Expressions;
 using System.Reflection;
-using CodeArchitects.Platform.GraphQL.Document.Nodes;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 

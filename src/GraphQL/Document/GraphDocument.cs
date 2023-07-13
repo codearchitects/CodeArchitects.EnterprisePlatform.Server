@@ -1,10 +1,12 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Expressions;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
+[DebuggerDisplay("{ToString()}")]
 public abstract class GraphDocument
 {
   private readonly Expression _expression;

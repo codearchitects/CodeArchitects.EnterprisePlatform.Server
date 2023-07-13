@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
-using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using System.Data.Common;
 
@@ -65,7 +64,7 @@ public abstract class DatabaseProvider
     {
       return typeArgument
         .GetGenericParameterConstraints()
-        .Any(constraint => constraintType.IsAssignableFrom(constraint));
+        .Any(constraintType.IsAssignableFrom);
     }
   }
 
