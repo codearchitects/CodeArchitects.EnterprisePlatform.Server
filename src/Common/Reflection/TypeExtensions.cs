@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace System.Reflection;
 
@@ -95,5 +96,23 @@ internal static class TypeExtensions
       type.Name.StartsWith("<>", StringComparison.Ordinal) &&
       type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), inherit: false).Length > 0 &&
       type.Name.Contains("AnonymousType");
+  }
+
+  public static bool IsNullable(this Type type, [NotNullWhen(true)] out Type? underlyingType)
+  {
+    if (!type.IsGenericType)
+    {
+      underlyingType = null;
+      return false;
+    }
+
+    if (type.IsGenericTypeDefinition && type == typeof(Nullable<>) || type.GetGenericTypeDefinition() == typeof(Nullable<>))
+    {
+      underlyingType = type.GetGenericArguments()[0];
+      return true;
+    }
+
+    underlyingType = null;
+    return false;
   }
 }
