@@ -5,25 +5,20 @@ using CodeArchitects.Platform.GraphQL.Model;
 
 namespace CodeArchitects.Platform.GraphQL;
 
-internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient<TDocumentRoot>
+internal class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient<TDocumentRoot>
   where TUtf8Document : IUtf8Document
   where TDocumentRoot : class
 {
   private readonly IDocumentCache<TUtf8Document> _documentCache;
   private readonly Func<GraphDocument, TUtf8Document> _compileDocument;
+  private readonly IRequestFactory<TUtf8Document> _requestFactory;
 
-  protected GraphClient(IDocumentCache<TUtf8Document> documentCache, Func<GraphDocument, TUtf8Document> compileDocument)
+  public GraphClient(IDocumentCache<TUtf8Document> documentCache, Func<GraphDocument, TUtf8Document> compileDocument, IRequestFactory<TUtf8Document> requestFactory)
   {
     _documentCache = documentCache;
     _compileDocument = compileDocument;
+    _requestFactory = requestFactory;
   }
-
-  protected abstract IGraphRequest<TResult> CreateRequest<TResult>(TUtf8Document utf8Document)
-    where TResult : class;
-
-  protected abstract IGraphRequest<TResult, TVariables> CreateRequest<TResult, TVariables>(TUtf8Document utf8Document)
-    where TResult : class
-    where TVariables : notnull;
 
   public IGraphRequest<TResult> Request<TResult>(GraphDocument<TResult> document)
     where TResult : class
@@ -33,7 +28,7 @@ internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient
 
     TUtf8Document utf8Document = _documentCache.GetOrCompile(document, _compileDocument);
 
-    return CreateRequest<TResult>(utf8Document);
+    return _requestFactory.CreateRequest<TResult>(utf8Document);
   }
 
   public IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(GraphDocument<TResult, TVariables> document)
@@ -45,7 +40,7 @@ internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient
     
     TUtf8Document utf8Document = _documentCache.GetOrCompile(document, _compileDocument);
 
-    return CreateRequest<TResult, TVariables>(utf8Document);
+    return _requestFactory.CreateRequest<TResult, TVariables>(utf8Document);
   }
 
   public IGraphRequest<TResult> Request<TResult>(Func<IDocumentBuilder<TDocumentRoot>, GraphDocument<TResult>> buildDocument)
@@ -57,7 +52,7 @@ internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient
     GraphDocument<TResult> document = buildDocument(DocumentBuilder<TDocumentRoot>.Instance);
     TUtf8Document utf8Document = _compileDocument(document);
 
-    return CreateRequest<TResult>(utf8Document);
+    return _requestFactory.CreateRequest<TResult>(utf8Document);
   }
 
   public IGraphRequest<TResult, TVariables> Request<TResult, TVariables>(Func<IDocumentBuilder<TDocumentRoot>, GraphDocument<TResult, TVariables>> buildDocument)
@@ -70,7 +65,7 @@ internal abstract class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient
     GraphDocument<TResult, TVariables> document = buildDocument(DocumentBuilder<TDocumentRoot>.Instance);
     TUtf8Document utf8Document = _compileDocument(document);
 
-    return CreateRequest<TResult, TVariables>(utf8Document);
+    return _requestFactory.CreateRequest<TResult, TVariables>(utf8Document);
   }
 
   protected static Func<GraphDocument, TUtf8Document> CreateGraphDocumentCompiler(IModel model, INodeContext nodeContext, IDocumentCompiler<TUtf8Document> documentCompiler)
