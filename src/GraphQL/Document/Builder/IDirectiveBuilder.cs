@@ -2,12 +2,12 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IDirectiveBuilder
+public interface IDirectiveBuilder
 {
   IDirectiveBuilder WithArgument<TArg>(string name, TArg value);
 }
 
-internal interface IDirectiveBuilder<TVariables>
+public interface IDirectiveBuilder<TVariables>
   where TVariables : notnull
 {
   IDirectiveBuilder<TVariables> WithArgument<TArg>(string name, TArg value);

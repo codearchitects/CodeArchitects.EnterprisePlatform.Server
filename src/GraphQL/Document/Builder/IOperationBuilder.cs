@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface IOperationBuilder<TField> : IExpander, ISelector
+public interface IOperationBuilder<TField> : IExpander, ISelector
 {
   IOperationBuilder<TField> WithDirective(string name);
 
@@ -11,7 +11,7 @@ internal interface IOperationBuilder<TField> : IExpander, ISelector
   IBuildResult<TResult> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-internal interface IOperationBuilder<TField, TVariables> : IExpander<TVariables>, ISelector
+public interface IOperationBuilder<TField, TVariables> : IExpander<TVariables>, ISelector
   where TVariables : notnull
 {
   IOperationBuilder<TField, TVariables> WithDirective(string name);

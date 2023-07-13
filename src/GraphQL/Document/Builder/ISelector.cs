@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal interface ISelector
+public interface ISelector
 {
   TResult SelectRef<TSource, TResult>(TSource? source, Expression<Func<TSource, TResult>> selection);
 

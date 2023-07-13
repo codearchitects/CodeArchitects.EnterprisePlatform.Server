@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal interface IDocumentRoot
+public interface IDocumentRoot
 {
   TField Field<TField>(string name);
 }

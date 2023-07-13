@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.GraphQL.Document.Builder.Nodes;
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.GraphQL.Fixtures;

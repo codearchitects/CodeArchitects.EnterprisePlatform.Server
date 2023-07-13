@@ -1,26 +1,30 @@
-﻿namespace CodeArchitects.Platform.GraphQL.Document;
+﻿using CodeArchitects.Platform.GraphQL.Document.Builder;
 
-internal sealed class ValueSeparator : IEquatable<ValueSeparator>
+namespace CodeArchitects.Platform.GraphQL.Document;
+
+public abstract class ValueSeparator
 {
-  public static readonly ValueSeparator Comma = new(", ");
-  public static readonly ValueSeparator Space = new(" ");
+  private ValueSeparator() { }
 
-  private readonly string _separator;
+  public static readonly ValueSeparator Comma = new CommaSeparator();
+  public static readonly ValueSeparator Space = new SpaceSeparator();
 
-  public ValueSeparator(string separator)
+  internal abstract void AppendOn(Utf8StringBuilder sb);
+
+  private sealed class CommaSeparator : ValueSeparator
   {
-    _separator = separator;
+    internal override void AppendOn(Utf8StringBuilder sb)
+    {
+      sb.AppendComma();
+      sb.AppendSpace();
+    }
   }
 
-  public bool Equals(ValueSeparator other) => other._separator == _separator;
-
-  public override bool Equals(object obj) => obj is ValueSeparator other && Equals(other);
-
-  public override int GetHashCode() => _separator.GetHashCode();
-
-  public override string ToString() => _separator;
-
-  public static bool operator ==(ValueSeparator left, ValueSeparator right) => left.Equals(right);
-
-  public static bool operator !=(ValueSeparator left, ValueSeparator right) => !(left == right);
+  private sealed class SpaceSeparator : ValueSeparator
+  {
+    internal override void AppendOn(Utf8StringBuilder sb)
+    {
+      sb.AppendSpace();
+    }
+  }
 }

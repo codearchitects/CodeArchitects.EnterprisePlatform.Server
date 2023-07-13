@@ -1,28 +1,18 @@
-﻿using System.Text;
+﻿using CodeArchitects.Platform.GraphQL.Document.Builder;
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
-internal abstract class LinePolicy
+public abstract class LinePolicy
 {
+  private LinePolicy() { }
+
   public static readonly LinePolicy Default = new IndentPolicy(2);
 
-  public static LinePolicy Indent(int indentSize)
-  {
-    if (indentSize < 0)
-      throw new ArgumentOutOfRangeException(nameof(indentSize), indentSize, $"'{nameof(indentSize)}' should not be less than 0.");
+  public static LinePolicy Indent(int indentSize) => new IndentPolicy(indentSize);
 
-    return new IndentPolicy(indentSize);
-  }
+  public static LinePolicy Space(int spaceSize) => new SpacePolicy(spaceSize);
 
-  public static LinePolicy Space(int spaceSize)
-  {
-    if (spaceSize < 1)
-      throw new ArgumentOutOfRangeException(nameof(spaceSize), spaceSize, $"'{nameof(spaceSize)}' should not be less than 1.");
-
-    return new SpacePolicy(new string(' ', spaceSize));
-  }
-
-  internal abstract void AppendLine(StringBuilder sb, int indent);
+  internal abstract void AppendOn(Utf8StringBuilder sb, int indent);
 
   private sealed class IndentPolicy : LinePolicy
   {
@@ -30,28 +20,34 @@ internal abstract class LinePolicy
 
     public IndentPolicy(int indentSize)
     {
+      if (indentSize < 0)
+        throw new ArgumentOutOfRangeException(nameof(indentSize), indentSize, $"'{nameof(indentSize)}' should not be less than 0.");
+
       _indentSize = indentSize;
     }
 
-    internal override void AppendLine(StringBuilder sb, int indent)
+    internal override void AppendOn(Utf8StringBuilder sb, int indent)
     {
       sb.AppendLine();
-      sb.Append(' ', indent * _indentSize);
+      sb.AppendSpaces(indent * _indentSize);
     }
   }
 
   private sealed class SpacePolicy : LinePolicy
   {
-    private readonly string _space;
+    private readonly int _spaceSize;
 
-    public SpacePolicy(string space)
+    public SpacePolicy(int spaceSize)
     {
-      _space = space;
+      if (spaceSize < 1)
+        throw new ArgumentOutOfRangeException(nameof(spaceSize), spaceSize, $"'{nameof(spaceSize)}' should not be less than 1.");
+
+      _spaceSize = spaceSize;
     }
 
-    internal override void AppendLine(StringBuilder sb, int indent)
+    internal override void AppendOn(Utf8StringBuilder sb, int indent)
     {
-      sb.Append(_space);
+      sb.AppendSpaces(_spaceSize);
     }
   }
 }
