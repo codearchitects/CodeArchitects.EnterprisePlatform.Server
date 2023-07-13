@@ -1,0 +1,19 @@
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using CodeArchitects.Platform.GraphQL.Model;
+using FluentMock;
+
+[assembly: GenerateFluentMockFor(typeof(IModel))]
+[assembly: GenerateFluentMockFor(typeof(IType))]
+[assembly: GenerateFluentMockFor(typeof(IScalarType))]
+[assembly: GenerateFluentMockFor(typeof(IObjectType))]
+[assembly: GenerateFluentMockFor(typeof(IField))]
+[assembly: GenerateFluentMockFor(typeof(IVariable))]
+
+[assembly: GenerateFluentMockFor(typeof(IOperationDefinitionNode))]
+[assembly: GenerateFluentMockFor(typeof(IDirectiveNode))]
+[assembly: GenerateFluentMockFor(typeof(ISelectionSetNode))]
+[assembly: GenerateFluentMockFor(typeof(ISelectionNode))]
+[assembly: GenerateFluentMockFor(typeof(IArgumentNode))]
+[assembly: GenerateFluentMockFor(typeof(IListValueNode))]
+[assembly: GenerateFluentMockFor(typeof(IObjectValueNode))]
+[assembly: GenerateFluentMockFor(typeof(IObjectFieldNode))]

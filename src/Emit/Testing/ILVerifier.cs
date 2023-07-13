@@ -30,6 +30,8 @@ internal abstract class ILVerifier
 
   public abstract ILVerifier Br_S(string label);
 
+  public abstract ILVerifier Box(Type type);
+
   public abstract ILVerifier Call(Predicate<MethodBase> predicate);
 
   public abstract ILVerifier Call(MethodBase methodBase);

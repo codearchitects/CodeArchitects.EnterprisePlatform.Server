@@ -48,6 +48,11 @@ internal class InstructionVerifier : ILVerifier
     return MoveNext();
   }
 
+  public override ILVerifier Box(Type type)
+  {
+    return Verify(OpCodes.Box, type);
+  }
+
   public override ILVerifier Call(Predicate<MethodBase> predicate)
   {
     return Verify(OpCodes.Call, predicate);
@@ -343,6 +348,11 @@ internal class InstructionVerifier : ILVerifier
       throw Error("The Type argument does not match the provided predicate.");
 
     return MoveNext();
+  }
+
+  private ILVerifier Verify(OpCode opcode, Type expected)
+  {
+    return VerifyValue(opcode, expected);
   }
 
   private ILVerifier Verify(OpCode opcode, int expected)

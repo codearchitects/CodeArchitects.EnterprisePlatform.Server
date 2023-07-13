@@ -153,6 +153,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Gra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.GraphQL.ChilliCream", "src\GraphQL.ChilliCream\CodeArchitects.Platform.GraphQL.ChilliCream.csproj", "{6BBC5670-C5CF-46DC-A597-BD5012267798}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.GraphQL.ChilliCream.UnitTests", "tests\GraphQL.ChilliCream.UnitTests\CodeArchitects.Platform.GraphQL.ChilliCream.UnitTests.csproj", "{8FD257B7-F78B-4495-8790-DFEB34E1EDFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -423,6 +425,10 @@ Global
 		{6BBC5670-C5CF-46DC-A597-BD5012267798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BBC5670-C5CF-46DC-A597-BD5012267798}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BBC5670-C5CF-46DC-A597-BD5012267798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -486,6 +492,7 @@ Global
 		{0F1AF08A-F1DB-4A7B-9C00-32CFF4DC3996} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A} = {6FFB7182-83ED-44D9-BE34-6D86E215D501}
 		{9FE314F4-6070-4D57-88F1-F02C7353D3F6} = {80AD5D6F-E49F-4E13-B635-7C0C8264BE94}
+		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}
