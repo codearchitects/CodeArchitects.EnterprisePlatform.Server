@@ -3,11 +3,11 @@ using System.Buffers;
 
 namespace CodeArchitects.Platform.GraphQL.Buffers;
 
-internal class BufferProvider : IBufferProvider
+internal class BufferProvider
 {
-  private readonly DefaultObjectPool<ArrayBufferWriter<byte>> _pool;
+  private readonly ObjectPool<ArrayBufferWriter<byte>> _pool;
 
-  public BufferProvider(DefaultObjectPool<ArrayBufferWriter<byte>> pool)
+  public BufferProvider(ObjectPool<ArrayBufferWriter<byte>> pool)
   {
     _pool = pool;
   }
@@ -18,7 +18,7 @@ internal class BufferProvider : IBufferProvider
     return new BufferOwner(_pool, writer);
   }
 
-  public static BufferProvider Create()
+  public static BufferProvider CreateDefault()
   {
     DefaultObjectPool<ArrayBufferWriter<byte>> pool = new(PooledBufferPolicy.Instance);
     return new(pool);

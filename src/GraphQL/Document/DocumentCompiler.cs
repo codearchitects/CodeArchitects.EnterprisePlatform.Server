@@ -8,10 +8,10 @@ namespace CodeArchitects.Platform.GraphQL.Document;
 internal abstract class DocumentCompiler<TUtf8Document> : IDocumentCompiler<TUtf8Document>
   where TUtf8Document : IUtf8Document
 {
-  private readonly IBufferProvider _bufferProvider;
+  private readonly BufferProvider _bufferProvider;
   private readonly DocumentSerializationOptions _options;
 
-  public DocumentCompiler(IBufferProvider bufferProvider, DocumentSerializationOptions options)
+  public DocumentCompiler(BufferProvider bufferProvider, DocumentSerializationOptions options)
   {
     _bufferProvider = bufferProvider;
     _options = options;

@@ -7,7 +7,7 @@ namespace CodeArchitects.Platform.GraphQL.ChilliCream.Document;
 
 internal class DocumentCompiler : DocumentCompiler<Utf8Document>
 {
-  public DocumentCompiler(IBufferProvider bufferProvider, DocumentSerializationOptions options)
+  public DocumentCompiler(BufferProvider bufferProvider, DocumentSerializationOptions options)
     : base(bufferProvider, options)
   {
   }

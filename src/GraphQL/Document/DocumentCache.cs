@@ -1,38 +1,19 @@
-﻿using CodeArchitects.Platform.Common.Utils;
-using Microsoft.Extensions.Caching.Memory;
+﻿using System.Collections.Concurrent;
 
 namespace CodeArchitects.Platform.GraphQL.Document;
 
 internal class DocumentCache<TUtf8Document> : IDocumentCache<TUtf8Document>
   where TUtf8Document : IUtf8Document
 {
-  private readonly IMemoryCache _cache;
-  private readonly Synchronizer _synchronizer;
+  private readonly ConcurrentDictionary<GraphDocument, TUtf8Document> _documents;
 
-  public DocumentCache(IMemoryCache cache, Synchronizer synchronizer)
+  public DocumentCache()
   {
-    _cache = cache;
-    _synchronizer = synchronizer;
+    _documents = new();
   }
 
-  public TUtf8Document GetOrCompile<TDocument>(TDocument document, Func<TDocument, TUtf8Document> compile)
-    where TDocument : class
+  public TUtf8Document GetOrCompile(GraphDocument document, Func<GraphDocument, TUtf8Document> compile)
   {
-    if (_cache.TryGetValue(document, out TUtf8Document utf8Document))
-      return utf8Document;
-
-    using (_synchronizer.Sync(document))
-    {
-      if (_cache.TryGetValue(document, out utf8Document))
-        return utf8Document;
-
-      utf8Document = compile(document);
-
-      using ICacheEntry entry = _cache.CreateEntry(document);
-      entry.Value = utf8Document;
-      entry.Size = utf8Document.Content.Length / 4;
-    }
-
-    return utf8Document;
+    return _documents.GetOrAdd(document, compile);
   }
 }

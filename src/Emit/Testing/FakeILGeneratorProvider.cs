@@ -34,4 +34,12 @@ internal class FakeILGeneratorProvider : IILGeneratorProvider
     result.MethodName = constructorBuilder.Name;
     return result;
   }
+
+  public IILGenerator GetILGenerator(DynamicMethod dynamicMethod)
+  {
+    dynamicMethod.GetILGenerator().Emit(OpCodes.Ret);
+    FakeILGenerator result = _generators[_index++];
+    result.MethodName = dynamicMethod.Name;
+    return result;
+  }
 }

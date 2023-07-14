@@ -39,6 +39,7 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.AdoNet.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.IntegrationTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL.ChilliCream.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests")]

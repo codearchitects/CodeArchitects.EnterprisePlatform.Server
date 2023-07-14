@@ -7,7 +7,6 @@ using CodeArchitects.Platform.GraphQL.Model;
 using CodeArchitects.Platform.GraphQL.Model.FluentMock;
 using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
-using Moq;
 using System.Linq.Expressions;
 using System.Reflection;
 

@@ -13,4 +13,9 @@ internal class ReflectionILGeneratorProvider : IILGeneratorProvider
   {
     return new ReflectionILGenerator(constructorBuilder.GetILGenerator());
   }
+
+  public IILGenerator GetILGenerator(DynamicMethod dynamicMethod)
+  {
+    return new ReflectionILGenerator(dynamicMethod.GetILGenerator());
+  }
 }

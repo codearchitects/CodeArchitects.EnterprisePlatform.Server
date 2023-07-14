@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -127,6 +128,7 @@ internal readonly ref struct Utf8StringBuilder
 
   public Utf8StringBuilder AppendLine() => Append(s_newLineBytes);
 
+  [ExcludeFromCodeCoverage]
   public override string ToString() => Encoding.UTF8.GetString(_writer.WrittenSpan);
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]

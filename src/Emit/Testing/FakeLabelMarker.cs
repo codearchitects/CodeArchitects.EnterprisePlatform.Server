@@ -34,6 +34,8 @@ internal class FakeLabelMarker : ILVerifier
 
   public override ILVerifier Br_S(string label) => MoveNext();
 
+  public override ILVerifier Box(Type type) => MoveNext();
+
   public override ILVerifier Call(Predicate<MethodBase> predicate) => MoveNext();
 
   public override ILVerifier Call(MethodBase methodBase) => MoveNext();
