@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
+namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class NodeContext : INodeContext
 {

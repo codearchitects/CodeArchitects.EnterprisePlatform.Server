@@ -1,5 +1,6 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document;
 using CodeArchitects.Platform.GraphQL.Document.Builder;
+using CodeArchitects.Platform.GraphQL.Document.Expressions;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 
