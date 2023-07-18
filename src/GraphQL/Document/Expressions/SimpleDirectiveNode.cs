@@ -4,12 +4,14 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class SimpleDirectiveNode : IDirectiveNode
 {
+  private readonly string _name;
+
   public SimpleDirectiveNode(string name)
   {
-    Name = name;
+    _name = name;
   }
 
-  public string Name { get; }
+  public ReadOnlySpan<char> Name => _name;
 
-  public IEnumerable<IArgumentNode> Arguments => Enumerable.Empty<IArgumentNode>();
+  public IArgumentListNode? ArgumentList => null;
 }

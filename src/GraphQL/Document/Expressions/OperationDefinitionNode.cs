@@ -7,15 +7,17 @@ using System.Linq.Expressions;
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal abstract class OperationDefinitionNode : IteratorNode, IOperationDefinitionNode,
-  IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>
+  IDirectiveListNode, IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>
 {
   private readonly INodeContext _context;
+  private readonly string _name;
+  private readonly IReadOnlyList<IVariable> _variables;
 
-  public OperationDefinitionNode(INodeContext context, string? name, IEnumerable<IVariable> variables, Expression expression)
+  public OperationDefinitionNode(INodeContext context, string name, IReadOnlyList<IVariable> variables, Expression expression)
   {
     _context = context;
-    Name = name;
-    Variables = variables;
+    _name = name;
+    _variables = variables;
     Expression = expression;
   }
 
@@ -23,9 +25,13 @@ internal abstract class OperationDefinitionNode : IteratorNode, IOperationDefini
 
   public abstract OperationType OperationType { get; }
 
-  public string? Name { get; }
+  public ReadOnlySpan<char> Name => _name;
 
-  public IEnumerable<IVariable> Variables { get; }
+  public IVariableDefinitionListNode? VariableDefinitionList => _variables.Count == 0
+    ? null
+    : new VariableDefinitionListNode(_variables);
+
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.WithDirective) ? this : null;
 
   public IEnumerable<IDirectiveNode> Directives => this;
 

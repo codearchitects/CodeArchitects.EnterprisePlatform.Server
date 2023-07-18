@@ -1,8 +1,8 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IType
+public interface IType
 {
-  string Name { get; }
+  bool IsNullable { get; }
 
   Type ClrType { get; }
 

@@ -1,7 +1,5 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
-using CodeArchitects.Platform.GraphQL.Model;
 using System.Buffers;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
@@ -9,11 +7,6 @@ internal ref struct DocumentRenderer
 {
   private delegate void AppendAction<T>(ref DocumentRenderer self, T element);
   private delegate void AppendAction(ref DocumentRenderer self);
-
-  private static readonly AppendAction s_appendNothing          = static (ref DocumentRenderer self) => { };
-  private static readonly AppendAction s_appendLeftParenthesis  = static (ref DocumentRenderer self) => self._sb.AppendLeftParenthesis();
-  private static readonly AppendAction s_appendRightParenthesis = static (ref DocumentRenderer self) => self._sb.AppendRightParenthesis();
-  private static readonly AppendAction s_appendSpace            = static (ref DocumentRenderer self) => self._sb.AppendSpace();
 
   private readonly Utf8StringBuilder _sb;
   private readonly DocumentSerializationOptions _options;
@@ -29,46 +22,100 @@ internal ref struct DocumentRenderer
   {
     _sb.AppendOperationType(operationDefinition.OperationType);
 
-    if (operationDefinition.Name is string name)
+    if (operationDefinition.Name is { Length: > 0 } name)
     {
       _sb
         .AppendSpace()
         .Append(name);
     }
 
-    AppendVariables(operationDefinition.Variables);
+    if (operationDefinition.VariableDefinitionList is { } variableDefinitions)
+    {
+      AppendVariableDefinitions(variableDefinitions);
+    }
 
-    AppendDirectives(operationDefinition.Directives);
+    if (operationDefinition.DirectiveList is { } directiveList)
+    {
+      AppendDirectiveList(directiveList);
+    }
 
     AppendSelectionSet(operationDefinition.SelectionSet);
   }
 
-  private void AppendVariables(IEnumerable<IVariable> variables)
+  private void AppendVariableDefinitions(IVariableDefinitionListNode variableDefinitions)
   {
-    AppendSeparated(
-      variables,
-      static (ref DocumentRenderer self, IVariable variable) => self.AppendVariable(variable),
-      s_appendLeftParenthesis,
-      s_appendRightParenthesis);
+    _sb.AppendLeftParenthesis();
+
+    AppendSeparated(variableDefinitions.VariableDefinitions, static (ref DocumentRenderer self, IVariableDefinitionNode variableDefinition) => self.AppendVariableDefinition(variableDefinition));
+
+    _sb.AppendRightParenthesis();
   }
 
-  private void AppendVariable(IVariable variable)
+  private void AppendVariableDefinition(IVariableDefinitionNode variableDefinition)
+  {
+    AppendVariable(variableDefinition.Variable);
+
+    _sb
+      .AppendColon()
+      .AppendSpace();
+
+    AppendType(variableDefinition.Type);
+  }
+
+  private void AppendVariable(IVariableNode variable)
   {
     _sb
       .AppendVariablePrefix()
-      .AppendCamelized(variable.Name)
-      .AppendColon()
-      .AppendSpace()
-      .Append(variable.Type.Name);
+      .Append(variable.Name);
   }
 
-  private void AppendDirectives(IEnumerable<IDirectiveNode> directives)
+  private void AppendType(ITypeNode type)
   {
-    AppendSpaced(
-      directives,
-      static (ref DocumentRenderer self, IDirectiveNode directive) => self.AppendDirective(directive),
-      s_appendSpace,
-      s_appendNothing);
+    switch (type.TypeKind)
+    {
+      case TypeNodeKind.NamedType:
+        AppendNamedType((INamedTypeNode)type);
+        break;
+
+      case TypeNodeKind.ListType:
+        AppendListType((IListTypeNode)type);
+        break;
+
+      case TypeNodeKind.NonNullType:
+        AppendNonNullType((INonNullTypeNode)type);
+        break;
+
+      default:
+        throw new InvalidOperationException($"Type node of kind {type.TypeKind} is not supported.");
+    }
+  }
+
+  private void AppendNamedType(INamedTypeNode namedType)
+  {
+    _sb.Append(namedType.Name);
+  }
+
+  private void AppendListType(IListTypeNode namedType)
+  {
+    _sb.AppendLeftBracket();
+
+    AppendType(namedType.ItemType);
+    
+    _sb.AppendRightBracket();
+  }
+
+  private void AppendNonNullType(INonNullTypeNode nonNullType)
+  {
+    AppendType(nonNullType.NullableType);
+
+    _sb.AppendBang();
+  }
+
+  private void AppendDirectiveList(IDirectiveListNode directiveList)
+  {
+    _sb.AppendSpace();
+
+    AppendSpaced(directiveList.Directives, static (ref DocumentRenderer self, IDirectiveNode directive) => self.AppendDirective(directive));
   }
 
   private void AppendDirective(IDirectiveNode directive)
@@ -77,7 +124,10 @@ internal ref struct DocumentRenderer
       .AppendDirectivePrefix()
       .Append(directive.Name);
 
-    AppendArguments(directive.Arguments);
+    if (directive.ArgumentList is { } argumentList)
+    {
+      AppendArgumentList(argumentList);
+    }
   }
 
   private void AppendSelectionSet(ISelectionSetNode selectionSet)
@@ -88,54 +138,112 @@ internal ref struct DocumentRenderer
     _indent++;
     AppendLine();
 
-    AppendSelections(selectionSet.Selections);
+    AppendLines(selectionSet.Selections, static (ref DocumentRenderer self, ISelectionNode selection) => self.AppendSelection(selection));
 
     _indent--;
     AppendLine();
     _sb.AppendRightBrace();
   }
 
-  private void AppendSelections(IEnumerable<ISelectionNode> selections)
-  {
-    AppendLines(selections, static (ref DocumentRenderer self, ISelectionNode selection)
-      => self.AppendSelection(selection));
-  }
-
   private void AppendSelection(ISelectionNode selection)
   {
-    if (selection.Alias is string alias)
+    switch (selection.SelectionKind)
+    {
+      case SelectionNodeKind.Field:
+        AppendField((IFieldNode)selection);
+        break;
+
+      case SelectionNodeKind.FragmentSpread:
+        AppendFragmentSpread((IFragmentSpreadNode)selection);
+        break;
+
+      case SelectionNodeKind.InlineFragment:
+        AppendInlineFragment((IInlineFragmentNode)selection);
+        break;
+
+      default:
+        throw new InvalidOperationException($"Selection node of kind {selection.SelectionKind} is not supported.");
+    }
+  }
+
+  private void AppendField(IFieldNode field)
+  {
+    if (field.Alias is { Length: > 0 } alias)
     {
       _sb
-        .AppendCamelized(alias)
+        .Append(alias)
         .AppendColon()
         .AppendSpace();
     }
 
-    _sb.AppendCamelized(selection.FieldName);
+    _sb.Append(field.FieldName);
 
-    AppendArguments(selection.Arguments);
+    if (field.ArgumentList is { } argumentList)
+    {
+      AppendArgumentList(argumentList);
+    }
 
-    AppendDirectives(selection.Directives);
+    if (field.DirectiveList is { } directiveList)
+    {
+      AppendDirectiveList(directiveList);
+    }
 
-    if (selection.SelectionSet is ISelectionSetNode selectionSet)
+    if (field.SelectionSet is ISelectionSetNode selectionSet)
     {
       AppendSelectionSet(selectionSet);
     }
   }
 
-  private void AppendArguments(IEnumerable<IArgumentNode> arguments)
+  private void AppendFragmentSpread(IFragmentSpreadNode fragmentSpread)
   {
-    AppendSeparated(
-      arguments,
-      static (ref DocumentRenderer self, IArgumentNode argument) => self.AppendArgument(argument),
-      s_appendLeftParenthesis,
-      s_appendRightParenthesis);
+    _sb
+      .AppendSpread()
+      .Append(fragmentSpread.FragmentName);
+
+    if (fragmentSpread.DirectiveList is { } directiveList)
+    {
+      AppendDirectiveList(directiveList);
+    }
+  }
+
+  private void AppendInlineFragment(IInlineFragmentNode inlineFragment)
+  {
+    if (inlineFragment.TypeCondition is { } typeCondition)
+    {
+      _sb.AppendSpace();
+      AppendTypeCondition(typeCondition);
+    }
+
+    if (inlineFragment.DirectiveList is { } directiveList)
+    {
+      AppendDirectiveList(directiveList);
+    }
+
+    _sb.AppendSpace();
+
+    AppendSelectionSet(inlineFragment.SelectionSet);
+  }
+
+  private void AppendTypeCondition(ITypeConditionNode typeCondition)
+  {
+    _sb.Append("on ");
+
+    AppendNamedType(typeCondition.Type);
+  }
+
+  private void AppendArgumentList(IArgumentListNode argumentList)
+  {
+    _sb.AppendLeftParenthesis();
+
+    AppendSeparated(argumentList.Arguments, static (ref DocumentRenderer self, IArgumentNode argument) => self.AppendArgument(argument));
+
+    _sb.AppendRightParenthesis();
   }
 
   private void AppendArgument(IArgumentNode argument)
   {
     _sb
-      .AppendCamelized(argument.Name)
+      .Append(argument.Name)
       .AppendColon()
       .AppendSpace();
 
@@ -174,22 +282,21 @@ internal ref struct DocumentRenderer
 
     switch (value)
     {
-      case MemberInfo member:
-        _sb
-          .AppendVariablePrefix()
-          .AppendCamelized(member.Name);
-        return;
+      case IVariableNode variable:
+        AppendVariable(variable);
+        break;
 
       case IObjectValueNode objectValue:
         AppendObjectValue(objectValue);
-        return;
+        break;
 
       case IListValueNode listValue:
         AppendListValue(listValue);
-        return;
-    }
+        break;
 
-    throw new NotSupportedException($"Value of type '{value.GetType()}' is not supported.");
+      default:
+        throw new NotSupportedException($"Value of type '{value.GetType()}' is not supported.");
+    }
   }
 
   private void AppendObjectValue(IObjectValueNode objectValue)
@@ -208,7 +315,7 @@ internal ref struct DocumentRenderer
   private void AppendObjectField(IObjectFieldNode field)
   {
     _sb
-      .AppendCamelized(field.Name)
+      .Append(field.Name)
       .AppendColon()
       .AppendSpace();
 
@@ -231,54 +338,32 @@ internal ref struct DocumentRenderer
 
   private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, appendElement, AppendLine, s_appendNothing, s_appendNothing);
+    AppendJoin(values, appendElement, AppendLine);
 
     static void AppendLine(ref DocumentRenderer self) => self.AppendLine();
   }
 
   private void AppendSeparated<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, appendElement, AppendSeparator, s_appendNothing, s_appendNothing);
+    AppendJoin(values, appendElement, AppendSeparator);
 
     static void AppendSeparator(ref DocumentRenderer self) => self._options.Separator.AppendOn(self._sb);
   }
 
   private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> appendElement)
   {
-    AppendJoin(values, appendElement, AppendSpace, s_appendNothing, s_appendNothing);
+    AppendJoin(values, appendElement, AppendSpace);
 
     static void AppendSpace(ref DocumentRenderer self) => self._sb.AppendSpace();
   }
 
-  private void AppendLines<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
-  {
-    AppendJoin(values, appendElement, AppendLine, appendBeforeFirst, appendAfterLast);
-
-    static void AppendLine(ref DocumentRenderer self) => self.AppendLine();
-  }
-
-  private void AppendSeparated<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
-  {
-    AppendJoin(values, appendElement, AppendSeparator, appendBeforeFirst, appendAfterLast);
-
-    static void AppendSeparator(ref DocumentRenderer self) => self._options.Separator.AppendOn(self._sb);
-  }
-
-  private void AppendSpaced<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
-  {
-    AppendJoin(values, appendElement, AppendSpace, appendBeforeFirst, appendAfterLast);
-
-    static void AppendSpace(ref DocumentRenderer self) => self._sb.AppendSpace();
-  }
-
-  private void AppendJoin<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendSeparator, AppendAction appendBeforeFirst, AppendAction appendAfterLast)
+  private void AppendJoin<T>(IEnumerable<T> values, AppendAction<T> appendElement, AppendAction appendSeparator)
   {
     using IEnumerator<T> enumerator = values.GetEnumerator();
 
     if (!enumerator.MoveNext())
       return;
 
-    appendBeforeFirst(ref this);
     appendElement(ref this, enumerator.Current);
 
     while (enumerator.MoveNext())
@@ -286,7 +371,5 @@ internal ref struct DocumentRenderer
       appendSeparator(ref this);
       appendElement(ref this, enumerator.Current);
     }
-
-    appendAfterLast(ref this);
   }
 }

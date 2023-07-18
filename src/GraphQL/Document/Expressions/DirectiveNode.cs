@@ -6,20 +6,23 @@ using System.Linq.Expressions;
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class DirectiveNode : IteratorNode, IDirectiveNode,
-  IEnumerable<IArgumentNode>, IEnumerator<IArgumentNode>
+  IArgumentListNode, IEnumerable<IArgumentNode>, IEnumerator<IArgumentNode>
 {
   private readonly INodeContext _context;
+  private readonly string _name;
 
   public DirectiveNode(INodeContext context, string name, Expression expression)
   {
     _context = context;
-    Name = name;
+    _name = name;
     Expression = expression;
   }
 
   protected override Expression Expression { get; }
 
-  public string Name { get; }
+  public ReadOnlySpan<char> Name => _name;
+
+  public IArgumentListNode? ArgumentList => Peek(MethodNames.WithArgument) ? this : null;
 
   public IEnumerable<IArgumentNode> Arguments => this;
 
@@ -31,8 +34,8 @@ internal class DirectiveNode : IteratorNode, IDirectiveNode,
   {
     return methodCall.Method.Name switch
     {
-      MethodNames.WithArgument => NodeFactory.CreateArgument(_context, methodCall),
-      _                        => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithArgument  => NodeFactory.CreateArgument(_context, methodCall),
+      _                         => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

@@ -5,29 +5,45 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
-internal class ExpandSelectionNode : IteratorNode, ISelectionNode,
-  IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>,
-  IEnumerable<IArgumentNode>, IEnumerator<IArgumentNode>
+internal class ExpandFieldNode : IteratorNode, IFieldNode,
+  IArgumentListNode, IEnumerable<IArgumentNode>, IEnumerator<IArgumentNode>,
+  IDirectiveListNode, IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>
 {
   private readonly INodeContext _context;
+  private readonly string? _alias;
+  private readonly string _fieldName;
 
-  public ExpandSelectionNode(INodeContext context, string? alias, string fieldName, Expression expression)
+  public ExpandFieldNode(INodeContext context, string? alias, string fieldName, Expression expression)
   {
     _context = context;
-    Alias = alias;
-    FieldName = fieldName;
+    _alias = alias;
+    _fieldName = fieldName;
     Expression = expression;
   }
 
   protected override Expression Expression { get; }
 
-  public string? Alias { get; }
+  public SelectionNodeKind SelectionKind => SelectionNodeKind.Field;
 
-  public string FieldName { get; }
+  public ReadOnlySpan<char> Alias => _alias;
+
+  public ReadOnlySpan<char> FieldName => _fieldName;
+
+  public IArgumentListNode? ArgumentList => Peek(MethodNames.WithArgument) ? this : null;
 
   public IEnumerable<IArgumentNode> Arguments => this;
 
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.WithDirective) ? this : null;
+
   public IEnumerable<IDirectiveNode> Directives => this;
+
+  IArgumentNode IEnumerator<IArgumentNode>.Current => GetCurrent<IArgumentNode>();
+
+  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodNames.WithArgument, this);
+
+  IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
+
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.WithDirective, this);
 
   public ISelectionSetNode? SelectionSet
   {
@@ -44,14 +60,6 @@ internal class ExpandSelectionNode : IteratorNode, ISelectionNode,
     }
   }
 
-  IArgumentNode IEnumerator<IArgumentNode>.Current => GetCurrent<IArgumentNode>();
-
-  IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
-
-  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodNames.WithArgument, this);
-
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.WithDirective, this);
-
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
@@ -59,7 +67,7 @@ internal class ExpandSelectionNode : IteratorNode, ISelectionNode,
       MethodNames.WithArgument  => NodeFactory.CreateArgument(_context, methodCall),
       MethodNames.WithDirective => NodeFactory.CreateDirective(_context, methodCall),
       MethodNames.WithSelection => NodeFactory.CreateSelectionSet(_context, methodCall),
-      _                         => throw new ExpressionEvaluationException(methodCall),
+      _                         => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

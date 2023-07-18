@@ -17,9 +17,9 @@ internal abstract class DocumentCompiler<TUtf8Document> : IDocumentCompiler<TUtf
     _options = options;
   }
 
-  protected abstract TUtf8Document CreateDocument(OperationType operationType, string? name, byte[] content);
+  protected abstract TUtf8Document CreateDocument(OperationType operationType, string name, byte[] content);
 
-  public TUtf8Document Compile(IOperationDefinitionNode operationDefinition)
+  public TUtf8Document Compile(OperationType operationType, string name, IOperationDefinitionNode operationDefinition)
   {
     byte[] content;
 
@@ -34,6 +34,6 @@ internal abstract class DocumentCompiler<TUtf8Document> : IDocumentCompiler<TUtf
       writer.WrittenSpan.CopyTo(content);
     }
 
-    return CreateDocument(operationDefinition.OperationType, operationDefinition.Name, content);
+    return CreateDocument(operationType, name, content);
   }
 }

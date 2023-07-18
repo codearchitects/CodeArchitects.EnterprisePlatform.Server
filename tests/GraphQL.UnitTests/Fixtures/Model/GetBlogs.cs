@@ -7,8 +7,8 @@ internal class GetBlogsResult
 
 internal class GetBlogsVariables
 {
-  public int First { get; set; }
-  public int Last { get; set; }
-  public string? Before { get; set; }
-  public string? After { get; set; }
+  public int Arg1 { get; set; }
+  public string? Arg2 { get; set; }
+  public int[] Arg3 { get; set; } = default!;
+  public int?[]? Arg4 { get; set; }
 }

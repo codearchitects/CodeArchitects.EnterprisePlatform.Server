@@ -1,5 +1,5 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal delegate T Getter<out T>(object instance);
+public delegate T Getter<out T>(object instance);
 
-internal delegate void Setter<in T>(object instance, T value);
+public delegate void Setter<in T>(object instance, T value);

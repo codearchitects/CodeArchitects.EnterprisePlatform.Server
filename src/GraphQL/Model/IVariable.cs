@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IVariable
+public interface IVariable
 {
   string Name { get; }
 

@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document;
 using FluentAssertions;
-using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL;
 
@@ -26,11 +25,16 @@ public class GraphClientTests
     IUtf8Document utf8Document = Mock.Of<IUtf8Document>(MockBehavior.Strict);
     IGraphRequest<object> expected = Mock.Of<IGraphRequest<object>>(MockBehavior.Strict);
 
+    OperationType operationType = OperationType.Query;
+    string name = "name";
+
     _requestFactoryMock
-      .Setup(x => x.CreateRequest<object>(It.IsAny<IUtf8Document>()))
+      .Setup(x => x.CreateRequest<object>(It.IsAny<OperationType>(), It.IsAny<string>(), It.IsAny<IUtf8Document>()))
       .Returns(expected);
 
-    GraphDocument<object> document = new GraphDocument<object>.Query(null, Expression.Constant(null));
+    GraphDocument<object> document = Mock.Of<GraphDocument<object>>(doc =>
+      doc.OperationType == operationType &&
+      doc.Name == name, MockBehavior.Strict);
 
     GraphClient<IUtf8Document, IDocumentRoot> sut = new(_documentCacheMock.Object, _ => utf8Document, _requestFactoryMock.Object);
 
@@ -40,7 +44,7 @@ public class GraphClientTests
     // Assert
     actual.Should().BeSameAs(expected);
     _documentCacheMock.Verify(x => x.GetOrCompile(document, It.IsAny<Func<GraphDocument, IUtf8Document>>()), Times.Once);
-    _requestFactoryMock.Verify(x => x.CreateRequest<object>(utf8Document), Times.Once);
+    _requestFactoryMock.Verify(x => x.CreateRequest<object>(operationType, name, utf8Document), Times.Once);
   }
 
   [Fact]
@@ -50,11 +54,16 @@ public class GraphClientTests
     IUtf8Document utf8Document = Mock.Of<IUtf8Document>(MockBehavior.Strict);
     IGraphRequest<object, object> expected = Mock.Of<IGraphRequest<object, object>>(MockBehavior.Strict);
 
+    OperationType operationType = OperationType.Mutation;
+    string name = "";
+
     _requestFactoryMock
-      .Setup(x => x.CreateRequest<object, object>(It.IsAny<IUtf8Document>()))
+      .Setup(x => x.CreateRequest<object, object>(It.IsAny<OperationType>(), It.IsAny<string>(), It.IsAny<IUtf8Document>()))
       .Returns(expected);
 
-    GraphDocument<object, object> document = new GraphDocument<object, object>.Query(null, Expression.Constant(null));
+    GraphDocument<object, object> document = Mock.Of<GraphDocument<object, object>>(doc =>
+      doc.OperationType == operationType &&
+      doc.Name == name, MockBehavior.Strict);
 
     GraphClient<IUtf8Document, IDocumentRoot> sut = new(_documentCacheMock.Object, _ => utf8Document, _requestFactoryMock.Object);
 
@@ -64,6 +73,6 @@ public class GraphClientTests
     // Assert
     actual.Should().BeSameAs(expected);
     _documentCacheMock.Verify(x => x.GetOrCompile(document, It.IsAny<Func<GraphDocument, IUtf8Document>>()), Times.Once);
-    _requestFactoryMock.Verify(x => x.CreateRequest<object, object>(utf8Document), Times.Once);
+    _requestFactoryMock.Verify(x => x.CreateRequest<object, object>(operationType, name, utf8Document), Times.Once);
   }
 }

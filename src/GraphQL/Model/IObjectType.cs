@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IObjectType : IType // TODO: Nullability
+public interface IObjectType : INamedType
 {
   IReadOnlyList<IField> Fields { get; }
 }

@@ -42,32 +42,16 @@ internal static class NodeFactory
     switch (arguments.Count)
     {
       case 1:
-        return CreateFromVariable(arguments[0]);
+        return CreateFromVariable(context, null, arguments[0]);
       
       case 2:
         string name = ExpressionEvaluator.Evaluate<string>(arguments[0]);
         return typeof(LambdaExpression).IsAssignableFrom(arguments[1].Type)
-          ? CreateFromNameAndVariable(name, arguments[1])
+          ? CreateFromVariable(context, name, arguments[1])
           : CreateFromNameAndValue(context, name, arguments[1]);
       
       default:
         throw new ExpressionEvaluationException(withArgumentCall);
-    }
-
-    static IArgumentNode CreateFromVariable(Expression variable)
-    {
-      LambdaExpression variableLambda = variable.EvaluateAsLambda();
-      MemberInfo member = GetVariableMember(variableLambda);
-
-      return new ArgumentNode(member.Name, member);
-    }
-
-    static IArgumentNode CreateFromNameAndVariable(string name, Expression variable)
-    {
-      LambdaExpression variableLambda = variable.EvaluateAsLambda();
-      MemberInfo member = GetVariableMember(variableLambda);
-
-      return new ArgumentNode(name, member);
     }
 
     static IArgumentNode CreateFromNameAndValue(INodeContext context, string name, Expression expression)
@@ -77,15 +61,21 @@ internal static class NodeFactory
       return new ArgumentNode(name, value);
     }
 
-    static MemberInfo GetVariableMember(LambdaExpression variableLambda)
+    static VariableArgumentNode CreateFromVariable(INodeContext context, string? name, Expression variableExpression)
     {
+      LambdaExpression variableLambda = variableExpression.EvaluateAsLambda();
+
       if (variableLambda.Body is not MemberExpression variableMember)
         throw new ExpressionEvaluationException(variableLambda);
 
       if (!ReferenceEquals(variableMember.Expression, variableLambda.Parameters[0]))
         throw new ExpressionEvaluationException(variableLambda);
 
-      return variableMember.Member;
+      if (variableMember.Member is not PropertyInfo property)
+        throw new ExpressionEvaluationException(variableLambda);
+
+      IVariable variable = context.GetVariable(property);
+      return new VariableArgumentNode(variable, name);
     }
   }
 
@@ -151,7 +141,7 @@ internal static class NodeFactory
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
 
-    return new SelectionNode(context, alias, fieldName, selection);
+    return new FieldNode(context, alias, fieldName, selection);
   }
 
   private static ISelectionNode CreateExpandSelection(INodeContext context, Expression field, string memberName, MethodCallExpression expandCall)
@@ -167,7 +157,7 @@ internal static class NodeFactory
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
 
-    return new ExpandSelectionNode(context, alias, fieldName, expansion.Body);
+    return new ExpandFieldNode(context, alias, fieldName, expansion.Body);
   }
 
   private static ISelectionNode CreateMemberSelection(INodeContext context, Expression field, string memberName, MemberExpression member)
@@ -179,9 +169,9 @@ internal static class NodeFactory
     string? alias = GetAlias(memberName, fieldName);
 
     if (context.TryGetDefaultSelection(member.Type, out LambdaExpression? defaultSelection))
-      return new SelectionNode(context, alias, fieldName, defaultSelection);
+      return new FieldNode(context, alias, fieldName, defaultSelection);
 
-    return new SimpleSelectionNode(alias, fieldName);
+    return new SimpleFieldNode(alias, fieldName);
   }
 
   private static ISelectionNode CreateRootSelection(INodeContext context, Expression root, string memberName, MethodCallExpression fieldCall)
@@ -193,9 +183,9 @@ internal static class NodeFactory
     string? alias = GetAlias(memberName, fieldName);
 
     if (context.TryGetDefaultSelection(fieldCall.Type, out LambdaExpression? defaultSelection))
-      return new SelectionNode(context, alias, fieldName, defaultSelection);
+      return new FieldNode(context, alias, fieldName, defaultSelection);
 
-    return new SimpleSelectionNode(alias, fieldName);
+    return new SimpleFieldNode(alias, fieldName);
   }
 
   private static string GetFieldName(Expression field, Expression source)

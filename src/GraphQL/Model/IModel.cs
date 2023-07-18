@@ -1,8 +1,8 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IModel
+public interface IModel
 {
   IType GetType(Type type);
 
-  IReadOnlyCollection<IVariable> GetVariables(Type variablesType);
+  IReadOnlyList<IVariable> GetVariables(Type variablesType);
 }

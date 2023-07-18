@@ -1,7 +1,9 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal enum TypeKind
+public enum TypeKind
 {
+  Unknown,
   Scalar,
-  Object
+  Object,
+  List
 }

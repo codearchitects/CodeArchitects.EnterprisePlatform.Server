@@ -1,16 +1,14 @@
-﻿using CodeArchitects.Platform.GraphQL.Model;
+﻿namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
 
-namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
-
-internal interface IOperationDefinitionNode // TODO: The AST should be as comprehensive and structured (conform to the original hierarchy) as possible and nodes should validate their values (e.g., names should conform to [_A-Za-z][_0-9A-Za-z]*)
+public interface IOperationDefinitionNode
 {
   OperationType OperationType { get; }
-  
-  string? Name { get; }
 
-  IEnumerable<IVariable> Variables { get; }
+  ReadOnlySpan<char> Name { get; }
 
-  IEnumerable<IDirectiveNode> Directives { get; }
+  IVariableDefinitionListNode? VariableDefinitionList { get; }
+
+  IDirectiveListNode? DirectiveList { get; }
 
   ISelectionSetNode SelectionSet { get; }
 }

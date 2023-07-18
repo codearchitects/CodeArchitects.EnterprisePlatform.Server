@@ -70,6 +70,19 @@ internal abstract class StreamingNode : ExpressionVisitor
     return false;
   }
 
+  protected bool Peek(string methodName)
+  {
+    MethodCallExpression? previousCall = _currentCall;
+
+    if (MoveNext(methodName))
+    {
+      _currentCall = previousCall;
+      return true;
+    }
+
+    return false;
+  }
+
   public sealed override Expression Visit(Expression node)
   {
     if (ReferenceEquals(node, _currentCall))

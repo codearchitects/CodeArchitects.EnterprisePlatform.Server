@@ -11,7 +11,10 @@ using FluentMock;
 
 [assembly: GenerateFluentMockFor(typeof(IOperationDefinitionNode))]
 [assembly: GenerateFluentMockFor(typeof(IDirectiveNode))]
+[assembly: GenerateFluentMockFor(typeof(IVariableDefinitionListNode))]
 [assembly: GenerateFluentMockFor(typeof(ISelectionSetNode))]
+[assembly: GenerateFluentMockFor(typeof(IArgumentListNode))]
+[assembly: GenerateFluentMockFor(typeof(IDirectiveListNode))]
 [assembly: GenerateFluentMockFor(typeof(ISelectionNode))]
 [assembly: GenerateFluentMockFor(typeof(IArgumentNode))]
 [assembly: GenerateFluentMockFor(typeof(IListValueNode))]

@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class MutationDefinitionNode : OperationDefinitionNode
 {
-  public MutationDefinitionNode(INodeContext context, string? name, IEnumerable<IVariable> variables, Expression expression)
+  public MutationDefinitionNode(INodeContext context, string name, IReadOnlyList<IVariable> variables, Expression expression)
     : base(context, name, variables, expression)
   {
   }

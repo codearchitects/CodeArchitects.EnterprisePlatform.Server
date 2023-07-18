@@ -30,11 +30,19 @@ internal readonly ref struct Utf8StringBuilder
     return Append(@string.AsSpan());
   }
 
-  public Utf8StringBuilder AppendCamelized(string @string)
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public Utf8StringBuilder Append(ReadOnlySpan<char> @string)
   {
-    Append(stackalloc char[1] { char.ToLowerInvariant(@string[0]) });
-    Append(@string.AsSpan()[1..]);
-    
+    int maxLength = Encoding.UTF8.GetMaxByteCount(@string.Length);
+    int length = _writer.FreeCapacity >= maxLength
+      ? maxLength
+      : Encoding.UTF8.GetByteCount(@string);
+
+    Span<byte> span = _writer.GetSpan(length);
+
+    int bytesWritten = Encoding.UTF8.GetBytes(@string, span);
+    _writer.Advance(bytesWritten);
+
     return this;
   }
 
@@ -126,6 +134,8 @@ internal readonly ref struct Utf8StringBuilder
 
   public Utf8StringBuilder AppendRightBrace() => Append("}"u8);
 
+  public Utf8StringBuilder AppendSpread() => Append("..."u8);
+
   public Utf8StringBuilder AppendLine() => Append(s_newLineBytes);
 
   [ExcludeFromCodeCoverage]
@@ -139,22 +149,6 @@ internal readonly ref struct Utf8StringBuilder
 
     bytes.CopyTo(span);
     _writer.Advance(length);
-
-    return this;
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private Utf8StringBuilder Append(ReadOnlySpan<char> @string)
-  {
-    int maxLength = Encoding.UTF8.GetMaxByteCount(@string.Length);
-    int length = _writer.FreeCapacity >= maxLength
-      ? maxLength
-      : Encoding.UTF8.GetByteCount(@string);
-
-    Span<byte> span = _writer.GetSpan(length);
-
-    int bytesWritten = Encoding.UTF8.GetBytes(@string, span);
-    _writer.Advance(bytesWritten);
 
     return this;
   }

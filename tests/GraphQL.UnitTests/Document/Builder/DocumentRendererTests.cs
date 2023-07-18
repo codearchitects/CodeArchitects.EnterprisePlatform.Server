@@ -1,12 +1,7 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
-using CodeArchitects.Platform.GraphQL.Fixtures.Model;
-using CodeArchitects.Platform.GraphQL.Model;
-using CodeArchitects.Platform.GraphQL.Model.FluentMock;
-using CodeArchitects.Platform.GraphQL.UnitTests.FluentMock;
 using FluentAssertions;
 using System.Buffers;
-using System.Reflection;
 using System.Text;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
@@ -35,19 +30,20 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -63,52 +59,52 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithVariables_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IScalarType integerType = ScalarTypeBuilder.Build(_ => _
-      .SetName("Integer")
-      .SetClrType(typeof(int))
-      .SetKind(TypeKind.Scalar));
-
-    IScalarType stringType = ScalarTypeBuilder.Build(_ => _
-      .SetName("String")
-      .SetClrType(typeof(string))
-      .SetKind(TypeKind.Scalar));
-
-    IReadOnlyList<IVariable> variables = ListBuilder<IVariable>.Build(_ => _
-      .Add(VariableBuilder.Build(_ => _
-        .SetName(nameof(GetBlogsVariables.First))
-        .SetType(integerType)))
-      .Add(VariableBuilder.Build(_ => _
-        .SetName(nameof(GetBlogsVariables.Last))
-        .SetType(integerType)))
-      .Add(VariableBuilder.Build(_ => _
-        .SetName(nameof(GetBlogsVariables.Before))
-        .SetType(stringType)))
-      .Add(VariableBuilder.Build(_ => _
-        .SetName(nameof(GetBlogsVariables.After))
-        .SetType(stringType))));
-
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables(variables)
-      .SetDirectives()
+      .SetVariableDefinitionList(_ => _
+        .SetVariableDefinitions(_ => _
+          .Add(_ => _
+            .SetVariable(_ => _
+              .SetName("arg1"))
+            .SetType<INamedTypeNode>(_ => _
+              .SetTypeKind(TypeNodeKind.NamedType)
+              .SetName("Integer")))
+          .Add(_ => _
+            .SetVariable(_ => _
+              .SetName("arg2"))
+            .SetType<INonNullTypeNode>(_ => _
+              .SetTypeKind(TypeNodeKind.NonNullType)
+              .SetNullableType<INamedTypeNode>(_ => _
+                .SetTypeKind(TypeNodeKind.NamedType)
+                .SetName("ID"))))
+          .Add(_ => _
+            .SetVariable(_ => _
+              .SetName("arg3"))
+            .SetType<IListTypeNode>(_ => _
+              .SetTypeKind(TypeNodeKind.ListType)
+              .SetItemType<INamedTypeNode>(_ => _
+                .SetTypeKind(TypeNodeKind.NamedType)
+                .SetName("String"))))))
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(null as ISelectionSetNode)))));
-
+  
     DocumentRenderer sut = CreateSut();
-    
+  
     // Act
     sut.AppendOperationDefinition(operationDefinition);
-
+  
     // Assert
     Content.Should().Be("""
-      query GetBlogs($first: Integer, $last: Integer, $before: String, $after: String) {
+      query GetBlogs($arg1: Integer, $arg2: ID!, $arg3: [String]) {
         blogs
       }
       """);
@@ -128,22 +124,24 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments(_ => _
-              .Add(_ => _
-                .SetName("literalArg")
-                .SetValue(value)))
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(_ => _
+              .SetArguments(_ => _
+                .Add(_ => _
+                  .SetName("literalArg")
+                  .SetValue(value))))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -162,32 +160,36 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments(_ => _
-              .Add(_ => _
-                .SetName("first")
-                .SetValue(typeof(GetBlogsVariables).GetRequiredProperty(nameof(GetBlogsVariables.First))))
-              .Add(_ => _
-                .SetName("Last")
-                .SetValue(typeof(GetBlogsVariables).GetRequiredProperty(nameof(GetBlogsVariables.Last)))))
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(_ => _
+              .SetArguments(_ => _
+                .Add(_ => _
+                  .SetName("first")
+                  .SetValue(VariableNodeBuilder.Build(_ => _
+                    .SetName("arg1"))))
+                .Add(_ => _
+                  .SetName("last")
+                  .SetValue(VariableNodeBuilder.Build(_ => _
+                    .SetName("arg2"))))))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
     // Assert
     Content.Should().Be("""
       query GetBlogs {
-        blogs(first: $first, last: $last)
+        blogs(first: $arg1, last: $arg2)
       }
       """);
   }
@@ -199,40 +201,42 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments(_ => _
-              .Add(_ => _
-                .SetName("obj")
-                .SetValue(ObjectValueNodeBuilder.Build(_ => _
-                  .SetFields(_ => _
-                    .Add(_ => _
-                      .SetName("ScalarField")
-                      .SetValue(1))
-                    .Add(_ => _
-                      .SetName("ObjectField")
-                      .SetValue(ObjectValueNodeBuilder.Build(_ => _
-                        .SetFields(_ => _
-                          .Add(_ => _
-                            .SetName("InnerField1")
-                            .SetValue("inner-field-1"))
-                          .Add(_ => _
-                            .SetName("InnerField2")
-                            .SetValue(2))))))
-                    .Add(_ => _
-                      .SetName("ListField")
-                      .SetValue(ListValueNodeBuilder.Build(_ => _
-                        .SetValues(new object?[] { 1, 2, 3 })))))))))
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(_ => _
+              .SetArguments(_ => _
+                .Add(_ => _
+                  .SetName("obj")
+                  .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                    .SetFields(_ => _
+                      .Add(_ => _
+                        .SetName("scalarField")
+                        .SetValue(1))
+                      .Add(_ => _
+                        .SetName("objectField")
+                        .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                          .SetFields(_ => _
+                            .Add(_ => _
+                              .SetName("innerField1")
+                              .SetValue("inner-field-1"))
+                            .Add(_ => _
+                              .SetName("innerField2")
+                              .SetValue(2))))))
+                      .Add(_ => _
+                        .SetName("listField")
+                        .SetValue(ListValueNodeBuilder.Build(_ => _
+                          .SetValues(new object?[] { 1, 2, 3 }))))))))))
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -251,28 +255,31 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives(_ => _
-        .Add(_ => _
-          .SetName("directive1")
-          .SetArguments())
-        .Add(_ => _
-          .SetName("directive2")
-          .SetArguments(_ => _
-            .Add(_ => _
-              .SetName("directiveArg")
-              .SetValue(1)))))
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(_ => _
+        .SetDirectives(_ => _
+          .Add(_ => _
+            .SetName("directive1")
+            .SetArgumentList(null as IArgumentListNode))
+          .Add(_ => _
+            .SetName("directive2")
+            .SetArgumentList(_ => _
+              .SetArguments(_ => _
+                .Add(_ => _
+                  .SetName("directiveArg")
+                  .SetValue(1)))))))
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -291,19 +298,20 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
             .SetAlias("blogs")
             .SetFieldName("blogsConnection")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(null as ISelectionSetNode)))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -322,39 +330,43 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(_ => _
               .SetSelections(_ => _
-                .Add(_ => _
-                  .SetAlias(null)
-                  .SetFieldName("Edges")
-                  .SetDirectives()
-                  .SetArguments()
+                .Add<FieldNodeBuilder>(_ => _
+                  .SetSelectionKind(SelectionNodeKind.Field)
+                  .SetAlias("")
+                  .SetFieldName("edges")
+                  .SetDirectiveList(null as IDirectiveListNode)
+                  .SetArgumentList(null as IArgumentListNode)
                   .SetSelectionSet(_ => _
                     .SetSelections(_ => _
-                      .Add(_ => _
-                        .SetAlias(null)
-                        .SetFieldName("Cursor")
-                        .SetDirectives()
-                        .SetArguments()
+                      .Add<FieldNodeBuilder>(_ => _
+                        .SetSelectionKind(SelectionNodeKind.Field)
+                        .SetAlias("")
+                        .SetFieldName("cursor")
+                        .SetDirectiveList(null as IDirectiveListNode)
+                        .SetArgumentList(null as IArgumentListNode)
                         .SetSelectionSet(null as ISelectionSetNode)))))
-                .Add(_ => _
-                  .SetAlias(null)
-                  .SetFieldName("PageInfo")
-                  .SetDirectives()
-                  .SetArguments()
+                .Add<FieldNodeBuilder>(_ => _
+                  .SetSelectionKind(SelectionNodeKind.Field)
+                  .SetAlias("")
+                  .SetFieldName("pageInfo")
+                  .SetDirectiveList(null as IDirectiveListNode)
+                  .SetArgumentList(null as IArgumentListNode)
                   .SetSelectionSet(null as ISelectionSetNode))))))));
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 
@@ -378,41 +390,45 @@ public class DocumentRendererTests
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(OperationType.Query)
       .SetName(s_queryName)
-      .SetVariables()
-      .SetDirectives()
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+      .SetDirectiveList(null as IDirectiveListNode)
       .SetSelectionSet(_ => _
         .SetSelections(_ => _
-          .Add(_ => _
-            .SetAlias(null)
+          .Add<FieldNodeBuilder>(_ => _
+            .SetSelectionKind(SelectionNodeKind.Field)
+            .SetAlias("")
             .SetFieldName("blogs")
-            .SetDirectives()
-            .SetArguments()
+            .SetDirectiveList(null as IDirectiveListNode)
+            .SetArgumentList(null as IArgumentListNode)
             .SetSelectionSet(_ => _
               .SetSelections(_ => _
-                .Add(_ => _
-                  .SetAlias(null)
-                  .SetFieldName("Edges")
-                  .SetDirectives()
-                  .SetArguments()
+                .Add<FieldNodeBuilder>(_ => _
+                  .SetSelectionKind(SelectionNodeKind.Field)
+                  .SetAlias("")
+                  .SetFieldName("edges")
+                  .SetDirectiveList(null as IDirectiveListNode)
+                  .SetArgumentList(null as IArgumentListNode)
                   .SetSelectionSet(_ => _
                     .SetSelections(_ => _
-                      .Add(_ => _
-                        .SetAlias(null)
-                        .SetFieldName("Cursor")
-                        .SetDirectives()
-                        .SetArguments()
+                      .Add<FieldNodeBuilder>(_ => _
+                        .SetSelectionKind(SelectionNodeKind.Field)
+                        .SetAlias("")
+                        .SetFieldName("cursor")
+                        .SetDirectiveList(null as IDirectiveListNode)
+                        .SetArgumentList(null as IArgumentListNode)
                         .SetSelectionSet(null as ISelectionSetNode)))))
-                .Add(_ => _
-                  .SetAlias(null)
-                  .SetFieldName("PageInfo")
-                  .SetDirectives()
-                  .SetArguments()
+                .Add<FieldNodeBuilder>(_ => _
+                  .SetSelectionKind(SelectionNodeKind.Field)
+                  .SetAlias("")
+                  .SetFieldName("pageInfo")
+                  .SetDirectiveList(null as IDirectiveListNode)
+                  .SetArgumentList(null as IArgumentListNode)
                   .SetSelectionSet(null as ISelectionSetNode))))))));
 
     _options.LinePolicy = LinePolicy.Space(1);
 
     DocumentRenderer sut = CreateSut();
-    
+
     // Act
     sut.AppendOperationDefinition(operationDefinition);
 

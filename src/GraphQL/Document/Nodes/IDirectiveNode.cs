@@ -1,8 +1,8 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
 
-internal interface IDirectiveNode
+public interface IDirectiveNode
 {
-  string Name { get; }
+  ReadOnlySpan<char> Name { get; }
 
-  IEnumerable<IArgumentNode> Arguments { get; }
+  IArgumentListNode? ArgumentList { get; }
 }

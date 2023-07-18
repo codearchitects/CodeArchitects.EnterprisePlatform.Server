@@ -1,8 +1,8 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
 
-internal interface IArgumentNode
+public interface IArgumentNode
 {
-  string Name { get; }
+  ReadOnlySpan<char> Name { get; }
 
   object? Value { get; }
 }

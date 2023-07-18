@@ -1,5 +1,5 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IScalarType : IType
+public interface IScalarType : INamedType
 {
 }

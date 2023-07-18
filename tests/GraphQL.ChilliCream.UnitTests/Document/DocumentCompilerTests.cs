@@ -35,18 +35,20 @@ public class DocumentCompilerTests
   public void Compile_ShouldReturnCorrectDocument(OperationType operationType, string operation)
   {
     // Arrange
+    string name = "test";
+
     IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
       .SetOperationType(operationType)
       .SetName("test")
-      .SetDirectives()
-      .SetVariables()
+      .SetDirectiveList(null as IDirectiveListNode)
+      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
       .SetSelectionSet(_ => _
         .SetSelections()));
 
     // Act
-    Utf8Document document = _sut.Compile(operationDefinition);
+    Utf8Document document = _sut.Compile(operationType, name, operationDefinition);
 
     // Assert
-    document.Content.Should().BeEquivalentTo(Encoding.UTF8.GetBytes($"{operation} test {{  }}"));
+    document.Content.Should().BeEquivalentTo(Encoding.UTF8.GetBytes($"{operation} {name} {{  }}"));
   }
 }

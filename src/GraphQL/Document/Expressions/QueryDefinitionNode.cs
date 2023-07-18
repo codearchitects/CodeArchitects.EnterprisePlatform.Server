@@ -5,7 +5,7 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class QueryDefinitionNode : OperationDefinitionNode
 {
-  public QueryDefinitionNode(INodeContext context, string? name, IEnumerable<IVariable> variables, Expression expression)
+  public QueryDefinitionNode(INodeContext context, string name, IReadOnlyList<IVariable> variables, Expression expression)
     : base(context, name, variables, expression)
   {
   }

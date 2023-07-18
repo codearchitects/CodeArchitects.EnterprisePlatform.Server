@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Model;
 
-internal interface IField
+public interface IField
 {
   string Name { get; }
 
