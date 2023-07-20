@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Common.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Builder;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 using System.Linq.Expressions;
@@ -9,19 +8,23 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 internal abstract class OperationDefinitionNode : IteratorNode, IOperationDefinitionNode,
   IDirectiveListNode, IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly string _name;
   private readonly IReadOnlyList<IVariable> _variables;
 
-  public OperationDefinitionNode(INodeContext context, string name, IReadOnlyList<IVariable> variables, Expression expression)
+  public OperationDefinitionNode(INodeRoot root, string name, IReadOnlyList<IVariable> variables, Expression expression)
   {
-    _context = context;
+    _root = root;
     _name = name;
     _variables = variables;
     Expression = expression;
   }
 
   protected sealed override Expression Expression { get; }
+
+  public DefinitionNodeKind DefinitionKind => DefinitionNodeKind.OperationDefinition;
+
+  public bool IsQueryShortHand => false;
 
   public abstract OperationType OperationType { get; }
 
@@ -31,23 +34,24 @@ internal abstract class OperationDefinitionNode : IteratorNode, IOperationDefini
     ? null
     : new VariableDefinitionListNode(_variables);
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodNames.WithDirective) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
-  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodNames.WithSelection);
+  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodName.Represents.SelectionSet);
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.WithDirective, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
 
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
     {
-      MethodNames.WithDirective => NodeFactory.CreateDirective(_context, methodCall),
-      MethodNames.WithSelection => NodeFactory.CreateSelectionSet(_context, methodCall),
-      _                         => throw new ExpressionEvaluationException(methodCall),
+      MethodName.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
+      MethodName.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
+      MethodName.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
+      _                           => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

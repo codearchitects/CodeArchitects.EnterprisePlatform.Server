@@ -2,7 +2,7 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-public interface IDocumentBuilder<TDocumentRoot>
+public interface IDocumentBuilder<TDocumentRoot> // TODO: Make parameter names consistent (e.g., expansion, expression, ...)
   where TDocumentRoot : notnull
 {
   GraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
@@ -32,6 +32,14 @@ public interface IDocumentBuilder<TDocumentRoot>
 
   GraphDocument<TResult, TVariables> Mutation<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
     where TResult : class
+    where TVariables : notnull;
+
+
+  GraphFragment<TField> Fragment<TField>(string name, Expression<Func<IFragmentBuilder<TField>, IBuildResult<TField>>> expansion)
+    where TField : class;
+
+  GraphFragment<TField, TVariables> Fragment<TField, TVariables>(string name, Expression<Func<IFragmentBuilder<TField, TVariables>, IBuildResult<TField, TVariables>>> expansion)
+    where TField : class
     where TVariables : notnull;
 
 

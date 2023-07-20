@@ -9,6 +9,8 @@ public interface IOperationBuilder<TField> : IExpander, ISelector
   IOperationBuilder<TField> WithDirective(string name, Expression<Func<IDirectiveBuilder, IDirectiveBuilder>> directive);
 
   IBuildResult<TResult> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
+
+  IBuildResult<TResult> WithSelectionSet<TResult>(Expression<Func<ISelectionSetBuilder<TField>, IBuildResult<TResult>>> selection);
 }
 
 public interface IOperationBuilder<TField, TVariables> : IExpander<TVariables>, ISelector
@@ -19,4 +21,6 @@ public interface IOperationBuilder<TField, TVariables> : IExpander<TVariables>, 
   IOperationBuilder<TField, TVariables> WithDirective(string name, Expression<Func<IDirectiveBuilder<TVariables>, IDirectiveBuilder<TVariables>>> directive);
 
   IBuildResult<TResult, TVariables> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
+
+  IBuildResult<TResult, TVariables> WithSelectionSet<TResult>(Expression<Func<ISelectionSetBuilder<TField, TVariables>, IBuildResult<TResult, TVariables>>> selection);
 }

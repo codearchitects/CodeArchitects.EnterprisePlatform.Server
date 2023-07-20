@@ -21,31 +21,35 @@ public class DocumentRendererTests
 
   private string? Content => Encoding.UTF8.GetString(_writer.WrittenSpan);
 
-  private DocumentRenderer CreateSut() => new DocumentRenderer(_writer, _options);
+  private DocumentRenderer CreateSut() => new(_writer, _options);
 
   [Fact]
   public void QueryBlogFieldWithoutVariables_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -59,48 +63,52 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithVariables_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(_ => _
-        .SetVariableDefinitions(_ => _
-          .Add(_ => _
-            .SetVariable(_ => _
-              .SetName("arg1"))
-            .SetType<INamedTypeNode>(_ => _
-              .SetTypeKind(TypeNodeKind.NamedType)
-              .SetName("Integer")))
-          .Add(_ => _
-            .SetVariable(_ => _
-              .SetName("arg2"))
-            .SetType<INonNullTypeNode>(_ => _
-              .SetTypeKind(TypeNodeKind.NonNullType)
-              .SetNullableType<INamedTypeNode>(_ => _
-                .SetTypeKind(TypeNodeKind.NamedType)
-                .SetName("ID"))))
-          .Add(_ => _
-            .SetVariable(_ => _
-              .SetName("arg3"))
-            .SetType<IListTypeNode>(_ => _
-              .SetTypeKind(TypeNodeKind.ListType)
-              .SetItemType<INamedTypeNode>(_ => _
-                .SetTypeKind(TypeNodeKind.NamedType)
-                .SetName("String"))))))
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(_ => _
+            .SetVariableDefinitions(_ => _
+              .Add(_ => _
+                .SetVariable(_ => _
+                  .SetName("arg1"))
+                .SetType<INamedTypeNode>(_ => _
+                  .SetTypeKind(TypeNodeKind.NamedType)
+                  .SetName("Integer")))
+              .Add(_ => _
+                .SetVariable(_ => _
+                  .SetName("arg2"))
+                .SetType<INonNullTypeNode>(_ => _
+                  .SetTypeKind(TypeNodeKind.NonNullType)
+                  .SetNullableType<INamedTypeNode>(_ => _
+                    .SetTypeKind(TypeNodeKind.NamedType)
+                    .SetName("ID"))))
+              .Add(_ => _
+                .SetVariable(_ => _
+                  .SetName("arg3"))
+                .SetType<IListTypeNode>(_ => _
+                  .SetTypeKind(TypeNodeKind.ListType)
+                  .SetItemType<INamedTypeNode>(_ => _
+                    .SetTypeKind(TypeNodeKind.NamedType)
+                    .SetName("String"))))))
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
   
     DocumentRenderer sut = CreateSut();
   
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
   
     // Assert
     Content.Should().Be("""
@@ -121,29 +129,33 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithLiteralArgument_ShouldProduceCorrectDocument(object? value, string valueString)
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("literalArg")
-                  .SetValue(value))))
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("literalArg")
+                      .SetValue(value))))
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be($$"""
@@ -157,34 +169,38 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithVariableArgument_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("first")
-                  .SetValue(VariableNodeBuilder.Build(_ => _
-                    .SetName("arg1"))))
-                .Add(_ => _
-                  .SetName("last")
-                  .SetValue(VariableNodeBuilder.Build(_ => _
-                    .SetName("arg2"))))))
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("first")
+                      .SetValue(VariableNodeBuilder.Build(_ => _
+                        .SetName("arg1"))))
+                    .Add(_ => _
+                      .SetName("last")
+                      .SetValue(VariableNodeBuilder.Build(_ => _
+                        .SetName("arg2"))))))
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -198,47 +214,51 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithObjectArgument_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("obj")
-                  .SetValue(ObjectValueNodeBuilder.Build(_ => _
-                    .SetFields(_ => _
-                      .Add(_ => _
-                        .SetName("scalarField")
-                        .SetValue(1))
-                      .Add(_ => _
-                        .SetName("objectField")
-                        .SetValue(ObjectValueNodeBuilder.Build(_ => _
-                          .SetFields(_ => _
-                            .Add(_ => _
-                              .SetName("innerField1")
-                              .SetValue("inner-field-1"))
-                            .Add(_ => _
-                              .SetName("innerField2")
-                              .SetValue(2))))))
-                      .Add(_ => _
-                        .SetName("listField")
-                        .SetValue(ListValueNodeBuilder.Build(_ => _
-                          .SetValues(new object?[] { 1, 2, 3 }))))))))))
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("obj")
+                      .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                        .SetFields(_ => _
+                          .Add(_ => _
+                            .SetName("scalarField")
+                            .SetValue(1))
+                          .Add(_ => _
+                            .SetName("objectField")
+                            .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                              .SetFields(_ => _
+                                .Add(_ => _
+                                  .SetName("innerField1")
+                                  .SetValue("inner-field-1"))
+                                .Add(_ => _
+                                  .SetName("innerField2")
+                                  .SetValue(2))))))
+                          .Add(_ => _
+                            .SetName("listField")
+                            .SetValue(ListValueNodeBuilder.Build(_ => _
+                              .SetValues(new object?[] { 1, 2, 3 }))))))))))
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -252,36 +272,40 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithDirectives_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(_ => _
-        .SetDirectives(_ => _
-          .Add(_ => _
-            .SetName("directive1")
-            .SetArgumentList(null as IArgumentListNode))
-          .Add(_ => _
-            .SetName("directive2")
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("directiveArg")
-                  .SetValue(1)))))))
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(_ => _
+            .SetDirectives(_ => _
+              .Add(_ => _
+                .SetName("directive1")
+                .SetArgumentList(null as IArgumentListNode))
+              .Add(_ => _
+                .SetName("directive2")
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("directiveArg")
+                      .SetValue(1)))))))
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -295,25 +319,29 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithAlias_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("blogs")
-            .SetFieldName("blogsConnection")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("blogs")
+                .SetFieldName("blogsConnection")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -327,48 +355,52 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithSelection_ShouldProduceCorrectDocument()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("edges")
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetSelectionSet(_ => _
-                    .SetSelections(_ => _
-                      .Add<FieldNodeBuilder>(_ => _
-                        .SetSelectionKind(SelectionNodeKind.Field)
-                        .SetAlias("")
-                        .SetFieldName("cursor")
-                        .SetDirectiveList(null as IDirectiveListNode)
-                        .SetArgumentList(null as IArgumentListNode)
-                        .SetSelectionSet(null as ISelectionSetNode)))))
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("pageInfo")
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("edges")
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetSelectionSet(_ => _
+                        .SetSelections(_ => _
+                          .Add<FieldNodeBuilder>(_ => _
+                            .SetSelectionKind(SelectionNodeKind.Field)
+                            .SetAlias("")
+                            .SetFieldName("cursor")
+                            .SetDirectiveList(null as IDirectiveListNode)
+                            .SetArgumentList(null as IArgumentListNode)
+                            .SetSelectionSet(null as ISelectionSetNode)))))
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("pageInfo")
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("""
@@ -387,52 +419,124 @@ public class DocumentRendererTests
   public void QueryBlogFieldWithSelection_ShouldProduceCorrectDocument_WhenNoIndentation()
   {
     // Arrange
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName(s_queryName)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetArgumentList(null as IArgumentListNode)
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("edges")
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetSelectionSet(_ => _
-                    .SetSelections(_ => _
-                      .Add<FieldNodeBuilder>(_ => _
-                        .SetSelectionKind(SelectionNodeKind.Field)
-                        .SetAlias("")
-                        .SetFieldName("cursor")
-                        .SetDirectiveList(null as IDirectiveListNode)
-                        .SetArgumentList(null as IArgumentListNode)
-                        .SetSelectionSet(null as ISelectionSetNode)))))
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("pageInfo")
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName(s_queryName)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("edges")
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetSelectionSet(_ => _
+                        .SetSelections(_ => _
+                          .Add<FieldNodeBuilder>(_ => _
+                            .SetSelectionKind(SelectionNodeKind.Field)
+                            .SetAlias("")
+                            .SetFieldName("cursor")
+                            .SetDirectiveList(null as IDirectiveListNode)
+                            .SetArgumentList(null as IArgumentListNode)
+                            .SetSelectionSet(null as ISelectionSetNode)))))
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("pageInfo")
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     _options.LinePolicy = LinePolicy.Space(1);
 
     DocumentRenderer sut = CreateSut();
 
     // Act
-    sut.AppendOperationDefinition(operationDefinition);
+    sut.AppendDocument(document);
 
     // Assert
     Content.Should().Be("query GetBlogs { blogs { edges { cursor } pageInfo } }");
+  }
+
+  [Fact]
+  public void DocumentWithOperationsAndFragments_ShouldProduceCorrectDocument()
+  {
+    // Arrange
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(true)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode))
+              .Add<FragmentSpreadNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.FragmentSpread)
+                .SetFragmentName("myFragment")
+                .SetDirectiveList(_ => _
+                  .SetDirectives(_ => _
+                    .Add(_ => _
+                      .SetName("dir1")
+                      .SetArgumentList(null as IArgumentListNode))))))))
+        .Add<FragmentDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.FragmentDefinition)
+          .SetFragmentName("myFragment")
+          .SetTypeCondition(_ => _
+            .SetType(_ => _
+              .SetName("Query")))
+          .SetDirectiveList(_ => _
+            .SetDirectives(_ => _
+              .Add(_ => _
+                .SetName("dir2")
+                .SetArgumentList(null as IArgumentListNode))))
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("users")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
+
+    DocumentRenderer sut = CreateSut();
+
+    // Act
+    sut.AppendDocument(document);
+
+    // Assert
+    Content.Should().Be("""
+      {
+        blogs
+        ...myFragment @dir1
+      }
+      fragment myFragment on Query @dir2 {
+        users
+      }
+      """);
   }
 }

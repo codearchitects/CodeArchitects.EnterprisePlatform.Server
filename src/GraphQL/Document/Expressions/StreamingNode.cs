@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.Common.Expressions;
+﻿using CodeArchitects.Platform.Common.Expressions;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
@@ -14,7 +13,9 @@ internal abstract class StreamingNode : ExpressionVisitor
 
   protected abstract Expression Expression { get; }
 
-  private bool Done => ReferenceEquals(Expression, _currentCall);
+  protected bool Started => _currentCall is not null;
+
+  protected bool Done => ReferenceEquals(Expression, _currentCall);
 
   protected abstract object OnMethodCall(MethodCallExpression methodCall);
 
@@ -25,8 +26,17 @@ internal abstract class StreamingNode : ExpressionVisitor
     return (T)OnMethodCall(_currentCall);
   }
 
+  protected bool MoveNext()
+  {
+    if (Done)
+      return false; // We are at the end of the method chain, there are no more method calls
+
+    Visit(Expression);
+    return true;
+  }
+
   [MemberNotNullWhen(true, nameof(_currentCall))]
-  protected bool MoveNext(string methodName)
+  protected bool MoveNext(Predicate<string> condition)
   {
     if (Done)
       return false; // We are at the end of the method chain, our method was not called
@@ -35,31 +45,28 @@ internal abstract class StreamingNode : ExpressionVisitor
     Visit(Expression);
 
     // At this point, _currentCall can be null only if there are no method calls in our expression, which would be something like x => x
-    if (_currentCall?.Method.Name != methodName)
-    {
-      // We didn't find our method call and overshot: go back to the previous method call so we can advance when the next element is accessed
-      _currentCall = previousCall;
-      return false;
-    }
+    if (_currentCall?.Method.Name is string methodName && condition(methodName))
+      return true;
 
-    return true;
+    // We didn't find our method call and overshot: go back to the previous method call so we can advance when the next element is accessed
+    _currentCall = previousCall;
+    return false;
   }
 
-  protected T GetNext<T>(string methodName)
+  protected T GetNext<T>(Predicate<string> condition)
     where T : class
   {
-    if (MoveNext(methodName))
+    if (MoveNext(condition))
       return GetCurrent<T>();
 
     // If the method call is mandatory, we should have found it
-    Debug.Fail($"'{methodName}' was not called inside the expression.");
-    throw Errors.Unreachable;
+    throw new InvalidOperationException("Unexpected method name.");
   }
 
-  protected bool TryGetNext<T>(string methodName, [NotNullWhen(true)] out T? next)
+  protected bool TryGetNext<T>(Predicate<string> condition, [NotNullWhen(true)] out T? next)
     where T : class
   {
-    if (MoveNext(methodName))
+    if (MoveNext(condition))
     {
       next = GetCurrent<T>();
       return true;
@@ -70,11 +77,11 @@ internal abstract class StreamingNode : ExpressionVisitor
     return false;
   }
 
-  protected bool Peek(string methodName)
+  protected bool Peek(Predicate<string> condition)
   {
     MethodCallExpression? previousCall = _currentCall;
 
-    if (MoveNext(methodName))
+    if (MoveNext(condition))
     {
       _currentCall = previousCall;
       return true;
@@ -109,7 +116,7 @@ internal abstract class StreamingNode : ExpressionVisitor
     return node;
   }
 
-  protected override Expression VisitParameter(ParameterExpression node)
+  protected sealed override Expression VisitParameter(ParameterExpression node)
   {
     Debug.Assert(_currentCall is null); // We are at the start of the method chain, so there should be no current method call
     return node;
@@ -120,100 +127,100 @@ internal abstract class StreamingNode : ExpressionVisitor
   // Our lambda should be a fluent method call chain
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitBinary(BinaryExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitBinary(BinaryExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitBlock(BlockExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitBlock(BlockExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override CatchBlock VisitCatchBlock(CatchBlock node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override CatchBlock VisitCatchBlock(CatchBlock node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitConditional(ConditionalExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitConditional(ConditionalExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitConstant(ConstantExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitConstant(ConstantExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitDebugInfo(DebugInfoExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitDebugInfo(DebugInfoExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitDefault(DefaultExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitDefault(DefaultExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitDynamic(DynamicExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitDynamic(DynamicExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override ElementInit VisitElementInit(ElementInit node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override ElementInit VisitElementInit(ElementInit node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitExtension(Expression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitExtension(Expression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitGoto(GotoExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitGoto(GotoExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitIndex(IndexExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitIndex(IndexExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitInvocation(InvocationExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitInvocation(InvocationExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitLabel(LabelExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitLabel(LabelExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override LabelTarget VisitLabelTarget(LabelTarget node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override LabelTarget VisitLabelTarget(LabelTarget node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitLambda<T>(Expression<T> node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitLambda<T>(Expression<T> node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitListInit(ListInitExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitListInit(ListInitExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitLoop(LoopExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitLoop(LoopExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitMember(MemberExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitMember(MemberExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override MemberAssignment VisitMemberAssignment(MemberAssignment node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override MemberAssignment VisitMemberAssignment(MemberAssignment node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override MemberBinding VisitMemberBinding(MemberBinding node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override MemberBinding VisitMemberBinding(MemberBinding node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitMemberInit(MemberInitExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitMemberInit(MemberInitExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override MemberListBinding VisitMemberListBinding(MemberListBinding node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override MemberListBinding VisitMemberListBinding(MemberListBinding node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitNew(NewExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitNew(NewExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitNewArray(NewArrayExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitNewArray(NewArrayExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitRuntimeVariables(RuntimeVariablesExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitRuntimeVariables(RuntimeVariablesExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitSwitch(SwitchExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitSwitch(SwitchExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override SwitchCase VisitSwitchCase(SwitchCase node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override SwitchCase VisitSwitchCase(SwitchCase node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitTry(TryExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitTry(TryExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitTypeBinary(TypeBinaryExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitTypeBinary(TypeBinaryExpression node) => throw new ExpressionEvaluationException(Expression);
 
   [ExcludeFromCodeCoverage]
-  protected override Expression VisitUnary(UnaryExpression node) => throw new ExpressionEvaluationException(Expression);
+  protected sealed override Expression VisitUnary(UnaryExpression node) => throw new ExpressionEvaluationException(Expression);
 
   #endregion
 }

@@ -26,8 +26,8 @@ internal abstract class ExpressionGraphDocument<TResult> : GraphDocument<TResult
 
     public override OperationType OperationType => OperationType.Query;
 
-    public override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context)
-      => new QueryDefinitionNode(context.GetService<INodeContext>(), Name, Array.Empty<IVariable>(), _expression);
+    public override IDocumentNode CreateDocumentNode(IGraphDocumentContext context)
+      => new QueryDocumentNode(context.GetService<INodeContext>(), Name, Array.Empty<IVariable>(), _expression);
   }
 
   public sealed class Mutation : ExpressionGraphDocument<TResult>
@@ -39,8 +39,8 @@ internal abstract class ExpressionGraphDocument<TResult> : GraphDocument<TResult
 
     public override OperationType OperationType => OperationType.Mutation;
 
-    public override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context)
-      => new MutationDefinitionNode(context.GetService<INodeContext>(), Name, Array.Empty<IVariable>(), _expression);
+    public override IDocumentNode CreateDocumentNode(IGraphDocumentContext context)
+      => new MutationDocumentNode(context.GetService<INodeContext>(), Name, Array.Empty<IVariable>(), _expression);
   }
 }
 
@@ -67,8 +67,8 @@ internal abstract class ExpressionGraphDocument<TResult, TVariables> : GraphDocu
 
     public override OperationType OperationType => OperationType.Query;
 
-    protected override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
-      => new QueryDefinitionNode(context.GetService<INodeContext>(), Name, variables, _expression);
+    protected override IDocumentNode CreateDocumentNode(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
+      => new QueryDocumentNode(context.GetService<INodeContext>(), Name, variables, _expression);
   }
 
   public sealed class Mutation : ExpressionGraphDocument<TResult, TVariables>
@@ -80,7 +80,7 @@ internal abstract class ExpressionGraphDocument<TResult, TVariables> : GraphDocu
 
     public override OperationType OperationType => OperationType.Mutation;
 
-    protected override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
-      => new MutationDefinitionNode(context.GetService<INodeContext>(), Name, variables, _expression);
+    protected override IDocumentNode CreateDocumentNode(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
+      => new MutationDocumentNode(context.GetService<INodeContext>(), Name, variables, _expression);
   }
 }

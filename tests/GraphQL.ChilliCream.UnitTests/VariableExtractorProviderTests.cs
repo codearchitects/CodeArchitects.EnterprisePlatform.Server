@@ -1,4 +1,3 @@
-using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Emit.Reflection;
 using CodeArchitects.Platform.Emit.Testing;
 using CodeArchitects.Platform.GraphQL.ChilliCream.UnitTests.FluentMock;
@@ -55,7 +54,7 @@ public class VariableExtractorProviderTests
     FakeILGeneratorProvider ilProvider = new();
     FakeILGenerator populateIL = ilProvider.AddGenerator();
 
-    VariableExtractorProvider sut = new(new Synchronizer(), _modelMock.Object, ilProvider);
+    VariableExtractorProvider sut = new(_modelMock.Object, ilProvider);
 
     // Act
     _ = sut.GetExtractor<Variables>();
@@ -98,7 +97,7 @@ public class VariableExtractorProviderTests
   public void Extractor_ShouldReturnCorrectDictionaries()
   {
     // Arrange
-    VariableExtractorProvider sut = new(new Synchronizer(), _modelMock.Object, new ReflectionILGeneratorProvider());
+    VariableExtractorProvider sut = new(_modelMock.Object, new ReflectionILGeneratorProvider());
 
     Variables variables = new()
     {

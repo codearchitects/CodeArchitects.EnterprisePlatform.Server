@@ -71,8 +71,8 @@ internal class GraphClient<TUtf8Document, TDocumentRoot> : IGraphClient<TDocumen
   {
     return delegate (GraphDocument document)
     {
-      IOperationDefinitionNode operationDefinition = document.CreateOperationDefinition(context);
-      return documentCompiler.Compile(document.OperationType, document.Name, operationDefinition);
+      IDocumentNode node = document.CreateDocumentNode(context);
+      return documentCompiler.Compile(document.OperationType, document.Name, node);
     };
   }
 }

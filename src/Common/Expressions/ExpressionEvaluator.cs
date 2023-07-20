@@ -189,9 +189,10 @@ internal partial class ExpressionEvaluator : ExpressionVisitor
   public static T Evaluate<T>(Expression expression, ReadOnlyCollection<ParameterExpression>? parameters = null, object?[]? arguments = null)
   {
     object? result = s_instance.Execute(expression, parameters, arguments);
-    Debug.Assert(result is T);
+    if (result is not T typedResult)
+      throw new ExpressionEvaluationException($"Expected expression to be of type '{typeof(T).Name}'", expression);
 
-    return (T)result!;
+    return typedResult;
   }
 
   public static object? Evaluate(Expression expression, ReadOnlyCollection<ParameterExpression>? parameters = null, object?[]? arguments = null)

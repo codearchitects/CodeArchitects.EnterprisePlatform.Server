@@ -25,7 +25,7 @@ internal class Utf8Document : IUtf8Document, IDocument
 
   ReadOnlySpan<byte> IDocument.Body => _content;
 
-  DocumentHash IDocument.Hash => new DocumentHash("md5Hash", _id);
+  DocumentHash IDocument.Hash => new("md5Hash", _id);
 
   public OperationRequest CreateRequest(RequestStrategy strategy)
   {

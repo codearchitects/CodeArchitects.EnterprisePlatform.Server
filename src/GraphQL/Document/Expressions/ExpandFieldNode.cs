@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Common.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Builder;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using System.Linq.Expressions;
 
@@ -9,13 +8,13 @@ internal class ExpandFieldNode : IteratorNode, IFieldNode,
   IArgumentListNode, IEnumerable<IArgumentNode>, IEnumerator<IArgumentNode>,
   IDirectiveListNode, IEnumerable<IDirectiveNode>, IEnumerator<IDirectiveNode>
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly string? _alias;
   private readonly string _fieldName;
 
-  public ExpandFieldNode(INodeContext context, string? alias, string fieldName, Expression expression)
+  public ExpandFieldNode(INodeRoot root, string? alias, string fieldName, Expression expression)
   {
-    _context = context;
+    _root = root;
     _alias = alias;
     _fieldName = fieldName;
     Expression = expression;
@@ -29,32 +28,32 @@ internal class ExpandFieldNode : IteratorNode, IFieldNode,
 
   public ReadOnlySpan<char> FieldName => _fieldName;
 
-  public IArgumentListNode? ArgumentList => Peek(MethodNames.WithArgument) ? this : null;
+  public IArgumentListNode? ArgumentList => Peek(MethodName.Represents.Argument) ? this : null;
 
   public IEnumerable<IArgumentNode> Arguments => this;
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodNames.WithDirective) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
   IArgumentNode IEnumerator<IArgumentNode>.Current => GetCurrent<IArgumentNode>();
 
-  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodNames.WithArgument, this);
+  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Argument, this);
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.WithDirective, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
 
   public ISelectionSetNode? SelectionSet
   {
     get
     {
-      if (TryGetNext(MethodNames.WithSelection, out ISelectionSetNode? selectionSet))
+      if (TryGetNext(MethodName.Represents.SelectionSet, out ISelectionSetNode? selectionSet))
         return selectionSet;
 
       Type fieldType = Expression.Type.GetGenericArguments()[0];
-      if (_context.TryGetDefaultSelection(fieldType, out LambdaExpression? defaultSelection))
-        return new NamedSelectionSetNode(_context, defaultSelection.Parameters[0], (MemberInitExpression)defaultSelection.Body);
+      if (_root.Context.TryGetDefaultSelection(fieldType, out LambdaExpression? defaultSelection))
+        return new NamedSimpleSelectionSetNode(_root, defaultSelection.Parameters[0], (MemberInitExpression)defaultSelection.Body);
 
       return null;
     }
@@ -64,10 +63,11 @@ internal class ExpandFieldNode : IteratorNode, IFieldNode,
   {
     return methodCall.Method.Name switch
     {
-      MethodNames.WithArgument  => NodeFactory.CreateArgument(_context, methodCall),
-      MethodNames.WithDirective => NodeFactory.CreateDirective(_context, methodCall),
-      MethodNames.WithSelection => NodeFactory.CreateSelectionSet(_context, methodCall),
-      _                         => throw new ExpressionEvaluationException(methodCall)
+      MethodName.WithArgument     => NodeFactory.CreateArgument(_root, methodCall),
+      MethodName.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
+      MethodName.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
+      MethodName.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
+      _                           => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

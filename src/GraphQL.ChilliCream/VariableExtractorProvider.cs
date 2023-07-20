@@ -1,6 +1,5 @@
 ﻿using CodeArchitects.Platform.Common.Utils;
 using CodeArchitects.Platform.Emit;
-using CodeArchitects.Platform.GraphQL.Document;
 using CodeArchitects.Platform.GraphQL.Model;
 using StrawberryShake;
 using System.Collections.Concurrent;
@@ -38,14 +37,12 @@ internal class VariableExtractorProvider : IVariableExtractorProvider
     bindingAttr: BindingFlags.Instance | BindingFlags.Public,
     types: new[] { typeof(Upload) });
 
-  private readonly Synchronizer _synchronizer;
   private readonly IModel _model;
   private readonly IILGeneratorProvider _ilProvider;
   private readonly ConcurrentDictionary<Type, Delegate> _extractors;
 
-  public VariableExtractorProvider(Synchronizer synchronizer, IModel model, IILGeneratorProvider ilProvider)
+  public VariableExtractorProvider(IModel model, IILGeneratorProvider ilProvider)
   {
-    _synchronizer = synchronizer;
     _model = model;
     _ilProvider = ilProvider;
     _extractors = new();
@@ -54,23 +51,10 @@ internal class VariableExtractorProvider : IVariableExtractorProvider
   public VariableExtractor<TVariables> GetExtractor<TVariables>()
     where TVariables : notnull
   {
-    VariableExtractor<TVariables>? extractor;
-    Type variablesType = typeof(TVariables);
-    Debug.Assert(variablesType != typeof(EmptyVariables));
+    return (VariableExtractor<TVariables>)_extractors.GetOrAdd(typeof(TVariables), BuildExtractor, this);
 
-    if (TryGetExtractor(variablesType, out extractor))
-      return extractor;
-
-    using (_synchronizer.Sync(variablesType))
-    {
-      if (TryGetExtractor(variablesType, out extractor))
-        return extractor;
-
-      extractor = BuildExtractor<TVariables>(variablesType);
-      _extractors[variablesType] = extractor;
-    }
-
-    return extractor;
+    static Delegate BuildExtractor(Type variablesType, VariableExtractorProvider self)
+      => self.BuildExtractor<TVariables>(variablesType);
   }
 
   private VariableExtractor<TVariables> BuildExtractor<TVariables>(Type variablesType)

@@ -32,9 +32,16 @@ public class ExpressionGraphDocumentTests
     var sut = new ExpressionGraphDocument<object>.Query(s_documentName, s_expression);
 
     // Act
-    IOperationDefinitionNode operationDefinition = sut.CreateOperationDefinition(_contextMock.Object);
+    IDocumentNode node = sut.CreateDocumentNode(_contextMock.Object);
 
     // Assert
+    IOperationDefinitionNode operationDefinition = node.Definitions.Should()
+      .ContainSingle(definition => definition.DefinitionKind == DefinitionNodeKind.OperationDefinition)
+      .Which
+      .Should()
+      .BeAssignableTo<IOperationDefinitionNode>()
+      .Subject;
+
     operationDefinition.OperationType.Should().Be(OperationType.Query);
     operationDefinition.Name.ToString().Should().Be(s_documentName);
     operationDefinition.VariableDefinitionList.Should().BeNull();
@@ -47,9 +54,16 @@ public class ExpressionGraphDocumentTests
     var sut = new ExpressionGraphDocument<object>.Mutation(s_documentName, s_expression);
 
     // Act
-    IOperationDefinitionNode operationDefinition = sut.CreateOperationDefinition(_contextMock.Object);
+    IDocumentNode node = sut.CreateDocumentNode(_contextMock.Object);
 
     // Assert
+    IOperationDefinitionNode operationDefinition = node.Definitions.Should()
+      .ContainSingle(definition => definition.DefinitionKind == DefinitionNodeKind.OperationDefinition)
+      .Which
+      .Should()
+      .BeAssignableTo<IOperationDefinitionNode>()
+      .Subject;
+
     operationDefinition.OperationType.Should().Be(OperationType.Mutation);
     operationDefinition.Name.ToString().Should().Be(s_documentName);
     operationDefinition.VariableDefinitionList.Should().BeNull();
@@ -62,9 +76,16 @@ public class ExpressionGraphDocumentTests
     var sut = new ExpressionGraphDocument<object, object>.Query(s_documentName, s_expression);
 
     // Act
-    IOperationDefinitionNode operationDefinition = sut.CreateOperationDefinition(_contextMock.Object);
+    IDocumentNode node = sut.CreateDocumentNode(_contextMock.Object);
 
     // Assert
+    IOperationDefinitionNode operationDefinition = node.Definitions.Should()
+      .ContainSingle(definition => definition.DefinitionKind == DefinitionNodeKind.OperationDefinition)
+      .Which
+      .Should()
+      .BeAssignableTo<IOperationDefinitionNode>()
+      .Subject;
+
     operationDefinition.OperationType.Should().Be(OperationType.Query);
     operationDefinition.Name.ToString().Should().Be(s_documentName);
     operationDefinition.VariableDefinitionList.Should().NotBeNull();
@@ -78,9 +99,16 @@ public class ExpressionGraphDocumentTests
     var sut = new ExpressionGraphDocument<object, object>.Mutation(s_documentName, s_expression);
 
     // Act
-    IOperationDefinitionNode operationDefinition = sut.CreateOperationDefinition(_contextMock.Object);
+    IDocumentNode node = sut.CreateDocumentNode(_contextMock.Object);
 
     // Assert
+    IOperationDefinitionNode operationDefinition = node.Definitions.Should()
+      .ContainSingle(definition => definition.DefinitionKind == DefinitionNodeKind.OperationDefinition)
+      .Which
+      .Should()
+      .BeAssignableTo<IOperationDefinitionNode>()
+      .Subject;
+
     operationDefinition.OperationType.Should().Be(OperationType.Mutation);
     operationDefinition.Name.ToString().Should().Be(s_documentName);
     operationDefinition.VariableDefinitionList.Should().NotBeNull();

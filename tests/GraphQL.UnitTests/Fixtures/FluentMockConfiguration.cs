@@ -10,7 +10,10 @@ using FluentMock;
 [assembly: GenerateFluentMockFor(typeof(IField))]
 [assembly: GenerateFluentMockFor(typeof(IVariable))]
 
+[assembly: GenerateFluentMockFor(typeof(IDocumentNode))]
+[assembly: GenerateFluentMockFor(typeof(IDefinitionNode))]
 [assembly: GenerateFluentMockFor(typeof(IOperationDefinitionNode))]
+[assembly: GenerateFluentMockFor(typeof(IFragmentDefinitionNode))]
 [assembly: GenerateFluentMockFor(typeof(IDirectiveNode))]
 [assembly: GenerateFluentMockFor(typeof(IVariableDefinitionListNode))]
 [assembly: GenerateFluentMockFor(typeof(IVariableDefinitionNode))]

@@ -56,5 +56,5 @@ public static partial class GQL
     => throw NotImplemented();
 
 
-  private static NotImplementedException NotImplemented() => new NotImplementedException("This method is to be used in document building expressions only.");
+  private static NotImplementedException NotImplemented() => new("This method is to be used in document building expressions only.");
 }

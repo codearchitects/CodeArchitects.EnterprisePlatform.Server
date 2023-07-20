@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.GraphQL.Document.Nodes;
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Literal;
 
@@ -66,7 +65,7 @@ internal partial class LiteralNode : IArgumentNode
           throw new NotImplementedException();
 
         default:
-          throw InvalidGraphQLDocumentException.Unexpected(_lexer.TokenKind);
+          throw LiteralGraphDocument.Unexpected(in _lexer);
       }
 
       _lexer.MoveNext();

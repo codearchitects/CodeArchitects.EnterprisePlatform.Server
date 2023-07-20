@@ -41,10 +41,6 @@ internal abstract class ListIterator<TSource1, TSource2, T> : IEnumerable<T>, IE
 
   IEnumerator<T> IEnumerable<T>.GetEnumerator() => this;
 
-  void IDisposable.Dispose()
-  {
-  }
-
   #region Not relevant
 
   [ExcludeFromCodeCoverage]
@@ -52,6 +48,9 @@ internal abstract class ListIterator<TSource1, TSource2, T> : IEnumerable<T>, IE
 
   [ExcludeFromCodeCoverage]
   IEnumerator IEnumerable.GetEnumerator() => throw new NotSupportedException();
+
+  [ExcludeFromCodeCoverage]
+  void IDisposable.Dispose() { }
 
   [ExcludeFromCodeCoverage]
   void IEnumerator.Reset() => throw new NotSupportedException();

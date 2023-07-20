@@ -4,15 +4,15 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
-internal class NamedSelectionSetNode : ListIterator<MemberBinding, ISelectionNode>, ISelectionSetNode
+internal class NamedSimpleSelectionSetNode : ListIterator<MemberBinding, ISelectionNode>, ISelectionSetNode
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly Expression _field;
   private readonly MemberInitExpression _expression;
 
-  public NamedSelectionSetNode(INodeContext context, Expression field, MemberInitExpression expression)
+  public NamedSimpleSelectionSetNode(INodeRoot root, Expression field, MemberInitExpression expression)
   {
-    _context = context;
+    _root = root;
     _field = field;
     _expression = expression;
   }
@@ -26,6 +26,6 @@ internal class NamedSelectionSetNode : ListIterator<MemberBinding, ISelectionNod
     if (binding is not MemberAssignment assignment)
       throw new ExpressionEvaluationException(_expression);
 
-    return NodeFactory.CreateSelection(_context, _field, assignment.Member.Name, assignment.Expression);
+    return NodeFactory.CreateField(_root, _field, assignment.Member.Name, assignment.Expression);
   }
 }

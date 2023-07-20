@@ -5,12 +5,12 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class AnonymousListValueNode : ListIterator<Expression, object?>, IListValueNode
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly NewArrayExpression _expression;
 
-  public AnonymousListValueNode(INodeContext context, NewArrayExpression expression)
+  public AnonymousListValueNode(INodeRoot root, NewArrayExpression expression)
   {
-    _context = context;
+    _root = root;
     _expression = expression;
   }
 
@@ -20,6 +20,6 @@ internal class AnonymousListValueNode : ListIterator<Expression, object?>, IList
 
   protected override object? OnCurrent(Expression element)
   {
-    return NodeFactory.CreateValue(_context, element);
+    return NodeFactory.CreateValue(_root, element);
   }
 }

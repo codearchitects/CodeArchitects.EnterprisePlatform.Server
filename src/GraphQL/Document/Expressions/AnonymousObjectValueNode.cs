@@ -6,12 +6,12 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class AnonymousObjectValueNode : ListIterator<MemberInfo, Expression, IObjectFieldNode>, IObjectValueNode
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly NewExpression _expression;
 
-  public AnonymousObjectValueNode(INodeContext context, NewExpression expression)
+  public AnonymousObjectValueNode(INodeRoot root, NewExpression expression)
   {
-    _context = context;
+    _root = root;
     _expression = expression;
   }
 
@@ -23,6 +23,6 @@ internal class AnonymousObjectValueNode : ListIterator<MemberInfo, Expression, I
 
   protected override IObjectFieldNode OnCurrent(MemberInfo member, Expression argument)
   {
-    return new ObjectFieldNode(member.Name, NodeFactory.CreateValue(_context, argument));
+    return new ObjectFieldNode(member.Name, NodeFactory.CreateValue(_root, argument));
   }
 }

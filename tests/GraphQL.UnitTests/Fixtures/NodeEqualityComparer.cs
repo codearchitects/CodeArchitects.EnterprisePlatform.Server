@@ -6,7 +6,10 @@ using System.Diagnostics.CodeAnalysis;
 namespace CodeArchitects.Platform.GraphQL.Fixtures;
 
 internal class NodeEqualityComparer :
+  IEqualityComparer<IDocumentNode>,
+  IEqualityComparer<IDefinitionNode>,
   IEqualityComparer<IOperationDefinitionNode>,
+  IEqualityComparer<IFragmentDefinitionNode>,
   IEqualityComparer<IVariableDefinitionListNode>,
   IEqualityComparer<IVariableDefinitionNode>,
   IEqualityComparer<IVariableNode>,
@@ -31,12 +34,48 @@ internal class NodeEqualityComparer :
 {
   public static readonly NodeEqualityComparer Instance = new();
 
+  public bool Equals(IDocumentNode? x, IDocumentNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!x.Definitions.SequenceEqual(y.Definitions, this))
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IDefinitionNode? x, IDefinitionNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    return y switch
+    {
+      IOperationDefinitionNode yOperationDefinition => Equals(x as IOperationDefinitionNode, yOperationDefinition),
+      IFragmentDefinitionNode yFragmentDefinition   => Equals(x as IFragmentDefinitionNode, yFragmentDefinition),
+      _                                             => throw Errors.Unreachable
+    };
+  }
+
   public bool Equals(IOperationDefinitionNode? x, IOperationDefinitionNode? y)
   {
     if (x is null)
       return y is null;
 
     if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.IsQueryShortHand != y.IsQueryShortHand)
       return false;
 
     if (x.OperationType != y.OperationType)
@@ -55,6 +94,40 @@ internal class NodeEqualityComparer :
       return false;
 
     return true;
+  }
+
+  public bool Equals(IFragmentDefinitionNode? x, IFragmentDefinitionNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (!x.FragmentName.SequenceEqual(y.FragmentName))
+      return false;
+
+    if (!Equals(x.TypeCondition, y.TypeCondition))
+      return false;
+
+    if (!Equals(x.DirectiveList, y.DirectiveList))
+      return false;
+
+    if (!Equals(x.SelectionSet, y.SelectionSet))
+      return false;
+
+    return true;
+  }
+
+  private static bool EqualsCore(IDefinitionNode x, IDefinitionNode y)
+  {
+    if (!MockHelper.IsSetUp(y, node => node.DefinitionKind))
+      return true;
+
+    return x.DefinitionKind == y.DefinitionKind;
   }
 
   public bool Equals(IVariableDefinitionListNode? x, IVariableDefinitionListNode? y)
@@ -446,4 +519,7 @@ internal class NodeEqualityComparer :
   public int GetHashCode([DisallowNull] IObjectFieldNode obj) => 0;
   public int GetHashCode([DisallowNull] object? obj) => 0;
   public int GetHashCode([DisallowNull] ITypeConditionNode obj) => 0;
+  public int GetHashCode([DisallowNull] IDocumentNode obj) => 0;
+  public int GetHashCode([DisallowNull] IFragmentDefinitionNode obj) => 0;
+  public int GetHashCode([DisallowNull] IDefinitionNode obj) => 0;
 }

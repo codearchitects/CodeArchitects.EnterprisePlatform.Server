@@ -5,14 +5,14 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class FieldNode : IFieldNode
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly LambdaExpression _expression;
   private readonly string? _alias;
   private readonly string _fieldName;
 
-  public FieldNode(INodeContext context, string? alias, string fieldName, LambdaExpression expression)
+  public FieldNode(INodeRoot root, string? alias, string fieldName, LambdaExpression expression)
   {
-    _context = context;
+    _root = root;
     _alias = alias;
     _fieldName = fieldName;
     _expression = expression;
@@ -28,5 +28,5 @@ internal class FieldNode : IFieldNode
 
   public IDirectiveListNode? DirectiveList => null;
 
-  public ISelectionSetNode? SelectionSet => new NamedSelectionSetNode(_context, _expression.Parameters[0], (MemberInitExpression)_expression.Body);
+  public ISelectionSetNode? SelectionSet => new NamedSimpleSelectionSetNode(_root, _expression.Parameters[0], (MemberInitExpression)_expression.Body);
 }

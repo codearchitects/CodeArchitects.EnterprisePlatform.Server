@@ -19,7 +19,7 @@ internal abstract class DocumentCompiler<TUtf8Document> : IDocumentCompiler<TUtf
 
   protected abstract TUtf8Document CreateDocument(OperationType operationType, string name, byte[] content);
 
-  public TUtf8Document Compile(OperationType operationType, string name, IOperationDefinitionNode operationDefinition)
+  public TUtf8Document Compile(OperationType operationType, string name, IDocumentNode node)
   {
     byte[] content;
 
@@ -28,7 +28,7 @@ internal abstract class DocumentCompiler<TUtf8Document> : IDocumentCompiler<TUtf
       ArrayBufferWriter<byte> writer = owner.Writer;
 
       DocumentRenderer renderer = new(writer, _options);
-      renderer.AppendOperationDefinition(operationDefinition);
+      renderer.AppendDocument(node);
 
       content = new byte[writer.WrittenCount];
       writer.WrittenSpan.CopyTo(content);

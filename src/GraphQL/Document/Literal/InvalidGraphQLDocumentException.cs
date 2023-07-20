@@ -24,9 +24,4 @@ public class InvalidGraphQLDocumentException : Exception
     : base(info, context)
   {
   }
-
-  internal static InvalidGraphQLDocumentException Unexpected(TokenKind kind)
-  {
-    return new InvalidGraphQLDocumentException($"Unexpected token '{kind}'.");
-  }
 }

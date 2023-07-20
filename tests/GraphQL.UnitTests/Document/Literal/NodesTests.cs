@@ -17,26 +17,30 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -49,26 +53,30 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("GetBlogs")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("GetBlogs")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -81,49 +89,53 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("GetBlogs")
-      .SetVariableDefinitionList(_ => _
-        .SetVariableDefinitions(_ => _
-          .Add(_ => _
-            .SetVariable(_ => _
-              .SetName("var1"))
-            .SetType<INonNullTypeNode>(_ => _
-              .SetTypeKind(TypeNodeKind.NonNullType)
-              .SetNullableType<IListTypeNode>(_ => _
-                .SetTypeKind(TypeNodeKind.ListType)
-                .SetItemType<INonNullTypeNode>(_ => _
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("GetBlogs")
+          .SetVariableDefinitionList(_ => _
+            .SetVariableDefinitions(_ => _
+              .Add(_ => _
+                .SetVariable(_ => _
+                  .SetName("var1"))
+                .SetType<INonNullTypeNode>(_ => _
                   .SetTypeKind(TypeNodeKind.NonNullType)
                   .SetNullableType<IListTypeNode>(_ => _
                     .SetTypeKind(TypeNodeKind.ListType)
                     .SetItemType<INonNullTypeNode>(_ => _
                       .SetTypeKind(TypeNodeKind.NonNullType)
-                      .SetNullableType<INamedTypeNode>(_ => _
-                        .SetTypeKind(TypeNodeKind.NamedType)
-                        .SetName("String"))))))))
-          .Add(_ => _
-            .SetVariable(_ => _
-              .SetName("var2"))
-            .SetType<INamedTypeNode>(_ => _
-              .SetTypeKind(TypeNodeKind.NamedType)
-              .SetName("Integer")))))
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+                      .SetNullableType<IListTypeNode>(_ => _
+                        .SetTypeKind(TypeNodeKind.ListType)
+                        .SetItemType<INonNullTypeNode>(_ => _
+                          .SetTypeKind(TypeNodeKind.NonNullType)
+                          .SetNullableType<INamedTypeNode>(_ => _
+                            .SetTypeKind(TypeNodeKind.NamedType)
+                            .SetName("String"))))))))
+              .Add(_ => _
+                .SetVariable(_ => _
+                  .SetName("var2"))
+                .SetType<INamedTypeNode>(_ => _
+                  .SetTypeKind(TypeNodeKind.NamedType)
+                  .SetName("Integer")))))
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -136,37 +148,41 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("GetBlogs")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(_ => _
-        .SetDirectives(_ => _
-          .Add(_ => _
-            .SetName("dir1")
-            .SetArgumentList(null as IArgumentListNode))
-          .Add(_ => _
-            .SetName("dir2")
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("id")
-                  .SetValue("my-id")))))))
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("GetBlogs")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(_ => _
+            .SetDirectives(_ => _
+              .Add(_ => _
+                .SetName("dir1")
+                .SetArgumentList(null as IArgumentListNode))
+              .Add(_ => _
+                .SetName("dir2")
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("id")
+                      .SetValue("my-id")))))))
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -179,26 +195,30 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("my_blogs")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("my_blogs")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -211,33 +231,37 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(_ => _
-              .SetArguments(_ => _
-                .Add(_ => _
-                  .SetName("id")
-                  .SetValue("my-id"))
-                .Add(_ => _
-                  .SetName("age")
-                  .SetValue(42))))
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(null as ISelectionSetNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("id")
+                      .SetValue("my-id"))
+                    .Add(_ => _
+                      .SetName("age")
+                      .SetValue(42))))
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -252,34 +276,38 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FieldNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.Field)
-            .SetAlias("")
-            .SetFieldName("blogs")
-            .SetArgumentList(null as IArgumentListNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("id")
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("id")
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -292,23 +320,27 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FragmentSpreadNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.FragmentSpread)
-            .SetFragmentName("blogs")
-            .SetDirectiveList(null as IDirectiveListNode)))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FragmentSpreadNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.FragmentSpread)
+                .SetFragmentName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -321,27 +353,31 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<FragmentSpreadNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.FragmentSpread)
-            .SetFragmentName("blogs")
-            .SetDirectiveList(_ => _
-              .SetDirectives(_ => _
-                .Add(_ => _
-                  .SetName("dir1")
-                  .SetArgumentList(null as IArgumentListNode))))))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FragmentSpreadNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.FragmentSpread)
+                .SetFragmentName("blogs")
+                .SetDirectiveList(_ => _
+                  .SetDirectives(_ => _
+                    .Add(_ => _
+                      .SetName("dir1")
+                      .SetArgumentList(null as IArgumentListNode))))))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -357,41 +393,45 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<InlineFragmentNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.InlineFragment)
-            .SetTypeCondition(_ => _
-              .SetType(_ => _
-                .SetName("Type")))
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("name")
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("age")
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<InlineFragmentNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.InlineFragment)
+                .SetTypeCondition(_ => _
+                  .SetType(_ => _
+                    .SetName("Type")))
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("name")
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("age")
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -406,38 +446,42 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<InlineFragmentNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.InlineFragment)
-            .SetTypeCondition(_ => _
-              .SetType(_ => _
-                .SetName("Type")))
-            .SetDirectiveList(_ => _
-              .SetDirectives(_ => _
-                .Add(_ => _
-                  .SetName("dir1")
-                  .SetArgumentList(null as IArgumentListNode))))
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("name")
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<InlineFragmentNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.InlineFragment)
+                .SetTypeCondition(_ => _
+                  .SetType(_ => _
+                    .SetName("Type")))
+                .SetDirectiveList(_ => _
+                  .SetDirectives(_ => _
+                    .Add(_ => _
+                      .SetName("dir1")
+                      .SetArgumentList(null as IArgumentListNode))))
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("name")
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
   [Fact]
@@ -452,31 +496,103 @@ public class NodesTests
       }
       """;
 
-    IOperationDefinitionNode expected = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(OperationType.Query)
-      .SetName("")
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections(_ => _
-          .Add<InlineFragmentNodeBuilder>(_ => _
-            .SetSelectionKind(SelectionNodeKind.InlineFragment)
-            .SetTypeCondition(null as ITypeConditionNode)
-            .SetDirectiveList(null as IDirectiveListNode)
-            .SetSelectionSet(_ => _
-              .SetSelections(_ => _
-                .Add<FieldNodeBuilder>(_ => _
-                  .SetSelectionKind(SelectionNodeKind.Field)
-                  .SetAlias("")
-                  .SetFieldName("name")
-                  .SetArgumentList(null as IArgumentListNode)
-                  .SetDirectiveList(null as IDirectiveListNode)
-                  .SetSelectionSet(null as ISelectionSetNode))))))));
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<InlineFragmentNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.InlineFragment)
+                .SetTypeCondition(null as ITypeConditionNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(_ => _
+                  .SetSelections(_ => _
+                    .Add<FieldNodeBuilder>(_ => _
+                      .SetSelectionKind(SelectionNodeKind.Field)
+                      .SetAlias("")
+                      .SetFieldName("name")
+                      .SetArgumentList(null as IArgumentListNode)
+                      .SetDirectiveList(null as IDirectiveListNode)
+                      .SetSelectionSet(null as ISelectionSetNode))))))))));
 
     // Act
-    LiteralNode queryDefinition = new(document);
+    IDocumentNode actual = new LiteralNode(document);
 
     // Assert
-    queryDefinition.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IOperationDefinitionNode>));
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
+  }
+
+  [Fact]
+  public void QueryShortHandWithFragmentDefinition_ShouldProduceCorrectAST()
+  {
+    // Arrange
+    string document = """
+      {
+        blogs
+        ...myFragment @dir1
+      }
+      fragment myFragment on Query @dir2 {
+        users
+      }
+      """;
+
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(true)
+          .SetOperationType(OperationType.Query)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("blogs")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(null as IArgumentListNode)
+                .SetSelectionSet(null as ISelectionSetNode))
+              .Add<FragmentSpreadNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.FragmentSpread)
+                .SetFragmentName("myFragment")
+                .SetDirectiveList(_ => _
+                  .SetDirectives(_ => _
+                    .Add(_ => _
+                      .SetName("dir1")
+                      .SetArgumentList(null as IArgumentListNode))))))))
+        .Add<FragmentDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.FragmentDefinition)
+          .SetFragmentName("myFragment")
+          .SetTypeCondition(_ => _
+            .SetType(_ => _
+              .SetName("Query")))
+          .SetDirectiveList(_ => _
+            .SetDirectives(_ => _
+              .Add(_ => _
+                .SetName("dir2")
+                .SetArgumentList(null as IArgumentListNode))))
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("users")
+                .SetArgumentList(null as IArgumentListNode)
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetSelectionSet(null as ISelectionSetNode)))))));
+
+    // Act
+    IDocumentNode actual = new LiteralNode(document);
+
+    // Assert
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 }

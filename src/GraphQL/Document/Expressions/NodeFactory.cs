@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Common.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Builder;
 using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using CodeArchitects.Platform.GraphQL.Model;
 using System.Collections;
@@ -11,57 +10,57 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal static class NodeFactory
 {
-  public static object? CreateValue(INodeContext context, Expression expression)
+  public static object? CreateValue(INodeRoot root, Expression expression)
   {
     return expression switch
     {
-      NewExpression newExpression when newExpression.Type.IsAnonymousType() => new AnonymousObjectValueNode(context, newExpression),
-      NewArrayExpression newArray                                           => new AnonymousListValueNode(context, newArray),
-      _                                                                     => CreateValue(context, ExpressionEvaluator.Evaluate(expression))
+      NewExpression newExpression when newExpression.Type.IsAnonymousType() => new AnonymousObjectValueNode(root, newExpression),
+      NewArrayExpression newArray                                           => new AnonymousListValueNode(root, newArray),
+      _                                                                     => CreateValue(root, ExpressionEvaluator.Evaluate(expression))
     };
   }
 
-  public static object? CreateValue(INodeContext context, object? @object)
+  public static object? CreateValue(INodeRoot root, object? @object)
   {
     if (Convert.GetTypeCode(@object) is TypeCode.Object)
     {
       if (@object is IEnumerable values)
-        return new ListValueNode(context, values.GetEnumerator());
+        return new ListValueNode(root, values.GetEnumerator());
 
-      if (context.TryGetObjectType(@object!.GetType(), out IObjectType? objectType))
-        return new ObjectValueNode(context, objectType, @object);
+      if (root.Context.TryGetObjectType(@object!.GetType(), out IObjectType? objectType))
+        return new ObjectValueNode(root, objectType, @object);
     }
 
     return @object;
   }
 
-  public static IArgumentNode CreateArgument(INodeContext context, MethodCallExpression withArgumentCall)
+  public static IArgumentNode CreateArgument(INodeRoot root, MethodCallExpression withArgumentCall)
   {
     ReadOnlyCollection<Expression> arguments = withArgumentCall.Arguments;
 
     switch (arguments.Count)
     {
       case 1:
-        return CreateFromVariable(context, null, arguments[0]);
+        return CreateFromVariable(root, null, arguments[0]);
       
       case 2:
         string name = ExpressionEvaluator.Evaluate<string>(arguments[0]);
         return typeof(LambdaExpression).IsAssignableFrom(arguments[1].Type)
-          ? CreateFromVariable(context, name, arguments[1])
-          : CreateFromNameAndValue(context, name, arguments[1]);
+          ? CreateFromVariable(root, name, arguments[1])
+          : CreateFromNameAndValue(root, name, arguments[1]);
       
       default:
         throw new ExpressionEvaluationException(withArgumentCall);
     }
 
-    static IArgumentNode CreateFromNameAndValue(INodeContext context, string name, Expression expression)
+    static IArgumentNode CreateFromNameAndValue(INodeRoot root, string name, Expression expression)
     {
-      object? value = CreateValue(context, expression);
+      object? value = CreateValue(root, expression);
 
       return new ArgumentNode(name, value);
     }
 
-    static VariableArgumentNode CreateFromVariable(INodeContext context, string? name, Expression variableExpression)
+    static VariableArgumentNode CreateFromVariable(INodeRoot root, string? name, Expression variableExpression)
     {
       LambdaExpression variableLambda = variableExpression.EvaluateAsLambda();
 
@@ -74,12 +73,12 @@ internal static class NodeFactory
       if (variableMember.Member is not PropertyInfo property)
         throw new ExpressionEvaluationException(variableLambda);
 
-      IVariable variable = context.GetVariable(property);
+      IVariable variable = root.Context.GetVariable(property);
       return new VariableArgumentNode(variable, name);
     }
   }
 
-  public static IDirectiveNode CreateDirective(INodeContext context, MethodCallExpression withDirectiveCall)
+  public static IDirectiveNode CreateDirective(INodeRoot root, MethodCallExpression withDirectiveCall)
   {
     ReadOnlyCollection<Expression> arguments = withDirectiveCall.Arguments;
 
@@ -91,10 +90,10 @@ internal static class NodeFactory
       return new SimpleDirectiveNode(name);
 
     LambdaExpression directiveExpression = arguments[1].EvaluateAsLambda();
-    return new DirectiveNode(context, name, directiveExpression.Body);
+    return new DirectiveNode(root, name, directiveExpression.Body);
   }
 
-  public static ISelectionSetNode CreateSelectionSet(INodeContext context, MethodCallExpression withSelectionCall)
+  public static ISelectionSetNode CreateSimpleSelectionSet(INodeRoot root, MethodCallExpression withSelectionCall)
   {
     ReadOnlyCollection<Expression> arguments = withSelectionCall.Arguments;
 
@@ -104,31 +103,78 @@ internal static class NodeFactory
     LambdaExpression selectionSet = arguments[0].EvaluateAsLambda();
     return selectionSet.Body switch
     {
-      MemberInitExpression memberInit                     => new NamedSelectionSetNode(context, selectionSet.Parameters[0], memberInit),
-      NewExpression @new when @new.Type.IsAnonymousType() => new AnonymousSelectionSetNode(context, selectionSet.Parameters[0], @new),
+      MemberInitExpression memberInit                     => new NamedSimpleSelectionSetNode(root, selectionSet.Parameters[0], memberInit),
+      NewExpression @new when @new.Type.IsAnonymousType() => new AnonymousSimpleSelectionSetNode(root, selectionSet.Parameters[0], @new),
       _                                                   => throw new ExpressionEvaluationException(selectionSet)
     };
   }
 
-  public static ISelectionNode CreateSelection(INodeContext context, Expression field, string memberName, Expression expression)
+  public static ISelectionSetNode CreateSelectionSet(INodeRoot root, MethodCallExpression withSelectionSetCall)
+  {
+    ReadOnlyCollection<Expression> arguments = withSelectionSetCall.Arguments;
+
+    if (arguments.Count < 1)
+      throw new ExpressionEvaluationException(withSelectionSetCall);
+
+    LambdaExpression expansion = arguments[0].EvaluateAsLambda();
+    return new SelectionSetNode(root, expansion.Body);
+  }
+
+  public static IFieldNode CreateField(INodeRoot root, Expression field, string memberName, Expression expression)
   {
     return expression switch
     {
-      MemberExpression member         => CreateMemberSelection(context, field, memberName, member),
+      MemberExpression member         => CreateMemberField(root, field, memberName, member),
       MethodCallExpression methodCall => methodCall.Method.Name switch
       {
-        MethodNames.Field             => CreateRootSelection(context, field, memberName, methodCall),
-        MethodNames.SelectRef or
-        MethodNames.SelectCol         => CreateSelectSelection(context, field, memberName, methodCall),
-        MethodNames.ExpandRef or
-        MethodNames.ExpandCol         => CreateExpandSelection(context, field, memberName, methodCall),
+        MethodName.Field              => CreateRootField(root, field, memberName, methodCall),
+        MethodName.SelectRef or
+        MethodName.SelectCol          => CreateSelectField(root, field, memberName, methodCall),
+        MethodName.ExpandRef or
+        MethodName.ExpandCol          => CreateExpandField(root, field, memberName, methodCall),
         _                             => throw new ExpressionEvaluationException(methodCall)
       },
       _                               => throw new ExpressionEvaluationException(expression)
     };
   }
 
-  private static ISelectionNode CreateSelectSelection(INodeContext context, Expression field, string memberName, MethodCallExpression selectCall)
+  public static IFragmentSpreadNode CreateFragmentSpread(INodeRoot root, MethodCallExpression withFragmentSpreadCall)
+  {
+    ReadOnlyCollection<Expression> arguments = withFragmentSpreadCall.Arguments;
+
+    if (arguments.Count < 1)
+      throw new ExpressionEvaluationException(withFragmentSpreadCall);
+
+    GraphFragment fragment = ExpressionEvaluator.Evaluate<GraphFragment>(arguments[0]);
+    root.ReportFragment(fragment);
+
+    if (arguments.Count == 1)
+      return new SimpleFragmentSpreadNode(fragment);
+
+    LambdaExpression expansion = arguments[1].EvaluateAsLambda();
+    return new FragmentSpreadNode(root, fragment, expansion.Body);
+  }
+
+  public static IInlineFragmentNode CreateInlineFragment(INodeRoot root, MethodCallExpression withInlineFragmentCall)
+  {
+    ReadOnlyCollection<Expression> arguments = withInlineFragmentCall.Arguments;
+
+    if (arguments.Count < 1)
+      throw new ExpressionEvaluationException(withInlineFragmentCall);
+
+    MethodInfo withInlineFragmentMethod = withInlineFragmentCall.Method;
+    LambdaExpression expansion = arguments[0].EvaluateAsLambda();
+
+    if (!withInlineFragmentMethod.IsGenericMethod)
+      return new UntypedInlineFragmentNode(root, expansion.Body);
+
+    if (!root.Context.TryGetObjectType(withInlineFragmentMethod.GetGenericArguments()[0], out IObjectType? fragmentType))
+      throw new ExpressionEvaluationException(withInlineFragmentCall);
+
+    return new TypedInlineFragmentNode(root, expansion.Body, fragmentType);
+  }
+
+  private static IFieldNode CreateSelectField(INodeRoot root, Expression field, string memberName, MethodCallExpression selectCall)
   {
     ReadOnlyCollection<Expression> arguments = selectCall.Arguments;
 
@@ -141,10 +187,10 @@ internal static class NodeFactory
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
 
-    return new FieldNode(context, alias, fieldName, selection);
+    return new FieldNode(root, alias, fieldName, selection);
   }
 
-  private static ISelectionNode CreateExpandSelection(INodeContext context, Expression field, string memberName, MethodCallExpression expandCall)
+  private static IFieldNode CreateExpandField(INodeRoot root, Expression field, string memberName, MethodCallExpression expandCall)
   {
     ReadOnlyCollection<Expression> arguments = expandCall.Arguments;
 
@@ -157,10 +203,10 @@ internal static class NodeFactory
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
 
-    return new ExpandFieldNode(context, alias, fieldName, expansion.Body);
+    return new ExpandFieldNode(root, alias, fieldName, expansion.Body);
   }
 
-  private static ISelectionNode CreateMemberSelection(INodeContext context, Expression field, string memberName, MemberExpression member)
+  private static IFieldNode CreateMemberField(INodeRoot root, Expression field, string memberName, MemberExpression member)
   {
     if (!IsFieldMember(member, field))
       throw new ExpressionEvaluationException(member);
@@ -168,22 +214,22 @@ internal static class NodeFactory
     string fieldName = member.Member.Name;
     string? alias = GetAlias(memberName, fieldName);
 
-    if (context.TryGetDefaultSelection(member.Type, out LambdaExpression? defaultSelection))
-      return new FieldNode(context, alias, fieldName, defaultSelection);
+    if (root.Context.TryGetDefaultSelection(member.Type, out LambdaExpression? defaultSelection))
+      return new FieldNode(root, alias, fieldName, defaultSelection);
 
     return new SimpleFieldNode(alias, fieldName);
   }
 
-  private static ISelectionNode CreateRootSelection(INodeContext context, Expression root, string memberName, MethodCallExpression fieldCall)
+  private static IFieldNode CreateRootField(INodeRoot root, Expression rootExpression, string memberName, MethodCallExpression fieldCall)
   {
-    if (!ReferenceEquals(fieldCall.Object, root))
+    if (!ReferenceEquals(fieldCall.Object, rootExpression))
       throw new ExpressionEvaluationException(fieldCall);
 
     string fieldName = ExpressionEvaluator.Evaluate<string>(fieldCall.Arguments[0]);
     string? alias = GetAlias(memberName, fieldName);
 
-    if (context.TryGetDefaultSelection(fieldCall.Type, out LambdaExpression? defaultSelection))
-      return new FieldNode(context, alias, fieldName, defaultSelection);
+    if (root.Context.TryGetDefaultSelection(fieldCall.Type, out LambdaExpression? defaultSelection))
+      return new FieldNode(root, alias, fieldName, defaultSelection);
 
     return new SimpleFieldNode(alias, fieldName);
   }
@@ -216,6 +262,6 @@ internal static class NodeFactory
 
   private static bool IsFieldCall(MethodCallExpression methodCall, Expression root)
   {
-    return methodCall.Method.Name == MethodNames.Field && ReferenceEquals(methodCall.Object, root);
+    return methodCall.Method.Name == MethodName.Field && ReferenceEquals(methodCall.Object, root);
   }
 }

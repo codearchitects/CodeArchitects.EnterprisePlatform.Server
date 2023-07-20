@@ -13,7 +13,7 @@ public abstract class GraphDocument
 
   public abstract string Name { get; }
 
-  public abstract IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context);
+  public abstract IDocumentNode CreateDocumentNode(IGraphDocumentContext context);
 
   /// <inheritdoc/>
   public override string ToString()
@@ -39,11 +39,11 @@ public abstract class GraphDocument<TResult, TVariables> : GraphDocument
   where TResult : class
   where TVariables : notnull
 {
-  public override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context)
+  public override IDocumentNode CreateDocumentNode(IGraphDocumentContext context)
   {
     IReadOnlyList<IVariable> variables = context.Model.GetVariables(typeof(TVariables));
-    return CreateOperationDefinition(context, variables);
+    return CreateDocumentNode(context, variables);
   }
 
-  protected abstract IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context, IReadOnlyList<IVariable> variables);
+  protected abstract IDocumentNode CreateDocumentNode(IGraphDocumentContext context, IReadOnlyList<IVariable> variables);
 }

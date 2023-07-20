@@ -1,7 +1,9 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
 
-public interface IOperationDefinitionNode
+public interface IOperationDefinitionNode : IExecutableDefinitionNode
 {
+  bool IsQueryShortHand { get; }
+
   OperationType OperationType { get; }
 
   ReadOnlySpan<char> Name { get; }

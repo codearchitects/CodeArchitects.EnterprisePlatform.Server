@@ -6,26 +6,26 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal abstract class IteratorNode : StreamingNode, IEnumerable, IEnumerator, IDisposable
 {
-  private string? _currentIterator;
+  private Predicate<string>? _currentCondition;
 
-  protected TEnumerator GetEnumerator<TEnumerator>(string methodName, TEnumerator @this)
+  protected TEnumerator GetEnumerator<TEnumerator>(Predicate<string> condition, TEnumerator @this)
     where TEnumerator : IEnumerator
   {
     Debug.Assert(ReferenceEquals(@this, this)); // Subclasses should implement TEnumerator and pass 'this'
 
-    _currentIterator = methodName;
+    _currentCondition = condition;
     return @this;
   }
 
   bool IEnumerator.MoveNext()
   {
-    Debug.Assert(_currentIterator is not null); // If someone is calling MoveNext(), ensure they called GetEnumerator(string, TEnumerator) before
-    return MoveNext(_currentIterator);
+    Debug.Assert(_currentCondition is not null); // If someone is calling MoveNext(), ensure they called GetEnumerator(string, TEnumerator) before
+    return MoveNext(_currentCondition);
   }
 
   void IDisposable.Dispose()
   {
-    _currentIterator = null; // Reset _currentIterator so the check inside MoveNext() is always valid
+    _currentCondition = null; // Reset _currentCondition so the check inside MoveNext() is always valid
   }
 
   #region Not relevant

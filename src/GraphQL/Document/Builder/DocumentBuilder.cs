@@ -64,6 +64,20 @@ internal class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
   }
 
 
+  public GraphFragment<TField> Fragment<TField>(string name, Expression<Func<IFragmentBuilder<TField>, IBuildResult<TField>>> expansion)
+    where TField : class
+  {
+    return new GraphFragment<TField>(name, expansion.Body);
+  }
+
+  public GraphFragment<TField, TVariables> Fragment<TField, TVariables>(string name, Expression<Func<IFragmentBuilder<TField, TVariables>, IBuildResult<TField, TVariables>>> expansion)
+    where TField : class
+    where TVariables : notnull
+  {
+    return new GraphFragment<TField, TVariables>(name, expansion.Body);
+  }
+
+
   public GraphDocument<TResult> Raw<TResult>(string document)
     where TResult : class
   {

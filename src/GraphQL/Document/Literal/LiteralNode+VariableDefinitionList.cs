@@ -15,7 +15,7 @@ internal partial class LiteralNode : IVariableDefinitionListNode, IEnumerable<IV
 
     _lexer.MoveNext();
     if (_lexer.TokenKind is TokenKind.RightParenthesis)
-      throw InvalidGraphQLDocumentException.Unexpected(TokenKind.RightParenthesis); // Validate against a "()" syntax
+      throw LiteralGraphDocument.Unexpected(in _lexer); // Validate against a "()" syntax
 
     SetIterator(IteratorKind.Variable);
     return this;

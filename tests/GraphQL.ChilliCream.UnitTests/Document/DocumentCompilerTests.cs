@@ -37,16 +37,20 @@ public class DocumentCompilerTests
     // Arrange
     string name = "test";
 
-    IOperationDefinitionNode operationDefinition = OperationDefinitionNodeBuilder.Build(_ => _
-      .SetOperationType(operationType)
-      .SetName("test")
-      .SetDirectiveList(null as IDirectiveListNode)
-      .SetVariableDefinitionList(null as IVariableDefinitionListNode)
-      .SetSelectionSet(_ => _
-        .SetSelections()));
+    IDocumentNode node = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(operationType)
+          .SetName("test")
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections()))));
 
     // Act
-    Utf8Document document = _sut.Compile(operationType, name, operationDefinition);
+    Utf8Document document = _sut.Compile(operationType, name, node);
 
     // Assert
     document.Content.Should().BeEquivalentTo(Encoding.UTF8.GetBytes($"{operation} {name} {{  }}"));

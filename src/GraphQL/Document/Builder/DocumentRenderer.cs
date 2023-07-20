@@ -18,8 +18,36 @@ internal ref struct DocumentRenderer
     _options = options;
   }
 
-  public void AppendOperationDefinition(IOperationDefinitionNode operationDefinition)
+  public void AppendDocument(IDocumentNode node)
   {
+    AppendLines(node.Definitions, static (ref DocumentRenderer self, IDefinitionNode definition) => self.AppendDefinition(definition));
+  }
+
+  private void AppendDefinition(IDefinitionNode definition)
+  {
+    switch (definition.DefinitionKind)
+    {
+      case DefinitionNodeKind.OperationDefinition:
+        AppendOperationDefinition((IOperationDefinitionNode)definition);
+        break;
+
+      case DefinitionNodeKind.FragmentDefinition:
+        AppendFragmentDefinition((IFragmentDefinitionNode)definition);
+        break;
+
+      default:
+        throw new NotSupportedException("Unsupported definition node kind.");
+    }
+  }
+
+  private void AppendOperationDefinition(IOperationDefinitionNode operationDefinition)
+  {
+    if (operationDefinition.IsQueryShortHand)
+    {
+      AppendSelectionSet(operationDefinition.SelectionSet);
+      return;
+    }
+
     _sb.AppendOperationType(operationDefinition.OperationType);
 
     if (operationDefinition.Name is { Length: > 0 } name)
@@ -36,10 +64,35 @@ internal ref struct DocumentRenderer
 
     if (operationDefinition.DirectiveList is { } directiveList)
     {
+      _sb.AppendSpace();
+
       AppendDirectiveList(directiveList);
     }
 
+    _sb.AppendSpace();
+
     AppendSelectionSet(operationDefinition.SelectionSet);
+  }
+
+  private void AppendFragmentDefinition(IFragmentDefinitionNode fragmentDefinition)
+  {
+    _sb
+      .Append("fragment ")
+      .Append(fragmentDefinition.FragmentName)
+      .AppendSpace();
+
+    AppendTypeCondition(fragmentDefinition.TypeCondition);
+
+    if (fragmentDefinition.DirectiveList is { } directiveList)
+    {
+      _sb.AppendSpace();
+
+      AppendDirectiveList(directiveList);
+    }
+
+    _sb.AppendSpace();
+
+    AppendSelectionSet(fragmentDefinition.SelectionSet);
   }
 
   private void AppendVariableDefinitions(IVariableDefinitionListNode variableDefinitions)
@@ -113,8 +166,6 @@ internal ref struct DocumentRenderer
 
   private void AppendDirectiveList(IDirectiveListNode directiveList)
   {
-    _sb.AppendSpace();
-
     AppendSpaced(directiveList.Directives, static (ref DocumentRenderer self, IDirectiveNode directive) => self.AppendDirective(directive));
   }
 
@@ -132,8 +183,6 @@ internal ref struct DocumentRenderer
 
   private void AppendSelectionSet(ISelectionSetNode selectionSet)
   {
-    _sb.AppendSpace();
-
     _sb.AppendLeftBrace();
     _indent++;
     AppendLine();
@@ -185,11 +234,15 @@ internal ref struct DocumentRenderer
 
     if (field.DirectiveList is { } directiveList)
     {
+      _sb.AppendSpace();
+
       AppendDirectiveList(directiveList);
     }
 
     if (field.SelectionSet is ISelectionSetNode selectionSet)
     {
+      _sb.AppendSpace();
+
       AppendSelectionSet(selectionSet);
     }
   }
@@ -202,6 +255,8 @@ internal ref struct DocumentRenderer
 
     if (fragmentSpread.DirectiveList is { } directiveList)
     {
+      _sb.AppendSpace();
+
       AppendDirectiveList(directiveList);
     }
   }
@@ -216,6 +271,8 @@ internal ref struct DocumentRenderer
 
     if (inlineFragment.DirectiveList is { } directiveList)
     {
+      _sb.AppendSpace();
+
       AppendDirectiveList(directiveList);
     }
 

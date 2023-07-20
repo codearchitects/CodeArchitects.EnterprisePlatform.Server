@@ -32,7 +32,7 @@ internal class LiteralGraphDocument<TResult> : GraphDocument<TResult>
     }
   }
 
-  public override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context)
+  public override IDocumentNode CreateDocumentNode(IGraphDocumentContext context)
   {
     // TODO: Validate TResult
     return new LiteralNode(_document);
@@ -69,7 +69,7 @@ internal class LiteralGraphDocument<TResult, TVariables> : GraphDocument<TResult
     }
   }
 
-  protected override IOperationDefinitionNode CreateOperationDefinition(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
+  protected override IDocumentNode CreateDocumentNode(IGraphDocumentContext context, IReadOnlyList<IVariable> variables)
   {
     // TODO: Validate TResult
     // TODO: Validate TVariables
@@ -94,7 +94,7 @@ internal static class LiteralGraphDocument
       "query"        => OperationType.Query,
       "mutation"     => OperationType.Mutation,
       "subscription" => OperationType.Subscription,
-      _              => throw new InvalidGraphQLDocumentException($"Invalid operation type '{value.ToString()}'")
+      _              => throw new InvalidGraphQLDocumentException("Expected an operation definition.")
     };
   }
 
@@ -112,6 +112,15 @@ internal static class LiteralGraphDocument
   public static void Expect(in GraphQLLexer lexer, TokenKind expected)
   {
     if (lexer.TokenKind != expected)
-      throw InvalidGraphQLDocumentException.Unexpected(lexer.TokenKind);
+      throw Unexpected(in lexer);
+  }
+
+  public static InvalidGraphQLDocumentException Unexpected(in GraphQLLexer lexer)
+  {
+    TokenKind kind = lexer.TokenKind;
+    if (kind is TokenKind.Error)
+      throw new InvalidGraphQLDocumentException($"GraphQL document had errors: '{lexer.Error}'.");
+
+    return new InvalidGraphQLDocumentException($"Unexpected token '{kind}'.");
   }
 }

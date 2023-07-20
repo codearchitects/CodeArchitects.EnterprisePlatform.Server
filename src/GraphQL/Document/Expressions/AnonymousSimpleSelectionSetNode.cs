@@ -4,16 +4,16 @@ using System.Reflection;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
-internal class AnonymousSelectionSetNode : ListIterator<MemberInfo, Expression, ISelectionNode>, ISelectionSetNode,
+internal class AnonymousSimpleSelectionSetNode : ListIterator<MemberInfo, Expression, ISelectionNode>, ISelectionSetNode,
   IEnumerable<ISelectionNode>, IEnumerator<ISelectionNode>
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly Expression _field;
   private readonly NewExpression _expression;
 
-  public AnonymousSelectionSetNode(INodeContext context, Expression field, NewExpression expression)
+  public AnonymousSimpleSelectionSetNode(INodeRoot root, Expression field, NewExpression expression)
   {
-    _context = context;
+    _root = root;
     _field = field;
     _expression = expression;
   }
@@ -26,6 +26,6 @@ internal class AnonymousSelectionSetNode : ListIterator<MemberInfo, Expression, 
 
   protected override ISelectionNode OnCurrent(MemberInfo member, Expression argument)
   {
-    return NodeFactory.CreateSelection(_context, _field, member.Name, argument);
+    return NodeFactory.CreateField(_root, _field, member.Name, argument);
   }
 }

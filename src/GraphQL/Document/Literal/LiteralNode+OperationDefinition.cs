@@ -4,6 +4,14 @@ namespace CodeArchitects.Platform.GraphQL.Document.Literal;
 
 internal partial class LiteralNode : IOperationDefinitionNode
 {
+  bool IOperationDefinitionNode.IsQueryShortHand
+  {
+    get
+    {
+      return _lexer.TokenKind is TokenKind.LeftBrace;
+    }
+  }
+
   OperationType IOperationDefinitionNode.OperationType
   {
     get

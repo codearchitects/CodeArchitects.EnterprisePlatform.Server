@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.GraphQL.Document.Nodes;
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -11,6 +10,7 @@ internal partial class LiteralNode
   private GraphQLLexer _lexer;
   private readonly Stack<IteratorKind> _iteratorKinds;
   private readonly Stack<TypeNodeKind> _typeKinds;
+  private bool _consumedOperationDefinition;
 
   public LiteralNode(string document)
   {
@@ -31,6 +31,8 @@ internal partial class LiteralNode
 
     switch (CurrentIterator)
     {
+      case IteratorKind.Definition:
+        return DefinitionMoveNext();
       case IteratorKind.Variable:
         return VariableMoveNext();
       case IteratorKind.Directive:
@@ -42,7 +44,7 @@ internal partial class LiteralNode
     }
 
     Debug.Fail("Invalid iteration over a GraphQL document node.");
-    throw Errors.Unreachable;
+    return false;
   }
 
   void IDisposable.Dispose()
@@ -64,18 +66,13 @@ internal partial class LiteralNode
 
   private void Expect(TokenKind expected)
   {
-    Expect(in _lexer, expected);
-  }
-
-  private void Expect(in GraphQLLexer lexer, TokenKind expected)
-  {
-    if (lexer.TokenKind != expected)
-      throw InvalidGraphQLDocumentException.Unexpected(lexer.TokenKind);
+    LiteralGraphDocument.Expect(in _lexer, expected);
   }
 
   private enum IteratorKind
   {
     None,
+    Definition,
     Variable,
     Directive,
     Argument,

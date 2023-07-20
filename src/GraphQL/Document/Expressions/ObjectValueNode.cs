@@ -5,13 +5,13 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class ObjectValueNode : ListIterator<IField, IObjectFieldNode>, IObjectValueNode
 {
-  private readonly INodeContext _context;
+  private readonly INodeRoot _root;
   private readonly IObjectType _type;
   private readonly object _object;
 
-  public ObjectValueNode(INodeContext context, IObjectType type, object @object)
+  public ObjectValueNode(INodeRoot root, IObjectType type, object @object)
   {
-    _context = context;
+    _root = root;
     _type = type;
     _object = @object;
   }
@@ -24,6 +24,6 @@ internal class ObjectValueNode : ListIterator<IField, IObjectFieldNode>, IObject
   {
     object? value = field.GetValue(_object);
 
-    return new ObjectFieldNode(field.Name, NodeFactory.CreateValue(_context, value));
+    return new ObjectFieldNode(field.Name, NodeFactory.CreateValue(_root, value));
   }
 }

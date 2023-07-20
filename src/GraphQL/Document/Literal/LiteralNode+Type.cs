@@ -36,7 +36,7 @@ internal partial class LiteralNode : ITypeNode
       lexer.MoveNext();
     }
 
-    Expect(in lexer, TokenKind.Name);
+    LiteralGraphDocument.Expect(in lexer, TokenKind.Name);
     _typeKinds.Push(TypeNodeKind.NamedType);
     lexer.MoveNext();
     TypeNodeKind lastTypeKind = TypeNodeKind.NamedType;
@@ -52,14 +52,14 @@ internal partial class LiteralNode : ITypeNode
 
         case TokenKind.Bang:
           if (lastTypeKind is TypeNodeKind.NonNullType)
-            throw InvalidGraphQLDocumentException.Unexpected(lexer.TokenKind);
+            throw LiteralGraphDocument.Unexpected(in lexer);
 
           lastTypeKind = TypeNodeKind.NonNullType;
           break;
 
         default:
           if (bracketCount != 0)
-            throw InvalidGraphQLDocumentException.Unexpected(lexer.TokenKind);
+            throw LiteralGraphDocument.Unexpected(in lexer);
 
           return;
       }

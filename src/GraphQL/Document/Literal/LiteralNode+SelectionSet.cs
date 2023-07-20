@@ -16,7 +16,7 @@ internal partial class LiteralNode : ISelectionSetNode, IEnumerable<ISelectionNo
     _lexer.MoveNext();
 
     if (_lexer.TokenKind is TokenKind.RightBrace)
-      throw InvalidGraphQLDocumentException.Unexpected(TokenKind.RightBrace); // Validate against a "{}" syntax
+      throw LiteralGraphDocument.Unexpected(in _lexer); // Validate against a "{}" syntax
 
     SetIterator(IteratorKind.Selection);
     return this;
