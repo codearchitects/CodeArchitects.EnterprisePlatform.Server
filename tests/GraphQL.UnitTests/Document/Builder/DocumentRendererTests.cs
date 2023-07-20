@@ -2,7 +2,9 @@
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
 using FluentAssertions;
 using System.Buffers;
+using System.Reflection;
 using System.Text;
+using Xunit.Sdk;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
@@ -119,14 +121,8 @@ public class DocumentRendererTests
   }
 
   [Theory]
-  [InlineData(1, "1")]
-  [InlineData(1.5, "1.5")]
-  [InlineData(1.5f, "1.5")]
-  [InlineData("literal-string", "\"literal-string\"")]
-  [InlineData(true, "true")]
-  [InlineData(false, "false")]
-  [InlineData(null, "null")]
-  public void QueryBlogFieldWithLiteralArgument_ShouldProduceCorrectDocument(object? value, string valueString)
+  [LiteralValueData]
+  public void QueryBlogFieldWithLiteralArgument_ShouldProduceCorrectDocument(IValueNode value, string valueString)
   {
     // Arrange
     IDocumentNode document = DocumentNodeBuilder.Build(_ => _
@@ -189,12 +185,14 @@ public class DocumentRendererTests
                   .SetArguments(_ => _
                     .Add(_ => _
                       .SetName("first")
-                      .SetValue(VariableNodeBuilder.Build(_ => _
-                        .SetName("arg1"))))
+                      .SetValue<IVariableNode>(_ => _
+                        .SetValueKind(ValueNodeKind.Variable)
+                        .SetName("arg1")))
                     .Add(_ => _
                       .SetName("last")
-                      .SetValue(VariableNodeBuilder.Build(_ => _
-                        .SetName("arg2"))))))
+                      .SetValue<IVariableNode>(_ => _
+                        .SetValueKind(ValueNodeKind.Variable)
+                        .SetName("arg2")))))
                 .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
@@ -234,25 +232,43 @@ public class DocumentRendererTests
                   .SetArguments(_ => _
                     .Add(_ => _
                       .SetName("obj")
-                      .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                      .SetValue<IObjectValueNode>(_ => _
+                        .SetValueKind(ValueNodeKind.ObjectValue)
                         .SetFields(_ => _
                           .Add(_ => _
                             .SetName("scalarField")
-                            .SetValue(1))
+                            .SetValue<IIntValueNode>(_ => _
+                              .SetValueKind(ValueNodeKind.IntValue)
+                              .SetValue(1)))
                           .Add(_ => _
                             .SetName("objectField")
-                            .SetValue(ObjectValueNodeBuilder.Build(_ => _
+                            .SetValue<IObjectValueNode>(_ => _
+                              .SetValueKind(ValueNodeKind.ObjectValue)
                               .SetFields(_ => _
                                 .Add(_ => _
                                   .SetName("innerField1")
-                                  .SetValue("inner-field-1"))
+                                  .SetValue<IStringValueNode>(_ => _
+                                    .SetValueKind(ValueNodeKind.StringValue)
+                                    .SetValue("inner-field-1")))
                                 .Add(_ => _
                                   .SetName("innerField2")
-                                  .SetValue(2))))))
+                                  .SetValue<IIntValueNode>(_ => _
+                                    .SetValueKind(ValueNodeKind.IntValue)
+                                    .SetValue(2))))))
                           .Add(_ => _
                             .SetName("listField")
-                            .SetValue(ListValueNodeBuilder.Build(_ => _
-                              .SetValues(new object?[] { 1, 2, 3 }))))))))))
+                            .SetValue<IListValueNode>(_ => _
+                              .SetValueKind(ValueNodeKind.ListValue)
+                              .SetValues(_ => _
+                                .Add<IntValueNodeBuilder>(_ => _
+                                  .SetValueKind(ValueNodeKind.IntValue)
+                                  .SetValue(1))
+                                .Add<IntValueNodeBuilder>(_ => _
+                                  .SetValueKind(ValueNodeKind.IntValue)
+                                  .SetValue(2))
+                                .Add<IntValueNodeBuilder>(_ => _
+                                  .SetValueKind(ValueNodeKind.IntValue)
+                                  .SetValue(3))))))))))
                 .SetSelectionSet(null as ISelectionSetNode)))))));
 
     DocumentRenderer sut = CreateSut();
@@ -291,7 +307,9 @@ public class DocumentRendererTests
                   .SetArguments(_ => _
                     .Add(_ => _
                       .SetName("directiveArg")
-                      .SetValue(1)))))))
+                      .SetValue<IIntValueNode>(_ => _
+                        .SetValueKind(ValueNodeKind.IntValue)
+                        .SetValue(1))))))))
           .SetSelectionSet(_ => _
             .SetSelections(_ => _
               .Add<FieldNodeBuilder>(_ => _
@@ -538,5 +556,41 @@ public class DocumentRendererTests
         users
       }
       """);
+  }
+
+  private sealed class LiteralValueDataAttribute : DataAttribute
+  {
+    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    {
+      IIntValueNode intValue = IntValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.IntValue)
+        .SetValue(1));
+
+      IFloatValueNode floatValue = FloatValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.FloatValue)
+        .SetValue(1.5));
+
+      IStringValueNode stringValue = StringValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.StringValue)
+        .SetValue("literal-string"));
+
+      IBooleanValueNode trueValue = BooleanValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.BooleanValue)
+        .SetValue(true));
+
+      IBooleanValueNode falseValue = BooleanValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.BooleanValue)
+        .SetValue(false));
+
+      INullValueNode nullValue = NullValueNodeBuilder.Build(_ => _
+        .SetValueKind(ValueNodeKind.NullValue));
+
+      yield return new object[] { intValue, "1" };
+      yield return new object[] { floatValue, "1.5" };
+      yield return new object[] { stringValue, "\"literal-string\"" };
+      yield return new object[] { trueValue, "true" };
+      yield return new object[] { falseValue, "false" };
+      yield return new object[] { nullValue, "null" };
+    }
   }
 }

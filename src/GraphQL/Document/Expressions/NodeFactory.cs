@@ -10,7 +10,7 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal static class NodeFactory
 {
-  public static object? CreateValue(INodeRoot root, Expression expression)
+  public static IValueNode CreateValue(INodeRoot root, Expression expression)
   {
     return expression switch
     {
@@ -20,18 +20,18 @@ internal static class NodeFactory
     };
   }
 
-  public static object? CreateValue(INodeRoot root, object? @object)
+  public static IValueNode CreateValue(INodeRoot root, object? value)
   {
-    if (Convert.GetTypeCode(@object) is TypeCode.Object)
+    if (Convert.GetTypeCode(value) is TypeCode.Object)
     {
-      if (@object is IEnumerable values)
+      if (value is IEnumerable values)
         return new ListValueNode(root, values.GetEnumerator());
 
-      if (root.Context.TryGetObjectType(@object!.GetType(), out IObjectType? objectType))
-        return new ObjectValueNode(root, objectType, @object);
+      if (root.Context.TryGetObjectType(value!.GetType(), out IObjectType? objectType))
+        return new ObjectValueNode(root, objectType, value);
     }
 
-    return @object;
+    return new LiteralValueNode(value);
   }
 
   public static IArgumentNode CreateArgument(INodeRoot root, MethodCallExpression withArgumentCall)
@@ -47,17 +47,10 @@ internal static class NodeFactory
         string name = ExpressionEvaluator.Evaluate<string>(arguments[0]);
         return typeof(LambdaExpression).IsAssignableFrom(arguments[1].Type)
           ? CreateFromVariable(root, name, arguments[1])
-          : CreateFromNameAndValue(root, name, arguments[1]);
+          : new ArgumentNode(root, name, arguments[1]);
       
       default:
         throw new ExpressionEvaluationException(withArgumentCall);
-    }
-
-    static IArgumentNode CreateFromNameAndValue(INodeRoot root, string name, Expression expression)
-    {
-      object? value = CreateValue(root, expression);
-
-      return new ArgumentNode(name, value);
     }
 
     static VariableArgumentNode CreateFromVariable(INodeRoot root, string? name, Expression variableExpression)

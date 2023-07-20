@@ -1,5 +1,5 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Expressions;
-using CodeArchitects.Platform.GraphQL.Document.Literal;
+using CodeArchitects.Platform.GraphQL.Document.Raw;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
@@ -81,13 +81,13 @@ internal class DocumentBuilder<TDocumentRoot> : IDocumentBuilder<TDocumentRoot>
   public GraphDocument<TResult> Raw<TResult>(string document)
     where TResult : class
   {
-    return new LiteralGraphDocument<TResult>(document);
+    return new RawGraphDocument<TResult>(document);
   }
 
   public GraphDocument<TResult, TVariables> Raw<TResult, TVariables>(string document)
     where TResult : class
     where TVariables : notnull
   {
-    return new LiteralGraphDocument<TResult, TVariables>(document);
+    return new RawGraphDocument<TResult, TVariables>(document);
   }
 }

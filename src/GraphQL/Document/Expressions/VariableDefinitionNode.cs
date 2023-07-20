@@ -16,6 +16,8 @@ internal class VariableDefinitionNode : IVariableDefinitionNode, IVariableNode, 
     _currentType = variable.Type;
   }
 
+  public ValueNodeKind ValueKind => ValueNodeKind.Variable;
+
   public IVariableNode Variable => this;
 
   public ITypeNode Type => this;

@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
-internal class ListValueNode : IListValueNode, IEnumerable<object?>, IEnumerator<object?>
+internal class ListValueNode : IListValueNode, IEnumerable<IValueNode>, IEnumerator<IValueNode>
 {
   private readonly INodeRoot _root;
   private readonly IEnumerator _values;
@@ -15,11 +15,13 @@ internal class ListValueNode : IListValueNode, IEnumerable<object?>, IEnumerator
     _values = values;
   }
 
-  public IEnumerable<object?> Values => this;
+  public ValueNodeKind ValueKind => ValueNodeKind.ListValue;
 
-  object? IEnumerator<object?>.Current => NodeFactory.CreateValue(_root, _values.Current);
+  public IEnumerable<IValueNode> Values => this;
 
-  IEnumerator<object?> IEnumerable<object?>.GetEnumerator() => this;
+  IValueNode IEnumerator<IValueNode>.Current => NodeFactory.CreateValue(_root, _values.Current);
+
+  IEnumerator<IValueNode> IEnumerable<IValueNode>.GetEnumerator() => this;
 
   bool IEnumerator.MoveNext() => _values.MoveNext();
 

@@ -15,6 +15,8 @@ internal class AnonymousObjectValueNode : ListIterator<MemberInfo, Expression, I
     _expression = expression;
   }
 
+  public ValueNodeKind ValueKind => ValueNodeKind.ObjectValue;
+
   public IEnumerable<IObjectFieldNode> Fields => this;
 
   protected override IReadOnlyList<MemberInfo> List1 => _expression.Members;
@@ -23,6 +25,6 @@ internal class AnonymousObjectValueNode : ListIterator<MemberInfo, Expression, I
 
   protected override IObjectFieldNode OnCurrent(MemberInfo member, Expression argument)
   {
-    return new ObjectFieldNode(member.Name, NodeFactory.CreateValue(_root, argument));
+    return new ExpressionObjectFieldNode(_root, member.Name, argument);
   }
 }

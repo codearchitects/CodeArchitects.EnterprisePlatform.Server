@@ -16,6 +16,8 @@ internal class ObjectValueNode : ListIterator<IField, IObjectFieldNode>, IObject
     _object = @object;
   }
 
+  public ValueNodeKind ValueKind => ValueNodeKind.ObjectValue;
+
   public IEnumerable<IObjectFieldNode> Fields => this;
 
   protected override IReadOnlyList<IField> List => _type.Fields;
@@ -24,6 +26,6 @@ internal class ObjectValueNode : ListIterator<IField, IObjectFieldNode>, IObject
   {
     object? value = field.GetValue(_object);
 
-    return new ObjectFieldNode(field.Name, NodeFactory.CreateValue(_root, value));
+    return new ObjectFieldNode(_root, field.Name, value);
   }
 }

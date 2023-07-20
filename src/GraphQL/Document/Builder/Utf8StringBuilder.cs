@@ -46,7 +46,7 @@ internal readonly ref struct Utf8StringBuilder
     return this;
   }
 
-  public Utf8StringBuilder AppendLiteral(float value)
+  public Utf8StringBuilder AppendLiteral(double value)
   {
     Span<byte> span = _writer.GetSpan(s_maxFloatFormatLength);
 
@@ -110,11 +110,11 @@ internal readonly ref struct Utf8StringBuilder
     });
   }
 
-  public Utf8StringBuilder AppendNullKeyword() => Append("null"u8);
+  public Utf8StringBuilder AppendNull() => Append("null"u8);
 
-  public Utf8StringBuilder AppendDirectivePrefix() => Append("@"u8);
+  public Utf8StringBuilder AppendAt() => Append("@"u8);
 
-  public Utf8StringBuilder AppendVariablePrefix() => Append("$"u8);
+  public Utf8StringBuilder AppendDollar() => Append("$"u8);
 
   public Utf8StringBuilder AppendBang() => Append("!"u8);
 

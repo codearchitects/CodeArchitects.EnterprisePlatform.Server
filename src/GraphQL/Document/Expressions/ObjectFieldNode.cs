@@ -4,15 +4,18 @@ namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
 internal class ObjectFieldNode : IObjectFieldNode
 {
+  private readonly INodeRoot _root;
   private readonly string? _name;
+  private readonly object? _value;
 
-  public ObjectFieldNode(string name, object? value)
+  public ObjectFieldNode(INodeRoot root, string? name, object? value)
   {
+    _root = root;
     _name = name;
-    Value = value;
+    _value = value;
   }
 
   public ReadOnlySpan<char> Name => _name;
 
-  public object? Value { get; }
+  public IValueNode Value => NodeFactory.CreateValue(_root, _value);
 }

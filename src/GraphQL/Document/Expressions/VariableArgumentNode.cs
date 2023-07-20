@@ -14,9 +14,11 @@ internal class VariableArgumentNode : IArgumentNode, IVariableNode
     _name = name;
   }
 
+  public ValueNodeKind ValueKind => ValueNodeKind.Variable;
+
   public ReadOnlySpan<char> Name => _name is null ? _variable.Name : _name.AsSpan();
 
-  public object? Value => this;
+  public IValueNode Value => this;
 
   ReadOnlySpan<char> IVariableNode.Name => _variable.Name;
 }

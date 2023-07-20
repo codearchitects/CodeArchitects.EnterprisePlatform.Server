@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Expressions;
 
-internal class AnonymousListValueNode : ListIterator<Expression, object?>, IListValueNode
+internal class AnonymousListValueNode : ListIterator<Expression, IValueNode>, IListValueNode
 {
   private readonly INodeRoot _root;
   private readonly NewArrayExpression _expression;
@@ -14,11 +14,13 @@ internal class AnonymousListValueNode : ListIterator<Expression, object?>, IList
     _expression = expression;
   }
 
-  public IEnumerable<object?> Values => this;
+  public ValueNodeKind ValueKind => ValueNodeKind.ListValue;
+
+  public IEnumerable<IValueNode> Values => this;
 
   protected override IReadOnlyList<Expression> List => _expression.Expressions;
 
-  protected override object? OnCurrent(Expression element)
+  protected override IValueNode OnCurrent(Expression element)
   {
     return NodeFactory.CreateValue(_root, element);
   }

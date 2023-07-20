@@ -1,4 +1,5 @@
 ﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using CodeArchitects.Platform.GraphQL.Document.Raw;
 using System.Buffers;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
@@ -118,7 +119,7 @@ internal ref struct DocumentRenderer
   private void AppendVariable(IVariableNode variable)
   {
     _sb
-      .AppendVariablePrefix()
+      .AppendDollar()
       .Append(variable.Name);
   }
 
@@ -172,7 +173,7 @@ internal ref struct DocumentRenderer
   private void AppendDirective(IDirectiveNode directive)
   {
     _sb
-      .AppendDirectivePrefix()
+      .AppendAt()
       .Append(directive.Name);
 
     if (directive.ArgumentList is { } argumentList)
@@ -307,53 +308,125 @@ internal ref struct DocumentRenderer
     AppendValue(argument.Value);
   }
 
-  private void AppendValue(object? value)
+  private void AppendValue(IValueNode value)
   {
-    if (value is null)
+    if (value is IRawLiteralNode rawValue)
     {
-      _sb.AppendNullKeyword();
+      _sb.Append(rawValue.ValueText);
       return;
     }
 
-    switch (Convert.GetTypeCode(value))
+    switch (value.ValueKind)
     {
-      case >= TypeCode.SByte and <= TypeCode.UInt64:
-        _sb.AppendLiteral(Convert.ToInt32(value));
-        return;
+      case ValueNodeKind.Variable:
+        AppendVariable((IVariableNode)value);
+        break;
 
-      case >= TypeCode.Single and <= TypeCode.Decimal:
-        _sb.AppendLiteral(Convert.ToSingle(value));
-        return;
+      case ValueNodeKind.IntValue:
+        AppendIntValue((IIntValueNode)value);
+        break;
 
-      case TypeCode.String:
-        _sb.AppendLiteral(Convert.ToString(value));
-        return;
+      case ValueNodeKind.FloatValue:
+        AppendFloatValue((IFloatValueNode)value);
+        break;
 
-      case TypeCode.Boolean:
-        _sb.AppendLiteral(Convert.ToBoolean(value));
-        return;
+      case ValueNodeKind.StringValue:
+        AppendStringValue((IStringValueNode)value);
+        break;
 
-      case TypeCode.DateTime:
-        throw new NotSupportedException("DateTime is not yet supported."); // TODO: Support
+      case ValueNodeKind.BlockStringValue:
+        AppendBlockStringValue((IBlockStringValueNode)value);
+        break;
+
+      case ValueNodeKind.BooleanValue:
+        AppendBooleanValue((IBooleanValueNode)value);
+        break;
+
+      case ValueNodeKind.NullValue:
+        _sb.AppendNull();
+        break;
+
+      case ValueNodeKind.EnumValue:
+        AppendEnumValue((IEnumValueNode)value);
+        break;
+
+      case ValueNodeKind.ListValue:
+        AppendListValue((IListValueNode)value);
+        break;
+
+      case ValueNodeKind.ObjectValue:
+        AppendObjectValue((IObjectValueNode)value);
+        break;
+    }
+  }
+
+  private void AppendIntValue(IIntValueNode intValue)
+  {
+    if (intValue is IRawLiteralNode rawValue)
+    {
+      AppendRawLiteral(rawValue);
+      return;
     }
 
-    switch (value)
+    _sb.AppendLiteral(intValue.Value);
+  }
+
+  private void AppendFloatValue(IFloatValueNode floatValue)
+  {
+    if (floatValue is IRawLiteralNode rawValue)
     {
-      case IVariableNode variable:
-        AppendVariable(variable);
-        break;
-
-      case IObjectValueNode objectValue:
-        AppendObjectValue(objectValue);
-        break;
-
-      case IListValueNode listValue:
-        AppendListValue(listValue);
-        break;
-
-      default:
-        throw new NotSupportedException($"Value of type '{value.GetType()}' is not supported.");
+      AppendRawLiteral(rawValue);
+      return;
     }
+
+    _sb.AppendLiteral(floatValue.Value);
+  }
+
+  private void AppendStringValue(IStringValueNode stringValue)
+  {
+    if (stringValue is IRawLiteralNode rawValue)
+    {
+      AppendRawLiteral(rawValue);
+      return;
+    }
+
+    _sb.AppendLiteral(stringValue.Value);
+  }
+
+  private void AppendBlockStringValue(IBlockStringValueNode blockStringValue)
+  {
+    throw new NotImplementedException();
+  }
+
+  private void AppendBooleanValue(IBooleanValueNode booleanValue)
+  {
+    if (booleanValue is IRawLiteralNode rawValue)
+    {
+      AppendRawLiteral(rawValue);
+      return;
+    }
+
+    _sb.AppendLiteral(booleanValue.Value);
+  }
+
+  private void AppendEnumValue(IEnumValueNode enumValue)
+  {
+    if (enumValue is IRawLiteralNode rawValue)
+    {
+      AppendRawLiteral(rawValue);
+      return;
+    }
+
+    _sb.Append(enumValue.Value);
+  }
+
+  private void AppendListValue(IListValueNode listValue)
+  {
+    _sb.AppendLeftBracket();
+
+    AppendSeparated(listValue.Values, static (ref DocumentRenderer self, IValueNode value) => self.AppendValue(value));
+
+    _sb.AppendRightBracket();
   }
 
   private void AppendObjectValue(IObjectValueNode objectValue)
@@ -379,13 +452,9 @@ internal ref struct DocumentRenderer
     AppendValue(field.Value);
   }
 
-  private void AppendListValue(IListValueNode listValue)
+  private void AppendRawLiteral(IRawLiteralNode rawLiteral)
   {
-    _sb.AppendLeftBracket();
-
-    AppendSeparated(listValue.Values, static (ref DocumentRenderer self, object? value) => self.AppendValue(value));
-
-    _sb.AppendRightBracket();
+    _sb.Append(rawLiteral.ValueText);
   }
 
   private void AppendLine()

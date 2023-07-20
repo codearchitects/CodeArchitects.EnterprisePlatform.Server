@@ -12,7 +12,6 @@ internal class NodeEqualityComparer :
   IEqualityComparer<IFragmentDefinitionNode>,
   IEqualityComparer<IVariableDefinitionListNode>,
   IEqualityComparer<IVariableDefinitionNode>,
-  IEqualityComparer<IVariableNode>,
   IEqualityComparer<IDirectiveListNode>,
   IEqualityComparer<IDirectiveNode>,
   IEqualityComparer<ISelectionSetNode>,
@@ -27,10 +26,18 @@ internal class NodeEqualityComparer :
   IEqualityComparer<INonNullTypeNode>,
   IEqualityComparer<IArgumentListNode>,
   IEqualityComparer<IArgumentNode>,
+  IEqualityComparer<IValueNode>,
+  IEqualityComparer<IVariableNode>,
+  IEqualityComparer<IIntValueNode>,
+  IEqualityComparer<IFloatValueNode>,
+  IEqualityComparer<IStringValueNode>,
+  IEqualityComparer<IBlockStringValueNode>,
+  IEqualityComparer<IBooleanValueNode>,
+  IEqualityComparer<INullValueNode>,
+  IEqualityComparer<IEnumValueNode>,
   IEqualityComparer<IListValueNode>,
   IEqualityComparer<IObjectValueNode>,
-  IEqualityComparer<IObjectFieldNode>,
-  IEqualityComparer<object?>
+  IEqualityComparer<IObjectFieldNode>
 {
   public static readonly NodeEqualityComparer Instance = new();
 
@@ -156,20 +163,6 @@ internal class NodeEqualityComparer :
       return false;
 
     if (!Equals(x.Type, y.Type))
-      return false;
-
-    return true;
-  }
-
-  public bool Equals(IVariableNode? x, IVariableNode? y)
-  {
-    if (x is null)
-      return y is null;
-
-    if (y is null)
-      return false;
-
-    if (!x.Name.SequenceEqual(y.Name))
       return false;
 
     return true;
@@ -438,6 +431,163 @@ internal class NodeEqualityComparer :
     return true;
   }
 
+  public bool Equals(IValueNode? x, IValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    return y switch
+    {
+      IVariableNode yVariable                 => Equals(x as IVariableNode, yVariable),
+      IIntValueNode yIntValue                 => Equals(x as IIntValueNode, yIntValue),
+      IFloatValueNode yFloatValue             => Equals(x as IFloatValueNode, yFloatValue),
+      IStringValueNode yStringValue           => Equals(x as IStringValueNode, yStringValue),
+      IBlockStringValueNode yBlockStringValue => Equals(x as IBlockStringValueNode, yBlockStringValue),
+      IBooleanValueNode yBooleanValue         => Equals(x as IBooleanValueNode, yBooleanValue),
+      INullValueNode yNullValue               => Equals(x as INullValueNode, yNullValue),
+      IEnumValueNode yEnumValue               => Equals(x as IEnumValueNode, yEnumValue),
+      IListValueNode yListValue               => Equals(x as IListValueNode, yListValue),
+      IObjectValueNode yObjectValue           => Equals(x as IObjectValueNode, yObjectValue),
+      _                                       => throw Errors.Unreachable
+    };
+  }
+
+  public bool Equals(IVariableNode? x, IVariableNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (!x.Name.SequenceEqual(y.Name))
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IIntValueNode? x, IIntValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.Value != y.Value)
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IFloatValueNode? x, IFloatValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.Value != y.Value)
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IStringValueNode? x, IStringValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.Value != y.Value)
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IBlockStringValueNode? x, IBlockStringValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (!x.Lines.SequenceEqual(y.Lines))
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IBooleanValueNode? x, IBooleanValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.Value != y.Value)
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(INullValueNode? x, INullValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    return true;
+  }
+
+  public bool Equals(IEnumValueNode? x, IEnumValueNode? y)
+  {
+    if (x is null)
+      return y is null;
+
+    if (y is null)
+      return false;
+
+    if (!EqualsCore(x, y))
+      return false;
+
+    if (x.Value != y.Value)
+      return false;
+
+    return true;
+  }
+
   public bool Equals(IListValueNode? x, IListValueNode? y)
   {
     if (x is null)
@@ -483,18 +633,12 @@ internal class NodeEqualityComparer :
     return true;
   }
 
-  public new bool Equals(object? x, object? y)
+  private static bool EqualsCore(IValueNode x, IValueNode y)
   {
-    if (y is IObjectValueNode yObjectValue)
-      return Equals(x as IObjectValueNode, yObjectValue);
+    if (!MockHelper.IsSetUp(y, node => node.ValueKind))
+      return true;
 
-    if (y is IListValueNode yListValue)
-      return Equals(x as IListValueNode, yListValue);
-
-    if (y is IVariableNode yVariable)
-      return Equals(x as IVariableNode, yVariable);
-
-    return object.Equals(x, y);
+    return x.ValueKind == y.ValueKind;
   }
 
   public int GetHashCode([DisallowNull] IOperationDefinitionNode obj) => 0;
@@ -517,9 +661,16 @@ internal class NodeEqualityComparer :
   public int GetHashCode([DisallowNull] IListValueNode obj) => 0;
   public int GetHashCode([DisallowNull] IObjectValueNode obj) => 0;
   public int GetHashCode([DisallowNull] IObjectFieldNode obj) => 0;
-  public int GetHashCode([DisallowNull] object? obj) => 0;
   public int GetHashCode([DisallowNull] ITypeConditionNode obj) => 0;
   public int GetHashCode([DisallowNull] IDocumentNode obj) => 0;
   public int GetHashCode([DisallowNull] IFragmentDefinitionNode obj) => 0;
   public int GetHashCode([DisallowNull] IDefinitionNode obj) => 0;
+  public int GetHashCode([DisallowNull] IValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IIntValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IFloatValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IStringValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IBlockStringValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IBooleanValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] INullValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] IEnumValueNode obj) => 0;
 }

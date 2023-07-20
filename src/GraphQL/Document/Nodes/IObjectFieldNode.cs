@@ -4,5 +4,5 @@ public interface IObjectFieldNode
 {
   ReadOnlySpan<char> Name { get; }
 
-  object? Value { get; }
+  IValueNode Value { get; }
 }

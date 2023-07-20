@@ -1,6 +1,6 @@
 ﻿namespace CodeArchitects.Platform.GraphQL.Document.Nodes;
 
-public interface IListValueNode
+public interface IListValueNode : IValueNode
 {
-  IEnumerable<object?> Values { get; }
+  IEnumerable<IValueNode> Values { get; }
 }
