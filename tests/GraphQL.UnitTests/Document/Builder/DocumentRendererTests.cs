@@ -558,6 +558,55 @@ public class DocumentRendererTests
       """);
   }
 
+  [Fact]
+  public void DocumentWithBlockString_ShouldProduceCorrectDocument()
+  {
+    string messageStr = "\"\"\"\r\n    Hello,\r\n      World!\r\n    \r\n    Yours,\r\n      GraphQL.\r\n  \"\"\"";
+
+    // Arrange
+    IDocumentNode document = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Mutation)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("sendEmail")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("message")
+                      .SetValue<IBlockStringValueNode>(_ => _
+                        .SetValueKind(ValueNodeKind.BlockStringValue)
+                        .SetLines(_ => _
+                          .Add("Hello,".AsMemory())
+                          .Add("  World!".AsMemory())
+                          .Add("".AsMemory())
+                          .Add("Yours,".AsMemory())
+                          .Add("  GraphQL.".AsMemory()))))))
+                .SetSelectionSet(null as ISelectionSetNode)))))));
+
+    DocumentRenderer sut = CreateSut();
+
+    // Act
+    sut.AppendDocument(document);
+
+    // Assert
+    Content.Should().Be($$"""
+      mutation {
+        sendEmail(message: {{messageStr}})
+      }
+      """);
+  }
+
   private sealed class LiteralValueDataAttribute : DataAttribute
   {
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)

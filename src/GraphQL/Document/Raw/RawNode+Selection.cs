@@ -15,7 +15,7 @@ internal partial class RawNode : ISelectionNode
       Expect(TokenKind.Spread);
       _lexer.MoveNext();
 
-      return _lexer.TokenKind is TokenKind.Name && _lexer.Value is not "on"
+      return _lexer.TokenKind is TokenKind.Name && _lexer.ValueSpan is not "on"
         ? SelectionNodeKind.FragmentSpread
         : SelectionNodeKind.InlineFragment;
     }

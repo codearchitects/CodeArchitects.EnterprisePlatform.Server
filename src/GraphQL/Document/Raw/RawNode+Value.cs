@@ -16,8 +16,8 @@ internal partial class RawNode : IValueNode, IRawLiteralNode
         TokenKind.Float                                       => ValueNodeKind.FloatValue,
         TokenKind.String                                      => ValueNodeKind.StringValue,
         TokenKind.BlockString                                 => ValueNodeKind.BlockStringValue,
-        TokenKind.Name when _lexer.Value is "true" or "false" => ValueNodeKind.BooleanValue,
-        TokenKind.Name when _lexer.Value is "null"            => ValueNodeKind.NullValue,
+        TokenKind.Name when _lexer.ValueSpan is "true" or "false" => ValueNodeKind.BooleanValue,
+        TokenKind.Name when _lexer.ValueSpan is "null"            => ValueNodeKind.NullValue,
         TokenKind.Name                                        => ValueNodeKind.EnumValue,
         TokenKind.LeftBracket                                 => ValueNodeKind.ListValue,
         TokenKind.LeftBrace                                   => ValueNodeKind.ObjectValue,
@@ -33,7 +33,7 @@ internal partial class RawNode : IValueNode, IRawLiteralNode
       if (_lexer.TokenKind is not TokenKind.Integer and not TokenKind.Float and not TokenKind.String and not TokenKind.Name)
         throw new InvalidOperationException("Attempted to get the value text of a non-literal node.");
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return value;

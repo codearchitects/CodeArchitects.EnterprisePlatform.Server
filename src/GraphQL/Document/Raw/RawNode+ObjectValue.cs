@@ -5,16 +5,21 @@ namespace CodeArchitects.Platform.GraphQL.Document.Raw;
 
 internal partial class RawNode : IObjectValueNode, IEnumerable<IObjectFieldNode>, IEnumerator<IObjectFieldNode>
 {
-  IEnumerable<IObjectFieldNode> IObjectValueNode.Fields => this;
+  IEnumerable<IObjectFieldNode> IObjectValueNode.Fields
+  {
+    get
+    {
+      Expect(TokenKind.LeftBrace);
+      _lexer.MoveNext();
+
+      return this;
+    }
+  }
 
   IObjectFieldNode IEnumerator<IObjectFieldNode>.Current => this;
 
   IEnumerator<IObjectFieldNode> IEnumerable<IObjectFieldNode>.GetEnumerator()
   {
-    Expect(TokenKind.LeftBrace);
-
-    _lexer.MoveNext();
-
     SetIterator(IteratorKind.ObjectValue);
     return this;
   }

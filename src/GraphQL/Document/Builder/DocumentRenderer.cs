@@ -310,12 +310,6 @@ internal ref struct DocumentRenderer
 
   private void AppendValue(IValueNode value)
   {
-    if (value is IRawLiteralNode rawValue)
-    {
-      _sb.Append(rawValue.ValueText);
-      return;
-    }
-
     switch (value.ValueKind)
     {
       case ValueNodeKind.Variable:
@@ -362,7 +356,7 @@ internal ref struct DocumentRenderer
 
   private void AppendIntValue(IIntValueNode intValue)
   {
-    if (intValue is IRawLiteralNode rawValue)
+    if (intValue is IRawLiteralNode rawValue) // Internal optimization
     {
       AppendRawLiteral(rawValue);
       return;
@@ -373,7 +367,7 @@ internal ref struct DocumentRenderer
 
   private void AppendFloatValue(IFloatValueNode floatValue)
   {
-    if (floatValue is IRawLiteralNode rawValue)
+    if (floatValue is IRawLiteralNode rawValue) // Internal optimization
     {
       AppendRawLiteral(rawValue);
       return;
@@ -384,7 +378,7 @@ internal ref struct DocumentRenderer
 
   private void AppendStringValue(IStringValueNode stringValue)
   {
-    if (stringValue is IRawLiteralNode rawValue)
+    if (stringValue is IRawLiteralNode rawValue) // Internal optimization
     {
       AppendRawLiteral(rawValue);
       return;
@@ -395,12 +389,20 @@ internal ref struct DocumentRenderer
 
   private void AppendBlockStringValue(IBlockStringValueNode blockStringValue)
   {
-    throw new NotImplementedException();
+    _sb.AppendBlockStringDelimiter();
+    _indent++;
+    AppendLine();
+
+    AppendLines(blockStringValue.Lines, static (ref DocumentRenderer self, ReadOnlyMemory<char> line) => self._sb.Append(line.Span));
+
+    _indent--;
+    AppendLine();
+    _sb.AppendBlockStringDelimiter();
   }
 
   private void AppendBooleanValue(IBooleanValueNode booleanValue)
   {
-    if (booleanValue is IRawLiteralNode rawValue)
+    if (booleanValue is IRawLiteralNode rawValue) // Internal optimization
     {
       AppendRawLiteral(rawValue);
       return;
@@ -411,7 +413,7 @@ internal ref struct DocumentRenderer
 
   private void AppendEnumValue(IEnumValueNode enumValue)
   {
-    if (enumValue is IRawLiteralNode rawValue)
+    if (enumValue is IRawLiteralNode rawValue) // Internal optimization
     {
       AppendRawLiteral(rawValue);
       return;

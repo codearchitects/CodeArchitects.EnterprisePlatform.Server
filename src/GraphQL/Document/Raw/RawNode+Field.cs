@@ -15,7 +15,7 @@ internal partial class RawNode : IFieldNode
 
       Expect(TokenKind.Name);
 
-      ReadOnlySpan<char> value = _lexer.Value;
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       Debug.Assert(_lexer.TokenKind is TokenKind.Colon);
@@ -31,7 +31,7 @@ internal partial class RawNode : IFieldNode
     {
       Expect(TokenKind.Name);
 
-      ReadOnlySpan<char> value = _lexer.Value;
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return value;

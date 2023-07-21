@@ -11,7 +11,7 @@ internal partial class RawNode : IFloatValueNode
     {
       Expect(TokenKind.Float);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return double.Parse(value);

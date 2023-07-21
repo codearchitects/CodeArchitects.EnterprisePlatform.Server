@@ -5,16 +5,21 @@ namespace CodeArchitects.Platform.GraphQL.Document.Raw;
 
 internal partial class RawNode : IListValueNode, IEnumerable<IValueNode>, IEnumerator<IValueNode>
 {
-  IEnumerable<IValueNode> IListValueNode.Values => this;
+  IEnumerable<IValueNode> IListValueNode.Values
+  {
+    get
+    {
+      Expect(TokenKind.LeftBracket);
+      _lexer.MoveNext();
+
+      return this;
+    }
+  }
 
   IValueNode IEnumerator<IValueNode>.Current => this;
 
   IEnumerator<IValueNode> IEnumerable<IValueNode>.GetEnumerator()
   {
-    Expect(TokenKind.LeftBracket);
-
-    _lexer.MoveNext();
-
     SetIterator(IteratorKind.ListValue);
     return this;
   }

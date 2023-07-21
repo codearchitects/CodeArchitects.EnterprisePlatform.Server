@@ -30,7 +30,6 @@ internal readonly ref struct Utf8StringBuilder
     return Append(@string.AsSpan());
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder Append(ReadOnlySpan<char> @string)
   {
     int maxLength = Encoding.UTF8.GetMaxByteCount(@string.Length);
@@ -84,6 +83,7 @@ internal readonly ref struct Utf8StringBuilder
     return this;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendSpace() => Append(" "u8);
 
   public Utf8StringBuilder AppendSpaces(int spaceCount)
@@ -99,6 +99,7 @@ internal readonly ref struct Utf8StringBuilder
     return this;
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendOperationType(OperationType type)
   {
     return Append(type switch
@@ -110,38 +111,54 @@ internal readonly ref struct Utf8StringBuilder
     });
   }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendNull() => Append("null"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendAt() => Append("@"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendDollar() => Append("$"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendBang() => Append("!"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendComma() => Append(","u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendColon() => Append(":"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendLeftParenthesis() => Append("("u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendRightParenthesis() => Append(")"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendLeftBracket() => Append("["u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendRightBracket() => Append("]"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendLeftBrace() => Append("{"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendRightBrace() => Append("}"u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendSpread() => Append("..."u8);
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public Utf8StringBuilder AppendBlockStringDelimiter() => Append("\"\"\""u8);
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public Utf8StringBuilder AppendLine() => Append(s_newLineBytes);
 
   [ExcludeFromCodeCoverage]
   public override string ToString() => Encoding.UTF8.GetString(_writer.WrittenSpan);
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private Utf8StringBuilder Append(ReadOnlySpan<byte> bytes)
   {
     int length = bytes.Length;

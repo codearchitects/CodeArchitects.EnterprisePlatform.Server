@@ -11,7 +11,7 @@ internal partial class RawNode : INamedTypeNode
     {
       Expect(TokenKind.Name);
 
-      ReadOnlySpan<char> value = _lexer.Value;
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
 
       do
       {

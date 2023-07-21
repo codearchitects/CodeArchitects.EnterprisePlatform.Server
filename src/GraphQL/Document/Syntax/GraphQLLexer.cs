@@ -22,7 +22,9 @@ internal struct GraphQLLexer
 
   public readonly TokenKind TokenKind => _kind;
 
-  public readonly ReadOnlySpan<char> Value => _document.AsSpan(_start, _position - _start);
+  public readonly ReadOnlySpan<char> ValueSpan => _document.AsSpan(_start, _position - _start);
+
+  public readonly ReadOnlyMemory<char> ValueMemory => _document.AsMemory(_start, _position - _start);
 
   private readonly char Current => _document[_position];
 

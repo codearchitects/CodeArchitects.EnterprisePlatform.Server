@@ -9,9 +9,12 @@ internal partial class RawNode : IDirectiveNode
   {
     get
     {
+      Expect(TokenKind.At);
+
+      _lexer.MoveNext();
       Expect(TokenKind.Name);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return value;

@@ -9,7 +9,7 @@ internal partial class RawNode : IInlineFragmentNode
   {
     get
     {
-      if (_lexer.TokenKind is TokenKind.Name && _lexer.Value is "on")
+      if (_lexer.TokenKind is TokenKind.Name && _lexer.ValueSpan is "on")
       {
         _lexer.MoveNext();
         return this;

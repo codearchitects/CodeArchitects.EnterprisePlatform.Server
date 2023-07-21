@@ -87,7 +87,7 @@ internal static class RawGraphDocument
 
     Expect(in lexer, TokenKind.Name);
 
-    var value = lexer.Value;
+    var value = lexer.ValueSpan;
     lexer.MoveNext();
 
     return value switch
@@ -104,7 +104,7 @@ internal static class RawGraphDocument
     if (lexer.TokenKind is not TokenKind.Name)
       return ReadOnlySpan<char>.Empty;
 
-    var value = lexer.Value;
+    var value = lexer.ValueSpan;
     lexer.MoveNext();
 
     return value;

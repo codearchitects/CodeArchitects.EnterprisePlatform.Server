@@ -11,7 +11,7 @@ internal partial class RawNode : IEnumValueNode
     {
       Expect(TokenKind.Name);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       if (value is "true" or "false" or "null")

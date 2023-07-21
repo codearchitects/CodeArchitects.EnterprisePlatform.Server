@@ -16,7 +16,7 @@ internal partial class RawNode : IDefinitionNode
       }
 
       Expect(TokenKind.Name);
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
 
       if (value is "fragment")
       {

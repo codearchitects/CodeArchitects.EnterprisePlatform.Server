@@ -11,7 +11,7 @@ internal partial class RawNode : IIntValueNode
     {
       Expect(TokenKind.Integer);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return int.Parse(value);

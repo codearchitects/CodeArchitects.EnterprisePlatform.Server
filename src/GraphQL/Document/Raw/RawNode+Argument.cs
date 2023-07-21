@@ -11,7 +11,7 @@ internal partial class RawNode : IArgumentNode
     {
       Expect(TokenKind.Name);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return value;

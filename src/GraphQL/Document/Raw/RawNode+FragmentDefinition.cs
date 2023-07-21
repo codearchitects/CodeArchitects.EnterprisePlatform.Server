@@ -11,7 +11,7 @@ internal partial class RawNode : IFragmentDefinitionNode
     {
       Expect(TokenKind.Name);
 
-      ReadOnlySpan<char> value = _lexer.Value;
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
 
       if (value is "on")
         throw new InvalidGraphQLDocumentException($"Unexpected fragment name 'on'.");
@@ -27,8 +27,8 @@ internal partial class RawNode : IFragmentDefinitionNode
     get
     {
       Expect(TokenKind.Name);
-      if (_lexer.Value is not "on")
-        throw new InvalidGraphQLDocumentException($"Expected 'on', found '{_lexer.Value.ToString()}'");
+      if (_lexer.ValueSpan is not "on")
+        throw new InvalidGraphQLDocumentException($"Expected 'on', found '{_lexer.ValueSpan.ToString()}'");
 
       _lexer.MoveNext();
       return this;

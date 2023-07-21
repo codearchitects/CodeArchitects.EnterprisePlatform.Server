@@ -37,7 +37,8 @@ internal class NodeEqualityComparer :
   IEqualityComparer<IEnumValueNode>,
   IEqualityComparer<IListValueNode>,
   IEqualityComparer<IObjectValueNode>,
-  IEqualityComparer<IObjectFieldNode>
+  IEqualityComparer<IObjectFieldNode>,
+  IEqualityComparer<ReadOnlyMemory<char>>
 {
   public static readonly NodeEqualityComparer Instance = new();
 
@@ -534,7 +535,7 @@ internal class NodeEqualityComparer :
     if (!EqualsCore(x, y))
       return false;
 
-    if (!x.Lines.SequenceEqual(y.Lines))
+    if (!x.Lines.SequenceEqual(y.Lines, this))
       return false;
 
     return true;
@@ -641,6 +642,11 @@ internal class NodeEqualityComparer :
     return x.ValueKind == y.ValueKind;
   }
 
+  public bool Equals(ReadOnlyMemory<char> x, ReadOnlyMemory<char> y)
+  {
+    return x.ToArray().SequenceEqual(y.ToArray());
+  }
+
   public int GetHashCode([DisallowNull] IOperationDefinitionNode obj) => 0;
   public int GetHashCode([DisallowNull] IVariableDefinitionListNode obj) => 0;
   public int GetHashCode([DisallowNull] IVariableDefinitionNode obj) => 0;
@@ -673,4 +679,5 @@ internal class NodeEqualityComparer :
   public int GetHashCode([DisallowNull] IBooleanValueNode obj) => 0;
   public int GetHashCode([DisallowNull] INullValueNode obj) => 0;
   public int GetHashCode([DisallowNull] IEnumValueNode obj) => 0;
+  public int GetHashCode([DisallowNull] ReadOnlyMemory<char> obj) => obj.Length;
 }

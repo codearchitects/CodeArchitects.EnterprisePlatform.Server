@@ -2,6 +2,8 @@
 using CodeArchitects.Platform.GraphQL.Document.Nodes.FluentMock;
 using CodeArchitects.Platform.GraphQL.Fixtures;
 using FluentAssertions;
+using System.Reflection;
+using Xunit.Sdk;
 
 namespace CodeArchitects.Platform.GraphQL.Document.Raw;
 
@@ -534,6 +536,49 @@ public class NodesTests
     actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
   }
 
+  [Theory]
+  [BlockStringData]
+  public void BlockString_ShouldProduceCorrectAST(string blockString, IReadOnlyList<ReadOnlyMemory<char>> lines)
+  {
+    // Arrange
+    string document = $$""""
+      mutation {
+        sendEmail(message: {{blockString}})
+      }
+      """";
+
+    IDocumentNode expected = DocumentNodeBuilder.Build(_ => _
+      .SetDefinitions(_ => _
+        .Add<OperationDefinitionNodeBuilder>(_ => _
+          .SetDefinitionKind(DefinitionNodeKind.OperationDefinition)
+          .SetIsQueryShortHand(false)
+          .SetOperationType(OperationType.Mutation)
+          .SetName("")
+          .SetVariableDefinitionList(null as IVariableDefinitionListNode)
+          .SetDirectiveList(null as IDirectiveListNode)
+          .SetSelectionSet(_ => _
+            .SetSelections(_ => _
+              .Add<FieldNodeBuilder>(_ => _
+                .SetSelectionKind(SelectionNodeKind.Field)
+                .SetAlias("")
+                .SetFieldName("sendEmail")
+                .SetDirectiveList(null as IDirectiveListNode)
+                .SetArgumentList(_ => _
+                  .SetArguments(_ => _
+                    .Add(_ => _
+                      .SetName("message")
+                      .SetValue<IBlockStringValueNode>(_ => _
+                        .SetValueKind(ValueNodeKind.BlockStringValue)
+                        .SetLines(lines)))))
+                .SetSelectionSet(null as ISelectionSetNode)))))));
+
+    // Act
+    IDocumentNode actual = new RawNode(document);
+
+    // Assert
+    actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
+  }
+
   [Fact]
   public void QueryShortHandWithFragmentDefinition_ShouldProduceCorrectAST()
   {
@@ -600,5 +645,142 @@ public class NodesTests
 
     // Assert
     actual.Should().BeEquivalentTo(expected, opt => opt.Using(NodeEqualityComparer.Instance as IEqualityComparer<IDocumentNode>));
+  }
+
+  private class BlockStringDataAttribute : DataAttribute
+  {
+    public override IEnumerable<object[]> GetData(MethodInfo testMethod)
+    {
+      yield return ToData(Example1);
+      yield return ToData(Example2);
+      yield return ToData(Example3);
+      yield return ToData(Example4);
+      yield return ToData(Example5);
+      yield return ToData(Example6);
+    }
+
+    private static (string, IReadOnlyList<string>) Example1
+    {
+      get
+      {
+        string blockString = """"
+        """
+            Hello,
+              World!
+        
+            Yours,
+              GraphQL.
+          """
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "Hello,",
+          "  World!",
+          "",
+          "Yours,",
+          "  GraphQL."
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static (string, IReadOnlyList<string>) Example2
+    {
+      get
+      {
+        string blockString = """"
+        """Hello"""
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "Hello"
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static (string, IReadOnlyList<string>) Example3
+    {
+      get
+      {
+        string blockString = """"
+        """Hello,
+        World!"""
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "Hello,",
+          "World!"
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static (string, IReadOnlyList<string>) Example4
+    {
+      get
+      {
+        string blockString = """"
+        """Hello,
+          World!"""
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "Hello,",
+          "World!"
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static (string, IReadOnlyList<string>) Example5
+    {
+      get
+      {
+        string blockString = """"
+        """Hello,
+          World!
+          
+          """
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "Hello,",
+          "World!"
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static (string, IReadOnlyList<string>) Example6
+    {
+      get
+      {
+        string blockString = """"
+        """  Hello,
+          World!"""
+        """";
+
+        IReadOnlyList<string> lines = new[]
+        {
+          "  Hello,",
+          "World!"
+        };
+
+        return (blockString, lines);
+      }
+    }
+
+    private static object[] ToData((string, IReadOnlyList<string>) pair) => new object[] { pair.Item1, pair.Item2.Select(line => line.AsMemory()).ToList() };
   }
 }

@@ -19,7 +19,7 @@ public class GraphQLLexerTests
     while (sut.MoveNext())
     {
       TokenKind kind = sut.TokenKind;
-      string value = sut.Value.ToString();
+      string value = sut.ValueSpan.ToString();
 
       tokens.Add(new(kind, value));
     }

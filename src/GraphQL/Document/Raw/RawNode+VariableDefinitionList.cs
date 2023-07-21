@@ -5,15 +5,21 @@ namespace CodeArchitects.Platform.GraphQL.Document.Raw;
 
 internal partial class RawNode : IVariableDefinitionListNode, IEnumerable<IVariableDefinitionNode>, IEnumerator<IVariableDefinitionNode>
 {
-  IEnumerable<IVariableDefinitionNode> IVariableDefinitionListNode.VariableDefinitions => this;
+  IEnumerable<IVariableDefinitionNode> IVariableDefinitionListNode.VariableDefinitions
+  {
+    get
+    {
+      Expect(TokenKind.LeftParenthesis);
+      _lexer.MoveNext();
+
+      return this;
+    }
+  }
 
   IVariableDefinitionNode IEnumerator<IVariableDefinitionNode>.Current => this;
 
   IEnumerator<IVariableDefinitionNode> IEnumerable<IVariableDefinitionNode>.GetEnumerator()
   {
-    Expect(TokenKind.LeftParenthesis);
-
-    _lexer.MoveNext();
     if (_lexer.TokenKind is TokenKind.RightParenthesis)
       throw Unexpected(); // Validate against a "()" syntax
 

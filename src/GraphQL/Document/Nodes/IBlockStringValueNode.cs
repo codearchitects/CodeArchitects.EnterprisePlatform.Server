@@ -2,5 +2,5 @@
 
 public interface IBlockStringValueNode : IValueNode
 {
-  IEnumerable<string> Lines { get; }
+  IEnumerable<ReadOnlyMemory<char>> Lines { get; }
 }

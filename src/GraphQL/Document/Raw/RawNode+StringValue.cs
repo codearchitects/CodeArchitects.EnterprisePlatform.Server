@@ -11,7 +11,7 @@ internal partial class RawNode : IStringValueNode
     {
       Expect(TokenKind.String);
 
-      var value = _lexer.Value;
+      var value = _lexer.ValueSpan;
       _lexer.MoveNext();
 
       return value[1..^1].ToString();
