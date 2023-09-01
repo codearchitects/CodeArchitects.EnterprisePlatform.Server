@@ -14,7 +14,7 @@ internal abstract class CaepExtensionBase : IDbContextOptionsExtension
 
   public abstract DbContextOptionsExtensionInfo Info { get; }
 
-  public void ApplyServices(IServiceCollection services)
+  public virtual void ApplyServices(IServiceCollection services)
   {
     services.AddScoped<AggregateServiceProvider>();
     PluginServiceCollection pluginServices = new(services);
