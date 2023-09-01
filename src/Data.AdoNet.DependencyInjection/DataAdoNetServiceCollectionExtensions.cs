@@ -43,7 +43,7 @@ public static class DataAdoNetServiceCollectionExtensions
     // Seed
     if (configurationBuilder.SeedType is { } seedType)
     {
-      services.AddScoped(typeof(DataSeed), seedType);
+      services.AddSingleton(typeof(DataSeed), seedType);
     }
 
     // Command
