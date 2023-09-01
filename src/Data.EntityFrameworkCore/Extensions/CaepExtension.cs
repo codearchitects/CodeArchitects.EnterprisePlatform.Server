@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
 
@@ -10,6 +13,13 @@ internal class CaepExtension : CaepExtensionBase
   }
 
   public override DbContextOptionsExtensionInfo Info => new CaepExtensionInfo(this);
+
+  public override void ApplyServices(IServiceCollection services)
+  {
+    base.ApplyServices(services);
+
+    services.TryAddSingleton<IMultitenancyContextBypasser, NullMultitenancyContextBypasser>();
+  }
 
   private sealed class CaepExtensionInfo : DbContextOptionsExtensionInfo
   {
