@@ -11,10 +11,12 @@ public class TestDbContext : DbContext
 {
   public static readonly MultitenancyContext MultitenancyContext = new();
   public static readonly SoftDeleteContext SoftDeleteContext = new();
+  private readonly bool _useCaep;
 
-  public TestDbContext(DbContextOptions options)
+  public TestDbContext(DbContextOptions options, bool useCaep = true)
     : base(options)
   {
+    _useCaep = useCaep;
   }
 
   public void Seed(TenantEntity entity)
@@ -42,21 +44,30 @@ public class TestDbContext : DbContext
 
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
-    optionsBuilder.UseCaep(data => data
-      .UseMultitenancy(new MultitenancyDescriptor(MultitenancyContext))
-      .UseSoftDelete(new SoftDeleteDescriptor(SoftDeleteContext)));
+    if (_useCaep)
+    {
+      optionsBuilder.UseCaep(data => data
+        .UseMultitenancy(new MultitenancyDescriptor(MultitenancyContext))
+        .UseSoftDelete(new SoftDeleteDescriptor(SoftDeleteContext)));
+    }
   }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     modelBuilder.Entity<TenantEntity>(entity =>
     {
-      entity.IsMultiTenant(TenantEntity.TenantIdPropertyName);
+      if (_useCaep)
+      {
+        entity.IsMultiTenant(TenantEntity.TenantIdPropertyName);
+      }
     });
 
     modelBuilder.Entity<SoftDeleteEntity>(entity =>
     {
-      entity.IsSoftDelete(SoftDeleteEntity.SoftDeletePropertyName);
+      if (_useCaep)
+      {
+        entity.IsSoftDelete(SoftDeleteEntity.SoftDeletePropertyName);
+      }
     });
   }
 }
