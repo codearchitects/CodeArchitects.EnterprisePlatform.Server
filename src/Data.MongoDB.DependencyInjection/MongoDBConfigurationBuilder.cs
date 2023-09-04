@@ -40,7 +40,7 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
 
     if (_seedType is not null)
     {
-      services.AddSingleton(typeof(DataSeed), _seedType);
+      services.AddScoped(typeof(DataSeed), _seedType);
     }
 
     services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
