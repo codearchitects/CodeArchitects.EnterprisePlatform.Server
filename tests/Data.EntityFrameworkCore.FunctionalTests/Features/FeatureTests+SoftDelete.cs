@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features;
 
-public partial class FeatureTests : IAsyncLifetime
+public partial class FeatureTests
 {
   [Fact]
   public void Find_ShouldReturnEntity_WhenExistsAndIsNotSoftDeleted()

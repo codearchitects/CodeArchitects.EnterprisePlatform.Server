@@ -4,8 +4,50 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Features;
 
-public partial class FeatureTests : IAsyncLifetime
+public partial class FeatureTests
 {
+  [Fact]
+  public void Seeding_ShouldBypassMultitenancy_WhenMultitenancyIsEnabled()
+  {
+    // Arrange
+    TenantEntity entity = TenantEntity.One();
+    TestDataSeed seed = new(entity);
+    Seeder seeder = new(_dbContext);
+
+    // Act
+    seeder.Apply(seed);
+    TenantEntity? fromDb = _dbContext
+      .Set<TenantEntity>()
+      .SingleOrDefault(e => e.Id == entity.Id);
+
+    // Assert
+    fromDb.Should().NotBeNull();
+    fromDb!.Id.Should().Be(entity.Id);
+  }
+
+  [Fact]
+  public void Seeding_ShouldNotFail_WhenMultitenancyIsDisabled()
+  {
+    // Arrange
+    using TestDbContext dbContext = new TestDbContext(s_options, false);
+    _dbContext.Database.EnsureDeleted();
+    dbContext.Database.EnsureCreated();
+    TenantEntity entity = TenantEntity.One();
+    TestDataSeed seed = new(entity);
+    Seeder seeder = new(_dbContext);
+
+    // Act
+    seeder.Apply(seed);
+    TenantEntity? fromDb = _dbContext
+      .Set<TenantEntity>()
+      .SingleOrDefault(e => e.Id == entity.Id);
+
+    // Assert
+    fromDb.Should().NotBeNull();
+    fromDb!.Id.Should().Be(entity.Id);
+    dbContext.Database.EnsureDeleted();
+  }
+
   [Fact]
   public void Find_ShouldReturnEntity_WhenExistsAndBelogsToCurrentTenant()
   {

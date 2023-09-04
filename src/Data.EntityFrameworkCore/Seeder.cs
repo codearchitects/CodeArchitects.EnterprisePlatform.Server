@@ -1,6 +1,8 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Features.Multitenancy;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore;
 
@@ -15,9 +17,9 @@ internal class Seeder : ISeeder
 
   public void Apply(DataSeed seed)
   {
-    IMultitenancyContextBypasser bypasser = _context.GetService<IMultitenancyContextBypasser>();
+    IMultitenancyContextBypasser? bypasser = GetMultitenancyContextBypasser(_context);
 
-    using (bypasser.BypassMultitenancy())
+    using (bypasser?.BypassMultitenancy())
     {
       seed.Seed(this);
       _context.SaveChanges();
@@ -32,5 +34,18 @@ internal class Seeder : ISeeder
     {
       _context.AddRange(entities);
     }
+  }
+
+  private static IMultitenancyContextBypasser? GetMultitenancyContextBypasser(IInfrastructure<IServiceProvider> accessor)
+  {
+    IServiceProvider internalServiceProvider = accessor.Instance;
+
+    object? bypasser = internalServiceProvider.GetService(typeof(IMultitenancyContextBypasser))
+      ?? internalServiceProvider.GetService<IDbContextOptions>()
+          ?.Extensions.OfType<CoreOptionsExtension>().FirstOrDefault()
+          ?.ApplicationServiceProvider
+          ?.GetService(typeof(IMultitenancyContextBypasser));
+
+    return bypasser as IMultitenancyContextBypasser;
   }
 }
