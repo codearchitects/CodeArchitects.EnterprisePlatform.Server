@@ -12,12 +12,10 @@ public sealed partial class FeatureTests : IDisposable
     .Options;
 
   private readonly TestDbContext _dbContext;
-  private readonly ITestOutputHelper _output;
 
-  public FeatureTests(ITestOutputHelper output)
+  public FeatureTests()
   {
     _dbContext = new(s_options);
-    _output = output;
     _dbContext.Database.EnsureCreated();
   }
 

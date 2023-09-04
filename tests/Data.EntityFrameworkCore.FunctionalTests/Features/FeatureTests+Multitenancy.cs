@@ -57,7 +57,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     // Act
     TenantEntity? fromDb = _dbContext
@@ -78,7 +77,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     TestDbContext.MultitenancyContext.TenantId = Guid.NewGuid();
 
@@ -101,7 +99,6 @@ public partial class FeatureTests
     TenantEntity entity = TenantEntity.One();
 
     // Act
-    _output.WriteLine(entity.Id.ToString());
     _dbContext.Add(entity);
     _dbContext.SaveChanges();
 
@@ -121,7 +118,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     entity.Name = "New entity name";
 
@@ -144,7 +140,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     TestDbContext.MultitenancyContext.TenantId = Guid.NewGuid();
 
@@ -167,7 +162,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     // Act
     _dbContext.Remove(entity);
@@ -187,7 +181,6 @@ public partial class FeatureTests
 
     TenantEntity entity = TenantEntity.One();
     _dbContext.Seed(entity);
-    _output.WriteLine(entity.Id.ToString());
 
     TestDbContext.MultitenancyContext.TenantId = Guid.NewGuid();
 
