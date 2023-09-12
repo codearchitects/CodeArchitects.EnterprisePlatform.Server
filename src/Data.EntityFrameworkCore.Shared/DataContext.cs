@@ -36,7 +36,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, key);
 
     return DbContext.Set<TEntity>().FirstOrDefault(keyPredicate);
   }
@@ -45,7 +45,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, key);
 
     return DbContext.Set<TEntity>().FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
   }
@@ -54,7 +54,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, key);
 
     return Include(includeAction).FirstOrDefault(keyPredicate)!;
   }
@@ -63,7 +63,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(key);
+    Expression<Func<TEntity, bool>> keyPredicate = _predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, key);
 
     return Include(includeAction).FirstOrDefaultAsync(keyPredicate, cancellationToken)!;
   }
@@ -148,7 +148,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (DbContext.Set<TEntity>().Any(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity)))
+    if (DbContext.Set<TEntity>().Any(_predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, entity)))
     {
       UpdateCore(entity);
     }
@@ -163,7 +163,7 @@ internal sealed class DataContext<TDbContext> : IDataContext<TDbContext>
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (await DbContext.Set<TEntity>().AnyAsync(_predicateProvider.GetFindPredicate<TEntity, TKey>(entity), cancellationToken))
+    if (await DbContext.Set<TEntity>().AnyAsync(_predicateProvider.GetFindPredicate<TEntity, TKey>(DbContext.Model, entity), cancellationToken))
     {
       await UpdateAsync<TEntity, TKey>(entity, cancellationToken);
     }

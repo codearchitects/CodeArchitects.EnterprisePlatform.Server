@@ -34,7 +34,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate<TEntity, TKey>(entityModel, key);
 
     return collection.Find(filter).FirstOrDefault();
   }
@@ -46,7 +46,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate<TEntity, TKey>(entityModel, key);
 
     return await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
   }
@@ -145,7 +145,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     _stateManager.Execute((cancellationToken) =>
     {
@@ -168,7 +168,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {
@@ -203,7 +203,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     _stateManager.Execute((cancellationToken) =>
     {
@@ -226,7 +226,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {
@@ -247,7 +247,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     _stateManager.Execute((cancellationToken) =>
     {
@@ -270,7 +270,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate(entity, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate(entityModel, entity);
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {
@@ -288,7 +288,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate<TEntity, TKey>(entityModel, key);
 
     _stateManager.Execute((cancellationToken) =>
     {
@@ -308,7 +308,7 @@ internal class DataContext : IDataContext
     IEntityModel entityModel = EnsureEntity<TEntity>();
 
     IMongoCollection<TEntity> collection = GetCollection<TEntity>(entityModel);
-    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetPredicate<TEntity, TKey>(key, entityModel);
+    Expression<Func<TEntity, bool>> filter = _predicateProvider.GetFindPredicate<TEntity, TKey>(entityModel, key);
 
     return _stateManager.ExecuteAsync(async (cancellationToken) =>
     {
