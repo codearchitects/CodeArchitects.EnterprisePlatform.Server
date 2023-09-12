@@ -6,18 +6,20 @@ namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
 internal class PredicateTemplateProvider : IPredicateTemplateProvider
 {
-  private readonly ConcurrentDictionary<Type, LambdaExpression> _templates;
+  private readonly ConcurrentDictionary<Type, LambdaExpression> _keyTemplates;
+  private readonly ConcurrentDictionary<Type, LambdaExpression> _entityTemplates;
 
   public PredicateTemplateProvider()
   {
-    _templates = new();
+    _keyTemplates = new();
+    _entityTemplates = new();
   }
 
   public LambdaExpression GetFindPredicateTemplate<TEntity, TKey>(IEntityModel entity)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    return _templates.GetOrAdd(typeof(TEntity), (_, entity) =>
+    return _keyTemplates.GetOrAdd(typeof(TEntity), (_, entity) =>
     {
       ParameterExpression entityParameter = Expression.Parameter(typeof(TEntity), "entity");
 
@@ -32,7 +34,7 @@ internal class PredicateTemplateProvider : IPredicateTemplateProvider
   public LambdaExpression GetFindPredicateTemplate<TEntity>(IEntityModel entity)
     where TEntity : class
   {
-    return _templates.GetOrAdd(typeof(TEntity), (_, entity) =>
+    return _entityTemplates.GetOrAdd(typeof(TEntity), (_, entity) =>
     {
       ParameterExpression entityParameter = Expression.Parameter(typeof(TEntity), "entity");
 

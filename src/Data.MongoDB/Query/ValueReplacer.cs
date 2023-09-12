@@ -26,7 +26,14 @@ internal class ValueReplacer : ExpressionVisitor
 
   protected override Expression VisitParameter(ParameterExpression node)
   {
-    return Expression.Constant(_value, node.Type);
+    try
+    {
+      return Expression.Constant(_value, node.Type);
+    }
+    catch
+    {
+      throw;
+    }
   }
 
   public static Expression Replace(Expression template, object? value)

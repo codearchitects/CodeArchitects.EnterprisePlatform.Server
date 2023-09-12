@@ -24,7 +24,7 @@ public partial class PredicateProviderTests
     Expression<Func<EntityWithSimplePropertyKey, bool>> expected = entity => entity.Id == id;
 
     _templateProviderMock
-      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimplePropertyKey, bool>(It.IsAny<IModel>()))
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimplePropertyKey, int>(It.IsAny<IModel>()))
       .Returns(FindPredicateTemplates.SimplePropertyKeyTemplate);
 
     // Act
@@ -42,7 +42,7 @@ public partial class PredicateProviderTests
     Expression<Func<EntityWithSimpleFieldKey, bool>> expected = entity => entity.Id == id;
 
     _templateProviderMock
-      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleFieldKey, bool>(It.IsAny<IModel>()))
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleFieldKey, int>(It.IsAny<IModel>()))
       .Returns(FindPredicateTemplates.SimpleFieldKeyTemplate);
 
     // Act
@@ -60,7 +60,7 @@ public partial class PredicateProviderTests
     Expression<Func<EntityWithSimpleShadowKey, bool>> expected = entity => EF.Property<int>(entity, "Id") == id;
 
     _templateProviderMock
-      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleShadowKey, bool>(It.IsAny<IModel>()))
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleShadowKey, int>(It.IsAny<IModel>()))
       .Returns(FindPredicateTemplates.SimpleShadowKeyTemplate);
 
     // Act
@@ -79,7 +79,7 @@ public partial class PredicateProviderTests
     Expression<Func<EntityWithCompositeKey, bool>> expected = entity => entity.Id1 == id1 && entity.Id2 == id2;
 
     _templateProviderMock
-      .Setup(x => x.GetFindPredicateTemplate<EntityWithCompositeKey, bool>(It.IsAny<IModel>()))
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithCompositeKey, (int, string)>(It.IsAny<IModel>()))
       .Returns(FindPredicateTemplates.CompositeKeyTemplate);
 
     // Act

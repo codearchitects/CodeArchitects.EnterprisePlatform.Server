@@ -43,7 +43,7 @@ public partial class PredicateProviderTests
     EntityModel entityModel = EntityModel.Create(typeof(EntityWithIdProperty));
 
     _templateProviderMock
-      .Setup(x => x.GetFindPredicateTemplate<EntityWithIdProperty, Guid>(entityModel))
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithIdProperty>(entityModel))
       .Returns(PredicateTemplates.EntityWithIdPropertyEntityTemplate);
 
     // Act
