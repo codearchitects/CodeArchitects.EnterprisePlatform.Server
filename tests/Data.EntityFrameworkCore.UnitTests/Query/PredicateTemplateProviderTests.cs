@@ -3,16 +3,16 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 
-public class PredicateTemplateFactoryTests
+public class PredicateTemplateProviderTests
 {
   [Fact]
   public void BuildFindPredicateTemplate_ShouldBuildCorrectExpression_WhenEntityHasSimplePropertyKey()
   {
     // Arrange
-    PredicateTemplateFactory sut = new(Models.SimplePropertyKeyModel);
+    PredicateTemplateProvider sut = new();
 
     // Act
-    Expression<Func<EntityWithSimplePropertyKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimplePropertyKey, int>();
+    LambdaExpression template = sut.GetFindPredicateTemplate<EntityWithSimplePropertyKey, int>(Models.SimplePropertyKeyModel);
 
     // Assert
     template.Should().BeEquivalentTo(FindPredicateTemplates.SimplePropertyKeyTemplate);
@@ -22,10 +22,10 @@ public class PredicateTemplateFactoryTests
   public void BuildFindPredicateTemplate_ShouldBuildCorrectExpression_WhenEntityHasSimpleFieldKey()
   {
     // Arrange
-    PredicateTemplateFactory sut = new(Models.SimpleFieldKeyModel);
+    PredicateTemplateProvider sut = new();
 
     // Act
-    Expression<Func<EntityWithSimpleFieldKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimpleFieldKey, int>();
+    LambdaExpression template = sut.GetFindPredicateTemplate<EntityWithSimpleFieldKey, int>(Models.SimpleFieldKeyModel);
 
     // Assert
     template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleFieldKeyTemplate);
@@ -35,10 +35,10 @@ public class PredicateTemplateFactoryTests
   public void BuildFindPredicateTemplate_ShouldBuildCorrectExpression_WhenEntityHasSimpleShadowKey()
   {
     // Arrange
-    PredicateTemplateFactory sut = new(Models.SimpleShadowKeyModel);
+    PredicateTemplateProvider sut = new();
 
     // Act
-    Expression<Func<EntityWithSimpleShadowKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithSimpleShadowKey, int>();
+    LambdaExpression template = sut.GetFindPredicateTemplate<EntityWithSimpleShadowKey, int>(Models.SimpleShadowKeyModel);
 
     // Assert
     template.Should().BeEquivalentTo(FindPredicateTemplates.SimpleShadowKeyTemplate);
@@ -48,10 +48,10 @@ public class PredicateTemplateFactoryTests
   public void BuildFindPredicateTemplate_ShouldBuildCorrectExpression_WhenEntityHasCompositeKey()
   {
     // Arrange
-    PredicateTemplateFactory sut = new(Models.CompositeKeyModel);
+    PredicateTemplateProvider sut = new();
 
     // Act
-    Expression<Func<EntityWithCompositeKey, bool>> template = sut.CreateFindPredicateTemplate<EntityWithCompositeKey, (int, string)>();
+    LambdaExpression template = sut.GetFindPredicateTemplate<EntityWithCompositeKey, (int, string)>(Models.CompositeKeyModel);
 
     // Assert
     template.Should().BeEquivalentTo(FindPredicateTemplates.CompositeKeyTemplate);

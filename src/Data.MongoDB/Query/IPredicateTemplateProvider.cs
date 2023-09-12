@@ -3,11 +3,12 @@ using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
-internal interface IPredicateTemplateFactory
+internal interface IPredicateTemplateProvider
 {
-  Expression<Func<TEntity, bool>> BuildPredicateTemplate<TEntity>(IEntityModel entity)
+  LambdaExpression GetFindPredicateTemplate<TEntity>(IEntityModel entity)
     where TEntity : class;
-  Expression<Func<TEntity, bool>> BuildPredicateTemplate<TEntity, TKey>(IEntityModel entity)
+
+  LambdaExpression GetFindPredicateTemplate<TEntity, TKey>(IEntityModel entity)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 }

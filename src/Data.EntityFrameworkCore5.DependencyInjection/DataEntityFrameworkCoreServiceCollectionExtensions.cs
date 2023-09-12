@@ -59,9 +59,8 @@ public static class DataEntityFrameworkCoreServiceCollectionExtensions
 
     services.AddScoped<ITrackingContext, TrackingContext>();
 
-    services.AddScoped<IPredicateProvider>(sp => new PredicateProvider(sp.GetRequiredService<IPredicateTemplateFactory>(), sp.GetRequiredService<IPredicateTemplateCache>(), sp.GetRequiredService<TDbContext>().Model));
-    services.AddScoped<IPredicateTemplateFactory>(sp => new PredicateTemplateFactory(sp.GetRequiredService<TDbContext>().Model));
-    services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
+    services.AddSingleton<IPredicateProvider, PredicateProvider>();
+    services.AddScoped<IPredicateTemplateProvider, PredicateTemplateProvider>();
 
     services.AddScoped<IDefaultEntityFactory, DefaultEntityFactory>();
     services.AddScoped<IDefaultEntityFactoryFactory>(sp => new DefaultEntityFactoryFactory(sp.GetRequiredService<TDbContext>().Model));

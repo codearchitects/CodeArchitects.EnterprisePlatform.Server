@@ -43,9 +43,8 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
       services.AddScoped(typeof(DataSeed), _seedType);
     }
 
-    services.AddSingleton<IPredicateTemplateCache>(PredicateTemplateCache.Create());
-    services.AddScoped<IPredicateTemplateFactory, PredicateTemplateFactory>();
-    services.AddScoped<IPredicateProvider, PredicateProvider>();
+    services.AddSingleton<IPredicateTemplateProvider, PredicateTemplateProvider>();
+    services.AddSingleton<IPredicateProvider, PredicateProvider>();
 
     services.AddSingleton<IDataModel>(dataModel);
 
