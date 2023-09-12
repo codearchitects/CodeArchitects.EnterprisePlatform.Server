@@ -1,34 +1,38 @@
 ﻿using CodeArchitects.Platform.Data.EntityFrameworkCore.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 
-internal class PredicateTemplateFactory : IPredicateTemplateFactory
+internal class PredicateTemplateProvider : IPredicateTemplateProvider
 {
-  private readonly IModel _model;
+  private readonly ConcurrentDictionary<Type, LambdaExpression> _templates;
 
-  public PredicateTemplateFactory(IModel model)
+  public PredicateTemplateProvider()
   {
-    _model = model;
+    _templates = new();
   }
 
-  public Expression<Func<TEntity, bool>> CreateFindPredicateTemplate<TEntity, TKey>()
+  public LambdaExpression GetFindPredicateTemplate<TEntity, TKey>(IModel model)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    IEntityType entityType = _model.FindEntityType(typeof(TEntity))!;
-    IReadOnlyList<IProperty> keyModels = entityType.FindPrimaryKey()!.Properties;
+    return _templates.GetOrAdd(typeof(TEntity), (_, model) =>
+    {
+      IEntityType entityType = model.FindEntityType(typeof(TEntity))!;
+      IReadOnlyList<IProperty> keyModels = entityType.FindPrimaryKey()!.Properties;
 
-    ParameterExpression entity = Expression.Parameter(typeof(TEntity), nameof(entity));
+      ParameterExpression entity = Expression.Parameter(typeof(TEntity), nameof(entity));
 
-    Expression body = typeof(ITuple).IsAssignableFrom(typeof(TKey))
-      ? CreateFromTuple(entity, keyModels)
-      : CreateFromScalar(entity, keyModels[0]);
+      Expression body = typeof(ITuple).IsAssignableFrom(typeof(TKey))
+        ? CreateFromTuple(entity, keyModels)
+        : CreateFromScalar(entity, keyModels[0]);
 
-    return Expression.Lambda<Func<TEntity, bool>>(body, entity);
+      return Expression.Lambda<Func<TEntity, bool>>(body, entity);
+    }, model);
   }
 
   private static Expression CreateFromTuple(ParameterExpression entity, IReadOnlyList<IProperty> keyModels)

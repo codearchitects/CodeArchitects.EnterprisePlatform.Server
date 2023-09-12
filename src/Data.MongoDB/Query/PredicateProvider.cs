@@ -5,54 +5,27 @@ namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
 internal class PredicateProvider : IPredicateProvider
 {
-  private readonly IPredicateTemplateFactory _templateFactory;
-  private readonly IPredicateTemplateCache _cache;
+  private readonly IPredicateTemplateProvider _templateProvider;
 
-  public PredicateProvider(IPredicateTemplateFactory templateFactory, IPredicateTemplateCache cache)
+  public PredicateProvider(IPredicateTemplateProvider templateProvider)
   {
-    _templateFactory = templateFactory;
-    _cache = cache;
+    _templateProvider = templateProvider;
   }
 
-  public Expression<Func<TEntity, bool>> GetPredicate<TEntity, TKey>(TKey key, IEntityModel entityModel)
+  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(IEntityModel entityModel, TKey key)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    LambdaExpression template = GetOrBuildTemplate<TEntity, TKey>(entityModel);
+    LambdaExpression template = _templateProvider.GetFindPredicateTemplate<TEntity, TKey>(entityModel);
 
     return (Expression<Func<TEntity, bool>>)ValueReplacer.Replace(template, key);
   }
 
-  public Expression<Func<TEntity, bool>> GetPredicate<TEntity>(TEntity entity, IEntityModel entityModel)
+  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity>(IEntityModel entityModel, TEntity entity)
     where TEntity : class
   {
-    LambdaExpression template = GetOrBuildTemplate<TEntity>(entityModel);
+    LambdaExpression template = _templateProvider.GetFindPredicateTemplate<TEntity>(entityModel);
 
     return (Expression<Func<TEntity, bool>>)ValueReplacer.Replace(template, entity);
-  }
-
-  private LambdaExpression GetOrBuildTemplate<TEntity, TKey>(IEntityModel entity)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    if (!_cache.TryGetTemplate(typeof(TKey), out LambdaExpression? template))
-    {
-      template = _templateFactory.BuildPredicateTemplate<TEntity, TKey>(entity);
-      _cache.AddTemplate(typeof(TKey), template);
-    }
-
-    return template;
-  }
-
-  private LambdaExpression GetOrBuildTemplate<TEntity>(IEntityModel entity)
-    where TEntity : class
-  {
-    if (!_cache.TryGetTemplate(typeof(TEntity), out LambdaExpression? template))
-    {
-      template = _templateFactory.BuildPredicateTemplate<TEntity>(entity);
-      _cache.AddTemplate(typeof(TEntity), template);
-    }
-
-    return template;
   }
 }

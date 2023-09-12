@@ -7,80 +7,85 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 
 public partial class PredicateProviderTests
 {
-  [Theory]
-  [EntityWithSimplePropertyKeyData]
-  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimplePropertyKey(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  private readonly Mock<IPredicateTemplateProvider> _templateProviderMock;
+  private readonly PredicateProvider _sut;
+
+  public PredicateProviderTests()
+  {
+    _templateProviderMock = new(MockBehavior.Strict);
+    _sut = new(_templateProviderMock.Object);
+  }
+
+  [Fact]
+  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimplePropertyKey()
   {
     // Arrange
     const int id = 12;
     Expression<Func<EntityWithSimplePropertyKey, bool>> expected = entity => entity.Id == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimplePropertyKey, bool>(It.IsAny<IModel>()))
+      .Returns(FindPredicateTemplates.SimplePropertyKeyTemplate);
 
     // Act
-    var predicate = sut.GetFindPredicate<EntityWithSimplePropertyKey, int>(id);
+    var predicate = _sut.GetFindPredicate<EntityWithSimplePropertyKey, int>(Mock.Of<IModel>(), id);
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 
-  [Theory]
-  [EntityWithSimpleFieldKeyData]
-  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimpleFieldKey(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  [Fact]
+  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimpleFieldKey()
   {
     // Arrange
     const int id = 12;
     Expression<Func<EntityWithSimpleFieldKey, bool>> expected = entity => entity.Id == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleFieldKey, bool>(It.IsAny<IModel>()))
+      .Returns(FindPredicateTemplates.SimpleFieldKeyTemplate);
 
     // Act
-    var predicate = sut.GetFindPredicate<EntityWithSimpleFieldKey, int>(id);
+    var predicate = _sut.GetFindPredicate<EntityWithSimpleFieldKey, int>(Mock.Of<IModel>(), id);
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 
-  [Theory]
-  [EntityWithSimpleShadowKeyData]
-  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimpleShadowKey(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  [Fact]
+  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithSimpleShadowKey()
   {
     // Arrange
     const int id = 12;
     Expression<Func<EntityWithSimpleShadowKey, bool>> expected = entity => EF.Property<int>(entity, "Id") == id;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithSimpleShadowKey, bool>(It.IsAny<IModel>()))
+      .Returns(FindPredicateTemplates.SimpleShadowKeyTemplate);
 
     // Act
-    var predicate = sut.GetFindPredicate<EntityWithSimpleShadowKey, int>(id);
+    var predicate = _sut.GetFindPredicate<EntityWithSimpleShadowKey, int>(Mock.Of<IModel>(), id);
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 
-  [Theory]
-  [EntityWithCompositeKeyData]
-  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithCompositeKey(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  [Fact]
+  internal void GetFindPredicate_ShouldReturnCorrectPredicate_ForEntityWithCompositeKey()
   {
     // Arrange
     const int id1 = 12;
     const string id2 = "id2";
     Expression<Func<EntityWithCompositeKey, bool>> expected = entity => entity.Id1 == id1 && entity.Id2 == id2;
 
-    PredicateProvider sut = new(templateFactory, cacheMock.Object, Mock.Of<IModel>(MockBehavior.Strict));
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithCompositeKey, bool>(It.IsAny<IModel>()))
+      .Returns(FindPredicateTemplates.CompositeKeyTemplate);
 
     // Act
-    var predicate = sut.GetFindPredicate<EntityWithCompositeKey, (int, string)>((id1, id2));
+    var predicate = _sut.GetFindPredicate<EntityWithCompositeKey, (int, string)>(Mock.Of<IModel>(), (id1, id2));
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 }

@@ -6,41 +6,50 @@ namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
 public partial class PredicateProviderTests
 {
-  [Theory]
-  [KeyPredicate]
-  internal void GetPredicate_ShouldReturnCorrectPredicate_ForKey(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  private readonly Mock<IPredicateTemplateProvider> _templateProviderMock;
+  private readonly PredicateProvider _sut;
+
+  public PredicateProviderTests()
+  {
+    _templateProviderMock = new(MockBehavior.Strict);
+    _sut = new(_templateProviderMock.Object);
+  }
+
+  [Fact]
+  internal void GetPredicate_ShouldReturnCorrectPredicate_ForKey()
   {
     // Arrange
     Guid id = Guid.Empty;
     Expression<Func<EntityWithIdProperty, bool>> expected = entity => entity.Id == id;
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
     EntityModel entityModel = EntityModel.Create(typeof(EntityWithIdProperty));
 
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithIdProperty, Guid>(entityModel))
+      .Returns(PredicateTemplates.EntityWithIdPropertyKeyTemplate);
+
     // Act
-    Expression<Func<EntityWithIdProperty, bool>> predicate = sut.GetPredicate<EntityWithIdProperty, Guid>(id, entityModel);
+    Expression<Func<EntityWithIdProperty, bool>> predicate = _sut.GetFindPredicate<EntityWithIdProperty, Guid>(entityModel, id);
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 
-  [Theory]
-  [EntityPredicate]
-  internal void GetPredicate_ShouldReturnCorrectPredicate_ForEntity(IPredicateTemplateFactory templateFactory, Mock<IPredicateTemplateCache> cacheMock)
+  [Fact]
+  internal void GetPredicate_ShouldReturnCorrectPredicate_ForEntity()
   {
     // Arrange
     EntityWithIdProperty entity = new() { Id = Guid.Empty };
     Expression<Func<EntityWithIdProperty, bool>> expected = entity => entity.Id == entity.Id;
-    PredicateProvider sut = new(templateFactory, cacheMock.Object);
     EntityModel entityModel = EntityModel.Create(typeof(EntityWithIdProperty));
 
+    _templateProviderMock
+      .Setup(x => x.GetFindPredicateTemplate<EntityWithIdProperty, Guid>(entityModel))
+      .Returns(PredicateTemplates.EntityWithIdPropertyEntityTemplate);
+
     // Act
-    Expression<Func<EntityWithIdProperty, bool>> predicate = sut.GetPredicate(entity, entityModel);
+    Expression<Func<EntityWithIdProperty, bool>> predicate = _sut.GetFindPredicate(entityModel, entity);
 
     // Assert
     predicate.Should().BeEquivalentTo(expected);
-    cacheMock.VerifyAll();
-    cacheMock.VerifyNoOtherCalls();
   }
 }

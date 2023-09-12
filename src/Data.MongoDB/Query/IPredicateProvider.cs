@@ -5,10 +5,10 @@ namespace CodeArchitects.Platform.Data.MongoDB.Query;
 
 internal interface IPredicateProvider
 {
-  Expression<Func<TEntity, bool>> GetPredicate<TEntity, TKey>(TKey key, IEntityModel entityModel)
+  Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(IEntityModel entityModel, TKey key)
     where TEntity : class
     where TKey : IEquatable<TKey>;
 
-  Expression<Func<TEntity, bool>> GetPredicate<TEntity>(TEntity entity, IEntityModel entityModel)
+  Expression<Func<TEntity, bool>> GetFindPredicate<TEntity>(IEntityModel entityModel, TEntity entity)
     where TEntity : class;
 }

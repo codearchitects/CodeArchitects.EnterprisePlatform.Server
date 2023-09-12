@@ -8,22 +8,18 @@ namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Query;
 
 internal class PredicateProvider : IPredicateProvider
 {
-  private readonly IPredicateTemplateFactory _templateFactory;
-  private readonly IPredicateTemplateCache _cache;
-  private readonly IModel _model; // TODO: Make DataContext pass the IEntityModel to each method call
+  private readonly IPredicateTemplateProvider _templateProvider;
 
-  public PredicateProvider(IPredicateTemplateFactory templateFactory, IPredicateTemplateCache cache, IModel model)
+  public PredicateProvider(IPredicateTemplateProvider templateProvider)
   {
-    _templateFactory = templateFactory;
-    _cache = cache;
-    _model = model;
+    _templateProvider = templateProvider;
   }
 
-  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(TKey key)
+  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(IModel model, TKey key)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    LambdaExpression template = GetOrBuildTemplate<TEntity, TKey>();
+    LambdaExpression template = _templateProvider.GetFindPredicateTemplate<TEntity, TKey>(model);
 
     Expression predicate = key is ITuple tuple
       ? TupleReplacer.Replace(template, tuple)
@@ -32,26 +28,13 @@ internal class PredicateProvider : IPredicateProvider
     return (Expression<Func<TEntity, bool>>)predicate;
   }
 
-  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(TEntity entity)
+  public Expression<Func<TEntity, bool>> GetFindPredicate<TEntity, TKey>(IModel model, TEntity entity)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    LambdaExpression template = GetOrBuildTemplate<TEntity, TKey>();
+    LambdaExpression template = _templateProvider.GetFindPredicateTemplate<TEntity, TKey>(model);
 
-    return (Expression<Func<TEntity, bool>>)EntityReplacer.Replace(template, entity, _model.FindEntityType(typeof(TEntity))!);
-  }
-
-  private LambdaExpression GetOrBuildTemplate<TEntity, TKey>()
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    if (!_cache.TryGetTemplate(typeof(TEntity), out LambdaExpression? template))
-    {
-      template = _templateFactory.CreateFindPredicateTemplate<TEntity, TKey>();
-      _cache.AddTemplate(typeof(TEntity), template);
-    }
-
-    return template;
+    return (Expression<Func<TEntity, bool>>)EntityReplacer.Replace(template, entity, model.FindEntityType(typeof(TEntity))!);
   }
 
   private sealed class EntityReplacer : ExpressionVisitor
