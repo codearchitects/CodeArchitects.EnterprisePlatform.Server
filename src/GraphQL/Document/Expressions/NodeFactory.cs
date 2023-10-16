@@ -120,11 +120,9 @@ internal static class NodeFactory
       MemberExpression member         => CreateMemberField(root, field, memberName, member),
       MethodCallExpression methodCall => methodCall.Method.Name switch
       {
-        MethodName.Field              => CreateRootField(root, field, memberName, methodCall),
-        MethodName.SelectRef or
-        MethodName.SelectCol          => CreateSelectField(root, field, memberName, methodCall),
-        MethodName.ExpandRef or
-        MethodName.ExpandCol          => CreateExpandField(root, field, memberName, methodCall),
+        MethodNames.Field             => CreateRootField(root, field, memberName, methodCall),
+        MethodNames.Select            => CreateSelectField(root, field, memberName, methodCall),
+        MethodNames.Expand            => CreateExpandField(root, field, memberName, methodCall),
         _                             => throw new ExpressionEvaluationException(methodCall)
       },
       _                               => throw new ExpressionEvaluationException(expression)
@@ -171,11 +169,11 @@ internal static class NodeFactory
   {
     ReadOnlyCollection<Expression> arguments = selectCall.Arguments;
 
-    if (arguments.Count < 2)
+    if (arguments.Count < 3)
       throw new ExpressionEvaluationException(selectCall);
 
     Expression source = arguments[0];
-    LambdaExpression selection = arguments[1].EvaluateAsLambda();
+    LambdaExpression selection = arguments[2].EvaluateAsLambda();
 
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
@@ -187,11 +185,11 @@ internal static class NodeFactory
   {
     ReadOnlyCollection<Expression> arguments = expandCall.Arguments;
 
-    if (arguments.Count < 2)
+    if (arguments.Count < 3)
       throw new ExpressionEvaluationException(expandCall);
 
     Expression source = arguments[0];
-    LambdaExpression expansion = arguments[1].EvaluateAsLambda();
+    LambdaExpression expansion = arguments[2].EvaluateAsLambda();
 
     string fieldName = GetFieldName(field, source);
     string? alias = GetAlias(memberName, fieldName);
@@ -255,6 +253,6 @@ internal static class NodeFactory
 
   private static bool IsFieldCall(MethodCallExpression methodCall, Expression root)
   {
-    return methodCall.Method.Name == MethodName.Field && ReferenceEquals(methodCall.Object, root);
+    return methodCall.Method.Name == MethodNames.Field && ReferenceEquals(methodCall.Object, root);
   }
 }

@@ -28,27 +28,27 @@ internal class ExpandFieldNode : IteratorNode, IFieldNode,
 
   public ReadOnlySpan<char> FieldName => _fieldName;
 
-  public IArgumentListNode? ArgumentList => Peek(MethodName.Represents.Argument) ? this : null;
+  public IArgumentListNode? ArgumentList => Peek(MethodNames.IsArgument) ? this : null;
 
   public IEnumerable<IArgumentNode> Arguments => this;
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.IsDirective) ? this : null;
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
   IArgumentNode IEnumerator<IArgumentNode>.Current => GetCurrent<IArgumentNode>();
 
-  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Argument, this);
+  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodNames.IsArgument, this);
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.IsDirective, this);
 
   public ISelectionSetNode? SelectionSet
   {
     get
     {
-      if (TryGetNext(MethodName.Represents.SelectionSet, out ISelectionSetNode? selectionSet))
+      if (TryGetNext(MethodNames.IsSelectionSet, out ISelectionSetNode? selectionSet))
         return selectionSet;
 
       Type fieldType = Expression.Type.GetGenericArguments()[0];
@@ -63,11 +63,11 @@ internal class ExpandFieldNode : IteratorNode, IFieldNode,
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithArgument     => NodeFactory.CreateArgument(_root, methodCall),
-      MethodName.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
-      MethodName.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
-      MethodName.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
-      _                           => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithArgument     => NodeFactory.CreateArgument(_root, methodCall),
+      MethodNames.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
+      MethodNames.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
+      MethodNames.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
+      _                            => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

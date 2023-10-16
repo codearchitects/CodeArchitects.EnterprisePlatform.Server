@@ -21,24 +21,24 @@ internal abstract class InlineFragmentNode : IteratorNode, IInlineFragmentNode,
 
   public SelectionNodeKind SelectionKind => SelectionNodeKind.InlineFragment;
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.IsDirective) ? this : null;
 
-  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodName.Represents.SelectionSet);
+  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodNames.IsSelectionSet);
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.IsDirective, this);
 
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
-      MethodName.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
-      MethodName.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
-      _                           => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithDirective    => NodeFactory.CreateDirective(_root, methodCall),
+      MethodNames.WithSelection    => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
+      MethodNames.WithSelectionSet => NodeFactory.CreateSelectionSet(_root, methodCall),
+      _                            => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

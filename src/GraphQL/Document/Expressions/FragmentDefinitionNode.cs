@@ -30,24 +30,24 @@ internal class FragmentDefinitionNode : IteratorNode, INodeRoot, IFragmentDefini
 
   public ITypeConditionNode TypeCondition => new TypeConditionNode(_type);
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.IsDirective) ? this : null;
 
-  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodName.Represents.SelectionSet);
+  public ISelectionSetNode SelectionSet => GetNext<ISelectionSetNode>(MethodNames.IsSelectionSet);
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.IsDirective, this);
 
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithSelection    => NodeFactory.CreateSimpleSelectionSet(this, methodCall),
-      MethodName.WithSelectionSet => NodeFactory.CreateSelectionSet(this, methodCall),
-      MethodName.WithDirective    => NodeFactory.CreateDirective(this, methodCall),
-      _                           => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithSelection    => NodeFactory.CreateSimpleSelectionSet(this, methodCall),
+      MethodNames.WithSelectionSet => NodeFactory.CreateSelectionSet(this, methodCall),
+      MethodNames.WithDirective    => NodeFactory.CreateDirective(this, methodCall),
+      _                            => throw new ExpressionEvaluationException(methodCall)
     };
   }
 

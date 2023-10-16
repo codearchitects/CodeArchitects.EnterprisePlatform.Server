@@ -40,7 +40,7 @@ internal class SelectionSetNode : StreamingNode, ISelectionSetNode,
     if (_simpleSelectionSetEnumerator is not null)
       return SimpleSelectionSetMoveNext(ref _simpleSelectionSetEnumerator);
 
-    if (!Started && TryGetNext(MethodName.Represents.SelectionSet, out ISelectionSetNode? selectionSet))
+    if (!Started && TryGetNext(MethodNames.IsSelectionSet, out ISelectionSetNode? selectionSet))
     {
       _simpleSelectionSetEnumerator = selectionSet.Selections.GetEnumerator();
       return SimpleSelectionSetMoveNext(ref _simpleSelectionSetEnumerator);
@@ -62,10 +62,10 @@ internal class SelectionSetNode : StreamingNode, ISelectionSetNode,
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithSelection      => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
-      MethodName.WithFragmentSpread => NodeFactory.CreateFragmentSpread(_root, methodCall),
-      MethodName.WithInlineFragment => NodeFactory.CreateInlineFragment(_root, methodCall),
-      _                             => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithSelection      => NodeFactory.CreateSimpleSelectionSet(_root, methodCall),
+      MethodNames.WithFragmentSpread => NodeFactory.CreateFragmentSpread(_root, methodCall),
+      MethodNames.WithInlineFragment => NodeFactory.CreateInlineFragment(_root, methodCall),
+      _                              => throw new ExpressionEvaluationException(methodCall)
     };
   }
 

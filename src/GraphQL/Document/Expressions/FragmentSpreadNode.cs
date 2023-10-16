@@ -23,20 +23,20 @@ internal class FragmentSpreadNode : IteratorNode, IFragmentSpreadNode,
 
   public ReadOnlySpan<char> FragmentName => _fragment.Name;
 
-  public IDirectiveListNode? DirectiveList => Peek(MethodName.Represents.Directive) ? this : null;
+  public IDirectiveListNode? DirectiveList => Peek(MethodNames.IsDirective) ? this : null;
 
   public IEnumerable<IDirectiveNode> Directives => this;
 
   IDirectiveNode IEnumerator<IDirectiveNode>.Current => GetCurrent<IDirectiveNode>();
 
-  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Directive, this);
+  IEnumerator<IDirectiveNode> IEnumerable<IDirectiveNode>.GetEnumerator() => GetEnumerator(MethodNames.IsDirective, this);
 
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithDirective => NodeFactory.CreateDirective(_root, methodCall),
-      _                        => throw new ExpressionEvaluationException(methodCall)
+      MethodNames.WithDirective => NodeFactory.CreateDirective(_root, methodCall),
+      _                         => throw new ExpressionEvaluationException(methodCall)
     };
   }
 }

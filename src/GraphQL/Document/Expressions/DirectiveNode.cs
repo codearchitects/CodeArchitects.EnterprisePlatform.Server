@@ -21,19 +21,19 @@ internal class DirectiveNode : IteratorNode, IDirectiveNode,
 
   public ReadOnlySpan<char> Name => _name;
 
-  public IArgumentListNode? ArgumentList => Peek(MethodName.Represents.Argument) ? this : null;
+  public IArgumentListNode? ArgumentList => Peek(MethodNames.IsArgument) ? this : null;
 
   public IEnumerable<IArgumentNode> Arguments => this;
 
   IArgumentNode IEnumerator<IArgumentNode>.Current => GetCurrent<IArgumentNode>();
 
-  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodName.Represents.Argument, this);
+  IEnumerator<IArgumentNode> IEnumerable<IArgumentNode>.GetEnumerator() => GetEnumerator(MethodNames.IsArgument, this);
 
   protected override object OnMethodCall(MethodCallExpression methodCall)
   {
     return methodCall.Method.Name switch
     {
-      MethodName.WithArgument  => NodeFactory.CreateArgument(_root, methodCall),
+      MethodNames.WithArgument => NodeFactory.CreateArgument(_root, methodCall),
       _                        => throw new ExpressionEvaluationException(methodCall)
     };
   }

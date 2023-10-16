@@ -2,12 +2,12 @@
 
 namespace CodeArchitects.Platform.GraphQL.Document.Builder;
 
-public interface ISelectionSetBuilder<TField> : IExpander, ISelector
+public interface ISelectionSetBuilder<TField> : IBuilder
 {
   ISelectionSetBuilderWithSelection<TResult> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-public interface ISelectionSetBuilderWithSelection<TField> : IBuildResult<TField>
+public interface ISelectionSetBuilderWithSelection<TField> : IBuildResult<TField>, IBuilder
 {
   ISelectionSetBuilderWithSelection<TField> WithFragmentSpread(GraphFragment<TField> fragment);
 
@@ -19,13 +19,13 @@ public interface ISelectionSetBuilderWithSelection<TField> : IBuildResult<TField
     where TFragment : TField;
 }
 
-public interface ISelectionSetBuilder<TField, TVariables> : IExpander, ISelector
+public interface ISelectionSetBuilder<TField, TVariables> : IBuilder<TVariables>
   where TVariables : notnull
 {
   ISelectionSetBuilderWithSelection<TResult, TVariables> WithSelection<TResult>(Expression<Func<TField, TResult>> selection);
 }
 
-public interface ISelectionSetBuilderWithSelection<TField, TVariables> : IBuildResult<TField, TVariables>
+public interface ISelectionSetBuilderWithSelection<TField, TVariables> : IBuildResult<TField, TVariables>, IBuilder<TVariables>
   where TVariables : notnull
 {
   ISelectionSetBuilderWithSelection<TField, TVariables> WithFragmentSpread(GraphFragment<TField> fragment);

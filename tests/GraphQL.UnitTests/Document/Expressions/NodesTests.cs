@@ -199,7 +199,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithArgument("literalArg", literalValue))
       });
 
@@ -240,7 +240,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot, GetBlogsVariables>, IBuildResult<GetBlogsResult, GetBlogsVariables>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithArgument("first", vars => vars.Arg1)
           .WithArgument(vars => vars.Arg2))
       });
@@ -299,7 +299,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithArgument("inlineObj", new
           {
             ScalarField = 1,
@@ -421,7 +421,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithArgument("runtimeObj", obj))
       });
 
@@ -548,7 +548,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithDirective("directive1")
           .WithDirective("directive2", _ => _
             .WithArgument("directiveArg", 1)))
@@ -752,10 +752,10 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithSelection(connection => new Connection<Blog>
           {
-            Edges = _.ExpandCol(connection.Edges, _ => _
+            Edges = connection.Edges.Expand(_, _ => _
               .WithSelection(edge => new Edge<Blog>
               {
                 Cursor = edge.Cursor
@@ -812,10 +812,10 @@ public class NodesTests
     var expansion = Infer(_ => _
       .WithSelection(root => new
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithSelection(connection => new
           {
-            Edges = _.ExpandCol(connection.Edges, _ => _
+            Edges = connection.Edges.Expand(_, _ => _
               .WithSelection(edge => new
               {
                 edge.Cursor
@@ -874,7 +874,7 @@ public class NodesTests
     // Arrange
     Expression<Func<Connection<Blog>, Connection<Blog>>> defaultConnectionSelectionLambda = connection => new Connection<Blog>
     {
-      Edges = GQL.ExpandCol(connection.Edges, _ => _
+      Edges = connection.Edges.Expand(default(IBuilder)!, _ => _
         .WithSelection(edge => new Edge<Blog>
         {
           Cursor = edge.Cursor
@@ -947,9 +947,9 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.SelectRef(root.Field<Connection<Blog>>("blogs"), connection => new Connection<Blog>
+        Blogs = root.Field<Connection<Blog>>("blogs").Select(_, connection => new Connection<Blog>
         {
-          Edges = _.SelectCol(connection.Edges, edge => new Edge<Blog>
+          Edges = connection.Edges.Select(_, edge => new Edge<Blog>
           {
             Cursor = edge.Cursor
           })
@@ -1004,7 +1004,7 @@ public class NodesTests
     // Arrange
     Expression<Func<Connection<Blog>, Connection<Blog>>> defaultConnectionSelectionLambda = connection => new Connection<Blog>
     {
-      Edges = GQL.SelectCol(connection.Edges, edge => new Edge<Blog>
+      Edges = connection.Edges.Select(default(IBuilder)!, edge => new Edge<Blog>
       {
         Cursor = edge.Cursor
       })
@@ -1078,10 +1078,10 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithSelection(connection => new Connection<Blog>
           {
-            Nodes = _.ExpandCol(connection.Nodes, _ => _
+            Nodes = connection.Nodes.Expand(_, _ => _
               .WithSelectionSet(_ => _
                 .WithSelection(blog => new Blog
                 {
@@ -1179,10 +1179,10 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithSelection(connection => new Connection<Blog>
           {
-            Nodes = _.ExpandCol(connection.Nodes, _ => _
+            Nodes = connection.Nodes.Expand(_, _ => _
               .WithSelectionSet(_ => _
                 .WithSelection(blog => new Blog
                 {
@@ -1277,7 +1277,7 @@ public class NodesTests
     Expression<Func<IOperationBuilder<IDocumentRoot>, IBuildResult<GetBlogsResult>>> expansion = _ => _
       .WithSelection(root => new GetBlogsResult
       {
-        Blogs = _.ExpandRef(root.Field<Connection<Blog>>("blogs"), _ => _
+        Blogs = root.Field<Connection<Blog>>("blogs").Expand(_, _ => _
           .WithSelectionSet(_ => _
             .WithSelection(connection => new Connection<Blog>
             {
