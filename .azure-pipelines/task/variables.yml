@@ -1,5 +1,5 @@
 variables:
-  nugetConfig: 'NuGet.Config'
+  NugetConfig: 'NuGet.Config'
   restoreTemplate: 'task/restore-nuget.yml'
   buildTemplate: 'task/dotnet-build.yml'
   testTemplate: 'task/dotnet-test.yml'
