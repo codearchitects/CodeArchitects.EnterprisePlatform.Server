@@ -1,6 +1,8 @@
 trigger: none
 variables:
   - template : './task/variables.yml'
+    parameters:
+      packageVersion: ${{ parameters.packageVersion }}
 
 parameters:
   - name: packageVersion
