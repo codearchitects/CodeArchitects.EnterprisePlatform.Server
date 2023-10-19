@@ -8,5 +8,5 @@ internal interface IStateDescriptor
 
   IReadOnlyList<FieldInfo> Fields { get; }
 
-  object? DefaultValue { get; }
+  object GetDefaultValue();
 }

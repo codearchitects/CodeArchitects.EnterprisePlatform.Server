@@ -154,10 +154,10 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     Type interfaceType = GetInterfaceType();
     CheckInterfaceType(interfaceType);
 
-    bool isStateless = StateComponents.Count == 0;
-    IStateDescriptor<TState> state = CreateState<TState>(isStateless);
+    IStateDescriptor<TState> state = CreateState<TState>();
     Action<TActor, TState> updateState = CreateUpdateStateFunc<TState>(state.Fields);
     IActorIdDescriptor<TState> id = CreateId<TState>(state.Fields);
+    bool isStateless = StateComponents.Count == 0;
     bool isVirtual = IsExplicitVirtual || isStateless;
     IActorFactoryDescriptor factory = CreateFactory(interfaceType, id, isVirtual);
     Type activityBaseType = _activityTypeBuilder.BuildBase(ActorType);
@@ -272,61 +272,56 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
       .Compile();
   }
 
-  private IStateDescriptor<TState> CreateState<TState>(bool isStateless)
+  private IStateDescriptor<TState> CreateState<TState>()
     where TState : ActorState, new()
   {
-    StateDescriptor<TState> state = new();
+    FieldInfo[] fields = typeof(TState).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 
-    if (isStateless)
-    {
-      state.DefaultValue = new();
-    }
-    else if (IsExplicitVirtual)
-    {
-      state.DefaultValue = CreateVirtualStateValue<TState>(state.Fields);
-    }
+    Func<TState> defaultStateFactory = IsExplicitVirtual
+      ? CreateVirtualStateFactory<TState>(fields)
+      : static () => new TState();
 
-    return state;
+    return new StateDescriptor<TState>(defaultStateFactory, fields);
   }
 
-  private TState CreateVirtualStateValue<TState>(IReadOnlyList<FieldInfo> stateTypeFields)
+  private Func<TState> CreateVirtualStateFactory<TState>(IReadOnlyList<FieldInfo> stateTypeFields)
     where TState : ActorState, new()
   {
-    TState defaultStateValue = new();
+    return Expression.Lambda<Func<TState>>(
+      body: Expression.MemberInit(
+        newExpression: Expression.New(typeof(TState)),
+        bindings: StateComponents.Select(component => Expression.Bind(
+          member: stateTypeFields[component.Index],
+          expression: GetExpression(component)))))
+      .Compile();
+  }
 
-    foreach (StateComponentMetadata<TActor> component in StateComponents)
+  private Expression GetExpression(StateComponentMetadata<TActor> component)
+  {
+    if (!component.TryGetDefaultValue(out object? defaultValue))
     {
-      FieldInfo stateField = stateTypeFields[component.Index];
-
-      if (!component.HasDefaultValue(out object? defaultComponentValue))
+      try
       {
-        try
-        {
-          defaultComponentValue = Activator.CreateInstance(stateField.FieldType);
-        }
-        catch
-        {
-          throw InvalidActorException.ActorCannotBeVirtual(ActorType);
-        }
+        return Expression.New(component.Type);
       }
-      else
+      catch
       {
-        if (defaultComponentValue is null)
-        {
-          if (component.Type.IsValueType)
-            throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
-
-          continue;
-        }
-
-        if (!component.Type.IsInstanceOfType(defaultComponentValue))
-          throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
+        throw InvalidActorException.ActorCannotBeVirtual(ActorType);
       }
-
-      stateField.SetValue(defaultStateValue, defaultComponentValue);
     }
 
-    return defaultStateValue;
+    if (defaultValue is null)
+    {
+      if (component.Type.IsValueType)
+        throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
+
+      return Expression.Constant(null, component.Type);
+    }
+
+    if (!component.Type.IsInstanceOfType(defaultValue))
+      throw InvalidActorException.InvalidDefaultValue(ActorType, component.Member);
+
+    return component.FactoryExpression;
   }
 
   private IActorIdDescriptor<TState> CreateId<TState>(IReadOnlyList<FieldInfo> stateFields)

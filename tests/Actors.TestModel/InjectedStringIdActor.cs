@@ -80,7 +80,9 @@ internal static class InjectedStringIdActorFixture
       .SetState(_ => _
         .SetType(typeof(InjectedStringIdActorState))
         .SetFields(Array.Empty<FieldInfo>())
-        .SetDefaultValue(new InjectedStringIdActorState()))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new InjectedStringIdActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IInjectedStringIdActorFactory))
         .SetGetMethod(factoryGetMethod))

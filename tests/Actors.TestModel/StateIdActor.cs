@@ -26,6 +26,10 @@ internal class StateIdActor : IStateIdActor
 internal class StateIdActorState : OrdinaryActorState
 {
   public int _0 { get; set; }
+
+  public override bool Equals(object? obj) => obj is StateIdActorState other && Equals(_0, other._0);
+
+  public override int GetHashCode() => _0.GetHashCode();
 }
 
 internal abstract class StateIdActorActivity : Activity<StateIdActor>
@@ -90,7 +94,9 @@ internal static class StateIdActorFixture
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(StateIdActorState)))
         .SetFields(stateFields)
-        .SetDefaultValue(null))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new StateIdActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStateIdActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

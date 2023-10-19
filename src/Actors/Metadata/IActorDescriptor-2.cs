@@ -16,9 +16,9 @@ internal interface IActorDescriptor<TActor, TState> : IActorDescriptor
 
   new IReadOnlyCollection<IImplementationDescriptor<TActor, TState>> Implementations { get; }
 
-  TActor CreateInstance(int implementationId, IServiceProvider services, TState state, IActorContext<TActor> context);
-
   new IImplementationDescriptor<TActor, TState> GetImplementation(Type implementationType);
+
+  TActor CreateInstance(int implementationId, IServiceProvider services, TState state, IActorContext<TActor> context);
 
   void UpdateState(TActor actor, TState state);
 }
