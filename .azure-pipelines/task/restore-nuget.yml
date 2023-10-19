@@ -10,13 +10,14 @@ parameters:
 
 steps:
 - task: DownloadSecureFile@1
+  name: securefile
   inputs:
     secureFile: '${{parameters.nuGetConfigName}}'
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
     script: |
-      Copy-Item -Path $(${{ parameters.securefile }}.secureFilePath) -Destination ./NuGet.Config
+      Copy-Item -Path $(securefile.secureFilePath) -Destination ./NuGet.Config
   displayName: 'authentication'
 - task: DotNetCoreCLI@2
   displayName: Restore NuGet packages with dotnet cli
