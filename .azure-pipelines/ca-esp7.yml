@@ -42,6 +42,9 @@ steps:
     nuGetConfigName: ${{variables.NugetConfig}}
 - template: ${{variables.buildTemplate}}
 - template: ${{variables.testTemplate}}
+- template: ${{variables.packTemplate}}
+  parameters:
+    releaseType: ${{parameters.release}}
 - template: ${{variables.pushTemplate}}
   parameters:
     condition: ${{variables.condition}}

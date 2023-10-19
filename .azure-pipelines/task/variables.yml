@@ -3,6 +3,7 @@ variables:
   restoreTemplate: 'task/restore-nuget.yml'
   buildTemplate: 'task/dotnet-build.yml'
   testTemplate: 'task/dotnet-test.yml'
+  packTemplate: 'task/dotnet-pack.yml'
   pushTemplate: 'task/dotnet-push.yml'
   check-pushTemplate: 'task/check-publish.yml'
   triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
