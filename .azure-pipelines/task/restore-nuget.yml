@@ -16,7 +16,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $path = ${{parameters.nuGetConfigName}} + .secureFilePath
+      $path = "${{parameters.nuGetConfigName}}" + ".secureFilePath"
       Copy-Item -Path $( $(path) ) -Destination ./NuGet.Config
   displayName: 'authentication'
 - task: DotNetCoreCLI@2
