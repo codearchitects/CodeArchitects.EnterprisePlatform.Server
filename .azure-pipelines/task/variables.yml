@@ -8,7 +8,10 @@ variables:
   check-pushTemplate: 'task/check-publish.yml'
   triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   releaseCondition: eq('${{ parameters.Release }}', 'RC')
+  betaReleaseName: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
   ${{ if eq(parameters.release, 'beta') }}:
+    version: ${{ variables.betaReleaseName }}
     condition: 'succeeded()'
   ${{ if ne(parameters.release, 'beta') }}:
     condition: and(${{variables.triggerCondition}}, ${{variables.releaseCondition}})
+    version: ${{ parameters.packageVersion }}

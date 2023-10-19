@@ -20,10 +20,7 @@ parameters:
     type: string
     default: $(Rev:r)
 
-${{ if eq(parameters.release, 'beta') }}:
-  name: "${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}"
-${{ if ne(parameters.release, 'beta') }}:
-  name: "${{ parameters.packageVersion }}"
+name: "${{ variables.version }}"
 
 jobs:
 - job: ${{ parameters.release }}
