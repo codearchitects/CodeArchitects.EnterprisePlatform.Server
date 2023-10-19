@@ -30,6 +30,7 @@
 
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Analyzer.FunctionalTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.Dapr.UnitTests")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.FunctionalTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.TestModel")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Actors.UnitTests")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Common.Analyzer.FunctionalTests")]

@@ -102,6 +102,10 @@ internal class StandardActorState : OrdinaryActorState
 {
   public string _0 { get; set; } = default!;
   public StandardActorStateComponent _1 { get; set; } = default!;
+
+  public override bool Equals(object? obj) => obj is StandardActorState other && (_0, _1).Equals((other._0, other._1));
+
+  public override int GetHashCode() => HashCode.Combine(_0, _1);
 }
 
 [ActorFactory<StandardActor>]
@@ -458,7 +462,9 @@ internal static class StandardActorFixture
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(StandardActorState)))
         .SetFields(stateFields)
-        .SetDefaultValue(null))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new StandardActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStandardActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

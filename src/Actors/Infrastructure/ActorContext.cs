@@ -323,7 +323,7 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     if (!_descriptor.IsVirtual)
       throw new UninitializedActorException(typeof(TActor));
 
-    TState defaultValue = _descriptor.State.DefaultValue!;
+    TState defaultValue = _descriptor.State.GetDefaultValue();
     if (_descriptor.IsPolymorphic)
     {
       defaultValue.ImplementationId = _descriptor.DefaultImplementation.Id;

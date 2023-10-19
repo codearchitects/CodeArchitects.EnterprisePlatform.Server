@@ -1,5 +1,4 @@
 ﻿using CodeArchitects.Platform.Actors.Infrastructure;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Implementation;
@@ -7,12 +6,19 @@ namespace CodeArchitects.Platform.Actors.Metadata.Implementation;
 internal class StateDescriptor<TState> : IStateDescriptor<TState>
   where TState : ActorState
 {
-  [DisallowNull]
-  public TState? DefaultValue { get; set; }
+  private readonly Func<TState> _defaultStateFactory;
+
+  public StateDescriptor(Func<TState> defaultStateFactory, IReadOnlyList<FieldInfo> fields)
+  {
+    _defaultStateFactory = defaultStateFactory;
+    Fields = fields;
+  }
 
   public Type Type => typeof(TState);
 
-  public IReadOnlyList<FieldInfo> Fields => Type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+  public IReadOnlyList<FieldInfo> Fields { get; }
 
-  object? IStateDescriptor.DefaultValue => DefaultValue;
+  public TState GetDefaultValue() => _defaultStateFactory();
+
+  object IStateDescriptor.GetDefaultValue() => GetDefaultValue();
 }

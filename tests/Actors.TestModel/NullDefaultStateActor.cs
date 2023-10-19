@@ -36,7 +36,7 @@ internal class NullDefaultStateActorState : OrdinaryActorState
 {
   public string _0 { get; set; } = default!;
 
-  public override bool Equals(object? obj) => obj is NullDefaultStateActorState state && _0 == state._0;
+  public override bool Equals(object? obj) => obj is NullDefaultStateActorState other && Equals(_0, other._0);
 
   public override int GetHashCode() => _0.GetHashCode();
 }
@@ -83,7 +83,9 @@ internal static class NullDefaultStateActorFixture
       .SetState(_ => _
         .SetType(typeof(NullDefaultStateActorState))
         .SetFields(stateFields)
-        .SetDefaultValue(new NullDefaultStateActorState()))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new NullDefaultStateActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(INullDefaultStateActorFactory))
         .SetGetMethod(factoryGetMethod))

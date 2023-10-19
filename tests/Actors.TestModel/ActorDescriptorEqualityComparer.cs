@@ -172,14 +172,14 @@ internal class ActorDescriptorEqualityComparer :
     if (!x.Fields.SequenceEqual(y.Fields))
       return false;
 
-    if (x.DefaultValue is { } defaultValue)
+    if (x.GetDefaultValue() is { } defaultValue)
     {
-      if (!Equals(defaultValue, y.DefaultValue))
+      if (!Equals(defaultValue, y.GetDefaultValue()))
         return false;
     }
     else
     {
-      if (y.DefaultValue is not null)
+      if (y.GetDefaultValue() is not null)
         return false;
     }
 
