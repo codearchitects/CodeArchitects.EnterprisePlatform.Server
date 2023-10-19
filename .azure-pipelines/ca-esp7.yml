@@ -33,6 +33,8 @@ jobs:
 
   steps:
   - template: ${{variables.restoreTemplate}}
+    parameters:
+      nuGetConfigName: ${{variables.NugetConfig}}
   - template: ${{variables.buildTemplate}}
   - template: ${{variables.testTemplate}}
   - template: ${{variables.packTemplate}}
