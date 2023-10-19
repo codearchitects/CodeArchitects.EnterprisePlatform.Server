@@ -78,7 +78,9 @@ internal static class StatelessActorFixture
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(StatelessActorState)))
         .SetFields()
-        .SetDefaultValue(new StatelessActorState()))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new StatelessActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IStatelessActorFactory))
         .SetCreateAsyncMethod(null)

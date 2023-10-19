@@ -3,6 +3,7 @@ using CodeArchitects.Platform.Actors.Metadata;
 using CodeArchitects.Platform.Actors.Metadata.Factory;
 using CodeArchitects.Platform.Actors.Metadata.FluentMock;
 using CodeArchitects.Platform.Actors.Scheduling;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.TestModel;
@@ -46,18 +47,9 @@ public class ComplexObject
   public int Field0 { get; set; }
   public string Field1 { get; set; } = "field1";
 
-  public override bool Equals(object? obj)
-  {
-    if (obj is not ComplexObject other)
-      return false;
+  public override bool Equals(object? obj) => obj is ComplexObject other && Field0 == other.Field0 && Field1 == other.Field1;
 
-    return Field0 == other.Field0 && Field1 == other.Field1;
-  }
-
-  public override int GetHashCode()
-  {
-    return HashCode.Combine(Field0, Field1);
-  }
+  public override int GetHashCode() => HashCode.Combine(Field0, Field1);
 }
 
 internal class VirtualActorState : OrdinaryActorState
@@ -66,18 +58,9 @@ internal class VirtualActorState : OrdinaryActorState
   public string _1 { get; set; } = default!;
   public int _2 { get; set; }
 
-  public override bool Equals(object? obj)
-  {
-    if (obj is not VirtualActorState other)
-      return false;
+  public override bool Equals(object? obj) => obj is VirtualActorState other && (_0, _1, _2).Equals((other._0, other._1, other._2));
 
-    return (_0, _1, _2).Equals((other._0, other._1, other._2));
-  }
-
-  public override int GetHashCode()
-  {
-    return HashCode.Combine(_0, _1, _2);
-  }
+  public override int GetHashCode() => HashCode.Combine(_0, _1, _2);
 }
 
 internal abstract class VirtualActorActivity : Activity<VirtualActor>
@@ -114,9 +97,10 @@ internal interface IVirtualActorFactory
 
 internal class VirtualActorDescriptorFactory : ActorDescriptorFactory<VirtualActor>
 {
-  public VirtualActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
+  public VirtualActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder, IReadOnlyCollection<StateComponentMetadata<VirtualActor>> stateComponents)
     : base(stateTypeBuilder, activityTypeBuilder)
   {
+    StateComponents = stateComponents;
   }
 
   protected override Type? InterfaceType => typeof(IVirtualActor);
@@ -127,12 +111,7 @@ internal class VirtualActorDescriptorFactory : ActorDescriptorFactory<VirtualAct
 
   protected override bool IsExplicitVirtual => true;
 
-  protected override IReadOnlyCollection<StateComponentMetadata<VirtualActor>> StateComponents => new VirtualActorStateComponentMetadata[]
-  {
-    new VirtualActorStateComponentMetadata(0, VirtualActorFixture.ObjField, typeof(ComplexObject), new ComplexObject()),
-    new VirtualActorStateComponentMetadata(1, VirtualActorFixture.State1Field, typeof(string), VirtualActorFixture.State1Default),
-    new VirtualActorStateComponentMetadata(2, VirtualActorFixture.State2Field, typeof(int), 0),
-  };
+  protected override IReadOnlyCollection<StateComponentMetadata<VirtualActor>> StateComponents { get; }
 
   protected override IEnumerable<MemberMetadata> ActorIdMembers => Enumerable.Empty<MemberMetadata>();
 
@@ -146,11 +125,32 @@ internal class VirtualActorDescriptorFactory : ActorDescriptorFactory<VirtualAct
   }
 }
 
-internal class VirtualActorStateComponentMetadata : StateComponentMetadata<VirtualActor>
+internal class VirtualActorStateComponentMetadataWithFactory<T> : StateComponentMetadata<VirtualActor>
 {
-  private readonly object _defaultValue;
+  private readonly Func<T> _defaultValueFactory;
 
-  public VirtualActorStateComponentMetadata(int index, MemberInfo member, Type type, object defaultValue)
+  public VirtualActorStateComponentMetadataWithFactory(int index, MemberInfo member, Type type, Func<T> defaultValueFactory)
+    : base(index, member, type)
+  {
+    _defaultValueFactory = defaultValueFactory;
+  }
+
+  public override bool IsActorId => false;
+
+  public override Expression FactoryExpression => Expression.Invoke(Expression.Constant(_defaultValueFactory));
+
+  public override bool TryGetDefaultValue(out object? defaultValue)
+  {
+    defaultValue = _defaultValueFactory();
+    return true;
+  }
+}
+
+internal class VirtualActorStateComponentMetadataWithConstant<T> : StateComponentMetadata<VirtualActor>
+{
+  private readonly T _defaultValue;
+
+  public VirtualActorStateComponentMetadataWithConstant(int index, MemberInfo member, Type type, T defaultValue)
     : base(index, member, type)
   {
     _defaultValue = defaultValue;
@@ -158,9 +158,11 @@ internal class VirtualActorStateComponentMetadata : StateComponentMetadata<Virtu
 
   public override bool IsActorId => false;
 
-  public override bool HasDefaultValue(out object? defaultComponentValue)
+  public override Expression FactoryExpression => Expression.Constant(_defaultValue);
+
+  public override bool TryGetDefaultValue(out object? defaultValue)
   {
-    defaultComponentValue = _defaultValue;
+    defaultValue = _defaultValue;
     return true;
   }
 }
@@ -209,6 +211,20 @@ internal static class VirtualActorFixture
       name: "_state2",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
+    MethodInfo incrementState2Method = typeof(VirtualActor).GetRequiredMethod(
+      name: nameof(VirtualActor.IncrementState2),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
+
+    MethodInfo incrementField0Method = typeof(VirtualActor).GetRequiredMethod(
+      name: nameof(VirtualActor.IncrementField0),
+      bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+      types: Type.EmptyTypes);
+
+    FieldInfo[] activity1Fields = typeof(VirtualActorActivity1).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+    FieldInfo[] activity2Fields = typeof(VirtualActorActivity2).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
     MethodInfo factoryGetMethod = typeof(IVirtualActorFactory).GetRequiredMethod(
       name: nameof(IVirtualActorFactory.Get),
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
@@ -231,7 +247,27 @@ internal static class VirtualActorFixture
       .SetIsVirtual(true)
       .SetActivityBaseType(typeof(VirtualActorActivity))
       .SetMethods()
-      .SetActivities()
+      .SetActivities(_ => _
+        .Add<VoidMethodDescriptorBuilder>(_ => _
+          .InitDefaults()
+          .SetId(1)
+          .SetName(nameof(VirtualActor.IncrementState2))
+          .SetInterfaceMethod(null)
+          .SetImplementationMethod(incrementState2Method)
+          .SetParameterTypes(Type.EmptyTypes)
+          .SetActivityType(typeof(VirtualActorActivity1))
+          .SetActivityFields(activity1Fields)
+          .SetHasCancellationTokenParameter(false))
+        .Add<VoidMethodDescriptorBuilder>(_ => _
+          .InitDefaults()
+          .SetId(2)
+          .SetName(nameof(VirtualActor.IncrementField0))
+          .SetInterfaceMethod(null)
+          .SetImplementationMethod(incrementField0Method)
+          .SetParameterTypes(Type.EmptyTypes)
+          .SetActivityType(typeof(VirtualActorActivity2))
+          .SetActivityFields(activity2Fields)
+          .SetHasCancellationTokenParameter(false)))
       .SetId(_ => _
         .SetType(typeof(string))
         .SetHasIdSource(false)
@@ -239,12 +275,14 @@ internal static class VirtualActorFixture
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(VirtualActorState)))
         .SetFields(stateFields)
-        .SetDefaultValue(new VirtualActorState
-        {
-          _0 = new ComplexObject(),
-          _1 = State1Default,
-          _2 = 0
-        }))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new VirtualActorState
+          {
+            _0 = new ComplexObject(),
+            _1 = State1Default,
+            _2 = 0
+          })))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IVirtualActorFactory))
         .SetCreateAsyncMethod(null)
@@ -264,6 +302,14 @@ internal static class VirtualActorFixture
     activityTypeBuilderMock
       .Setup(x => x.BuildBase(actorType))
       .Returns(activityBaseType);
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 1), actorType, activityBaseType))
+      .Returns(typeof(VirtualActorActivity1));
+
+    activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 2), actorType, activityBaseType))
+      .Returns(typeof(VirtualActorActivity2));
   }
 
   public static void AssertValidDescriptor(IActorDescriptor descriptor)

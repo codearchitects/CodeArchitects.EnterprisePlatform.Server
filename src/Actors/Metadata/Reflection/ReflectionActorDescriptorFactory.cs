@@ -38,8 +38,8 @@ internal class ReflectionActorDescriptorFactory<TActor> : ActorDescriptorFactory
   {
     get
     {
-      MemberInfo[] members = ActorType
-        .GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+      MemberInfo[] members = ActorType.GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
       foreach (MemberInfo member in members)
       {
         if (!member.IsDefined(typeof(ActorIdAttribute)) || member.IsDefined(typeof(StateAttribute)))

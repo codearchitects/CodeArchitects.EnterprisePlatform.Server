@@ -87,6 +87,10 @@ internal class PolymorphicActorImplementation2 : PolymorphicActor
 internal class PolymorphicActorState : Infrastructure.PolymorphicActorState
 {
   public int _0 { get; set; }
+
+  public override bool Equals(object? obj) => obj is PolymorphicActorState other && _0.Equals(other._0);
+
+  public override int GetHashCode() => _0.GetHashCode();
 }
 
 [ActorFactory<PolymorphicActor>]
@@ -314,7 +318,9 @@ internal static class PolymorphicActorFixture
       .SetState(_ => _
         .SetType(new StateTypeDelegator(typeof(PolymorphicActorState)))
         .SetFields(stateFields)
-        .SetDefaultValue(null))
+        .Setup(mock => mock
+          .Setup(x => x.GetDefaultValue())
+          .Returns(() => new PolymorphicActorState())))
       .SetFactory(_ => _
         .SetFactoryType(typeof(IPolymorphicActorFactory))
         .SetCreateAsyncMethod(factoryCreateAsyncMethod)

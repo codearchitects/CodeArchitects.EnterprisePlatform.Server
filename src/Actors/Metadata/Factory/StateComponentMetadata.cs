@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Factory;
 
@@ -15,9 +16,11 @@ internal abstract class StateComponentMetadata<TActor> : MemberMetadata, IStateC
 
   public int Index { get; }
 
-  public abstract bool HasDefaultValue(out object? defaultComponentValue);
+  public abstract Expression FactoryExpression { get; }
 
   public abstract bool IsActorId { get; }
+
+  public abstract bool TryGetDefaultValue(out object? defaultValue);
 
   private void CheckStateType()
   {

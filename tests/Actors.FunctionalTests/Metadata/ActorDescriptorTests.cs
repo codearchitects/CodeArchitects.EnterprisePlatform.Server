@@ -7,35 +7,44 @@ namespace CodeArchitects.Platform.Actors.Metadata;
 
 public class ActorDescriptorTests
 {
-  private readonly IActorDescriptor<VirtualActor, VirtualActorState> _descriptor;
+  private readonly Mock<IStateTypeBuilder> _stateTypeBuilderMock;
+  private readonly Mock<IActivityTypeBuilder> _activityTypeBuilderMock;
 
   public ActorDescriptorTests()
   {
-    Mock<IStateTypeBuilder> stateTypeBuilderMock = new(MockBehavior.Strict);
-    stateTypeBuilderMock
+    _stateTypeBuilderMock = new(MockBehavior.Strict);
+    _stateTypeBuilderMock
       .Setup(x => x.Build(typeof(VirtualActor), It.Is<IEnumerable<IStateComponentMetadata>>(components => components.Count() == 3), false))
       .Returns(typeof(VirtualActorState));
 
-    Mock<IActivityTypeBuilder> activityTypeBuilderMock = new(MockBehavior.Strict);
-    activityTypeBuilderMock
+    _activityTypeBuilderMock = new(MockBehavior.Strict);
+    _activityTypeBuilderMock
       .Setup(x => x.BuildBase(typeof(VirtualActor)))
       .Returns(typeof(VirtualActorActivity));
-    activityTypeBuilderMock
-      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Name == nameof(VirtualActor.IncrementState2)), typeof(VirtualActor), typeof(VirtualActorActivity)))
+    _activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 1), typeof(VirtualActor), typeof(VirtualActorActivity)))
       .Returns(typeof(VirtualActorActivity1));
-    activityTypeBuilderMock
-      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Name == nameof(VirtualActor.IncrementField0)), typeof(VirtualActor), typeof(VirtualActorActivity)))
+    _activityTypeBuilderMock
+      .Setup(x => x.Build(It.Is<IMethodDescriptor>(method => method.Id == 2), typeof(VirtualActor), typeof(VirtualActorActivity)))
       .Returns(typeof(VirtualActorActivity2));
+  }
 
-    VirtualActorDescriptorFactory factory = new VirtualActorDescriptorFactory(stateTypeBuilderMock.Object, activityTypeBuilderMock.Object);
-    _descriptor = (IActorDescriptor<VirtualActor, VirtualActorState>)factory.CreateDescriptor();
+  private VirtualActorDescriptorFactory CreateDescriptorFactory(params StateComponentMetadata<VirtualActor>[] components)
+  {
+    return new VirtualActorDescriptorFactory(_stateTypeBuilderMock.Object, _activityTypeBuilderMock.Object, components);
   }
 
   [Fact]
   public void UpdateState_ShouldNotModifyVirtualStateDefaultValue_WhenStateComponentIsValueType()
   {
     // Arrange
-    VirtualActorState defaultState = _descriptor.State.DefaultValue!;
+    VirtualActorDescriptorFactory factory = CreateDescriptorFactory(
+      new VirtualActorStateComponentMetadataWithFactory<ComplexObject>(0, VirtualActorFixture.ObjField, typeof(ComplexObject), () => new ComplexObject()),
+      new VirtualActorStateComponentMetadataWithConstant<string>(1, VirtualActorFixture.State1Field, typeof(string), VirtualActorFixture.State1Default),
+      new VirtualActorStateComponentMetadataWithConstant<int>(2, VirtualActorFixture.State2Field, typeof(int), 0));
+
+    IActorDescriptor<VirtualActor, VirtualActorState>  descriptor = (IActorDescriptor<VirtualActor, VirtualActorState>)factory.CreateDescriptor();
+    VirtualActorState defaultState = descriptor.State.GetDefaultValue();
     VirtualActorState expected = new VirtualActorState
     {
       _0 = new ComplexObject
@@ -48,19 +57,25 @@ public class ActorDescriptorTests
     };
 
     // Act
-    VirtualActor actor = _descriptor.CreateInstance(0, Mock.Of<IServiceProvider>(), defaultState, Mock.Of<IActorContext<VirtualActor>>());
+    VirtualActor actor = descriptor.CreateInstance(0, Mock.Of<IServiceProvider>(), defaultState, Mock.Of<IActorContext<VirtualActor>>());
     actor.IncrementState2();
-    _descriptor.UpdateState(actor, defaultState);
+    descriptor.UpdateState(actor, defaultState);
 
     // Assert
-    _descriptor.State.DefaultValue!.Should().Be(expected);
+    descriptor.State.GetDefaultValue().Should().Be(expected);
   }
 
   [Fact]
-  public void UpdateState_ShouldNotModifyVirtualStateDefaultValue_WhenStateComponentIsReferenceType()
+  public void UpdateState_ShouldNotModifyVirtualStateDefaultValue_WhenStateComponentIsReferenceTypeAndDefaultValueFactoryIsUsed()
   {
     // Arrange
-    VirtualActorState defaultState = _descriptor.State.DefaultValue!;
+    VirtualActorDescriptorFactory factory = CreateDescriptorFactory(
+      new VirtualActorStateComponentMetadataWithFactory<ComplexObject>(0, VirtualActorFixture.ObjField, typeof(ComplexObject), () => new ComplexObject()),
+      new VirtualActorStateComponentMetadataWithConstant<string>(1, VirtualActorFixture.State1Field, typeof(string), VirtualActorFixture.State1Default),
+      new VirtualActorStateComponentMetadataWithConstant<int>(2, VirtualActorFixture.State2Field, typeof(int), 0));
+
+    IActorDescriptor<VirtualActor, VirtualActorState> descriptor = (IActorDescriptor<VirtualActor, VirtualActorState>)factory.CreateDescriptor();
+    VirtualActorState defaultState = descriptor.State.GetDefaultValue();
     VirtualActorState expected = new VirtualActorState
     {
       _0 = new ComplexObject
@@ -73,11 +88,42 @@ public class ActorDescriptorTests
     };
 
     // Act
-    VirtualActor actor = _descriptor.CreateInstance(0, Mock.Of<IServiceProvider>(), defaultState, Mock.Of<IActorContext<VirtualActor>>());
+    VirtualActor actor = descriptor.CreateInstance(0, Mock.Of<IServiceProvider>(), defaultState, Mock.Of<IActorContext<VirtualActor>>());
     actor.IncrementField0();
-    _descriptor.UpdateState(actor, defaultState);
+    descriptor.UpdateState(actor, defaultState);
 
     // Assert
-    _descriptor.State.DefaultValue!.Should().Be(expected);
+    descriptor.State.GetDefaultValue().Should().Be(expected);
+  }
+
+  [Fact]
+  public void UpdateState_ShouldModifyVirtualStateDefaultValue_WhenStateComponentIsReferenceTypeAndDefaultValueConstantIsUsed()
+  {
+    // Arrange
+    VirtualActorDescriptorFactory factory = CreateDescriptorFactory(
+      new VirtualActorStateComponentMetadataWithConstant<ComplexObject>(0, VirtualActorFixture.ObjField, typeof(ComplexObject), new ComplexObject()),
+      new VirtualActorStateComponentMetadataWithConstant<string>(1, VirtualActorFixture.State1Field, typeof(string), VirtualActorFixture.State1Default),
+      new VirtualActorStateComponentMetadataWithConstant<int>(2, VirtualActorFixture.State2Field, typeof(int), 0));
+
+    IActorDescriptor<VirtualActor, VirtualActorState> descriptor = (IActorDescriptor<VirtualActor, VirtualActorState>)factory.CreateDescriptor();
+    VirtualActorState defaultState = descriptor.State.GetDefaultValue();
+    VirtualActorState expected = new VirtualActorState
+    {
+      _0 = new ComplexObject
+      {
+        Field0 = defaultState._0.Field0,
+        Field1 = defaultState._0.Field1
+      },
+      _1 = defaultState._1,
+      _2 = defaultState._2
+    };
+
+    // Act
+    VirtualActor actor = descriptor.CreateInstance(0, Mock.Of<IServiceProvider>(), defaultState, Mock.Of<IActorContext<VirtualActor>>());
+    actor.IncrementField0();
+    descriptor.UpdateState(actor, defaultState);
+
+    // Assert
+    descriptor.State.GetDefaultValue().Should().NotBe(expected);
   }
 }

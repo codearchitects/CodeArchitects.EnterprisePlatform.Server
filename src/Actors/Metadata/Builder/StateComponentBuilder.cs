@@ -1,13 +1,14 @@
 ﻿using CodeArchitects.Platform.Actors.Metadata.Factory;
-using CodeArchitects.Platform.Common;
+using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Builder;
 
-internal class StateComponentBuilder<TActor, TState> : StateComponentMetadata<TActor>, IStateComponentBuilder<TActor, TState>
+internal class StateComponentBuilder<TActor, TStateComponent> : StateComponentMetadata<TActor>, IStateComponentBuilder<TActor, TStateComponent>
   where TActor : class
 {
-  private Optional<TState> _defaultValue;
+  private Func<TStateComponent>? _defaultValueFactory;
   private bool _isActorId;
 
   public StateComponentBuilder(int index, MemberInfo member, Type type)
@@ -17,27 +18,43 @@ internal class StateComponentBuilder<TActor, TState> : StateComponentMetadata<TA
 
   public override bool IsActorId => _isActorId;
 
-  public IStateComponentBuilder<TActor, TState> AsBuilder() => this;
-
-  public override bool HasDefaultValue(out object? defaultComponentValue)
+  public override Expression FactoryExpression
   {
-    if (_defaultValue.HasValue)
+    get
     {
-      defaultComponentValue = _defaultValue.Value;
-      return true;
-    }
+      Debug.Assert(_defaultValueFactory != null);
 
-    defaultComponentValue = null;
-    return false;
+      return Expression.Invoke(Expression.Constant(_defaultValueFactory));
+    }
   }
 
-  IStateComponentBuilder<TActor, TState> IStateComponentBuilder<TActor, TState>.HasDefaultValue(TState value)
+  public IStateComponentBuilder<TActor, TStateComponent> AsBuilder() => this;
+
+  public override bool TryGetDefaultValue(out object? defaultValue)
   {
-    _defaultValue = value;
+    if (_defaultValueFactory is null)
+    {
+      defaultValue = null;
+      return false;
+    }
+
+    defaultValue = _defaultValueFactory();
+    return true;
+  }
+
+  IStateComponentBuilder<TActor, TStateComponent> IStateComponentBuilder<TActor, TStateComponent>.HasDefaultValue(TStateComponent value)
+  {
+    _defaultValueFactory = () => value;
     return this;
   }
 
-  IStateComponentBuilder<TActor, TState> IStateComponentBuilder<TActor, TState>.IsActorId(bool isActorId)
+  IStateComponentBuilder<TActor, TStateComponent> IStateComponentBuilder<TActor, TStateComponent>.HasDefaultValueFactory(Func<TStateComponent> valueFactory)
+  {
+    _defaultValueFactory = valueFactory;
+    return this;
+  }
+
+  IStateComponentBuilder<TActor, TStateComponent> IStateComponentBuilder<TActor, TStateComponent>.IsActorId(bool isActorId)
   {
     _isActorId = isActorId;
     return this;

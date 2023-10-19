@@ -1,5 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Metadata.Factory;
 using CodeArchitects.Platform.Common;
+using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Actors.Metadata.Reflection;
@@ -14,17 +16,27 @@ internal class ReflectionStateComponentMetadata<TActor> : StateComponentMetadata
 
   public override bool IsActorId => Member.IsDefined(typeof(ActorIdAttribute));
 
-  public override bool HasDefaultValue(out object? defaultComponentValue)
+  public override Expression FactoryExpression
   {
-    Optional<object?> defaultValue = Member.GetCustomAttribute<StateAttribute>().DefaultValue;
-
-    if (defaultValue.HasValue)
+    get
     {
-      defaultComponentValue = defaultValue.Value;
-      return true;
-    }
+      Optional<object?> optionalDefaultValue = GetOptionalDefaultValue();
+      Debug.Assert(optionalDefaultValue.HasValue);
 
-    defaultComponentValue = null;
-    return false;
+      return Expression.Constant(optionalDefaultValue.Value);
+    }
+  }
+
+  public override bool TryGetDefaultValue(out object? defaultValue)
+  {
+    Optional<object?> optionalDefaultValue = GetOptionalDefaultValue();
+
+    defaultValue = optionalDefaultValue.Value;
+    return optionalDefaultValue.HasValue;
+  }
+
+  private Optional<object?> GetOptionalDefaultValue()
+  {
+    return Member.GetCustomAttribute<StateAttribute>().DefaultValue;
   }
 }
