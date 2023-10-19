@@ -35,6 +35,7 @@ jobs:
   - template: ${{variables.restoreTemplate}}
     parameters:
       nuGetConfigName: ${{variables.NugetConfig}}
+      type: string
   - template: ${{variables.buildTemplate}}
   - template: ${{variables.testTemplate}}
   - template: ${{variables.packTemplate}}
