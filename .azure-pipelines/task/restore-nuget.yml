@@ -3,6 +3,10 @@ parameters:
     displayName: solution
     type: string
     default: "*/**.sln"
+  - name: nuGetConfigName
+    displayName: nuGetConfigName
+    type: string
+    default: "NuGet.Config"
 
 steps:
 - task: DownloadSecureFile@1
