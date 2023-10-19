@@ -17,7 +17,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      Copy-Item $(${{parameters.nuGetConfigName}}.secureFilePath) ./NuGet.Config
+      Copy-Item "$(${{parameters.nuGetConfigName}}.secureFilePath)" ./NuGet.Config
   displayName: 'authentication'
 - task: DotNetCoreCLI@2
   displayName: Restore NuGet packages with dotnet cli
