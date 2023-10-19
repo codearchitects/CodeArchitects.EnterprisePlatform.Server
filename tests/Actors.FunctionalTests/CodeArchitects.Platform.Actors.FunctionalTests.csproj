@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Actors.TestModel\CodeArchitects.Platform.Actors.TestModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Metadata\Factory\" />
+  </ItemGroup>
+
 </Project>

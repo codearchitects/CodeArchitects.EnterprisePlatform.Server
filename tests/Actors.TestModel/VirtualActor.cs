@@ -21,13 +21,23 @@ public class VirtualActor : IVirtualActor
   private readonly string _state1;
   
   [State]
-  private readonly int _state2;
+  private int _state2;
 
   public VirtualActor(ComplexObject obj, string state1, int state2)
   {
     _obj = obj;
     _state1 = state1;
     _state2 = state2;
+  }
+
+  public void IncrementState2()
+  {
+    _state2++;
+  }
+
+  public void IncrementField0()
+  {
+    _obj.Field0++;
   }
 }
 
@@ -74,10 +84,101 @@ internal abstract class VirtualActorActivity : Activity<VirtualActor>
 {
 }
 
+internal class VirtualActorActivity1 : VirtualActorActivity
+{
+  public override int Id => 1;
+
+  public override Task ExecuteAsync(VirtualActor actor, CancellationToken cancellationToken)
+  {
+    actor.IncrementState2();
+    return Task.CompletedTask;
+  }
+}
+
+internal class VirtualActorActivity2 : VirtualActorActivity
+{
+  public override int Id => 2;
+
+  public override Task ExecuteAsync(VirtualActor actor, CancellationToken cancellationToken)
+  {
+    actor.IncrementField0();
+    return Task.CompletedTask;
+  }
+}
+
 [ActorFactory(typeof(VirtualActor))]
 internal interface IVirtualActorFactory
 {
   IVirtualActor Get(string id);
+}
+
+internal class VirtualActorDescriptorFactory : ActorDescriptorFactory<VirtualActor>
+{
+  public VirtualActorDescriptorFactory(IStateTypeBuilder stateTypeBuilder, IActivityTypeBuilder activityTypeBuilder)
+    : base(stateTypeBuilder, activityTypeBuilder)
+  {
+  }
+
+  protected override Type? InterfaceType => typeof(IVirtualActor);
+
+  protected override Type? FactoryType => typeof(IVirtualActorFactory);
+
+  protected override Type? IdType => typeof(string);
+
+  protected override bool IsExplicitVirtual => true;
+
+  protected override IReadOnlyCollection<StateComponentMetadata<VirtualActor>> StateComponents => new VirtualActorStateComponentMetadata[]
+  {
+    new VirtualActorStateComponentMetadata(0, VirtualActorFixture.ObjField, typeof(ComplexObject), new ComplexObject()),
+    new VirtualActorStateComponentMetadata(1, VirtualActorFixture.State1Field, typeof(string), VirtualActorFixture.State1Default),
+    new VirtualActorStateComponentMetadata(2, VirtualActorFixture.State2Field, typeof(int), 0),
+  };
+
+  protected override IEnumerable<MemberMetadata> ActorIdMembers => Enumerable.Empty<MemberMetadata>();
+
+  protected override ImplementationDescriptorFactory<VirtualActor> BaseImplementationFactory => new VirtualActorImplementationDescriptorFactory(0, this);
+
+  protected override IReadOnlyCollection<ImplementationDescriptorFactory<VirtualActor>> ImplementationFactories => Array.Empty<ImplementationDescriptorFactory<VirtualActor>>();
+
+  protected override IReadOnlyCollection<IMessageHandlerMetadata> GetMessageHandlerMetadataCollection(IMethodDescriptor activity)
+  {
+    throw new NotImplementedException();
+  }
+}
+
+internal class VirtualActorStateComponentMetadata : StateComponentMetadata<VirtualActor>
+{
+  private readonly object _defaultValue;
+
+  public VirtualActorStateComponentMetadata(int index, MemberInfo member, Type type, object defaultValue)
+    : base(index, member, type)
+  {
+    _defaultValue = defaultValue;
+  }
+
+  public override bool IsActorId => false;
+
+  public override bool HasDefaultValue(out object? defaultComponentValue)
+  {
+    defaultComponentValue = _defaultValue;
+    return true;
+  }
+}
+
+internal class VirtualActorImplementationDescriptorFactory : ImplementationDescriptorFactory<VirtualActor>
+{
+  public VirtualActorImplementationDescriptorFactory(int id, ActorDescriptorFactory<VirtualActor> actorDescriptorFactory)
+    : base(id, actorDescriptorFactory)
+  {
+  }
+
+  public override bool IsDefault => true;
+
+  public override Type ImplementationType => typeof(VirtualActor);
+
+  protected override bool DefinesStateMembers => true;
+
+  protected override ConstructorInfo? Constructor => VirtualActorFixture.Constructor;
 }
 
 internal static class VirtualActorFixture
@@ -85,24 +186,26 @@ internal static class VirtualActorFixture
   public const string State1Default = "state1Default";
 
   public static IActorDescriptor Descriptor;
+  public static readonly ConstructorInfo Constructor;
+  public static readonly FieldInfo ObjField;
+  public static readonly FieldInfo State1Field;
+  public static readonly FieldInfo State2Field;
 
   static VirtualActorFixture()
   {
-    ConstructorInfo constructor = typeof(VirtualActor).GetRequiredConstructor(
+    Constructor = typeof(VirtualActor).GetRequiredConstructor(
       bindingAttr: BindingFlags.Public | BindingFlags.Instance,
       types: new[] { typeof(ComplexObject), typeof(string), typeof(int) });
 
-    ParameterInfo[] constructorParameters = constructor.GetParameters();
-
-    FieldInfo objField = typeof(VirtualActor).GetRequiredField(
+    ObjField = typeof(VirtualActor).GetRequiredField(
       name: "_obj",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    FieldInfo state1Field = typeof(VirtualActor).GetRequiredField(
+    State1Field = typeof(VirtualActor).GetRequiredField(
       name: "_state1",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
-    FieldInfo state2Field = typeof(VirtualActor).GetRequiredField(
+    State2Field = typeof(VirtualActor).GetRequiredField(
       name: "_state2",
       bindingAttr: BindingFlags.NonPublic | BindingFlags.Instance);
 
