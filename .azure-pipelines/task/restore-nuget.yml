@@ -10,7 +10,6 @@ parameters:
 
 steps:
 - task: DownloadSecureFile@1
-  name: NuGetConfig
   inputs:
     secureFile: '${{parameters.nuGetConfigName}}'
 - task: PowerShell@2
