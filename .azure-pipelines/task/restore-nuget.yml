@@ -6,7 +6,7 @@ parameters:
   - name: nuGetConfigName
     displayName: nuGetConfigName
     type: string
-    default: "NuGet.Config"
+    default: "${{variables.NugetConfig}}"
 
 steps:
 - task: DownloadSecureFile@1
