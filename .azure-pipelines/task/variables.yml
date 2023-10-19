@@ -9,6 +9,7 @@ variables:
   triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   releaseCondition: eq('${{ parameters.Release }}', 'RC')
   betaReleaseName: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
+  prefix: 'CodeArchitects.Platform'
   ${{ if eq(parameters.release, 'beta') }}:
     version: ${{ variables.betaReleaseName }}
     condition: 'succeeded()'
