@@ -1,0 +1,13 @@
+variables:
+  nugetConfig: 'NuGet.Config'
+  restoreTemplate: 'task/restore-nuget.yml'
+  buildTemplate: 'task/dotnet-build.yml'
+  testTemplate: 'task/dotnet-test.yml'
+  pushTemplate: 'task/dotnet-push.yml'
+  check-pushTemplate: 'task/check-publish.yml'
+  triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  releaseCondition: eq('${{ parameters.Release }}', 'RC')
+  ${{ if eq(parameters.release, 'beta') }}:
+    condition: 'succeeded()'
+  ${{ if ne(parameters.release, 'beta') }}:
+    condition: and(${{variables.triggerCondition}}, ${{variables.releaseCondition}})

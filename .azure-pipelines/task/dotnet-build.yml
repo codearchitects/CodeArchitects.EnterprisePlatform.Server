@@ -14,7 +14,7 @@ parameters:
 
 steps:
 - task: PowerShell@2
-  displayName: build $(solution)
+  displayName: build ${{parameters.solution}}
   inputs:
     targetType: 'inline'
-    script: 'dotnet build $(solution) --no-restore -c $(buildConfiguration)'
+    script: 'dotnet build ${{parameters.solution}} --no-restore -c ${{parameters.buildConfiguration}}'

@@ -1,0 +1,45 @@
+parameters:
+- name: workDir
+  displayName: workDir
+  type: string
+  default: $(System.DefaultWorkingDirectory)
+- name: condition
+  displayName: condition
+  type: string
+
+steps:
+- task: PowerShell@2
+  condition: ${{ parameters.condition }}
+  displayName: Check package availability
+  inputs:
+    targetType: 'inline'
+    workingDirectory: ${{ parameters.workDir }}
+    script: |
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+      $user = $env:SA_NAME
+      $token = $env:TOKEN
+      $base64auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $user, $token )))
+      $header = @{"Accept" = "*/*"; Authorization = ("Basic {0}" -f $base64auth) }
+      $password = ConvertTo-SecureString $token -AsPlainText -Force
+      $credential = New-Object System.Management.Automation.PSCredential($user, $password)
+
+      $pkgName = "$env:NPM_PACKAGE_NAME"
+      $pkgName = $pkgName.Replace('@', '%40').Replace('/', '%2F')
+      $pkgDest = $env:REGISTRY_LIST
+      $pkgDest = $pkgDest.Split(',')
+      $version = "$(Build.BuildNumber)"
+
+      $methods = @( "Head", "Get" )
+      $domain = "https://devops.codearchitects.com:444/Code%20Architects/_apis/packaging/feeds"
+
+      foreach ( $registry in $pkgDest ){
+        Write-Host "Checking for $registry registry..."
+        $uri = "$domain/$registry/npm/packages/$pkgName/versions/$(Build.BuildNumber)/content?api-version=5.0-preview.1"
+        Write-Host "Uri: $uri"
+        foreach ( $method in $methods ) {
+          Invoke-RestMethod -Method $method -Headers $header -Credential $credential -Uri $uri
+        }
+      }
+  env:
+    TOKEN: $(SA_TOKEN)

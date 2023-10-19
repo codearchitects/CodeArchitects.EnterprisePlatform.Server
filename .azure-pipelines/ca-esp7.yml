@@ -1,0 +1,51 @@
+trigger:
+  - main
+  - develop
+variables:
+  - template : './task/variables.yml'
+
+parameters:
+  - name: packageVersion
+    type: string
+    default: 0.0.$(Rev:r)
+    displayname: 'Package Version'
+  - name: release
+    type: string
+    default: CI
+    values:
+      - 'CI'
+      - 'RC'
+      - 'Beta'
+    displayname: 'Release'
+  - name: betaVersion
+    displayName: 'Only if selected Release is "beta": 14.1.0-beta.<betaVersion>'
+    type: string
+    default: $(Rev:r)
+
+
+name:
+  ${{ if eq(parameters.release, 'beta') }}:
+    "${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}"
+  ${{ if ne(parameters.release, 'beta') }}:
+    "${{ parameters.packageVersion }}"
+
+jobs:
+- job: ${{ parameters.release }}
+  pool:
+    name: kubernetes
+    demands:
+    - DOTNET_VERSION -equals 7
+
+steps:
+- template: ${{variables.restoreTemplate}}
+  parameters:
+    nuGetConfigName: ${{variables.NugetConfig}}
+- template: ${{variables.buildTemplate}}
+- template: ${{variables.testTemplate}}
+- template: ${{variables.pushTemplate}}
+  parameters:
+    condition: ${{variables.condition}}
+    nuGetConfigName: ${{variables.NugetConfig}}
+- template: ${{variables.check-pushTemplate}}
+  parameters:
+    condition: ${{variables.condition}}
