@@ -6,7 +6,7 @@ parameters:
   - name: packageVersion
     type: string
     default: 0.0.$(Rev:r)
-    displayname: 'Package Version'
+    displayName: 'Package Version'
   - name: release
     type: string
     default: CI
@@ -14,7 +14,7 @@ parameters:
       - 'CI'
       - 'RC'
       - 'Beta'
-    displayname: 'Release'
+    displayName: 'Release'
   - name: betaVersion
     displayName: 'Only if selected Release is "beta": 14.1.0-beta.<betaVersion>'
     type: string
@@ -22,10 +22,10 @@ parameters:
 
 
 name:
-  ${{ if eq(parameters.release, 'beta') }}:
-    "${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}"
-  ${{ if ne(parameters.release, 'beta') }}:
-    "${{ parameters.packageVersion }}"
+${{ if eq(parameters.release, 'beta') }}:
+  "${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}"
+${{ if ne(parameters.release, 'beta') }}:
+  "${{ parameters.packageVersion }}"
 
 jobs:
 - job: ${{ parameters.release }}
@@ -34,19 +34,19 @@ jobs:
     demands:
     - DOTNET_VERSION -equals 7
 
-steps:
-- template: ${{variables.restoreTemplate}}
-  parameters:
-    nuGetConfigName: ${{variables.NugetConfig}}
-- template: ${{variables.buildTemplate}}
-- template: ${{variables.testTemplate}}
-- template: ${{variables.packTemplate}}
-  parameters:
-    releaseType: ${{parameters.release}}
-- template: ${{variables.pushTemplate}}
-  parameters:
-    condition: ${{variables.condition}}
-    nuGetConfigName: ${{variables.NugetConfig}}
-- template: ${{variables.check-pushTemplate}}
-  parameters:
-    condition: ${{variables.condition}}
+  steps:
+  - template: ${{variables.restoreTemplate}}
+    parameters:
+      nuGetConfigName: ${{variables.NugetConfig}}
+  - template: ${{variables.buildTemplate}}
+  - template: ${{variables.testTemplate}}
+  - template: ${{variables.packTemplate}}
+    parameters:
+      releaseType: ${{parameters.release}}
+  - template: ${{variables.pushTemplate}}
+    parameters:
+      condition: ${{variables.condition}}
+      nuGetConfigName: ${{variables.NugetConfig}}
+  - template: ${{variables.check-pushTemplate}}
+    parameters:
+      condition: ${{variables.condition}}
