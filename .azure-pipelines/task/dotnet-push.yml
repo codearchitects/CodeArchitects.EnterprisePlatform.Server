@@ -1,8 +1,8 @@
 steps:
 - task: Powershell@2
   displayName: 'Run dotnet add source and publish'
-  workingDirectory: '$(System.DefaultWorkingDirectory)'
   inputs:
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     targetType: 'inline'
     script: |
       # dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile ${{parameters.nuGetConfigName}}

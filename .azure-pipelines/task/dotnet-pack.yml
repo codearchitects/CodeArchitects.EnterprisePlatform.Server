@@ -5,8 +5,8 @@ steps:
  - ${{ each csproj in parameters.csprojList }}:
     - task: Powershell@2
       displayName: 'Run dotnet pack '
-      workingDirectory: '$(System.DefaultWorkingDirectory)/src'
       inputs:
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src'
         targetType: 'inline'
         script: |
           dotnet pack ${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-build --output ../nupkgs
