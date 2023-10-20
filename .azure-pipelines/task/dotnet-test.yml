@@ -2,7 +2,7 @@ parameters:
   - name: solution
     displayName: solution
     type: string
-    default: "*/**.sln"
+    default: "*.sln"
 
 steps:
 - task: PowerShell@2
@@ -10,5 +10,6 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      # dotnet tool install --global dotnet-coverage
-      dotnet-coverage collect 'dotnet test ${{parameters.solution}} -m:1' -f xml  -o 'coverage.xml'
+     # dotnet tool install --global dotnet-coverage
+     # dotnet-coverage collect 'dotnet test ${{parameters.solution}} -m:1' -f xml  -o 'coverage.xml'
+     dotnet test ${{parameters.solution}} --no-restore --no-build
