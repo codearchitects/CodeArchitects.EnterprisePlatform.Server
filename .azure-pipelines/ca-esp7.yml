@@ -22,7 +22,7 @@ parameters:
     type: string
     default: $(Rev:r)
 
-name: "${{ variables.version }}"
+name: "${{ variables.pipelineVersion }}"
 
 jobs:
 - job: ${{ parameters.release }}

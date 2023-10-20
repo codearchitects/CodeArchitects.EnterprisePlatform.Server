@@ -11,8 +11,8 @@ variables:
   betaReleaseName: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
   prefix: 'CodeArchitects.Platform'
   ${{ if eq(parameters.release, 'beta') }}:
-    version: ${{ variables.betaReleaseName }}
+    pipelineVersion: ${{ variables.betaReleaseName }}
     condition: 'succeeded()'
   ${{ if ne(parameters.release, 'beta') }}:
     condition: and(${{variables.triggerCondition}}, ${{variables.releaseCondition}})
-    version: ${{ parameters.packageVersion }}
+    pipelineVersion: ${{ parameters.packageVersion }}
