@@ -13,7 +13,6 @@ public class RequestFactoryTests
 
   public RequestFactoryTests()
   {
-    Console.WriteLine("Hello, world"); // TODO: Delete
     _executorProviderMock = new(MockBehavior.Strict);
     _executorProviderMock
       .Setup(x => x.GetExecutor<object>())
