@@ -12,4 +12,4 @@ steps:
     script: |
        # dotnet tool install --global dotnet-coverage
        # dotnet-coverage collect 'dotnet test ${{parameters.solution}} -m:1' -f xml  -o 'coverage.xml'
-       dotnet test .sln --no-restore --no-build
+       dotnet test ".sln" --no-restore --no-build
