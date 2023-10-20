@@ -2,7 +2,7 @@ parameters:
   - name: solution
     displayName: solution
     type: string
-    default: "*/**.sln"
+    default: "*.sln"
   - name: buildPlatform
     displayName: buildPlatform
     type: string
