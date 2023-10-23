@@ -5,7 +5,7 @@ variables:
   testTemplate: 'task/dotnet-test.yml'
   packTemplate: 'task/dotnet-pack.yml'
   pushTemplate: 'task/dotnet-push.yml'
-  check-pushTemplate: 'task/check-publish.yml'
+  check_pushTemplate: 'task/check-publish.yml'
   triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   releaseCondition: or(eq('${{ parameters.Release }}', 'RC'), eq('${{ parameters.Release }}', 'Beta'))
   betaReleaseName: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
