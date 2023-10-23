@@ -4,6 +4,7 @@ parameters:
 steps:
 - ${{ each csproj in parameters.csprojList }}:
   - task: DotNetCoreCLI@2
+    displayName: Dotnet Test ${{csproj}}
     inputs:
       command: test
       projects: '$(System.DefaultWorkingDirectory)/tests/${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj)'
