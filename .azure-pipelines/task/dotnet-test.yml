@@ -2,7 +2,7 @@ parameters:
   - name: solution
     displayName: solution
     type: string
-    default: "CodeArchitects.Platforform.sln"
+    default: "CodeArchitects.Platform.sln"
 
 steps:
 - task: PowerShell@2
