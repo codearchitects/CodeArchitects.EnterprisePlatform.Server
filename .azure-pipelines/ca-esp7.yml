@@ -3,6 +3,7 @@ variables:
   - template : './task/variables.yml'
     parameters:
       packageVersion: ${{ parameters.packageVersion }}
+      release: ${{ parameters.release }}
 
 parameters:
   - name: packageVersion
@@ -38,8 +39,6 @@ jobs:
   - template: ${{variables.buildTemplate}}
   - template: ${{variables.testTemplate}}
   - template: ${{variables.packTemplate}}
-    parameters:
-      releaseType: ${{parameters.release}}
   - template: ${{variables.pushTemplate}}
     parameters:
       condition: ${{variables.condition}}
