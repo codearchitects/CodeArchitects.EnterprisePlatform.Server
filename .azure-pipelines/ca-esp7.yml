@@ -40,7 +40,7 @@ jobs:
   - template: ${{variables.packTemplate}}
     parameters:
       releaseType: ${{parameters.release}}
-      condition: ${{variables.condition}}
+      condition: ${{variables.condition}} # this will be replaced by parmeters declared into the dotnet-pack template
   - template: ${{variables.pushTemplate}}
     parameters:
       condition: ${{variables.condition}}

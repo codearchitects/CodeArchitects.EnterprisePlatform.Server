@@ -7,7 +7,7 @@ variables:
   pushTemplate: 'task/dotnet-push.yml'
   check-pushTemplate: 'task/check-publish.yml'
   triggerCondition: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  releaseCondition: eq('${{ parameters.Release }}', 'RC')
+  releaseCondition: or(eq('${{ parameters.Release }}', 'RC'), eq('${{ parameters.Release }}', 'Beta'))
   betaReleaseName: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
   prefix: 'CodeArchitects.Platform'
   ${{ if eq(parameters.release, 'beta') }}:
