@@ -3,8 +3,8 @@ parameters:
 
 steps:
 - ${{ each csproj in parameters.csprojList }}:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: test
-    projects: '$(System.DefaultWorkingDirectory)/tests/${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj)'
-    arguments: '--configuration Release --no-build'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: test
+      projects: '$(System.DefaultWorkingDirectory)/tests/${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj)'
+      arguments: '--configuration Release --no-build'
