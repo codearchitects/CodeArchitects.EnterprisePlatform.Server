@@ -1,6 +1,8 @@
 parameters:
   - name: condition
     type: string
+  - name: nuGetConfigName
+    type: string
 steps:
 - task: Powershell@2
   condition: ${{parameters.condition}}
