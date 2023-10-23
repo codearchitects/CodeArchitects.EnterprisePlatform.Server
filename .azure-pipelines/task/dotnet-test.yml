@@ -1,15 +1,10 @@
 parameters:
-  - name: solution
-    displayName: solution
-    type: string
-    default: "CodeArchitects.Platform.sln"
+  csprojList: ['Actors.Analyzer.FunctionalTests','Actors.Dapr.AspNetCore.IntegrationTests','Actors.Dapr.UnitTests','Actors.FunctionalTests','Actors.TestModel','Actors.UnitTests','Application.UnitTests','Common.Analyzer.FunctionalTests','Common.UnitTests','Dapr.AspNetCore.UnitTests','Data.AdoNet.FunctionalTests','Data.AdoNet.UnitTests',Data.EntityFrameworkCore.FunctionalTests','Data.EntityFrameworkCore.UnitTests','Data.IntegrationTests','Data.MongoDB.IntegrationTests','Data.MongoDB.UnitTests','Data.UnitTests','Infrastructure.Dapr.AspNetCore.UnitTests','Infrastructure.Dapr.UnitTests','Messaging.AspNetCore.UnitTests','Messaging.Dapr.AspNetCore.IntegrationTests','Messaging.Dapr.AspNetCore.UnitTests','Messaging.Dapr.UnitTests','Messaging.UnitTests','Shared.UnitTests'] # this array contain the list of csproj files to test
 
 steps:
-- task: PowerShell@2
-  displayName: "Run tests"
+- ${{ each csproj in parameters.csprojList }}:
+- task: DotNetCoreCLI@2
   inputs:
-    targetType: 'inline'
-    script: |
-       # dotnet tool install --global dotnet-coverage
-       # dotnet-coverage collect 'dotnet test ${{parameters.solution}} -m:1' -f xml  -o 'coverage.xml'
-       dotnet test ${{parameters.solution}} --no-build
+    command: test
+    projects: '$(System.DefaultWorkingDirectory)/tests/${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj)'
+    arguments: '--configuration Release --no-build'
