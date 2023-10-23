@@ -39,6 +39,9 @@ jobs:
   - template: ${{variables.buildTemplate}}
   - template: ${{variables.testTemplate}}
   - template: ${{variables.packTemplate}}
+    parameters:
+      prefix: ${{variables.prefix}}
+      condition: ${{variables.condition}}
   - template: ${{variables.pushTemplate}}
     parameters:
       condition: ${{variables.condition}}
