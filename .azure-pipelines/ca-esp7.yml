@@ -46,6 +46,6 @@ jobs:
     parameters:
       condition: ${{variables.condition}}
       nuGetConfigName: ${{variables.NugetConfig}}
-  - template: ${{variables.pushTemplate}}
+  - template: ${{variables.check-pushTemplate}}
     parameters:
       condition: ${{variables.condition}}
