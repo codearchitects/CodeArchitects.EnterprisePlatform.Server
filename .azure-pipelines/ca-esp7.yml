@@ -40,6 +40,7 @@ jobs:
   - template: ${{variables.packTemplate}}
     parameters:
       releaseType: ${{parameters.release}}
+      condition: ${{variables.condition}}
   - template: ${{variables.pushTemplate}}
     parameters:
       condition: ${{variables.condition}}
