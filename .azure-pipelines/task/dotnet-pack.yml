@@ -1,16 +1,15 @@
-variables:
-  - template: './task/variables.yml'
 parameters:
   csprojList: ['Actors','Actors.Analyzer','Actors.Dapr','Actors.Dapr.AspNetCore','Application','Common','Common.Analyzer','Dapr.AspNetCore','Data','Data.AdoNet','Data.AdoNet.DependencyInjection','Data.AdoNet.MySQL','Data.AdoNet.Oracle','Data.AdoNet.PostgreSQL','Data.AdoNet.SQLServer','Data.AutoMapper','Data.EntityFrameworkCore','Data.EntityFrameworkCore.DependencyInjection','Data.EntityFrameworkCore.Shared','Data.EntityFrameworkCore5','Data.EntityFrameworkCore5.DependencyInjection','Data.MongoDB','Data.MongoDB.DependencyInjection','Emit','Extensions','Infrastructure','Infrastructure.Dapr','Infrastructure.Dapr.AspNetCore','Messaging','Messaging.AspNetCore','Messaging.Dapr','Messaging.Dapr.AspNetCore'] # this array contain the list of csproj files to pack
-
+  condition: ${{variables.condition}}
+  prefix: ${{variables.prefix}}
 steps:
  - ${{ each csproj in parameters.csprojList }}:
     - task: Powershell@2
       displayName: 'Run dotnet pack '
-      condition: ${{variables.condition}}
+      condition: ${{parameters.condition}}
       inputs:
         workingDirectory: '$(System.DefaultWorkingDirectory)/src'
         targetType: 'inline'
         script: |
-          dotnet pack ${{csproj}}/${{variables.prefix}}.${{csproj}}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-build --output ../nupkgs
+          dotnet pack ${{csproj}}/${{parameters.prefix}}.${{csproj}}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-build --output ../nupkgs
 
