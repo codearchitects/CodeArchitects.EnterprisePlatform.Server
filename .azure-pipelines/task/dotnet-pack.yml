@@ -16,4 +16,3 @@ steps:
         targetType: 'inline'
         script: |
           dotnet pack ${{csproj}}/${{parameters.prefix}}.${{csproj}}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-build --output ../nupkgs
-

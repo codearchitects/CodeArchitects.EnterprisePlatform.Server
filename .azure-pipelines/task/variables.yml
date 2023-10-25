@@ -16,3 +16,4 @@ variables:
   ${{ if ne(parameters.release, 'beta') }}:
     condition: and(${{variables.triggerCondition}}, ${{variables.releaseCondition}})
     pipelineVersion: ${{ parameters.packageVersion }}
+    

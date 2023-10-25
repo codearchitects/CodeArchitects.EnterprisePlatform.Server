@@ -18,3 +18,4 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'dotnet build ${{parameters.solution}} --no-restore -c ${{parameters.buildConfiguration}}'
+    

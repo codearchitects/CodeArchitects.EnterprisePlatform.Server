@@ -1,15 +1,22 @@
 parameters:
+  - name: csprojList
+    type: object
+    default: ['Actors','Actors.Analyzer','Actors.Dapr','Actors.Dapr.AspNetCore','Application','Common','Common.Analyzer','Dapr.AspNetCore','Data','Data.AdoNet','Data.AdoNet.DependencyInjection','Data.AdoNet.MySQL','Data.AdoNet.Oracle','Data.AdoNet.PostgreSQL','Data.AdoNet.SQLServer','Data.AutoMapper','Data.EntityFrameworkCore','Data.EntityFrameworkCore.DependencyInjection','Data.EntityFrameworkCore.Shared','Data.EntityFrameworkCore5','Data.EntityFrameworkCore5.DependencyInjection','Data.MongoDB','Data.MongoDB.DependencyInjection','Emit','Extensions','Infrastructure','Infrastructure.Dapr','Infrastructure.Dapr.AspNetCore','Messaging','Messaging.AspNetCore','Messaging.Dapr','Messaging.Dapr.AspNetCore'] # this array contain the list of csproj files to pack
   - name: condition
     type: string
   - name: nuGetConfigName
     type: string
+  - name: prefix
+    type: string
+    default: 'CodeArchitects.Platform'
 steps:
-- task: Powershell@2
-  condition: ${{parameters.condition}}
-  displayName: 'Run dotnet add source and publish'
-  inputs:
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-    targetType: 'inline'
-    script: |
-      # dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile ${{parameters.nuGetConfigName}}
-      dotnet nuget push ./nupkgs/*.nupkg -s "$(SOURCE)" -k "$(SA_TOKEN)"
+- ${{ each csproj in parameters.csprojList }}:
+  - task: Powershell@2
+    condition: ${{parameters.condition}}
+    displayName: 'Run dotnet add source and publish'
+    inputs:
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+      targetType: 'inline'
+      script: |
+        # dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile ${{parameters.nuGetConfigName}}
+        dotnet nuget push ./nupkgs/${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -s "$(SOURCE)" -k "$(SA_TOKEN)"
