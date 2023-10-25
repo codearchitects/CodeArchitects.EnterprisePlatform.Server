@@ -4,6 +4,7 @@ variables:
     parameters:
       packageVersion: ${{ parameters.packageVersion }}
       Release: ${{ parameters.release }}
+      betaVersion: ${{ parameters.betaVersion }}
 
 parameters:
   - name: packageVersion
