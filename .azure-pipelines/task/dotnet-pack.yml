@@ -9,7 +9,7 @@ parameters:
 steps:
  - ${{ each csproj in parameters.csprojList }}:
     - task: Powershell@2
-      displayName: 'Run dotnet pack '
+      displayName: 'Run dotnet pack ${{csproj}} '
       condition: ${{parameters.condition}}
       inputs:
         workingDirectory: '$(System.DefaultWorkingDirectory)/src'

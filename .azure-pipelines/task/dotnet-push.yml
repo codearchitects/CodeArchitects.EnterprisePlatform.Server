@@ -13,7 +13,7 @@ steps:
 - ${{ each csproj in parameters.csprojList }}:
   - task: Powershell@2
     condition: ${{parameters.condition}}
-    displayName: 'Run dotnet add source and publish'
+    displayName: 'Run dotnet push ${{ csproj }}'
     inputs:
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       targetType: 'inline'
