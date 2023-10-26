@@ -1,0 +1,18 @@
+parameters:
+  - name: csprojList
+    type: object
+    default: ['Actors','Actors.Dapr','Actors.Dapr.AspNetCore','Application','Common','Dapr.AspNetCore','Data','Data.AdoNet','Data.AdoNet.DependencyInjection','Data.AdoNet.MySQL','Data.AdoNet.Oracle','Data.AdoNet.PostgreSQL','Data.AdoNet.SQLServer','Data.AutoMapper','Data.EntityFrameworkCore','Data.EntityFrameworkCore.DependencyInjection','Data.EntityFrameworkCore.Shared','Data.EntityFrameworkCore5','Data.EntityFrameworkCore5.DependencyInjection','Data.MongoDB','Data.MongoDB.DependencyInjection','Emit','Extensions','Infrastructure','Infrastructure.Dapr','Infrastructure.Dapr.AspNetCore','Messaging','Messaging.AspNetCore','Messaging.Dapr','Messaging.Dapr.AspNetCore'] # this array contain the list of csproj files to pack
+  - name: condition
+    type: string
+  - name: prefix
+    type: string
+steps:
+ - ${{ each csproj in parameters.csprojList }}:
+    - task: Powershell@2
+      displayName: 'Run dotnet pack ${{csproj}} '
+      condition: ${{parameters.condition}}
+      inputs:
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src'
+        targetType: 'inline'
+        script: |
+          dotnet pack ${{csproj}}/${{parameters.prefix}}.${{csproj}}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-restore --output ../nupkgs
