@@ -19,4 +19,4 @@ steps:
       targetType: 'inline'
       script: |
         # dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile ${{parameters.nuGetConfigName}}
-        dotnet nuget push ./nupkgs/${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -k "$(SA_TOKEN)" -s "$(SOURCE)"
+        dotnet nuget push ./nupkgs/${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -k $(SA_TOKEN) -s $(SOURCE)
