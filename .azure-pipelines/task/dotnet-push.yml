@@ -18,5 +18,6 @@ steps:
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       targetType: 'inline'
       script: |
-        # dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile ${{parameters.nuGetConfigName}}
-        dotnet nuget push ./nupkgs/${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -k $(SA_TOKEN) -s $(SOURCE)
+        dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA_NAME) -p $(SA_TOKEN) --store-password-in-clear-text --valid-authentication-types basic
+        dotnet nuget push ./nupkgs/${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -k $(SA_TOKEN) -s $(SOURCE_NAME)
+        rm ~/.nuget/NuGet/NuGet.Config
