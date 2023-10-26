@@ -25,5 +25,5 @@ steps:
     command: 'restore'
     projects: '${{parameters.solution}}'
     feedsToUse: 'config'
-    nugetConfigPath: '${{parameters.nuGetConfigName}}'
+    nugetConfigPath: './NuGet.Config'
     noCache: true
