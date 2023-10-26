@@ -6,7 +6,6 @@ parameters:
   - name: nuGetConfigName
     displayName: nuGetConfigName
     type: string
-    default: "NuGet.Config"
 
 steps:
 - task: DownloadSecureFile@1
