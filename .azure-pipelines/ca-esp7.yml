@@ -1,9 +1,5 @@
-${{ if ${{variables.triggerCondition}} -eq $true }}:
-  trigger:
-    - variables['Build.SourceBranch']
-${{ if (${{variables.triggerCondition}} -ne $true }}:
-  trigger:
-    - develop
+trigger:
+  - develop
 variables:
   - template : './task/variables.yml'
     parameters:
