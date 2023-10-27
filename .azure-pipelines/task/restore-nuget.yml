@@ -19,11 +19,9 @@ steps:
       Copy-Item -Path $(securefile.secureFilePath) -Destination ./NuGet.Config
      # dotnet nuget add source $(SOURCE) -n "$(SOURCE_NAME)"  -u "$(SA_NAME)" -p "$(SA_TOKEN)" --store-password-in-clear-text --valid-authentication-types basic --configfile ./NuGet.Config
   displayName: 'authentication'
-- task: DotNetCoreCLI@2
+- task: Powershell@2
   displayName: Restore NuGet packages with dotnet cli
   inputs:
-    command: 'restore'
-    projects: '${{parameters.solution}}'
-    feedsToUse: 'config'
-    nugetConfigPath: './NuGet.Config'
-    noCache: true
+    targetType: 'inline'
+    script: |
+      dotnet restore ${{parameters.solution}} --configfile ./NuGet.Config
