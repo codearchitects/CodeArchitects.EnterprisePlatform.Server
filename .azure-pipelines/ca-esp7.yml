@@ -1,4 +1,5 @@
-trigger: none
+trigger:
+  - develop
 variables:
   - template : './task/variables.yml'
     parameters:
