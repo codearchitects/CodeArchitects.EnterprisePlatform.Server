@@ -42,6 +42,7 @@ steps:
           $uri = "$domain/$registry/nuget/packages/${{ parameters.prefix }}.${{ nupkg }}/versions/$(Build.BuildNumber)/content?api-version=5.0-preview.1"
           Write-Host "Uri: $uri"
           foreach ( $method in $methods ) {
-            Invoke-RestMethod -Method $method -Headers $header -Credential $credential -Uri $uri
+            $response = $(Invoke-WebRequest -Method $method -Headers $header -Credential $credential -Uri $uri)
+            Write-Host "response for $registry with $method : $($response.StatusCode) $($response.StatusDescription)"
           }
         }
