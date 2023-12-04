@@ -258,43 +258,24 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     return new BindingId(index);
   }
 
-  public async Task BeginMethodAsync(CancellationToken cancellationToken)
+  public Task BeginMethodAsync(CancellationToken cancellationToken)
   {
-    _state = await GetStateAsync(cancellationToken);
-
-    InitActor(_state, _state.ImplementationId);
-    VerifyBindingPreconditions(_actor);
-
-    _section = ExecutionSection.Method;
+    return BeginExecutionAsync(ExecutionSection.Method, 0, cancellationToken);
   }
 
-  public async Task BeginActivityAsync(Activity<TActor> activity, CancellationToken cancellationToken)
+  public Task BeginActivityAsync(Activity<TActor> activity, CancellationToken cancellationToken)
   {
-    _state = await GetStateAsync(cancellationToken);
-
-    int implementationId = activity.ImplementationId;
-    if (implementationId == 0)
-    {
-      implementationId = _state.ImplementationId;
-    }
-
-    InitActor(_state, implementationId);
-    VerifyBindingPreconditions(_actor);
-
-    _section = ExecutionSection.Activity;
+    return BeginExecutionAsync(ExecutionSection.Activity, activity.ImplementationId, cancellationToken);
   }
 
-  public async Task EndExecutionAsync(CancellationToken cancellationToken)
+  public Task EndMethodAsync(CancellationToken cancellationToken)
   {
-    EnsureActorInitialized();
-    EnsureStateInitialized();
+    return EndExecutionAsync(ExecutionSection.Method, cancellationToken);
+  }
 
-    _section = ExecutionSection.None;
-    await ExecuteBindingsAsync(cancellationToken);
-
-    _descriptor.UpdateState(_actor, _state);
-
-    await _host.SetStateAsync(_state, cancellationToken);
+  public Task EndActivityAsync(CancellationToken cancellationToken)
+  {
+    return EndExecutionAsync(ExecutionSection.Activity, cancellationToken);
   }
 
   public void InitializeState(ActorState state)
@@ -305,12 +286,50 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     }
   }
 
-  [MemberNotNull(nameof(_actor))]
-  private void InitActor(TState state, int implementationId)
+  private async Task BeginExecutionAsync(ExecutionSection section, int implementationId, CancellationToken cancellationToken)
   {
+    _state = await GetStateAsync(cancellationToken);
+    if (implementationId == 0)
+    {
+      implementationId = _state.ImplementationId;
+    }
+
     _section = ExecutionSection.Constructor;
-    _actor = _descriptor.CreateInstance(implementationId, _services, state, this);
+    _actor = _descriptor.CreateInstance(implementationId, _services, _state, this);
+
+    VerifyBindingPreconditions(_actor);
+
+    _section = section;
+  }
+
+  private async Task EndExecutionAsync(ExecutionSection section, CancellationToken cancellationToken)
+  {
+    Debug.Assert(_section == section, $"Expected execution section to be {section}, but it was {_section}.");
+    EnsureActorInitialized();
+    EnsureStateInitialized();
+
+    // Execute bindings
+    _section = ExecutionSection.Bindings;
+
+    for (int index = 0; index < _bindings.Count; index++)
+    {
+      IActorBinding<TActor> binding = _bindings[index];
+
+      if (!_state.IsBindingEnabled(index))
+        continue;
+
+      await binding.ExecuteAsync(_actor, cancellationToken);
+    }
+
+    // Update state
+    _descriptor.UpdateState(_actor, _state);
+    await _host.SetStateAsync(_state, cancellationToken);
+
+    // Cleanup
     _section = ExecutionSection.None;
+    _actor = null;
+    _state = null;
+    _bindings.Clear();
   }
 
   private async Task<TState> GetStateAsync(CancellationToken cancellationToken)
@@ -331,27 +350,6 @@ internal class ActorContext<TActor, TState> : IActorContext<TActor>, IActorManag
     _descriptor.Id.SetId(defaultValue, _host.ActorId);
 
     return defaultValue;
-  }
-
-  private async Task ExecuteBindingsAsync(CancellationToken cancellationToken)
-  {
-    EnsureActorInitialized();
-    EnsureStateInitialized();
-
-    ExecutionSection previousSection = _section;
-    _section = ExecutionSection.Bindings;
-
-    for (int index = 0; index < _bindings.Count; index++)
-    {
-      IActorBinding<TActor> binding = _bindings[index];
-
-      if (!_state.IsBindingEnabled(index))
-        continue;
-
-      await binding.ExecuteAsync(_actor, cancellationToken);
-    }
-
-    _section = previousSection;
   }
 
   private void VerifyBindingPreconditions(TActor actor)

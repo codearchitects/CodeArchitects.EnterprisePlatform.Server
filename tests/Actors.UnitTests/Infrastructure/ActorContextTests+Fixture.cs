@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Actors.Scheduling;
+﻿using CodeArchitects.Platform.Actors.Bindings;
+using CodeArchitects.Platform.Actors.Scheduling;
 
 namespace CodeArchitects.Platform.Actors.Infrastructure;
 
@@ -39,7 +40,7 @@ public partial class ActorContextTests
     {
       State = state;
 
-      context.RegisterBinding(binding => binding
+      BindingId = context.RegisterBinding(binding => binding
         .WithPreCondition(self => self.State.Value == 1)
         .WithPostCondition(self => self.State.Value == 2)
         .IsEnabled()
@@ -47,6 +48,8 @@ public partial class ActorContextTests
     }
 
     public TestActor2State State { get; }
+
+    public BindingId BindingId { get; private set; }
 
     public bool BindingExecuted { get; private set; }
   }

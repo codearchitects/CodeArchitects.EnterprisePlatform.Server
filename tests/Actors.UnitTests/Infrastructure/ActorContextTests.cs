@@ -95,6 +95,20 @@ public partial class ActorContextTests
     _state1.ImplementationId.Should().Be(implementationId);
   }
 
+  [Fact]
+  public async Task EndMethodAsync_ShouldCleanUpBindings()
+  {
+    // Arrange
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+
+    // Act
+    await _sut2.EndMethodAsync(CancellationToken.None);
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+
+    // Assert
+    _sut2.Actor.BindingId._index.Should().Be(0);
+  }
+
   [Theory]
   [InlineData(1, 2, false, true, "precondition and postcondition are verified")]
   [InlineData(3, 2, false, false, "precondition is not verified")]
@@ -104,15 +118,16 @@ public partial class ActorContextTests
   {
     // Arrange
     _state2.Value = initialValue;
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+    TestActor2 actor = _sut2.Actor;
 
     // Act
-    await _sut2.BeginMethodAsync(CancellationToken.None);
     _state2.Value = finalValue;
     _state2.EnabledBindings = disableBinding ? 0 : 1;
-    await _sut2.EndExecutionAsync(CancellationToken.None);
+    await _sut2.EndMethodAsync(CancellationToken.None);
 
     // Assert
-    _sut2.Actor.BindingExecuted.Should().Be(bindingExecuted, because);
+    actor.BindingExecuted.Should().Be(bindingExecuted, because);
   }
 
   [Theory]
