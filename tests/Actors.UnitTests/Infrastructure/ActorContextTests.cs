@@ -95,6 +95,19 @@ public partial class ActorContextTests
     _state1.ImplementationId.Should().Be(implementationId);
   }
 
+  [Fact]
+  public async Task EndMethodAsync_ShouldCleanUpContext()
+  {
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+    await _sut2.EndExecutionAsync(CancellationToken.None);
+
+    _sut2.Actor.Should().BeNull();
+
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+
+    _sut2.Actor.BindingId._index.Should().Be(0);
+  }
+
   [Theory]
   [InlineData(1, 2, false, true, "precondition and postcondition are verified")]
   [InlineData(3, 2, false, false, "precondition is not verified")]
