@@ -102,6 +102,9 @@ public class DaprActorHostTests
     fixture.ManagerMock
       .Setup(x => x.BeginActivityAsync(It.IsAny<Activity<StandardActor>>(), It.IsAny<CancellationToken>()))
       .Returns(Task.CompletedTask);
+    fixture.ManagerMock
+      .Setup(x => x.EndActivityAsync(It.IsAny<CancellationToken>()))
+      .Returns(Task.CompletedTask);
 
     // Act
     await sut.ReceiveReminderAsync("", payload, TimeSpan.Zero, TimeSpan.Zero);
