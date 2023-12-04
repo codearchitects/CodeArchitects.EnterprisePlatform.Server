@@ -20,5 +20,7 @@ internal interface IActorManager<TActor>
 
   Task BeginActivityAsync(Activity<TActor> activity, CancellationToken cancellationToken);
 
-  Task EndExecutionAsync(CancellationToken cancellationToken);
+  Task EndMethodAsync(CancellationToken cancellationToken);
+
+  Task EndActivityAsync(CancellationToken cancellationToken);
 }

@@ -42,7 +42,7 @@ public readonly struct ScheduleId : IEquatable<ScheduleId>
   /// </summary>
   /// <param name="id">The <see cref="ScheduleId"/> to convert.</param>
   /// <returns>The schedule id as a string.</returns>
-  public static implicit operator string(ScheduleId id) => id.Id;
+  public static explicit operator string(ScheduleId id) => id.Id;
 
   /// <summary>
   /// Determines whether two instances of <see cref="ScheduleId"/> are equal.

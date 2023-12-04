@@ -1,6 +1,7 @@
 ﻿using CodeArchitects.Platform.Actors.Infrastructure;
 using CodeArchitects.Platform.Actors.Scheduling;
 using Dapr.Actors.Runtime;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace CodeArchitects.Platform.Actors.Dapr.Infrastructure;
@@ -23,9 +24,7 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
 
   protected override async Task OnPreActorMethodAsync(ActorMethodContext actorMethodContext)
   {
-    if (actorMethodContext.CallType is not ActorCallType.ActorInterfaceMethod)
-      return;
-    if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
+    if (!IsInterfaceMethod(actorMethodContext))
       return;
 
     await _manager.BeginMethodAsync(CancellationToken.None);
@@ -33,10 +32,10 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
 
   protected override async Task OnPostActorMethodAsync(ActorMethodContext actorMethodContext)
   {
-    if (actorMethodContext.MethodName is Constants.InitAsyncMethodName)
+    if (!IsInterfaceMethod(actorMethodContext))
       return;
 
-    await _manager.EndExecutionAsync(CancellationToken.None);
+    await _manager.EndMethodAsync(CancellationToken.None);
   }
 
   protected Task InitAsync(byte[] payload, CancellationToken cancellationToken)
@@ -50,20 +49,22 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
   {
     byte[] payload = JsonSerializer.SerializeToUtf8Bytes(activity, _manager.ActivityType, _manager.JsonSerializerOptions);
 
-    return RegisterReminderAsync(id, payload, options.Timer, options.Period);
+    return RegisterReminderAsync(id.Id, payload, options.Timer, options.Period);
   }
 
   public Task UnscheduleAsync(ScheduleId id, CancellationToken cancellationToken)
   {
-    return UnregisterReminderAsync(id);
+    return UnregisterReminderAsync(id.Id);
   }
 
   public async Task ReceiveReminderAsync(string reminderName, byte[] payload, TimeSpan dueTime, TimeSpan period)
   {
-    Activity<TActor> activity = (Activity<TActor>)JsonSerializer.Deserialize(payload, _manager.ActivityType, _manager.JsonSerializerOptions)!;
+    Activity<TActor>? activity = (Activity<TActor>?)JsonSerializer.Deserialize(payload, _manager.ActivityType, _manager.JsonSerializerOptions);
+    Debug.Assert(activity is not null, "Deserializing activity payload returned null.");
 
     await _manager.BeginActivityAsync(activity, CancellationToken.None);
     await activity.ExecuteAsync(_manager.Actor, CancellationToken.None);
+    await _manager.EndActivityAsync(CancellationToken.None);
   }
 
   public async Task<TState?> GetStateAsync(CancellationToken cancellationToken)
@@ -79,5 +80,12 @@ internal class DaprActorHost<TActor, TState> : Actor, IActorHost<TActor, TState>
   public async Task SetStateAsync(TState state, CancellationToken cancellationToken)
   {
     await StateManager.SetStateAsync(Constants.ActorStateName, state, CancellationToken.None);
+  }
+
+  private static bool IsInterfaceMethod(ActorMethodContext actorMethodContext)
+  {
+    return
+      actorMethodContext.CallType == ActorCallType.ActorInterfaceMethod &&
+      actorMethodContext.MethodName != Constants.InitAsyncMethodName;
   }
 }

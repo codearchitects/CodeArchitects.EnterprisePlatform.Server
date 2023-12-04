@@ -96,15 +96,16 @@ public partial class ActorContextTests
   }
 
   [Fact]
-  public async Task EndMethodAsync_ShouldCleanUpContext()
+  public async Task EndMethodAsync_ShouldCleanUpBindings()
   {
-    await _sut2.BeginMethodAsync(CancellationToken.None);
-    await _sut2.EndExecutionAsync(CancellationToken.None);
-
-    _sut2.Actor.Should().BeNull();
-
+    // Arrange
     await _sut2.BeginMethodAsync(CancellationToken.None);
 
+    // Act
+    await _sut2.EndMethodAsync(CancellationToken.None);
+    await _sut2.BeginMethodAsync(CancellationToken.None);
+
+    // Assert
     _sut2.Actor.BindingId._index.Should().Be(0);
   }
 
@@ -122,7 +123,7 @@ public partial class ActorContextTests
     await _sut2.BeginMethodAsync(CancellationToken.None);
     _state2.Value = finalValue;
     _state2.EnabledBindings = disableBinding ? 0 : 1;
-    await _sut2.EndExecutionAsync(CancellationToken.None);
+    await _sut2.EndMethodAsync(CancellationToken.None);
 
     // Assert
     _sut2.Actor.BindingExecuted.Should().Be(bindingExecuted, because);
