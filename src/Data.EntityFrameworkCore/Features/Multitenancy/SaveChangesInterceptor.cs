@@ -45,13 +45,15 @@ internal class SaveChangesInterceptor : Microsoft.EntityFrameworkCore.Diagnostic
         continue;
 
       PropertyEntry tenantIdEntry = entry.Property(tenantIdPropertyName);
+      object tenantId = _context.TenantId;
       switch (entry.State)
       {
         case EntityState.Added:
-          tenantIdEntry.CurrentValue = _context.TenantId;
+          tenantIdEntry.CurrentValue = tenantId;
           break;
         case EntityState.Modified or EntityState.Deleted:
-          tenantIdEntry.CurrentValue = _context.TenantId;
+          tenantIdEntry.OriginalValue = tenantId;
+          tenantIdEntry.CurrentValue = tenantId;
           tenantIdEntry.IsModified = false;
           break;
       }

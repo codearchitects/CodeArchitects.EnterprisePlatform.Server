@@ -51,6 +51,7 @@ internal class SaveChangesInterceptor : Microsoft.EntityFrameworkCore.Diagnostic
           flagEntry.CurrentValue = false;
           break;
         case EntityState.Modified:
+          flagEntry.OriginalValue = false;
           flagEntry.CurrentValue = false;
           flagEntry.IsModified = false;
           break;
@@ -60,6 +61,7 @@ internal class SaveChangesInterceptor : Microsoft.EntityFrameworkCore.Diagnostic
           {
             propertyEntry.IsModified = false;
           }
+          flagEntry.OriginalValue = false;
           flagEntry.CurrentValue = true;
           flagEntry.IsModified = true;
           break;
