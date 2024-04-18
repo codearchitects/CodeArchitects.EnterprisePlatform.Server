@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -10,8 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj" />
+		<ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" Properties="BuildProjectReferences=false;">
+			<SetTargetFramework>TargetFramework=$(TargetFramework)</SetTargetFramework>
+		</ProjectReference>
+		<ProjectReference Include="..\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj" Properties="BuildProjectReferences=false;">
+			<SetTargetFramework>TargetFramework=$(TargetFramework)</SetTargetFramework>
+		</ProjectReference>
   </ItemGroup>
 
 </Project>

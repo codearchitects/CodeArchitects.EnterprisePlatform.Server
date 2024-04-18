@@ -14,6 +14,9 @@ components:
   - name: CodeArchitects.Platform.Application
     path: src\Application
     type: dotnet-package
+  - name: CodeArchitects.Platform.Auth
+    path: src\Auth
+    type: dotnet-package
   - name: CodeArchitects.Platform.Common
     path: src\Common
     type: dotnet-package
@@ -96,6 +99,9 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Application.UnitTests
     path: tests\Application.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Auth.UnitTests
+    path: tests\Auth.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Common.UnitTests
     path: tests\Common.UnitTests
