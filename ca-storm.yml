@@ -14,9 +14,6 @@ components:
   - name: CodeArchitects.Platform.Application
     path: src\Application
     type: dotnet-package
-  - name: CodeArchitects.Platform.Auth
-    path: src\Auth
-    type: dotnet-package
   - name: CodeArchitects.Platform.Common
     path: src\Common
     type: dotnet-package
@@ -89,6 +86,12 @@ components:
   - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore
     path: src\Messaging.Dapr.AspNetCore
     type: dotnet-package
+  - name: CodeArchitects.Platform.PolicyManager
+    path: src\PolicyManager
+    type: dotnet-package
+  - name: CodeArchitects.Platform.PolicyManager.DependencyInjection
+    path: src\PolicyManager.DependencyInjection
+    type: dotnet-package
 
   # unit tests
   - name: CodeArchitects.Platform.Actors.Dapr.UnitTests
@@ -99,9 +102,6 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Application.UnitTests
     path: tests\Application.UnitTests
-    type: dotnet-test
-  - name: CodeArchitects.Platform.Auth.UnitTests
-    path: tests\Auth.UnitTests
     type: dotnet-test
   - name: CodeArchitects.Platform.Common.UnitTests
     path: tests\Common.UnitTests
@@ -139,6 +139,9 @@ components:
   - name: CodeArchitects.Platform.Shared.UnitTests
     path: tests\Shared.UnitTests
     type: dotnet-test
+  - name: CodeArchitects.Platform.PolicyManager.UnitTests
+    path: tests\PolicyManager.UnitTests
+    type: dotnet-test
 
   # functional tests
   - name: CodeArchitects.Platform.Actors.Analyzer.FunctionalTests
@@ -169,4 +172,7 @@ components:
     type: dotnet-test
   - name: CodeArchitects.Platform.Data.MongoDB.IntegrationTests
     path: tests\Data.MongoDB.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.PolicyManager.IntegrationTests
+    path: tests\PolicyManager.IntegrationTests
     type: dotnet-test
