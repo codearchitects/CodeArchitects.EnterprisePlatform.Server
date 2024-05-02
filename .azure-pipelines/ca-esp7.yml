@@ -29,9 +29,7 @@ name: "${{ variables.pipelineVersion }}"
 jobs:
 - job: ${{ parameters.release }}
   pool:
-    name: kubernetes
-    demands:
-    - DOTNET_VERSION -equals 7
+    name: 'DevOpsAzureTFSAgents'
 
   steps:
   - template: ${{variables.restoreTemplate}}
