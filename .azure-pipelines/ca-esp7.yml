@@ -37,6 +37,8 @@ jobs:
       nuGetConfigName: ${{variables.NugetConfig}}
       solution: CodeArchitects.Platform.sln
   - template: ${{variables.buildTemplate}}
+    parameters:
+      solution: CodeArchitects.Platform.sln
   - template: ${{variables.testTemplate}}
   - template: ${{variables.packTemplate}}
     parameters:
