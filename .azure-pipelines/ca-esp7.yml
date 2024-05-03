@@ -32,6 +32,7 @@ jobs:
     name: 'DevOpsAzureTFSAgents'
 
   steps:
+  - script: dotnet nuget locals all --clear
   - template: ${{variables.restoreTemplate}}
     parameters:
       nuGetConfigName: ${{variables.NugetConfig}}
