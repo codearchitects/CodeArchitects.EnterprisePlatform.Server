@@ -17,5 +17,5 @@ steps:
   displayName: build ${{parameters.solution}}
   inputs:
     targetType: 'inline'
-    script: 'dotnet build ${{parameters.solution}} --no-restore -c ${{parameters.buildConfiguration}}'
+    script: 'dotnet build ${{parameters.solution}} -c ${{parameters.buildConfiguration}}'
     
