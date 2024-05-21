@@ -11,7 +11,7 @@ public class PolicyManagerTests
 	private readonly ClaimsPrincipal _principal;
 	private readonly string _resource = "component://invoices/button/confirm";
 	private readonly string _policyCollectionName = "TestPolicy";
-	private IServiceProvider _services;
+	private IServiceProvider? _services;
 
 	public PolicyManagerTests()
 	{

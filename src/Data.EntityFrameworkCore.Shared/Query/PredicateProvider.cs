@@ -74,7 +74,7 @@ internal class PredicateProvider : IPredicateProvider
       object? value =
         property.PropertyInfo is { } propertyInfo ? propertyInfo.GetValue(_entity) :
         property.FieldInfo is { } fieldInfo ? fieldInfo.GetValue(_entity) :
-        throw CouldNotGetKeyValue(property.DeclaringEntityType);
+        throw CouldNotGetKeyValue((IEntityType)property.DeclaringType);
 
       return Expression.Constant(value, node.Type);
     }

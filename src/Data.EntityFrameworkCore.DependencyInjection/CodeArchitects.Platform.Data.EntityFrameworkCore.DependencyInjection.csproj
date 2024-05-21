@@ -10,12 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-		<ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" Properties="BuildProjectReferences=false;">
-			<SetTargetFramework>TargetFramework=$(TargetFramework)</SetTargetFramework>
-		</ProjectReference>
-		<ProjectReference Include="..\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj" Properties="BuildProjectReferences=false;">
-			<SetTargetFramework>TargetFramework=$(TargetFramework)</SetTargetFramework>
-		</ProjectReference>
+		<ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" Properties="BuildProjectReferences=false;" />
+		<ProjectReference Include="..\Data.EntityFrameworkCore\CodeArchitects.Platform.Data.EntityFrameworkCore.csproj" Properties="BuildProjectReferences=false;" />
   </ItemGroup>
 
 </Project>
