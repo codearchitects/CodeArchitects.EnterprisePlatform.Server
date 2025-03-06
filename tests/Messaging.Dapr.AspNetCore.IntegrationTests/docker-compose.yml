@@ -11,13 +11,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
   publisher-dapr:
     image: daprio/daprd:latest
     network_mode: service:publisher
     depends_on:
-      - publisher
+      publisher:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     command: ["./daprd",
       "-app-id", "publisher",
       "-app-port", "80",
@@ -36,13 +40,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
   subscriber-dapr:
     image: daprio/daprd:latest
     network_mode: service:subscriber
     depends_on:
-      - subscriber
+      subscriber:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     command: ["./daprd",
       "-app-id", "subscriber",
       "-app-port", "80",
@@ -56,3 +64,8 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 20s
+      timeout: 5s
+      retries: 5

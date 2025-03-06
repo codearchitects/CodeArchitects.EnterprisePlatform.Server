@@ -1,0 +1,13 @@
+parameters:
+- name: workDir
+  type: string
+  default: $(System.DefaultWorkingDirectory)
+
+steps:
+- task: PowerShell@2
+  displayName: nuget logout
+  inputs:
+    workingDirectory: ${{ parameters.workDir }}
+    targetType: 'inline'
+    script: |
+      dotnet nuget remove source $(SOURCE_NAME) --configfile NuGet.Config

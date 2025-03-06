@@ -1,0 +1,14 @@
+parameters:
+- name: solution
+  type: string
+- name: workDir
+  type: string
+  default: $(System.DefaultWorkingDirectory)
+
+steps:
+- task: Powershell@2
+  displayName: dotnet clean ${{ parameters.solution }}
+  inputs:
+    targetType: 'inline'
+    script: |
+      dotnet clean ${{parameters.solution}} -c Release

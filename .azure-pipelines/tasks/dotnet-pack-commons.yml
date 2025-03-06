@@ -1,0 +1,67 @@
+parameters:
+- name: prefix
+  type: string
+- name: release
+  type: string
+- name: csprojList
+  type: object
+  default:
+  - Actors
+  - Actors.Dapr
+  - Actors.Dapr.AspNetCore
+  - Application
+  - Common
+  - Dapr.AspNetCore
+  - Data
+  - Data.AdoNet
+  - Data.AdoNet.DependencyInjection
+  - Data.AdoNet.MySQL
+  - Data.AdoNet.Oracle
+  - Data.AdoNet.PostgreSQL
+  - Data.AdoNet.SQLServer
+  - Data.AutoMapper
+  - Data.EntityFrameworkCore
+  - Data.EntityFrameworkCore.DependencyInjection
+  - Data.EntityFrameworkCore.Shared
+  - Data.EntityFrameworkCore5
+  - Data.EntityFrameworkCore5.DependencyInjection
+  - Data.MongoDB
+  - Data.MongoDB.DependencyInjection
+  - Emit
+  - Extensions
+  - Infrastructure
+  - Infrastructure.Dapr
+  - Infrastructure.Dapr.AspNetCore
+  - Messaging
+  - Messaging.AspNetCore
+  - Messaging.Dapr
+  - Messaging.Dapr.AspNetCore
+
+steps:
+- ${{ each csproj in parameters.csprojList }}:
+  - task: Powershell@2
+    displayName: dotnet pack ${{csproj}}
+    inputs:
+      workingDirectory: $(System.DefaultWorkingDirectory)/src
+      targetType: inline
+      script: |
+        dotnet pack ${{ csproj }}/${{ parameters.prefix }}.${{ csproj }}.csproj -p:PackageVersion=$(Build.BuildNumber) --no-restore --output ../nupkgs
+  - task: Powershell@2
+    displayName: sign ${{csproj}}
+    inputs:
+      workingDirectory: $(System.DefaultWorkingDirectory)/nupkgs
+      targetType: inline
+      script: |
+        $nupkg = "./${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg"
+        $env:AZURE_CLIENT_ID = "$(AZURE_CLIENT_ID)" 
+        $env:AZURE_TENANT_ID = "$(AZURE_TENANT_ID)" 
+        $env:AZURE_CLIENT_SECRET = "$(AZURE_CLIENT_SECRET)"
+        sign code trusted-signing -tsa $(TSA) -tse $(TSE) -tscp $(TSCP) $nupkg
+        dotnet nuget verify $nupkg
+  - task: Powershell@2
+    displayName: dotnet push ${{ csproj }}
+    inputs:
+      workingDirectory: $(System.DefaultWorkingDirectory)/nupkgs
+      targetType: inline
+      script: |
+        dotnet nuget push ./${{parameters.prefix}}.${{ csproj }}.$(Build.BuildNumber).nupkg -k $(TOKEN) -s $(SOURCE_NAME)

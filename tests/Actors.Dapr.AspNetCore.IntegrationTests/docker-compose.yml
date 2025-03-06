@@ -17,8 +17,12 @@ services:
   actorapp-dapr:
     image: daprio/daprd:latest
     network_mode: service:actorapp
+    restart: on-failure
     depends_on:
-      - actorapp
+      actorapp:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     command: ["./daprd",
       "-app-id", "actorapp",
       "-app-port", "80",
@@ -38,6 +42,11 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 15s
+      timeout: 5s
+      retries: 5
       
   dapr-placement:
     image: "daprio/dapr:latest"

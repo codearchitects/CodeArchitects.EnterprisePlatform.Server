@@ -23,8 +23,8 @@ steps:
       script: |
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-        $user = "$(SA_NAME)"
-        $token = "$(SA_TOKEN)"
+        $user = "$(SA)"
+        $token = "$(TOKEN)"
         $base64auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $user, $token )))
         $header = @{"Accept" = "*/*"; Authorization = ("Basic {0}" -f $base64auth) }
         $password = ConvertTo-SecureString $token -AsPlainText -Force

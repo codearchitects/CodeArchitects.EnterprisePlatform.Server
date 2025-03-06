@@ -1,0 +1,8 @@
+steps:
+- task: PowerShell@2
+  displayName: install sign tool
+  inputs:
+    workingDirectory: ${{ parameters.workDir }}
+    targetType: inline
+    script: |
+      dotnet tool install --global sign --version 0.9.1-beta.24361.2

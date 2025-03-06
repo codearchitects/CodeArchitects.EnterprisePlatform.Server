@@ -1,54 +1,90 @@
 trigger: none
+
 variables:
-  - template : './task/variables.yml'
-    parameters:
-      packageVersion: ${{ parameters.packageVersion }}
-      Release: ${{ parameters.release }}
-      betaVersion: ${{ parameters.betaVersion }}
+- group: auth
+- name: prefix
+  value: CodeArchitects.Platform
+- name: solution
+  value: ${{ variables.prefix}}.sln
+- name: buildConfiguration
+  value: Release
+# - name: triggerCondition
+#   value: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+# - name: releaseCondition
+#   value: or(eq('${{ parameters.Release }}', 'CD'), eq('${{ parameters.Release }}', 'Beta'))
+- ${{ if eq(parameters.release, 'beta') }}:
+  - name: betaReleaseName
+    value: ${{ parameters.packageVersion }}-beta.${{ parameters.betaVersion }}
+  - name: pipelineVersion
+    value: ${{ variables.betaReleaseName }}
+  - name: condition
+    value: 'succeeded()'
+- ${{ if ne(parameters.release, 'beta') }}:
+  - name: pipelineVersion
+    value: ${{ parameters.packageVersion }}
+  # - name: condition
+  #   value: and(${{variables.triggerCondition}}, ${{variables.releaseCondition}})
 
 parameters:
-  - name: packageVersion
-    type: string
-    default: 0.0.$(Rev:r)
-    displayName: 'Package Version'
-  - name: release
-    type: string
-    default: CI
-    values:
-      - 'CI'
-      - 'RC'
-      - 'Beta'
-    displayName: 'Release'
-  - name: betaVersion
-    displayName: 'Only if selected Release is "beta": 14.1.0-beta.<betaVersion>'
-    type: string
-    default: $(Rev:r)
+- name: release
+  displayName: Release
+  type: string
+  default: CI
+  values:
+    - CI
+    - CD
+    - beta
+- name: packageVersion
+  displayName: Package Version
+  type: string
+  default: 0.0.$(Rev:r)
+- name: betaVersion
+  displayName: 'Only if selected Release is "beta": 14.1.0-beta.<betaVersion>'
+  type: string
+  default: $(Rev:r)
 
-name: "${{ variables.pipelineVersion }}"
+name: ${{ variables.pipelineVersion }}
 
 jobs:
+# - job: ${{ parameters.release }}
+#   pool:
+#     name: kubernetes
+#     demands:
+#     - DOTNET_VERSION -equals all
 - job: ${{ parameters.release }}
   pool:
     name: 'DevOpsAzureTFSAgents'
-
   steps:
-  - script: dotnet nuget locals all --clear
-  - template: ${{variables.restoreTemplate}}
+  - powershell: |
+      git ls-files --eol
+    displayName: check EOL
+  # - task: UseDotNet@2
+  #   inputs:
+  #     version: 8.x
+  - template: tasks/clean-cache.yml
+  - template: tasks/dotnet-clean.yml
     parameters:
-      nuGetConfigName: ${{variables.NugetConfig}}
-      solution: CodeArchitects.Platform.sln
-  - template: ${{variables.buildTemplate}}
+      solution: ${{ variables.solution }}
+  - template: tasks/auth-login.yml
+  - template: tasks/dotnet-restore.yml
     parameters:
-      solution: CodeArchitects.Platform.sln
-  - template: ${{variables.testTemplate}}
-  - template: ${{variables.packTemplate}}
+      solution: ${{ variables.solution }}
+  - powershell: |
+      dotnet build ./src/Common/CodeArchitects.Platform.Common.csproj -c Release
+      dotnet build ./src/Data/CodeArchitects.Platform.Data.csproj -c Release
+      dotnet build ./src/Data.EntityFrameworkCore.Shared/CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj -c Release
+    displayName: "workaround: build csproj deps"
+  - template: tasks/dotnet-build.yml
     parameters:
-      prefix: ${{variables.prefix}}
-      condition: ${{variables.condition}}
-  - template: ${{variables.pushTemplate}}
+      solution: ${{ variables.solution }}
+  - template: tasks/dotnet-test-commons.yml
     parameters:
-      condition: ${{variables.condition}}
-      nuGetConfigName: ${{variables.NugetConfig}}
-  - template: ${{variables.check_pushTemplate}}
-    parameters:
-      condition: ${{variables.condition}}
+      prefix: ${{ variables.prefix }}
+      release: ${{ parameters.release }}
+  - ${{ if ne(parameters.release, 'CI') }}:
+    - template: tasks/sign-tool.yml
+    - template: tasks/dotnet-pack-commons.yml
+      parameters:
+        prefix: ${{ variables.prefix }}
+        release: ${{ parameters.release }}
+  - template: tasks/auth-logout.yml
