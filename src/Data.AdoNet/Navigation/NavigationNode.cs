@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Exceptions;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Linq.Expressions;
 using System.Reflection;

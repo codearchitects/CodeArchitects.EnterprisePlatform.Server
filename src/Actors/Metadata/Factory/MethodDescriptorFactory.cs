@@ -46,7 +46,8 @@ internal class MethodDescriptorFactory
   private void AddMethod(MethodInfo interfaceMethod, MethodInfo implementationMethod)
   {
     if (!TryGetKind(implementationMethod, out MethodKind kind) || kind is MethodKind.Void)
-      throw InvalidActorException.InvalidMethodReturnType(implementationMethod.DeclaringType, implementationMethod);
+      throw InvalidActorException.InvalidMethodReturnType(implementationMethod.DeclaringType
+        ?? throw new ArgumentNullException(nameof(implementationMethod.DeclaringType)), implementationMethod);
 
     if (implementationMethod.IsGenericMethod)
       throw InvalidActorException.GenericMethodsAreNotSupported(_actorType, implementationMethod);
@@ -142,7 +143,12 @@ internal class MethodDescriptorFactory
     {
       ParameterInfo parameter = parameters[i];
       if (i != parameters.Length - 1 && parameter.ParameterType == typeof(CancellationToken))
+      {
+        if (method.DeclaringType == null)
+          throw new ArgumentNullException(nameof(method), "DeclaringType cannot be null.");
+
         throw InvalidActorException.CancellationTokenMustBeLastParameter(method.DeclaringType, method);
+      }
 
       parameterTypes[i] = parameter.ParameterType;
     }

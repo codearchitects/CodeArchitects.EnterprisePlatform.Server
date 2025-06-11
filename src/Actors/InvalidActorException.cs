@@ -17,9 +17,12 @@ public sealed class InvalidActorException : Exception
   }
 
   private InvalidActorException(SerializationInfo info, StreamingContext context)
-    : base(info, context)
+     : base(info, context)
   {
-    Type = Type.GetType(info.GetString(nameof(Type)));
+    var typeName = info.GetString(nameof(Type)) 
+      ?? throw new SerializationException($"The {nameof(Type)} property is missing or null in the serialized data.");
+    Type = Type.GetType(typeName)
+      ?? throw new SerializationException($"The type '{typeName}' could not be resolved.");
   }
 
   /// <summary>

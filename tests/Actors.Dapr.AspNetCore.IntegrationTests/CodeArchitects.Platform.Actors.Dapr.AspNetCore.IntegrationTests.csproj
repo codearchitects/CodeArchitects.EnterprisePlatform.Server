@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -16,9 +16,16 @@
     <None Remove="ActorApp\**" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.15.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0' Or '$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.9.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.6.4" />
-    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.9.0" />
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="xunit" Version="2.4.2" />

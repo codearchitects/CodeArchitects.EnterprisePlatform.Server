@@ -1,8 +1,9 @@
-﻿using CodeArchitects.Platform.Application.Identity;
-using CodeArchitects.Platform.Common.Exceptions;
-using CodeArchitects.Platform.Common.Identity;
-using CodeArchitects.Platform.Common.Utils;
-using System.Reflection;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Exceptions;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Identity;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Utils;
+using CaPlatformCommon.System.Reflection;
+using CodeArchitects.Platform.Application.Identity;
 using System.Security.Claims;
 
 namespace Microsoft.Extensions.DependencyInjection;

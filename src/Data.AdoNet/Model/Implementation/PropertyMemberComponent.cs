@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.System.Reflection;
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 

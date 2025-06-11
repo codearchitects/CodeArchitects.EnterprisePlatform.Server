@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net7.0</TargetFrameworks>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -14,12 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Condition="'$(TargetFramework)' == 'netcoreapp3.1'" Include="Microsoft.Identity.Web" Version="1.26.0" />
-    <PackageReference Condition="'$(TargetFramework)' == 'net7.0'" Include="Microsoft.Identity.Web" Version="2.7.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.9.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj" />
+    <ProjectReference Include="..\Common\CodeArchitects.Platform.Common.csproj">
+      <Aliases>CaPlatformCommon</Aliases>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

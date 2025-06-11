@@ -14,12 +14,13 @@ internal class MemberMetadata : IEquatable<MemberMetadata>
 
   public Type Type { get; }
 
-  public bool Equals(MemberMetadata other)
+  public bool Equals(MemberMetadata? other)
   {
+    if (other is null) return false; // Handle null case explicitly
     return Member == other.Member && Type == other.Type;
   }
 
-  public override bool Equals(object obj)
+  public override bool Equals(object? obj)
   {
     return obj is MemberMetadata other && Equals(other);
   }

@@ -106,7 +106,11 @@ internal abstract class ActorDescriptorFactory<TActor> : ActorDescriptorFactory
     }
     catch (TargetInvocationException ex)
     {
-      ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+      if (ex.InnerException != null)
+      {
+        ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+      }
+
       throw Errors.Unreachable;
     }
   }

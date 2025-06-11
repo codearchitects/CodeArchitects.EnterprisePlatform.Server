@@ -67,7 +67,7 @@ internal class FixCaepActr008 : FixingActionProvider<ClassDeclarationSyntax>
       if (solution.GetDocument(attribute.SyntaxTree) is not Document document)
         continue;
 
-      if (!attributes.TryGetValue(document, out List<AttributeSyntax> documentAttributes))
+      if (!attributes.TryGetValue(document, out List<AttributeSyntax>? documentAttributes))
       {
         documentAttributes = new();
         attributes[document] = documentAttributes;

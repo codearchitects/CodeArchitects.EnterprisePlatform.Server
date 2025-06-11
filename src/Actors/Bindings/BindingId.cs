@@ -16,7 +16,7 @@ public readonly struct BindingId : IEquatable<BindingId>
   public bool Equals(BindingId other) => other._index == _index;
 
   /// <inheritdoc/>
-  public override bool Equals(object obj) => obj is BindingId other && Equals(other);
+  public override bool Equals(object? obj) => obj is BindingId other && Equals(other);
 
   /// <inheritdoc/>
   public override int GetHashCode() => _index;

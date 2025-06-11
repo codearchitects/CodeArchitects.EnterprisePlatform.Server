@@ -70,7 +70,7 @@ internal class ActivityTypeBuilder : TypeBuilderBase, IActivityTypeBuilder
   private void ImplementExecuteAsyncMethod(TypeBuilder type, Type actorType, IMethodDescriptor descriptor, IReadOnlyList<FieldInfo> argumentFields)
   {
     MethodInfo implementationMethod = descriptor.ImplementationMethod;
-    Type implementationType = implementationMethod.DeclaringType;
+    Type implementationType = implementationMethod.DeclaringType ?? throw new InvalidOperationException($"Implementation method '{implementationMethod}' has an unsupported declaring type.");
 
     MethodInfo declaration = typeof(Activity<>).MakeGenericType(actorType.UnderlyingSystemType).GetRequiredMethod(
       name: nameof(Activity<object>.ExecuteAsync),

@@ -35,13 +35,22 @@ parameters:
   - Messaging.Dapr.UnitTests
   - Messaging.UnitTests
   - Shared.UnitTests
+  - PolicyManager.UnitTests
+  - PolicyManager.IntegrationTests
+- name: targetFrameworks
+  type: object
+  default:
+  - net7.0
+  - net8.0
+  - net9.0
 
 steps:
 - ${{ each csproj in parameters.csprojList }}:
-  - task: Powershell@2
-    displayName: dotnet test ${{csproj}}
-    inputs:
-      workingDirectory: $(System.DefaultWorkingDirectory)/tests
-      targetType: inline
-      script: |
-        dotnet test ./${{ csproj }}/${{ parameters.prefix }}.${{ csproj }}.csproj --configuration ${{ parameters.buildConfiguration }} --no-build --no-restore
+  - ${{ each targetFramework in parameters.targetFrameworks }}:
+    - task: Powershell@2
+      displayName: dotnet test ${{csproj}}
+      inputs:
+        workingDirectory: $(System.DefaultWorkingDirectory)/tests
+        targetType: inline
+        script: |
+          dotnet test ./${{ csproj }}/${{ parameters.prefix }}.${{ csproj }}.csproj --framework ${{ targetFramework }} --configuration ${{ parameters.buildConfiguration }} --no-build --no-restore

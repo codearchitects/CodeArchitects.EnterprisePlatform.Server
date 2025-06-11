@@ -70,9 +70,9 @@ jobs:
     parameters:
       solution: ${{ variables.solution }}
   - powershell: |
-      dotnet build ./src/Common/CodeArchitects.Platform.Common.csproj -c Release
-      dotnet build ./src/Data/CodeArchitects.Platform.Data.csproj -c Release
-      dotnet build ./src/Data.EntityFrameworkCore.Shared/CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj -c Release
+      dotnet build ./src/Common/CodeArchitects.Platform.Common.csproj -c Release --no-restore
+      dotnet build ./src/Data/CodeArchitects.Platform.Data.csproj -c Release --no-restore
+      dotnet build ./src/Data.EntityFrameworkCore.Shared/CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj -c Release --no-restore
     displayName: "workaround: build csproj deps"
   - template: tasks/dotnet-build.yml
     parameters:

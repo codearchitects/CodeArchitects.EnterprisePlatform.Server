@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 

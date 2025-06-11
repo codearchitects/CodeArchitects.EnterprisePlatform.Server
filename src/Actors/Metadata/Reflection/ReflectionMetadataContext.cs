@@ -71,9 +71,9 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
         if (!actorType.IsAssignableFrom(type))
           throw InvalidActorException.ActorNotInherited(actorType, type);
 
-        if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type> types))
+        if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type>? types))
         {
-          types = new();
+          types = [];
           _implementationTypes.Add(actorType, types);
         }
 
@@ -119,9 +119,9 @@ internal class ReflectionMetadataContext : ActorModelFactory, IReflectionMetadat
         if (!actorType.IsAssignableFrom(type))
           throw InvalidActorException.ActorNotInherited(actorType, type);
 
-        if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type> types))
+        if (!_implementationTypes.TryGetValue(actorType, out HashSet<Type>? types))
         {
-          types = new();
+          types = [];
           _implementationTypes.Add(actorType, types);
         }
 

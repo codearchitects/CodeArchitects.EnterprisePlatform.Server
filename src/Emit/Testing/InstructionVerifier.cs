@@ -476,7 +476,7 @@ internal class InstructionVerifier : ILVerifier
   {
     int position = ((FakeLabel)label).Position;
 
-    if (!_markedLabels.TryGetValue(position, out string labelName))
+    if (!_markedLabels.TryGetValue(position, out string? labelName))
       throw Error($"Label at position {position} was not marked.");
 
     if (name != labelName)

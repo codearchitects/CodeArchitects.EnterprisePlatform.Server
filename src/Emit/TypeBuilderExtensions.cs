@@ -36,6 +36,11 @@ internal static class TypeBuilderExtensions
 
   public static string GetComponentTypeName(this Type type, string componentName)
   {
+    if (type.FullName == null)
+    {
+      throw new InvalidOperationException("Type.FullName is null.");
+    }
+
     int index = type.FullName.LastIndexOf(type.Name);
     Debug.Assert(index >= 0);
 

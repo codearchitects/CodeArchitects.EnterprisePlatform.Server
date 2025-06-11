@@ -66,22 +66,26 @@ internal abstract class MessagingMetadata
 
     public static ResolvedMessagingMetadata Create(Assembly messagingAssembly)
     {
-      Type? attributeType = messagingAssembly.GetType($"{MessagingNamespace}.MessageHandlerAttribute", throwOnError: true);
+      Type? attributeType = messagingAssembly.GetType($"{MessagingNamespace}.MessageHandlerAttribute", throwOnError: true)
+          ?? throw new InvalidOperationException($"Type '{MessagingNamespace}.MessageHandlerAttribute' not found in assembly '{messagingAssembly.FullName}'.");
 
       ConstructorInfo constructor = attributeType.GetRequiredConstructor(
-        bindingAttr: BindingFlags.Instance | BindingFlags.Public,
-        types: new[] { typeof(string), typeof(string) });
+          bindingAttr: BindingFlags.Instance | BindingFlags.Public,
+          types: new[] { typeof(string), typeof(string) });
 
       PropertyInfo busProperty = attributeType.GetRequiredProperty(
-        name: "Bus",
-        bindingAttr: BindingFlags.Instance | BindingFlags.Public);
+          name: "Bus",
+          bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
       PropertyInfo topicProperty = attributeType.GetRequiredProperty(
-        name: "Topic",
-        bindingAttr: BindingFlags.Instance | BindingFlags.Public);
+          name: "Topic",
+          bindingAttr: BindingFlags.Instance | BindingFlags.Public);
 
-      Type messageHandlerType = messagingAssembly.GetType($"{MessagingNamespace}.IMessageHandler`1", throwOnError: true);
-      Type messageHandlerWithResultType = messagingAssembly.GetType($"{MessagingNamespace}.IMessageHandler`2", throwOnError: true);
+      Type messageHandlerType = messagingAssembly.GetType($"{MessagingNamespace}.IMessageHandler`1", throwOnError: true)
+          ?? throw new InvalidOperationException($"Type '{MessagingNamespace}.IMessageHandler`1' not found in assembly '{messagingAssembly.FullName}'.");
+
+      Type messageHandlerWithResultType = messagingAssembly.GetType($"{MessagingNamespace}.IMessageHandler`2", throwOnError: true)
+          ?? throw new InvalidOperationException($"Type '{MessagingNamespace}.IMessageHandler`2' not found in assembly '{messagingAssembly.FullName}'.");
 
       return new(attributeType, constructor, busProperty, topicProperty, messageHandlerType, messageHandlerWithResultType);
     }

@@ -37,6 +37,12 @@ internal class ReflectionStateComponentMetadata<TActor> : StateComponentMetadata
 
   private Optional<object?> GetOptionalDefaultValue()
   {
-    return Member.GetCustomAttribute<StateAttribute>().DefaultValue;
+    var stateAttribute = Member.GetCustomAttribute<StateAttribute>();
+    if (stateAttribute == null)
+    {
+      return Optional<object?>.None;
+    }
+
+    return stateAttribute.DefaultValue;
   }
 }

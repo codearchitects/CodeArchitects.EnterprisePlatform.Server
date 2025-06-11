@@ -36,6 +36,8 @@ parameters:
   - Messaging.AspNetCore
   - Messaging.Dapr
   - Messaging.Dapr.AspNetCore
+  - PolicyManager
+  - PolicyManager.DependencyInjection
 
 steps:
 - ${{ each csproj in parameters.csprojList }}:

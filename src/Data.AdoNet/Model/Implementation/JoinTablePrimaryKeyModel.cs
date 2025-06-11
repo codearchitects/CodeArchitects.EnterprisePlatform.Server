@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Exceptions;
+using CaPlatformCommon.System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model.Implementation;

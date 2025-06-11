@@ -1,13 +1,15 @@
-version: '3.4'
-
 services:
   actorapp:
     image: ${DOCKER_REGISTRY-}actorapp
     build:
       context: ../..
       dockerfile: tests/Actors.Dapr.AspNetCore.IntegrationTests/ActorApp/Dockerfile
+      args:
+        - TARGET_FRAMEWORK=${TARGET_FRAMEWORK}
+        - LATEST_FRAMEWORK=${LATEST_FRAMEWORK}
+        - HTTP_PORT=${HTTP_PORT}
     ports:
-      - 20100:80
+      - 20100:${HTTP_PORT}
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -25,7 +27,7 @@ services:
         condition: service_healthy
     command: ["./daprd",
       "-app-id", "actorapp",
-      "-app-port", "80",
+      "-app-port", "${HTTP_PORT}",
       "-placement-host-address", "dapr-placement:50000",
       "-components-path", "/components"
       ]

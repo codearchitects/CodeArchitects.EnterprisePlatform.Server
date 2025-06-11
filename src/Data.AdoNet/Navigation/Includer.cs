@@ -1,6 +1,7 @@
-﻿using CodeArchitects.Platform.Data.Navigation;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.System.Reflection;
+using CodeArchitects.Platform.Data.Navigation;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 

@@ -1,13 +1,15 @@
-version: '3.4'
-
 services:
   publisher:
     image: ${DOCKER_REGISTRY-}publisher
     build:
       context: ../..
       dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Publisher/Dockerfile
+      args:
+        - TARGET_FRAMEWORK=${TARGET_FRAMEWORK}
+        - LATEST_FRAMEWORK=${LATEST_FRAMEWORK}
+        - HTTP_PORT=${HTTP_PORT}
     ports:
-      - 20000:80
+      - 20000:${HTTP_PORT}
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -24,7 +26,7 @@ services:
         condition: service_healthy
     command: ["./daprd",
       "-app-id", "publisher",
-      "-app-port", "80",
+      "-app-port", "${HTTP_PORT}",
       "-components-path", "/components"
       ]
     volumes:
@@ -35,8 +37,12 @@ services:
     build:
       context: ../..
       dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Dockerfile
+      args:
+        - TARGET_FRAMEWORK=${TARGET_FRAMEWORK}
+        - LATEST_FRAMEWORK=${LATEST_FRAMEWORK}
+        - HTTP_PORT=${HTTP_PORT}
     ports:
-      - 20001:80
+      - 20001:${HTTP_PORT}
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
@@ -53,7 +59,7 @@ services:
         condition: service_healthy
     command: ["./daprd",
       "-app-id", "subscriber",
-      "-app-port", "80",
+      "-app-port", "${HTTP_PORT}",
       "-components-path", "/components"
       ]
     volumes:

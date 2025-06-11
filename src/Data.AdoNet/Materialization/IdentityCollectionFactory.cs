@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.System.Reflection;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq.Expressions;

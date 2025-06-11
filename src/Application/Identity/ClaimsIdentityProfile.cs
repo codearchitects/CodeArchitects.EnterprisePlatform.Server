@@ -1,5 +1,6 @@
-﻿using CodeArchitects.Platform.Common.Identity;
-using CodeArchitects.Platform.Common.Utils;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Identity;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Utils;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
@@ -72,7 +73,7 @@ public class ClaimsIdentityProfile<TUserId> : IIdentityProfile<TUserId>
     if (!IsAuthenticated)
       throw new AuthenticationException();
 
-    return Claims.FindFirstValue(claimType);
+    return Claims?.FindFirstValue(claimType);
   }
 
   /// <summary>

@@ -178,7 +178,7 @@ internal class AdoNetConfigurationBuilder : IAdoNetConfigurationBuilder, IAdoNet
         throw new InvalidOperationException($"Found more than one class implementing '{nameof(IConcurrencyTokenProvider)}' in the provided assembly.");
       }
 
-      ConcurrencyTokenProviderDescriptor = new ServiceDescriptor(typeof(IConcurrencyTokenProvider), tokenProviderType, ServiceLifetime.Singleton);
+      ConcurrencyTokenProviderDescriptor = new ServiceDescriptor(typeof(IConcurrencyTokenProvider), tokenProviderType!, ServiceLifetime.Singleton);
     }
   }
 }

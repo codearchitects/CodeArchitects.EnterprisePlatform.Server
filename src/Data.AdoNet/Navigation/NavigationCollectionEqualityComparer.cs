@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Common.Collections;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Collections;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Navigation;
 

@@ -9,6 +9,7 @@ using Docker.DotNet;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Containers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 using Testcontainers.MariaDb;
@@ -32,6 +33,7 @@ public class TestFixture : IAsyncLifetime
   private IServiceProvider _mariaDbServices = default!;
 
   private bool _isExecuting;
+  private readonly XunitLoggerFactory _loggerFactory;
 
   public TestFixture()
   {
@@ -39,6 +41,8 @@ public class TestFixture : IAsyncLifetime
     _postgresContainer = new PostgreSqlBuilder().Build();
     _oracleContainer = new OracleBuilder().Build();
     _mariaDbContainer = new MariaDbBuilder().Build();
+
+    _loggerFactory = new XunitLoggerFactory(this);
   }
 
   public ITestOutputHelper? Output { get; private set; }
@@ -86,10 +90,10 @@ public class TestFixture : IAsyncLifetime
     return dbProvider switch
     {
       DbProvider.SqlServer => _sqlServerServices,
-      DbProvider.Postgres  => _postgresServices,
-      DbProvider.Oracle    => _oracleServices,
-      DbProvider.MariaDb   => _mariaDbServices,
-      _                    => throw Errors.Unreachable
+      DbProvider.Postgres => _postgresServices,
+      DbProvider.Oracle => _oracleServices,
+      DbProvider.MariaDb => _mariaDbServices,
+      _ => throw Errors.Unreachable
     };
   }
 
@@ -121,9 +125,16 @@ public class TestFixture : IAsyncLifetime
       options => options.UseNpgsql(PostgresConnectionString),
       options => options.UseProvider<PostgreSQLProvider>(postgres => postgres.UseConnection(PostgresConnectionString)));
 
+#if NET7_0
     _oracleServices = CreateServiceProvider(
       options => options.UseOracle(OracleConnectionString),
       options => options.UseProvider<OracleProvider>(oracle => oracle.UseConnection(OracleConnectionString)));
+#elif NET8_0_OR_GREATER
+    _oracleServices = CreateServiceProvider(
+      options => options.UseOracle(OracleConnectionString, b =>
+        b.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion19)),
+      options => options.UseProvider<OracleProvider>(oracle => oracle.UseConnection(OracleConnectionString)));
+#endif
 
     _mariaDbServices = CreateServiceProvider(
       options => options.UseMySql(MariaDbConnectionString, new MariaDbServerVersion("10.10.0")),
@@ -138,7 +149,10 @@ public class TestFixture : IAsyncLifetime
 
     serviceCollection.AddDbContext<TestDbContext>(options => useEfCoreProvider(options)
       .EnableSensitiveDataLogging()
-      .UseLoggerFactory(new XunitLoggerFactory(this))
+      .UseLoggerFactory(_loggerFactory)
+      .ConfigureWarnings(warnings =>
+        warnings.Ignore(CoreEventId.ManyServiceProvidersCreatedWarning)
+      )
       .UseCaep(caep => caep
         .UseOptimisticConcurrency()));
 

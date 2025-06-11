@@ -13,7 +13,7 @@ public readonly struct ScheduleId : IEquatable<ScheduleId>
   public bool Equals(ScheduleId other) => other.Id == Id;
 
   /// <inheritdoc/>
-  public override bool Equals(object obj) => obj is ScheduleId other && Equals(other);
+  public override bool Equals(object? obj) => obj is ScheduleId other && Equals(other);
 
   /// <inheritdoc/>
   public override int GetHashCode() => Id is not null

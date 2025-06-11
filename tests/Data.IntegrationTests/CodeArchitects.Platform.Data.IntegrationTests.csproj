@@ -1,41 +1,86 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>preview</LangVersion>
+    <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <EnablePreviewFeatures>true</EnablePreviewFeatures>
 
     <IsPackable>false</IsPackable>
 
     <RootNamespace>$(MSBuildProjectName.Replace(".IntegrationTests", ""))</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.80" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-preview.3.efcore.9.0.0" />
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.Oracle" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MariaDb" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.80" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.15" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.Oracle" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MariaDb" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.15">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="7.21.13" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.18" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.20" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+    <PackageReference Include="Testcontainers" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.Oracle" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.MariaDb" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.0.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.20">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.20">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.17">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
-    <PackageReference Include="Oracle.EntityFrameworkCore" Version="5.21.61" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
-    <PackageReference Include="Testcontainers" Version="3.0.0" />
-    <PackageReference Include="Testcontainers.MariaDb" Version="3.0.0" />
-    <PackageReference Include="Testcontainers.MsSql" Version="3.0.0" />
-    <PackageReference Include="Testcontainers.Oracle" Version="3.0.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="3.0.0" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+    <PackageReference Include="xunit" Version="2.4.2" /><!--2.9.3-->
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5"><!--3.0.2-->
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -51,9 +96,7 @@
     <ProjectReference Include="..\..\src\Data.AdoNet.PostgreSQL\CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.SQLServer\CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj" />
     <ProjectReference Include="..\..\src\Data.AdoNet.DependencyInjection\CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj" />
-    <ProjectReference Include="..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj">
-      <SetTargetFramework>TargetFramework=netcoreapp3.1</SetTargetFramework>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" />
     <ProjectReference Include="..\..\src\Data.EntityFrameworkCore5.DependencyInjection\CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection.csproj" />
   </ItemGroup>
 

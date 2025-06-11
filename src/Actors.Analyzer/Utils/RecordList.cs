@@ -30,7 +30,7 @@ internal readonly struct RecordList<T> : IReadOnlyList<T>, IEquatable<RecordList
     return true;
   }
 
-  public override bool Equals(object obj)
+  public override bool Equals(object? obj)
   {
     return obj is RecordList<T> other && Equals(other);
   }

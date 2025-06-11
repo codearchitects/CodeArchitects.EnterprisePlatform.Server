@@ -8,11 +8,12 @@ namespace CodeArchitects.Platform.Actors.Analyzer.CodeFixes;
 
 internal abstract class FixingActionProvider
 {
-  private static readonly Dictionary<string, FixingActionProvider> s_providers =
-    typeof(FixingActionProvider).Assembly.DefinedTypes
-    .Where(type => typeof(FixingActionProvider).IsAssignableFrom(type) && !type.IsAbstract)
-    .Select(type => (FixingActionProvider)Activator.CreateInstance(type))
-    .ToDictionary(provider => provider.DiagnosticId);
+  private static readonly Dictionary<string, FixingActionProvider?> s_providers =
+      typeof(FixingActionProvider).Assembly.DefinedTypes
+      .Where(type => typeof(FixingActionProvider).IsAssignableFrom(type) && !type.IsAbstract)
+      .Select(type => Activator.CreateInstance(type) as FixingActionProvider)
+      .Where(provider => provider != null)
+      .ToDictionary(provider => provider!.DiagnosticId);
 
   public static readonly string[] FixableDiagnosticIds = s_providers.Keys.ToArray();
 
@@ -24,10 +25,13 @@ internal abstract class FixingActionProvider
 
   public static ValueTask<CodeAction?> GetFixingActionAsync(Document document, SyntaxNode root, Diagnostic diagnostic, CancellationToken cancellationToken)
   {
-    if (!s_providers.TryGetValue(diagnostic.Id, out FixingActionProvider? provider))
+    if (!s_providers.TryGetValue(diagnostic.Id, out FixingActionProvider? provider) || provider is null)
       return None;
 
-    SyntaxNode node = root.FindNode(diagnostic.Location.SourceSpan);
+    SyntaxNode? node = root.FindNode(diagnostic.Location.SourceSpan);
+    if (node is null)
+      return None;
+
     IReadOnlyList<string> properties;
 
     if (diagnostic.Properties is null)
@@ -37,9 +41,9 @@ internal abstract class FixingActionProvider
     else
     {
       properties = diagnostic.Properties
-        .OrderBy(pair => pair.Key)
-        .Select(pair => pair.Value)
-        .ToList()!;
+          .OrderBy(pair => pair.Key)
+          .Select(pair => pair.Value)
+          .ToList()!;
     }
 
     return provider.GetFixingActionAsync(document, root, node, properties, cancellationToken);

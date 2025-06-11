@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Command;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.System.Collections.Generic;
+using CodeArchitects.Platform.Data.AdoNet.Command;
 using CodeArchitects.Platform.Data.AdoNet.Features.Concurrency;
 using System.Data;
 using System.Data.Common;

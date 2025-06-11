@@ -11,6 +11,7 @@ namespace CodeArchitects.Platform.Messaging.AspNetCore.Handlers;
 /// <typeparam name="THandler">The type of the handler.</typeparam>
 /// <typeparam name="TMessage">The type of the message.</typeparam>
 internal abstract class BaseHandlerDelegate<THandler, TMessage> : HandlerDelegate
+    where THandler : notnull
 {
   public sealed override Task HandleAsync(HttpContext context, JObject messageJson)
   {

@@ -177,9 +177,9 @@ internal class ActivityManager<TActor> : IActivityManager<TActor>
 
     private MethodDescriptorEqualityComparer() { }
 
-    public override bool Equals(IMethodDescriptor x, IMethodDescriptor y)
+    public override bool Equals(IMethodDescriptor? x, IMethodDescriptor? y) // Updated nullability annotations
     {
-      return x.Id == y.Id;
+      return x?.Id == y?.Id;
     }
 
     public override int GetHashCode(IMethodDescriptor obj)

@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.CodeAnalysis;
-using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Visitors;
 using CodeArchitects.Platform.Data.Navigation;
 using System.Data;

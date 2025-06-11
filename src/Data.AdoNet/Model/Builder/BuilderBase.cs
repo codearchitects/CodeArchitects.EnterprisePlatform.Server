@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Common.Exceptions;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.Exceptions;
+using CaPlatformCommon.System.Reflection;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -112,7 +114,7 @@ internal class BuilderBase
         if (methodCallExpression.Method != ModelConfiguration.s_hiddenColumnMethod || methodCallExpression.Arguments[0] is not ConstantExpression columnNameExpression)
           throw InvalidExpression();
 
-        yield return new ColumnName((string)columnNameExpression.Value);
+        yield return new ColumnName((string)columnNameExpression.Value!);
         break;
 
       default:

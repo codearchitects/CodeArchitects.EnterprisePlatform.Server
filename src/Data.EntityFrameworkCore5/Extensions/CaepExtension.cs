@@ -22,13 +22,24 @@ internal class CaepExtension : CaepExtensionBase
 
     public override string LogFragment => "CodeArchitects:Caep";
 
-    public override long GetServiceProviderHashCode()
+    public override int GetServiceProviderHashCode()
     {
       return 0;
     }
 
     public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
     {
+    }
+
+    public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+    {
+      if (other is not DataExtensionInfo otherInfo)
+        return false;
+
+      var thisPlugins = ((CaepExtension)Extension).Plugins;
+      var otherPlugins = ((CaepExtension)otherInfo.Extension).Plugins;
+
+      return thisPlugins.SequenceEqual(otherPlugins);
     }
   }
 }

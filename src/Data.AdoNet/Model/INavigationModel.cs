@@ -1,4 +1,5 @@
-﻿using CodeArchitects.Platform.Common.CodeAnalysis;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data.Features.Associations;
 
 namespace CodeArchitects.Platform.Data.AdoNet.Model;

@@ -14,7 +14,16 @@ public class CommonAnalyzerTest<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, XUnit
   private static readonly string s_commonAssemblyDirectory = Directory.GetCurrentDirectory()
     .Replace("tests", "src")
     .Replace("Common.Analyzer.FunctionalTests", "Common")
-    .Replace("net7.0", "netstandard2.1");
+#if NET9_0
+          .Replace("net9.0", "netstandard2.1")
+#elif NET8_0
+          .Replace("net8.0", "netstandard2.1")
+#elif NET7_0
+          .Replace("net7.0", "netstandard2.1")
+#else
+          .Replace("net7.0", "netstandard2.1")
+#endif
+          ;
 
   private static readonly string s_commonAssemblyLocation = Path.Combine(s_commonAssemblyDirectory, "CodeArchitects.Platform.Common.dll");
 

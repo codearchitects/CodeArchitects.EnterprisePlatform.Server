@@ -7,6 +7,8 @@ internal abstract class CaepExtensionBase : IDbContextOptionsExtension
 {
   private readonly IEnumerable<ICaepExtensionPlugin> _plugins;
 
+  protected IEnumerable<ICaepExtensionPlugin> Plugins => _plugins;
+
   public CaepExtensionBase(IEnumerable<ICaepExtensionPlugin> plugins)
   {
     _plugins = plugins;

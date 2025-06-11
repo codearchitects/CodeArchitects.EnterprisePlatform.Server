@@ -163,6 +163,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Pol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.PolicyManager.DependencyInjection", "src\PolicyManager.DependencyInjection\CodeArchitects.Platform.PolicyManager.DependencyInjection.csproj", "{03ED8AC4-63AD-4622-B744-45CD2A54E2A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Shared.UnitTests", "tests\Shared.UnitTests\CodeArchitects.Platform.Shared.UnitTests.csproj", "{6269E188-8049-BE15-311F-B16602B542EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -453,6 +455,10 @@ Global
 		{03ED8AC4-63AD-4622-B744-45CD2A54E2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03ED8AC4-63AD-4622-B744-45CD2A54E2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03ED8AC4-63AD-4622-B744-45CD2A54E2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6269E188-8049-BE15-311F-B16602B542EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6269E188-8049-BE15-311F-B16602B542EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6269E188-8049-BE15-311F-B16602B542EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6269E188-8049-BE15-311F-B16602B542EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -517,6 +523,9 @@ Global
 		{E8226DE1-37D0-49DD-B95F-C9E4FBBC425A} = {6FFB7182-83ED-44D9-BE34-6D86E215D501}
 		{9FE314F4-6070-4D57-88F1-F02C7353D3F6} = {80AD5D6F-E49F-4E13-B635-7C0C8264BE94}
 		{8FD257B7-F78B-4495-8790-DFEB34E1EDFC} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{13870FAA-5169-451F-81A3-85F4B5603C31} = {AE6B4AEB-0C5A-404B-A5BE-6BAED09F6A3C}
+		{847564D0-467C-4F10-9C5D-C1A090D8B767} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{6269E188-8049-BE15-311F-B16602B542EA} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

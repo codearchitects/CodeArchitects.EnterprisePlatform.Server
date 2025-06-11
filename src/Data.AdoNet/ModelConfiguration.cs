@@ -1,4 +1,6 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Model;
+﻿extern alias CaPlatformCommon;
+using CaPlatformCommon.System.Reflection;
+using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.Model.Builder;
 using CodeArchitects.Platform.Data.AdoNet.Model.Implementation;
 using CodeArchitects.Platform.Data.Features.Associations;

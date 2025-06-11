@@ -76,9 +76,10 @@ internal static class AssemblyBuilderExtensions
     assemblyNameProperty.SetGetMethod(assemblyNameGetter);
 
     return type.CreateTypeInfo()!.GetConstructor(
-      bindingAttr: BindingFlags.Public | BindingFlags.Instance,
-      binder: null,
-      types: new[] { typeof(string) },
-      modifiers: null);
+     bindingAttr: BindingFlags.Public | BindingFlags.Instance,
+     binder: null,
+     types: new[] { typeof(string) },
+     modifiers: null)
+     ?? throw new InvalidOperationException("Constructor could not be created.");
   }
 }

@@ -88,7 +88,7 @@ internal class ActorDiagnosticAnalyzer : DiagnosticAnalyzer
   private static void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, Dictionary<string, List<DiagnosticReference>> diagnostics)
   {
     SyntaxTree syntaxTree = context.Tree;
-    if (diagnostics.TryGetValue(syntaxTree.FilePath, out List<DiagnosticReference> references))
+    if (diagnostics.TryGetValue(syntaxTree.FilePath, out List<DiagnosticReference>? references) && references != null)
     {
       foreach (DiagnosticReference reference in references)
       {
