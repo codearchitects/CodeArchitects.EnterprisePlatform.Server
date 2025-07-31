@@ -5,4 +5,4 @@ steps:
     workingDirectory: ${{ parameters.workDir }}
     targetType: inline
     script: |
-      dotnet tool install --global sign --version 1.0.95
+      dotnet tool install --global sign --version 0.9.1-beta.25228.1
