@@ -10,4 +10,4 @@ steps:
     workingDirectory: ${{ parameters.workDir }}
     targetType: 'inline'
     script: |
-      dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u $(SA) -p $(TOKEN) --store-password-in-clear-text --valid-authentication-types basic --configfile NuGet.Config
+      dotnet nuget add source $(SOURCE) -n $(SOURCE_NAME) -u "AzureDevOps" -p "$(System.AccessToken)" --store-password-in-clear-text --valid-authentication-types basic --configfile NuGet.Config
