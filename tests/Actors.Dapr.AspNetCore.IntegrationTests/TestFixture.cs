@@ -8,14 +8,17 @@ public class TestFixture : IAsyncLifetime
 {
   private static readonly string s_dockerComposePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../../.."));
   private readonly IReadOnlyDictionary<string, string?> _envVars;
-  private const string LATEST_FRAMEWORK = "9.0";
+  private const string LATEST_FRAMEWORK = "10.0";
 
   public TestFixture()
   {
     string targetFrameworkMoniker;
     string httpPort;
 
-#if NET9_0
+#if NET10_0
+    targetFrameworkMoniker = "10.0";
+    httpPort = "8080";
+#elif NET9_0
     targetFrameworkMoniker = "9.0";
     httpPort = "8080";
 #elif NET8_0

@@ -58,9 +58,6 @@ jobs:
   - powershell: |
       git ls-files --eol
     displayName: check EOL
-  # - task: UseDotNet@2
-  #   inputs:
-  #     version: 8.x
   - template: tasks/clean-cache.yml
   - template: tasks/dotnet-clean.yml
     parameters:

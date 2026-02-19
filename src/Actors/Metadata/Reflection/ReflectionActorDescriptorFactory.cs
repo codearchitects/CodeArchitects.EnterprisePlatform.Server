@@ -47,11 +47,11 @@ internal class ReflectionActorDescriptorFactory<TActor> : ActorDescriptorFactory
 
         switch (member)
         {
-          case FieldInfo field:
-            yield return new MemberMetadata(field, field.FieldType);
+          case FieldInfo fieldInfo:
+            yield return new MemberMetadata(fieldInfo, fieldInfo.FieldType);
             break;
-          case PropertyInfo property:
-            yield return new MemberMetadata(property, property.PropertyType);
+          case PropertyInfo propertyInfo:
+            yield return new MemberMetadata(propertyInfo, propertyInfo.PropertyType);
             break;
         }
       }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net7.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -9,8 +9,13 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <MicrosoftDataSqlClientVersion Condition="'$(TargetFramework)' == 'net7.0'">5.2.3</MicrosoftDataSqlClientVersion>
+    <MicrosoftDataSqlClientVersion Condition="'$(TargetFramework)' == 'net10.0'">6.1.4</MicrosoftDataSqlClientVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="$(MicrosoftDataSqlClientVersion)" />
   </ItemGroup>
 
   <ItemGroup>

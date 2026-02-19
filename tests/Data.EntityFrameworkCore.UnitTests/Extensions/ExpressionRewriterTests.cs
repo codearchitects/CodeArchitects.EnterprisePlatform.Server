@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace CodeArchitects.Platform.Data.EntityFrameworkCore.Extensions;
@@ -36,7 +37,10 @@ public class ExpressionRewriterTests
   {
     // Arrange
     EntityQueryProvider provider = new(Mock.Of<IQueryCompiler>(MockBehavior.Strict));
-    var queryable = new EntityQueryable<Entity>(provider, _entityType)
+    var queryable = new EntityQueryable<Entity>(provider, _entityType);
+
+    // Explicitly cast to IQueryable<Entity> to resolve ambiguity
+    var query = ((IQueryable<Entity>)queryable)
       .Where(x => x.Id > 4)
       .OrderBy(x => x.Id)
       .Select(x => new { NewId = x.Id });
@@ -49,7 +53,7 @@ public class ExpressionRewriterTests
       .Setup(x => x.IsEnabled(It.IsAny<IQueryRootExpressionInterceptor>()))
       .Returns(true);
 
-    Expression expression = queryable.Expression;
+    Expression expression = query.Expression;
 
     // Act
     Expression result = _sut.Rewrite(expression, _interceptorInfoMock.Object);
@@ -60,17 +64,20 @@ public class ExpressionRewriterTests
     _interceptorMock.Verify(x => x.Apply(It.Is<EntityQueryRootExpression>(expr => expr.Type == typeof(IQueryable<Entity>)), _entityType));
     _interceptorMock.VerifyNoOtherCalls();
   }
-  
+
   [Fact]
   public void Rewrite_ShouldNotCallInterceptorsWithRootExpression_WhenTheyShouldNotApply()
   {
     // Arrange
     EntityQueryProvider provider = new(Mock.Of<IQueryCompiler>(MockBehavior.Strict));
-    var queryable = new EntityQueryable<Entity>(provider, _entityType)
+    var queryable = new EntityQueryable<Entity>(provider, _entityType);
+
+    // Explicitly cast to IQueryable<Entity> to resolve ambiguity
+    var query = ((IQueryable<Entity>)queryable)
       .Where(x => x.Id > 4)
       .OrderBy(x => x.Id)
       .Select(x => new { NewId = x.Id });
-  
+
     _interceptorMock
       .Setup(x => x.Apply(It.IsAny<Expression>(), It.IsAny<IEntityType>()))
       .Returns<Expression, IEntityType>((expr, type) => expr);
@@ -79,11 +86,11 @@ public class ExpressionRewriterTests
       .Setup(x => x.IsEnabled(It.IsAny<IQueryRootExpressionInterceptor>()))
       .Returns(false);
 
-    Expression expression = queryable.Expression;
-  
+    Expression expression = query.Expression;
+
     // Act
     Expression result = _sut.Rewrite(expression, _interceptorInfoMock.Object);
-  
+
     // Assert
     result.Should().BeEquivalentTo(expression, options => options.Using(ExpressionEqualityComparer.Instance)); // Because the interceptor is no-op
     _interceptorInfoMock.Verify(x => x.IsEnabled(_interceptorMock.Object));

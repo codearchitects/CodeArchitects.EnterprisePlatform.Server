@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net9.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -9,17 +9,16 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.15.4" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="Dapr.Actors.AspNetCore" Version="1.9.0" />
-  </ItemGroup>
+  <PropertyGroup>
+    <DaprActorsAspNetCoreVersion Condition="'$(TargetFramework)' == 'net7.0'">1.9.0</DaprActorsAspNetCoreVersion>
+    <DaprActorsAspNetCoreVersion Condition="'$(TargetFramework)' == 'net9.0'">1.15.4</DaprActorsAspNetCoreVersion>
+    <DaprActorsAspNetCoreVersion Condition="'$(TargetFramework)' == 'net10.0'">1.16.1</DaprActorsAspNetCoreVersion>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Actors.Dapr\CodeArchitects.Platform.Actors.Dapr.csproj" />
     <ProjectReference Include="..\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="$(DaprActorsAspNetCoreVersion)" />
   </ItemGroup>
 
 </Project>

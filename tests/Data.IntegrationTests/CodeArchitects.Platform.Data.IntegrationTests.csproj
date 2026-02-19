@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,16 +11,39 @@
     <RootNamespace>$(MSBuildProjectName.Replace(".IntegrationTests", ""))</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="10.23.26100" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+    <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="10.0.0-preview.3" />
+    <PackageReference Include="Testcontainers" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.Oracle" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.MariaDb" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.10.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.10.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.80" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.5" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0-preview.3.efcore.9.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     <PackageReference Include="Testcontainers" Version="4.4.0" />
     <PackageReference Include="Testcontainers.Oracle" Version="4.4.0" />
     <PackageReference Include="Testcontainers.MariaDb" Version="4.4.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -42,6 +65,7 @@
     <PackageReference Include="Testcontainers.MariaDb" Version="4.4.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.15">
       <PrivateAssets>all</PrivateAssets>
@@ -63,6 +87,7 @@
     <PackageReference Include="Testcontainers.MariaDb" Version="4.0.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.0.0" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
 
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.20">
       <PrivateAssets>all</PrivateAssets>
@@ -77,7 +102,6 @@
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="xunit" Version="2.4.2" /><!--2.9.3-->
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5"><!--3.0.2-->

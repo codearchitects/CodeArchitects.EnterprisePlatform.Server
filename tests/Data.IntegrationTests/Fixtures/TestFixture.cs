@@ -137,7 +137,7 @@ public class TestFixture : IAsyncLifetime
 #endif
 
     _mariaDbServices = CreateServiceProvider(
-      options => options.UseMySql(MariaDbConnectionString, new MariaDbServerVersion("10.10.0")),
+      options => options.UseMySql(MariaDbConnectionString, ServerVersion.AutoDetect(MariaDbConnectionString)),
       options => options.UseProvider<MySQLProvider>(mySql => mySql.UseConnection(MariaDbConnectionString)));
   }
 
