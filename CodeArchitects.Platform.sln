@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11620.152 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.Infrastructure", "src\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj", "{54743C88-11C2-4761-8536-B56218604416}"
 EndProject
@@ -164,6 +164,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArchitects.Platform.PolicyManager.DependencyInjection", "src\PolicyManager.DependencyInjection\CodeArchitects.Platform.PolicyManager.DependencyInjection.csproj", "{03ED8AC4-63AD-4622-B744-45CD2A54E2A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Shared.UnitTests", "tests\Shared.UnitTests\CodeArchitects.Platform.Shared.UnitTests.csproj", "{6269E188-8049-BE15-311F-B16602B542EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeArchitects.Platform.Data.Mapster", "src\Data.Mapster\CodeArchitects.Platform.Data.Mapster.csproj", "{5A06D6D7-3737-4926-9B94-721F6334956C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -459,6 +461,10 @@ Global
 		{6269E188-8049-BE15-311F-B16602B542EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6269E188-8049-BE15-311F-B16602B542EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6269E188-8049-BE15-311F-B16602B542EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A06D6D7-3737-4926-9B94-721F6334956C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A06D6D7-3737-4926-9B94-721F6334956C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A06D6D7-3737-4926-9B94-721F6334956C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A06D6D7-3737-4926-9B94-721F6334956C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -526,6 +532,7 @@ Global
 		{13870FAA-5169-451F-81A3-85F4B5603C31} = {AE6B4AEB-0C5A-404B-A5BE-6BAED09F6A3C}
 		{847564D0-467C-4F10-9C5D-C1A090D8B767} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
 		{6269E188-8049-BE15-311F-B16602B542EA} = {2221E47A-0474-48FC-8840-E8E6CDAED427}
+		{5A06D6D7-3737-4926-9B94-721F6334956C} = {9B8AE08D-7A27-45A1-8E11-74E23BC55E2E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6E0758CD-5D42-4CAC-B572-B98177958052}

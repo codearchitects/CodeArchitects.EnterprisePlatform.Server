@@ -8,7 +8,7 @@ parameters:
   type: string
 - name: nupkgList
   type: object
-  default: ['Actors','Actors.Dapr','Actors.Dapr.AspNetCore','Application','Common','Dapr.AspNetCore','Data','Data.AdoNet','Data.AdoNet.DependencyInjection','Data.AdoNet.MySQL','Data.AdoNet.Oracle','Data.AdoNet.PostgreSQL','Data.AdoNet.SQLServer','Data.AutoMapper','Data.EntityFrameworkCore','Data.EntityFrameworkCore.DependencyInjection','Data.EntityFrameworkCore.Shared','Data.EntityFrameworkCore5','Data.EntityFrameworkCore5.DependencyInjection','Data.MongoDB','Data.MongoDB.DependencyInjection','Emit','Extensions','Infrastructure','Infrastructure.Dapr','Infrastructure.Dapr.AspNetCore','Messaging','Messaging.AspNetCore','Messaging.Dapr','Messaging.Dapr.AspNetCore','PolicyManager','PolicyManager.DependencyInjection'] # this array contain the list of csproj files to pack
+  default: ['Actors','Actors.Dapr','Actors.Dapr.AspNetCore','Application','Common','Dapr.AspNetCore','Data','Data.AdoNet','Data.AdoNet.DependencyInjection','Data.AdoNet.MySQL','Data.AdoNet.Oracle','Data.AdoNet.PostgreSQL','Data.AdoNet.SQLServer','Data.AutoMapper','Data.EntityFrameworkCore','Data.EntityFrameworkCore.DependencyInjection','Data.EntityFrameworkCore.Shared','Data.EntityFrameworkCore5','Data.EntityFrameworkCore5.DependencyInjection','Data.MongoDB','Data.MongoDB.DependencyInjection','Emit','Extensions','Infrastructure','Infrastructure.Dapr','Infrastructure.Dapr.AspNetCore','Messaging','Messaging.AspNetCore','Messaging.Dapr','Messaging.Dapr.AspNetCore','PolicyManager','PolicyManager.DependencyInjection','Data.Mapster'] # this array contain the list of csproj files to pack
 - name: prefix
   type: string
   default: 'CodeArchitects.Platform'
