@@ -21,6 +21,14 @@
     <!-- NuGet dependency auditing: warn on known-vulnerable direct AND transitive packages. -->
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
+
+    <!--
+      Disable reference assemblies. With multi-targeted ProjectReferences, parallel builds
+      (e.g. on CI) can intermittently fail with CS0006 "Metadata file '.../ref/*.dll' could not
+      be found" because a dependent project starts compiling before the referenced project's
+      reference assembly is written. Referencing the real output assembly instead removes the race.
+    -->
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <!--
