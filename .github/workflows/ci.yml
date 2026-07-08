@@ -91,7 +91,7 @@ jobs:
           dotnet CycloneDX CodeArchitects.Platform.sln -o sbom --json --filename sbom.json
 
       - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: sbom/sbom.json
