@@ -1,0 +1,14 @@
+*.vs/
+**/[Bb]in
+**/[Oo]bj
+
+*.user
+
+# storm
+ca-cli.*.log
+repo.lock
+coverage.opencover.xml
+.sonarqube
+.scannerwork
+.ca
+.storm_build

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net7.0'">1.9.0</DaprAspNetCoreVersion>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net9.0'">1.15.4</DaprAspNetCoreVersion>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net10.0'">1.16.1</DaprAspNetCoreVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Dapr.AspNetCore" Version="$(DaprAspNetCoreVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj" />
+  </ItemGroup>
+
+</Project>

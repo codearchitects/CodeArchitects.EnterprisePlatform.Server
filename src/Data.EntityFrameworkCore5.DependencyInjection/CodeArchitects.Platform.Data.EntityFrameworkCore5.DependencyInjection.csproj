@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+    <RootNamespace>$(MSBuildProjectName.Replace("EntityFrameworkCore5", "EntityFrameworkCore"))</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Data.EntityFrameworkCore5\CodeArchitects.Platform.Data.EntityFrameworkCore5.csproj" />
+  </ItemGroup>
+
+</Project>

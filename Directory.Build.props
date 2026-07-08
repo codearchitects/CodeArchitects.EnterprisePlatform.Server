@@ -1,0 +1,76 @@
+<Project>
+
+  <!--
+    Centralized metadata for every project in the repository.
+    Package-specific values (PackageId, Description) stay in each .csproj.
+  -->
+  <PropertyGroup>
+    <Authors>Code Architects S.r.l.</Authors>
+    <Company>Code Architects S.r.l.</Company>
+    <Product>Code Architects Enterprise Solution Platform</Product>
+    <Copyright>Copyright © 2026 Code Architects S.r.l.</Copyright>
+
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>code-architects;platform;esp;dotnet;dapr;microservices;messaging;actors</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- NuGet dependency auditing: warn on known-vulnerable direct AND transitive packages. -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+  </PropertyGroup>
+
+  <!--
+    Bundle a README into every produced NuGet package: the package's own README.md when present,
+    otherwise fall back to the repository README so no package ships without one.
+  -->
+  <ItemGroup Condition="Exists('$(MSBuildProjectDirectory)/README.md')">
+    <None Include="$(MSBuildProjectDirectory)/README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('$(MSBuildProjectDirectory)/README.md') And Exists('$(MSBuildThisFileDirectory)README.md')">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <!--
+    ============================================================================
+    Accepted security advisories (single source of truth — see SECURITY.md).
+    ============================================================================
+    Each entry below is a known advisory for which no viable fix is currently
+    available. They are suppressed here (silencing build-time NU190x warnings)
+    and the CI security gate reads this same list as its allow-list, so a NEW,
+    un-accepted vulnerability in a shipped (src/) package fails the build.
+    Review this list on every dependency bump.
+
+      * GHSA-rvv3-g6hj-g44x  AutoMapper 10/14 (High) — src/Data.AutoMapper.
+        Fix exists only in the commercial AutoMapper 15/16 majors. Package is
+        maintenance-only; new code should use CodeArchitects.Platform.Data.Mapster.
+
+      * GHSA-6c8g-7p36-r338  SharpCompress 0.30.1 (Moderate) — transitive via
+        MongoDB.Driver 2.19.0. No patched release is compatible with the
+        netstandard2.1 target. Real fix = upgrade MongoDB.Driver (breaking).
+
+      * GHSA-2m69-gcr7-jv3q  SQLitePCLRaw.lib.e_sqlite3 2.1.x (High) — TEST-ONLY
+        (EFCore functional tests, not shipped). Fix requires the SQLitePCLRaw 3.x
+        major, unsupported by EF Core 7/8. No impact on published packages.
+
+      * GHSA-68w7-72jg-6qpp (NuGet.Packaging, Critical),
+        GHSA-6qmf-mmc7-6c2p / GHSA-g3q9-xf95-8hp5 (NuGet.Common/Protocol, High) —
+        TEST-ONLY. Pulled transitively by the Roslyn analyzer-testing harness
+        (Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.XUnit 1.1.1). The only
+        release that ships patched NuGet.* is 1.1.2, whose behavioral changes break
+        the analyzer code-fix tests. Not shipped; no untrusted input in CI. Tracked
+        follow-up: upgrade the harness to 1.1.2 and update the affected tests.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6c8g-7p36-r338" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-68w7-72jg-6qpp" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-6qmf-mmc7-6c2p" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-g3q9-xf95-8hp5" />
+  </ItemGroup>
+
+</Project>

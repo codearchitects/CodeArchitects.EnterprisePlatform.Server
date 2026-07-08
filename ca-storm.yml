@@ -1,0 +1,178 @@
+version: 1
+
+components:
+  # packages
+  - name: CodeArchitects.Platform.Actors
+    path: src\Actors
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Actors.Dapr
+    path: src\Actors.Dapr
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore
+    path: src\Actors.Dapr.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Application
+    path: src\Application
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Common
+    path: src\Common
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Dapr.AspNetCore
+    path: src\Dapr.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data
+    path: src\Data
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet
+    path: src\Data.AdoNet
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.DependencyInjection
+    path: src\Data.AdoNet.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.MySQL
+    path: src\Data.AdoNet.MySQL
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.Oracle
+    path: src\Data.AdoNet.Oracle
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.PostgreSQL
+    path: src\Data.AdoNet.PostgreSQL
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AdoNet.SQLServer
+    path: src\Data.AdoNet.SQLServer
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.AutoMapper
+    path: src\Data.AutoMapper
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore
+    path: src\Data.EntityFrameworkCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5
+    path: src\Data.EntityFrameworkCore5
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection
+    path: src\Data.EntityFrameworkCore.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection
+    path: src\Data.EntityFrameworkCore5.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.MongoDB
+    path: src\Data.MongoDB
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Data.MongoDB.DependencyInjection
+    path: src\Data.MongoDB.DependencyInjection
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Emit
+    path: src\Emit
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure
+    path: src\Infrastructure
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure.Dapr
+    path: src\Infrastructure.Dapr
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore
+    path: src\Infrastructure.Dapr.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Messaging
+    path: src\Messaging
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Messaging.AspNetCore
+    path: src\Messaging.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Messaging.Dapr
+    path: src\Messaging.Dapr
+    type: dotnet-package
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore
+    path: src\Messaging.Dapr.AspNetCore
+    type: dotnet-package
+  - name: CodeArchitects.Platform.PolicyManager
+    path: src\PolicyManager
+    type: dotnet-package
+  - name: CodeArchitects.Platform.PolicyManager.DependencyInjection
+    path: src\PolicyManager.DependencyInjection
+    type: dotnet-package
+
+  # unit tests
+  - name: CodeArchitects.Platform.Actors.Dapr.UnitTests
+    path: tests\Actors.Dapr.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Actors.UnitTests
+    path: tests\Actors.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Application.UnitTests
+    path: tests\Application.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Common.UnitTests
+    path: tests\Common.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Dapr.AspNetCore.UnitTests
+    path: tests\Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.AdoNet.UnitTests
+    path: tests\Data.AdoNet.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests
+    path: tests\Data.EntityFrameworkCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.MongoDB.UnitTests
+    path: tests\Data.MongoDB.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests
+    path: tests\Infrastructure.Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Infrastructure.Dapr.UnitTests
+    path: tests\Infrastructure.Dapr.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.AspNetCore.UnitTests
+    path: tests\Messaging.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.UnitTests
+    path: tests\Messaging.Dapr.AspNetCore.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.Dapr.UnitTests
+    path: tests\Messaging.Dapr.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.UnitTests
+    path: tests\Messaging.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Shared.UnitTests
+    path: tests\Shared.UnitTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.PolicyManager.UnitTests
+    path: tests\PolicyManager.UnitTests
+    type: dotnet-test
+
+  # functional tests
+  - name: CodeArchitects.Platform.Actors.Analyzer.FunctionalTests
+    path: tests\Actors.Analyzer.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Actors.FunctionalTests
+    path: tests\Actors.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Common.Analyzer.FunctionalTests
+    path: tests\Common.Analyzer.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.AdoNet.FunctionalTests
+    path: tests\Data.AdoNet.FunctionalTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests
+    path: tests\Data.EntityFrameworkCore.FunctionalTests
+    type: dotnet-test
+
+  # integration tests
+  - name: CodeArchitects.Platform.Actors.Dapr.AspNetCore.IntegrationTests
+    path: tests\Actors.Dapr.AspNetCore.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests
+    path: tests\Messaging.Dapr.AspNetCore.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.IntegrationTests
+    path: tests\Data.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.Data.MongoDB.IntegrationTests
+    path: tests\Data.MongoDB.IntegrationTests
+    type: dotnet-test
+  - name: CodeArchitects.Platform.PolicyManager.IntegrationTests
+    path: tests\PolicyManager.IntegrationTests
+    type: dotnet-test

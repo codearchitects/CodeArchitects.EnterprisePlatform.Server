@@ -1,0 +1,42 @@
+﻿namespace CodeArchitects.Platform.Data.AdoNet.Interceptors;
+
+/// <summary>
+/// Represents an operation performed by the data context.
+/// </summary>
+public enum OperationType
+{
+  /// <summary>
+  /// The Find operation.
+  /// </summary>
+  Find,
+
+  /// <summary>
+  /// The Insert operation.
+  /// </summary>
+  Insert,
+
+  /// <summary>
+  /// The Update operation.
+  /// </summary>
+  Update,
+
+  /// <summary>
+  /// The Upsert operation.
+  /// </summary>
+  Upsert,
+
+  /// <summary>
+  /// The Remove operation.
+  /// </summary>
+  Remove,
+
+  /// <summary>
+  /// The InsertMany operation.
+  /// </summary>
+  InsertMany,
+
+  /// <summary>
+  /// The UpdateMany operation.
+  /// </summary>
+  UpdateMany
+}

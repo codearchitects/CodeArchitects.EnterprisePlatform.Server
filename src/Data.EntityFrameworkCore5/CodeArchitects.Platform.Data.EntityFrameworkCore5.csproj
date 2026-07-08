@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+
+    <RootNamespace>$(MSBuildProjectName.Replace("EntityFrameworkCore5", "EntityFrameworkCore"))</RootNamespace>
+
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeP2PAssets</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.EntityFrameworkCore.Shared\CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <Target Name="IncludeP2PAssets">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.xml" />
+    </ItemGroup>
+  </Target>
+</Project>

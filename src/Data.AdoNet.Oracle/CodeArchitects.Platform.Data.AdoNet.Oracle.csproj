@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net8.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OracleManagedDataAccessCoreVersion Condition="'$(TargetFramework)' == 'net7.0'">3.21.180</OracleManagedDataAccessCoreVersion>
+    <OracleManagedDataAccessCoreVersion Condition="'$(TargetFramework)' == 'net8.0'">23.8.0</OracleManagedDataAccessCoreVersion>
+    <OracleManagedDataAccessCoreVersion Condition="'$(TargetFramework)' == 'net10.0'">23.26.100</OracleManagedDataAccessCoreVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="$(OracleManagedDataAccessCoreVersion)" />
+  </ItemGroup>
+
+</Project>

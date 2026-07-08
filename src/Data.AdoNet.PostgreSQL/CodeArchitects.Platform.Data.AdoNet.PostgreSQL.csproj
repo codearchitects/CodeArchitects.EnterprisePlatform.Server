@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NpgsqlVersion Condition="'$(TargetFramework)' == 'net7.0'">7.0.7</NpgsqlVersion>
+    <NpgsqlVersion Condition="'$(TargetFramework)' == 'net8.0'">8.0.8</NpgsqlVersion>
+    <NpgsqlVersion Condition="'$(TargetFramework)' == 'net9.0'">9.0.4</NpgsqlVersion>
+    <NpgsqlVersion Condition="'$(TargetFramework)' == 'net10.0'">10.0.1</NpgsqlVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="$(NpgsqlVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data.AdoNet\CodeArchitects.Platform.Data.AdoNet.csproj" />
+  </ItemGroup>
+
+</Project>

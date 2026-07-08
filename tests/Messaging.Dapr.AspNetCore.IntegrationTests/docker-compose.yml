@@ -1,0 +1,77 @@
+services:
+  publisher:
+    image: ${DOCKER_REGISTRY-}publisher
+    build:
+      context: ../..
+      dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Publisher/Dockerfile
+      args:
+        - TARGET_FRAMEWORK=${TARGET_FRAMEWORK}
+        - LATEST_FRAMEWORK=${LATEST_FRAMEWORK}
+        - HTTP_PORT=${HTTP_PORT}
+    ports:
+      - 20000:${HTTP_PORT}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  publisher-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:publisher
+    depends_on:
+      publisher:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    command: ["./daprd",
+      "-app-id", "publisher",
+      "-app-port", "${HTTP_PORT}",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+
+  subscriber:
+    image: ${DOCKER_REGISTRY-}subscriber
+    build:
+      context: ../..
+      dockerfile: tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Dockerfile
+      args:
+        - TARGET_FRAMEWORK=${TARGET_FRAMEWORK}
+        - LATEST_FRAMEWORK=${LATEST_FRAMEWORK}
+        - HTTP_PORT=${HTTP_PORT}
+    ports:
+      - 20001:${HTTP_PORT}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  subscriber-dapr:
+    image: daprio/daprd:latest
+    network_mode: service:subscriber
+    depends_on:
+      subscriber:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    command: ["./daprd",
+      "-app-id", "subscriber",
+      "-app-port", "${HTTP_PORT}",
+      "-components-path", "/components"
+      ]
+    volumes:
+      - ./Dapr/components:/components
+    
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 20s
+      timeout: 5s
+      retries: 5

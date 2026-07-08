@@ -1,0 +1,15 @@
+site_name: Code Architects Enterprise Solution Framework
+site_url: https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server
+theme: readthedocs
+nav:
+  - Home: index.md
+  - Messaging:
+      - Overview: messaging.md
+      - With Dapr: messaging-dapr.md
+  - State management:
+      - Overview: statemanagement.md
+      - With Dapr: statemanagement-dapr.md
+  - Data access:
+      - Overview: dataaccesslayer.md
+      - Entity Framework Core: efcore.md
+      - ADO.NET: adonet.md

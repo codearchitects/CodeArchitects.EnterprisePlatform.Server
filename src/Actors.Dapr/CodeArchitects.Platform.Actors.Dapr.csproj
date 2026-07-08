@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DaprActorsVersion Condition="'$(TargetFramework)' == 'net7.0'">1.9.0</DaprActorsVersion>
+    <DaprActorsVersion Condition="'$(TargetFramework)' == 'net9.0'">1.15.4</DaprActorsVersion>
+    <DaprActorsVersion Condition="'$(TargetFramework)' == 'net10.0'">1.16.1</DaprActorsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IsExternalInit" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dapr.Actors" Version="$(DaprActorsVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Actors\CodeArchitects.Platform.Actors.csproj" />
+  </ItemGroup>
+
+</Project>

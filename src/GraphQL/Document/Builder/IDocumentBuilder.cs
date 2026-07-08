@@ -1,0 +1,52 @@
+﻿using System.Linq.Expressions;
+
+namespace CodeArchitects.Platform.GraphQL.Document.Builder;
+
+public interface IDocumentBuilder<TDocumentRoot> // TODO: Make parameter names consistent (e.g., expansion, expression, ...)
+  where TDocumentRoot : notnull
+{
+  GraphDocument<TResult> Query<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+    where TResult : class;
+
+  GraphDocument<TResult, TVariables> Query<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+    where TResult : class
+    where TVariables : notnull;
+
+  GraphDocument<TResult> Query<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+    where TResult : class;
+
+  GraphDocument<TResult, TVariables> Query<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+    where TResult : class
+    where TVariables : notnull;
+
+
+  GraphDocument<TResult> Mutation<TResult>(Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+    where TResult : class;
+
+  GraphDocument<TResult, TVariables> Mutation<TResult, TVariables>(Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+    where TResult : class
+    where TVariables : notnull;
+
+  GraphDocument<TResult> Mutation<TResult>(string name, Expression<Func<IOperationBuilder<TDocumentRoot>, IBuildResult<TResult>>> expansion)
+    where TResult : class;
+
+  GraphDocument<TResult, TVariables> Mutation<TResult, TVariables>(string name, Expression<Func<IOperationBuilder<TDocumentRoot, TVariables>, IBuildResult<TResult, TVariables>>> expansion)
+    where TResult : class
+    where TVariables : notnull;
+
+
+  GraphFragment<TField> Fragment<TField>(string name, Expression<Func<IFragmentBuilder<TField>, IBuildResult<TField>>> expansion)
+    where TField : class;
+
+  GraphFragment<TField, TVariables> Fragment<TField, TVariables>(string name, Expression<Func<IFragmentBuilder<TField, TVariables>, IBuildResult<TField, TVariables>>> expansion)
+    where TField : class
+    where TVariables : notnull;
+
+
+  GraphDocument<TResult> Raw<TResult>(string document)
+    where TResult : class;
+
+  GraphDocument<TResult, TVariables> Raw<TResult, TVariables>(string document)
+    where TResult : class
+    where TVariables : notnull;
+}

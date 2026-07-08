@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Application\CodeArchitects.Platform.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Common\CodeArchitects.Platform.Common.csproj" />
+    <ProjectReference Include="..\..\..\src\Dapr.AspNetCore\CodeArchitects.Platform.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Infrastructure.Dapr.AspNetCore\CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Infrastructure.Dapr\CodeArchitects.Platform.Infrastructure.Dapr.csproj" />
+    <ProjectReference Include="..\..\..\src\Infrastructure\CodeArchitects.Platform.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging.AspNetCore\CodeArchitects.Platform.Messaging.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging.Dapr.AspNetCore\CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging.Dapr\CodeArchitects.Platform.Messaging.Dapr.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\CodeArchitects.Platform.Messaging.csproj" />
+  </ItemGroup>
+
+</Project>

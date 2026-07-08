@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net7.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"></FrameworkReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net7.0'">1.9.0</DaprAspNetCoreVersion>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net9.0'">1.15.4</DaprAspNetCoreVersion>
+    <DaprAspNetCoreVersion Condition="'$(TargetFramework)' == 'net10.0'">1.16.1</DaprAspNetCoreVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="12.3.1" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="$(DaprAspNetCoreVersion)" />
+    <PackageReference Include="Dapr.AspNetCore" Version="$(DaprAspNetCoreVersion)" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,57 @@
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using CodeArchitects.Platform.GraphQL.Document.Syntax;
+
+namespace CodeArchitects.Platform.GraphQL.Document.Raw;
+
+internal partial class RawNode : IFragmentDefinitionNode
+{
+  ReadOnlySpan<char> IFragmentDefinitionNode.FragmentName
+  {
+    get
+    {
+      Expect(TokenKind.Name);
+
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
+
+      if (value is "on")
+        throw new InvalidGraphQLDocumentException($"Unexpected fragment name 'on'.");
+
+      _lexer.MoveNext();
+
+      return value;
+    }
+  }
+
+  ITypeConditionNode IFragmentDefinitionNode.TypeCondition
+  {
+    get
+    {
+      Expect(TokenKind.Name);
+      if (_lexer.ValueSpan is not "on")
+        throw new InvalidGraphQLDocumentException($"Expected 'on', found '{_lexer.ValueSpan.ToString()}'");
+
+      _lexer.MoveNext();
+      return this;
+    }
+  }
+
+  IDirectiveListNode? IFragmentDefinitionNode.DirectiveList
+  {
+    get
+    {
+      if (_lexer.TokenKind is not TokenKind.At)
+        return null;
+
+      return this;
+    }
+  }
+
+  ISelectionSetNode IFragmentDefinitionNode.SelectionSet
+  {
+    get
+    {
+      Expect(TokenKind.LeftBrace);
+      return this;
+    }
+  }
+}

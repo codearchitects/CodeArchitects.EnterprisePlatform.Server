@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main, master]
+  pull_request:
+    branches: [develop, main, master]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore CodeArchitects.Platform.sln
+
+      - name: Build
+        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore
+
+      - name: Test (unit & functional)
+        shell: bash
+        run: |
+          set -e
+          # Integration tests require external services (databases, Dapr) and are excluded.
+          projects=$(find tests -name '*.UnitTests.csproj' -o -name '*.FunctionalTests.csproj')
+          for proj in $projects; do
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --configuration Release --no-build --verbosity normal
+            echo "::endgroup::"
+          done
+
+  security:
+    name: Security & SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore CodeArchitects.Platform.sln
+
+      - name: Vulnerability scan (full, informational)
+        shell: bash
+        run: |
+          echo "::group::All vulnerable packages (src + tests)"
+          dotnet list CodeArchitects.Platform.sln package --vulnerable --include-transitive || true
+          echo "::endgroup::"
+
+      - name: Fail on unaccepted vulnerabilities in shipped (src) packages
+        shell: bash
+        run: |
+          set -uo pipefail
+          # Accepted advisories = the allow-list maintained in Directory.Build.props (single source of truth).
+          accepted=$(grep -oiE 'GHSA-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+' Directory.Build.props | sort -u || true)
+          echo "Accepted advisories:"; echo "$accepted"
+          report=""
+          for proj in $(find src -name '*.csproj'); do
+            report+=$(dotnet list "$proj" package --vulnerable --include-transitive 2>/dev/null)$'\n'
+          done
+          found=$(echo "$report" | grep -oiE 'GHSA-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+' | sort -u || true)
+          unexpected=$(comm -23 <(echo "$found") <(echo "$accepted") | grep -E 'GHSA' || true)
+          if [ -n "$unexpected" ]; then
+            echo "::error::Unaccepted vulnerabilities in shipped (src/) packages:"
+            echo "$unexpected"
+            echo "Fix the dependency, or (if no fix exists) add the advisory to the allow-list in Directory.Build.props with a documented rationale in SECURITY.md."
+            exit 1
+          fi
+          echo "OK: no unaccepted vulnerabilities in shipped packages."
+
+      - name: Generate SBOM (CycloneDX)
+        run: |
+          dotnet tool install --global CycloneDX
+          dotnet CycloneDX CodeArchitects.Platform.sln -o sbom --json --filename sbom.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom/sbom.json

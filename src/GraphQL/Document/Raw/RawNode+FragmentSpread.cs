@@ -1,0 +1,31 @@
+﻿using CodeArchitects.Platform.GraphQL.Document.Nodes;
+using CodeArchitects.Platform.GraphQL.Document.Syntax;
+
+namespace CodeArchitects.Platform.GraphQL.Document.Raw;
+
+internal partial class RawNode : IFragmentSpreadNode
+{
+  ReadOnlySpan<char> IFragmentSpreadNode.FragmentName
+  {
+    get
+    {
+      Expect(TokenKind.Name);
+
+      ReadOnlySpan<char> value = _lexer.ValueSpan;
+      _lexer.MoveNext();
+
+      return value;
+    }
+  }
+
+  IDirectiveListNode? IFragmentSpreadNode.DirectiveList
+  {
+    get
+    {
+      if (_lexer.TokenKind is not TokenKind.At)
+        return null;
+
+      return this;
+    }
+  }
+}
