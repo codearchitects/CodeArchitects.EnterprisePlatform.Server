@@ -44,11 +44,11 @@ internal partial class RawNode : IBlockStringValueNode
       switch (current)
       {
         case '\n':
+          end = position;
+          position++;
           if (isWhitespaceLine)
             return ReadOnlyMemory<char>.Empty;
 
-          end = position;
-          position++;
           return value[start..end];
 
         case '\r':

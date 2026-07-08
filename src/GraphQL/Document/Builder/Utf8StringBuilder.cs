@@ -15,7 +15,7 @@ internal readonly ref struct Utf8StringBuilder
   private const int s_maxFloatFormatLength = 128;
   private const int s_spaceBufferCharCount = 32;
 
-  private static readonly byte[] s_newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+  private static readonly byte[] s_newLineBytes = "\n"u8.ToArray();
   private static readonly byte[] s_spaceBytes   = Encoding.UTF8.GetBytes(new string(' ', s_spaceBufferCharCount));
 
   private readonly ArrayBufferWriter<byte> _writer;
