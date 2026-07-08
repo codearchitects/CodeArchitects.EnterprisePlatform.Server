@@ -561,7 +561,7 @@ public class DocumentRendererTests
   [Fact]
   public void DocumentWithBlockString_ShouldProduceCorrectDocument()
   {
-    string messageStr = "\"\"\"\r\n    Hello,\r\n      World!\r\n    \r\n    Yours,\r\n      GraphQL.\r\n  \"\"\"";
+    string messageStr = "\"\"\"\n    Hello,\n      World!\n    \n    Yours,\n      GraphQL.\n  \"\"\"";
 
     // Arrange
     IDocumentNode document = DocumentNodeBuilder.Build(_ => _

@@ -15,7 +15,9 @@ internal readonly ref struct Utf8StringBuilder
   private const int s_maxFloatFormatLength = 128;
   private const int s_spaceBufferCharCount = 32;
 
-  private static readonly byte[] s_newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+  // Use LF explicitly (not Environment.NewLine) so rendered GraphQL documents are byte-for-byte
+  // deterministic across platforms (Windows/Linux/macOS).
+  private static readonly byte[] s_newLineBytes = Encoding.UTF8.GetBytes("\n");
   private static readonly byte[] s_spaceBytes   = Encoding.UTF8.GetBytes(new string(' ', s_spaceBufferCharCount));
 
   private readonly ArrayBufferWriter<byte> _writer;
