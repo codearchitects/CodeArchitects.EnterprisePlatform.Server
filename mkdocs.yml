@@ -1,5 +1,5 @@
 site_name: Code Architects Enterprise Solution Framework
-site_url: https://example.com/
+site_url: https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server
 theme: readthedocs
 nav:
   - Home: index.md

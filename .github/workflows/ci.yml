@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main, master]
+  pull_request:
+    branches: [develop, main, master]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore CodeArchitects.Platform.sln
+
+      - name: Build
+        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore
+
+      - name: Test (unit & functional)
+        shell: bash
+        run: |
+          set -e
+          # Integration tests require external services (databases, Dapr) and are excluded.
+          projects=$(find tests -name '*.UnitTests.csproj' -o -name '*.FunctionalTests.csproj')
+          for proj in $projects; do
+            echo "::group::Testing $proj"
+            dotnet test "$proj" --configuration Release --no-build --verbosity normal
+            echo "::endgroup::"
+          done

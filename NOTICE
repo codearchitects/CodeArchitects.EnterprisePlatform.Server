@@ -1,0 +1,13 @@
+Code Architects Enterprise Solution Platform
+Copyright 2026 Code Architects S.r.l.
+
+This product is developed and maintained by Code Architects S.r.l.
+
+Licensed under the Apache License, Version 2.0 (the "License").
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+This product depends on third-party libraries distributed via NuGet,
+each governed by its own license. Refer to the respective package
+metadata for the applicable terms.

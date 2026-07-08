@@ -1,0 +1,27 @@
+<Project>
+
+  <!--
+    Centralized metadata for every project in the repository.
+    Package-specific values (PackageId, Description) stay in each .csproj.
+  -->
+  <PropertyGroup>
+    <Authors>Code Architects S.r.l.</Authors>
+    <Company>Code Architects S.r.l.</Company>
+    <Product>Code Architects Enterprise Solution Platform</Product>
+    <Copyright>Copyright © 2026 Code Architects S.r.l.</Copyright>
+
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/code-architects/CodeArchitects.Platform</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/code-architects/CodeArchitects.Platform</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>code-architects;platform;esp;dotnet;dapr;microservices;messaging;actors</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <!-- Bundle the README into every produced NuGet package. -->
+  <ItemGroup Condition="Exists('$(MSBuildThisFileDirectory)README.md')">
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+</Project>
