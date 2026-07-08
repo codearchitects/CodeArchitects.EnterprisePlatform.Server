@@ -87,7 +87,7 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
         semicolonToken: SyntaxFactory.Token(
           leading: default,
           kind: SyntaxKind.SemicolonToken,
-          trailing: SyntaxFactory.TriviaList(SyntaxFactory.CarriageReturnLineFeed))));
+          trailing: SyntaxFactory.TriviaList(SyntaxFactory.LineFeed))));
     }
 
     if (!isIdTypeAccessible)
@@ -119,7 +119,7 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
         semicolonToken: SyntaxFactory.Token(
           leading: default,
           kind: SyntaxKind.SemicolonToken,
-          trailing: SyntaxFactory.TriviaList(SyntaxFactory.CarriageReturnLineFeed))));
+          trailing: SyntaxFactory.TriviaList(SyntaxFactory.LineFeed))));
     }
 
     return document.WithSyntaxRoot(root);

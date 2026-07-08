@@ -1,0 +1,28 @@
+# Normalize line endings: text files are LF in the repository and in working trees
+# on every platform. This keeps analyzer code-fix tests deterministic cross-platform.
+* text=auto eol=lf
+
+# Explicit source/text types
+*.cs      text eol=lf
+*.csproj  text eol=lf
+*.props   text eol=lf
+*.targets text eol=lf
+*.json    text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.md      text eol=lf
+*.sh      text eol=lf
+
+# Visual Studio solution files are conventionally CRLF
+*.sln     text eol=crlf
+
+# Binary files (never normalized)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.snk binary
+*.pfx binary
+*.dll binary
+*.exe binary

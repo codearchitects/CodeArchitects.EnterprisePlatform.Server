@@ -7,7 +7,17 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Description>
+      Legacy AutoMapper integration for the Code Architects Platform, kept in maintenance mode for
+      applications not yet migrated to CodeArchitects.Platform.Data.Mapster. New projects should use
+      the Mapster integration. This package depends on AutoMapper 14.x, which is affected by advisory
+      GHSA-rvv3-g6hj-g44x; the fix is only available in the commercial AutoMapper 15/16 majors, so it
+      is not applied here. See SECURITY.md for the accepted-risk rationale.
+    </Description>
   </PropertyGroup>
+
+  <!-- AutoMapper GHSA-rvv3-g6hj-g44x is an accepted advisory (no non-commercial fix); it is
+       centrally suppressed and documented in Directory.Build.props and SECURITY.md. -->
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
     <PackageReference Include="AutoMapper" Version="10.0.0" PrivateAssets="All" />

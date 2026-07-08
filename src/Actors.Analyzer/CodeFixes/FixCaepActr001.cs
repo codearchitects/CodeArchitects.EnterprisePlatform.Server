@@ -72,7 +72,7 @@ internal class FixCaepActr001 : FixingActionProvider<ClassDeclarationSyntax>
   private static Document AddInterfaceImplementationAndDeclaration(Document document, SyntaxNode root, ClassDeclarationSyntax @class, string interfaceName)
   {
     InterfaceDeclarationSyntax interfaceDeclaration = CreateInterfaceDeclaration(interfaceName, @class);
-    ClassDeclarationSyntax newClass = AddToBaseList(@class, SyntaxFactory.IdentifierName(interfaceName)).WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
+    ClassDeclarationSyntax newClass = AddToBaseList(@class, SyntaxFactory.IdentifierName(interfaceName)).WithTrailingTrivia(SyntaxFactory.LineFeed);
 
     CompilationUnitSyntax compilationUnit = (CompilationUnitSyntax)root;
     SyntaxList<MemberDeclarationSyntax> members = SyntaxFactory.List(compilationUnit.Members.ReplaceRange(@class, new MemberDeclarationSyntax[] { newClass, interfaceDeclaration }));

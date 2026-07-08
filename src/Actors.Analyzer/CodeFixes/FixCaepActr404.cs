@@ -145,7 +145,7 @@ internal class FixCaepActr404 : FixingActionProvider<MethodDeclarationSyntax>
         semicolonToken: SyntaxFactory.Token(
           leading: default,
           kind: SyntaxKind.SemicolonToken,
-          trailing: SyntaxFactory.TriviaList(SyntaxFactory.CarriageReturnLineFeed))));
+          trailing: SyntaxFactory.TriviaList(SyntaxFactory.LineFeed))));
     }
   }
 }

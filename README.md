@@ -1,7 +1,7 @@
 # Code Architects Enterprise Solution Platform 7.0
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![CI](https://github.com/code-architects/CodeArchitects.Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/code-architects/CodeArchitects.Platform/actions/workflows/ci.yml)
+[![CI](https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server/actions/workflows/ci.yml/badge.svg)](https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server/actions/workflows/ci.yml)
 
 The **Code Architects Enterprise Solution Platform (ESP)** is a set of .NET libraries
 for building distributed, cloud-native applications. It provides consistent building
@@ -35,8 +35,8 @@ See the [`samples/`](samples/) folder for runnable examples (`EFCoreSample`, `Da
 ## Building from source
 
 ```bash
-git clone https://github.com/code-architects/CodeArchitects.Platform.git
-cd CodeArchitects.Platform
+git clone https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server.git
+cd CodeArchitects.EnterprisePlatform.Server
 dotnet restore CodeArchitects.Platform.sln
 dotnet build CodeArchitects.Platform.sln --configuration Release
 ```
