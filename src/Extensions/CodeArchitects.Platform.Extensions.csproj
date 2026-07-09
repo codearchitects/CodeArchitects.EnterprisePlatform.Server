@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <!-- Placeholder project with no public API yet: do not publish to NuGet. -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
 </Project>

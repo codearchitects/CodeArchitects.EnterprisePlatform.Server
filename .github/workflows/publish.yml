@@ -1,0 +1,167 @@
+name: Publish packages
+
+# Packs every packable project under src/ and publishes it to NuGet.org at a
+# single shared version (from Directory.Build.props). Internal ProjectReferences
+# are automatically pinned to that same version by `dotnet pack`.
+#
+# Two ways to release:
+#
+#   1. Manual (recommended) — run this workflow from the Actions tab and pick a
+#      bump type. The workflow computes the next version from the current one
+#      (Directory.Build.props) and publishes. For a STABLE release it also commits
+#      the version bump back to the branch and creates a `v<version>` git tag.
+#
+#        * patch / minor / major                        -> stable release
+#        * prepatch / preminor / premajor / prerelease + a pre-id
+#          (beta | rc | alpha | canary | next)          -> pre-release, e.g.
+#          7.1.0-beta.0. NuGet treats a version with a pre-release suffix as
+#          pre-release automatically (consumers must opt in with --prerelease).
+#          Pre-releases are NOT committed back and do NOT change the base version.
+#
+#   2. GitHub Release — publishing a Release with a tag like `v7.1.0`
+#      (or `v7.1.0-rc.1`) publishes exactly that version.
+#
+# Requires repository secret NUGET_API_KEY (a NuGet.org API key with push rights
+# for the CodeArchitects.Platform.* package ids). Commit-back uses GITHUB_TOKEN.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "Version bump"
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
+      preid:
+        description: "Pre-release identifier (only used for pre* bumps)"
+        type: choice
+        required: false
+        default: beta
+        options:
+          - beta
+          - rc
+          - alpha
+          - canary
+          - next
+      dry_run:
+        description: "Dry run: pack only, no publish and no git changes"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit the version bump and push the tag
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Resolve version
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          current=$(grep -oP '<Version>\K[^<]+' Directory.Build.props | head -1)
+          if [ "${{ github.event_name }}" = "release" ]; then
+            version=$(bash build/compute-version.sh tag "${{ github.event.release.tag_name }}")
+            is_dispatch=false
+          else
+            version=$(bash build/compute-version.sh bump "${{ inputs.release_type }}" "${{ inputs.preid }}" "$current")
+            is_dispatch=true
+          fi
+          case "$version" in *-*) prerelease=true ;; *) prerelease=false ;; esac
+          echo "version=$version"        >> "$GITHUB_OUTPUT"
+          echo "is_dispatch=$is_dispatch" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease"   >> "$GITHUB_OUTPUT"
+          echo "Publishing version $version (prerelease=$prerelease)"
+
+      - name: Restore
+        run: dotnet restore CodeArchitects.Platform.sln
+
+      - name: Build
+        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore -p:Version=${{ steps.meta.outputs.version }}
+
+      - name: Pack (all packable projects under src/)
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf artifacts && mkdir -p artifacts
+          for proj in $(find src -name '*.csproj'); do
+            dotnet pack "$proj" --configuration Release --no-build \
+              -p:Version=${{ steps.meta.outputs.version }} --output artifacts
+          done
+          echo "Packages produced:"
+          ls -1 artifacts/*.nupkg
+
+      - name: Publish to NuGet.org
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
+      - name: Commit version bump and tag (stable manual releases only)
+        if: >-
+          steps.meta.outputs.is_dispatch == 'true' &&
+          steps.meta.outputs.prerelease == 'false' &&
+          inputs.dry_run == false
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.meta.outputs.version }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          sed -i -E "s#<Version>[^<]+</Version>#<Version>${version}</Version>#" Directory.Build.props
+          git add Directory.Build.props
+          git commit -m "chore(release): v${version}"
+          git tag -a "v${version}" -m "Release v${version}"
+          git push origin "HEAD:${GITHUB_REF_NAME}" --follow-tags
+
+      - name: Upload package artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: artifacts/*.nupkg
+          if-no-files-found: warn
+
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Publish result"
+            echo "- version: \`${{ steps.meta.outputs.version }}\`"
+            echo "- prerelease: \`${{ steps.meta.outputs.prerelease }}\`"
+            echo "- dry run: \`${{ inputs.dry_run || false }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"

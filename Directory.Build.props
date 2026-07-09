@@ -5,6 +5,10 @@
     Package-specific values (PackageId, Description) stay in each .csproj.
   -->
   <PropertyGroup>
+    <!-- Single source of truth for the shared package version. The publish workflow
+         (.github/workflows/publish.yml) bumps this and commits it back on stable releases. -->
+    <Version>7.0.0</Version>
+
     <Authors>Code Architects S.r.l.</Authors>
     <Company>Code Architects S.r.l.</Company>
     <Product>Code Architects Enterprise Solution Platform</Product>
