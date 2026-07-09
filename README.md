@@ -1,4 +1,4 @@
-# Code Architects Enterprise Solution Platform 7.0
+# Code Architects Enterprise Solution Platform - Server
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server/actions/workflows/ci.yml/badge.svg)](https://github.com/codearchitects/CodeArchitects.EnterprisePlatform.Server/actions/workflows/ci.yml)
