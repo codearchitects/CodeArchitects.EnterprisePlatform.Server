@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Actors.Analyzer.Utils;
+using CodeArchitects.Platform.Actors.Analyzer.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp;
@@ -63,6 +63,7 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
     bool isIdTypeAccessible = idTypeSymbol.IsAccessible(semanticModel, @class.SpanStart);
 
     GenericNameSyntax newBaseTypeName = CreateNewBaseTypeName(idTypeSymbol);
+    SyntaxTrivia endOfLine = GetEndOfLine(root);
 
     root = baseType is null
       ? AddActorMessageInterface(root, info.Class, newBaseTypeName)
@@ -87,7 +88,7 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
         semicolonToken: SyntaxFactory.Token(
           leading: default,
           kind: SyntaxKind.SemicolonToken,
-          trailing: SyntaxFactory.TriviaList(SyntaxFactory.LineFeed))));
+          trailing: SyntaxFactory.TriviaList(endOfLine))));
     }
 
     if (!isIdTypeAccessible)
@@ -119,10 +120,21 @@ internal sealed class FixCaepActr702 : FixingActionProvider<SimpleBaseTypeSyntax
         semicolonToken: SyntaxFactory.Token(
           leading: default,
           kind: SyntaxKind.SemicolonToken,
-          trailing: SyntaxFactory.TriviaList(SyntaxFactory.LineFeed))));
+          trailing: SyntaxFactory.TriviaList(endOfLine))));
     }
 
     return document.WithSyntaxRoot(root);
+  }
+
+  private static SyntaxTrivia GetEndOfLine(CompilationUnitSyntax root)
+  {
+    foreach (SyntaxTrivia trivia in root.DescendantTrivia(descendIntoTrivia: true))
+    {
+      if (trivia.IsKind(SyntaxKind.EndOfLineTrivia))
+        return trivia;
+    }
+
+    return SyntaxFactory.CarriageReturnLineFeed;
   }
 
   private static CompilationUnitSyntax ChangeActorMessageInterface(CompilationUnitSyntax root, BaseTypeSyntax baseType, GenericNameSyntax newBaseTypeName)
