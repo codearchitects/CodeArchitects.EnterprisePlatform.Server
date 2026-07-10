@@ -22,7 +22,11 @@ name: Publish packages
 #      (or `v7.1.0-rc.1`) publishes exactly that version.
 #
 # Requires repository secret NUGET_API_KEY (a NuGet.org API key with push rights
-# for the CodeArchitects.Platform.* package ids). Commit-back uses GITHUB_TOKEN.
+# for the CodeArchitects.Platform.* package ids). The commit-back + tag push is
+# authenticated with a GitHub App installation token (secrets
+# CODEARCHITECTS_RELEASE_BOT_APP_ID / CODEARCHITECTS_RELEASE_BOT_PRIVATE_KEY) so it
+# can bypass the branch ruleset that would otherwise require a pull request. The
+# built-in GITHUB_TOKEN cannot bypass that rule.
 
 on:
   release:
@@ -69,10 +73,18 @@ jobs:
     permissions:
       contents: write   # needed to commit the version bump and push the tag
     steps:
+      - name: Generate GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CODEARCHITECTS_RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.CODEARCHITECTS_RELEASE_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
+          # full history + GitHub App token to bypass branch protection rules
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app_token.outputs.token }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
