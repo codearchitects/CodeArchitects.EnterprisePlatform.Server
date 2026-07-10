@@ -59,10 +59,31 @@ pip install mkdocs
 mkdocs serve
 ```
 
+## Versioning & releases
+
+All packages share a **single version**, defined once in
+[`Directory.Build.props`](Directory.Build.props). Versioning follows
+[Semantic Versioning](https://semver.org/), with the major version aligned to the
+.NET release wave (the first public release is `10.0.0`). Internal project
+references are pinned to the same shared version at pack time.
+
+Releases are cut by maintainers through the
+[publish workflow](.github/workflows/publish.yml), in one of two ways:
+
+- **Manually** from the *Actions* tab — pick a bump type (`patch`/`minor`/`major`,
+  or a `prepatch`/`preminor`/`premajor`/`prerelease` with a `beta`/`rc`/`alpha`/
+  `canary`/`next` identifier). A `dry_run` option is available.
+- **By publishing a GitHub Release** with a tag such as `v10.1.0` or `v10.1.0-rc.1`.
+
+Pre-release versions carry a suffix (e.g. `10.1.0-beta.0`); consumers opt in to
+them with `--prerelease`. See the [CHANGELOG](CHANGELOG.md) for release notes.
+
 ## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and our
 [Code of Conduct](CODE_OF_CONDUCT.md) before opening an issue or pull request.
+See [GOVERNANCE.md](GOVERNANCE.md) for how the project is run and
+[SUPPORT.md](SUPPORT.md) for how to get help.
 
 ## Security
 
