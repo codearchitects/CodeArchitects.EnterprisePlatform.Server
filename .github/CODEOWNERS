@@ -1,0 +1,7 @@
+# Code owners for the Code Architects Enterprise Solution Platform.
+#
+# These owners are automatically requested for review on pull requests and are
+# the maintainers referenced in GOVERNANCE.md. Replace the entry below with a
+# GitHub team (e.g. @codearchitects/esp-maintainers) once one is created.
+
+* @gmasci-ca
