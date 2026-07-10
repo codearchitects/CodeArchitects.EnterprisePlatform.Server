@@ -12,3 +12,12 @@ coverage.opencover.xml
 .scannerwork
 .ca
 .storm_build
+
+# Security reports: ignore temporary SBOM/audit artifacts dotnet tools may drop in the
+# repo root, but DO track the curated reports/ tree (generated via
+# `node scripts/generate-security-report.mjs`).
+/sbom.json
+/sbom/
+/audit-*.json
+!reports/
+!reports/**

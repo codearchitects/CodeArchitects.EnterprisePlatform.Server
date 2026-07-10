@@ -1,0 +1,23 @@
+<Project>
+
+  <!--
+    Local security report launcher.
+
+        dotnet msbuild build/SecurityReport.proj -t:SecurityReport
+
+    Thin MSBuild wrapper around scripts/generate-security-report.mjs so the report
+    logic lives in ONE place (identical to what contributors run with `node ...`
+    and to the CI `security` job). Generates, into reports/:
+      * audit/audit-vulnerabilities.json  (dotnet list package vulnerability scan)
+      * sbom/sbom.json                    (dotnet CycloneDX)
+      * vulnerabilities/advisories.md     (summary, shipped vs test, accept status)
+
+    Requires Node.js and the CycloneDX global tool (see reports/README.md).
+    Exits non-zero if a NEW unaccepted vulnerability exists in a shipped (src/) package.
+  -->
+  <Target Name="SecurityReport">
+    <Exec Command="node &quot;$(MSBuildThisFileDirectory)../scripts/generate-security-report.mjs&quot;"
+          WorkingDirectory="$(MSBuildThisFileDirectory).." />
+  </Target>
+
+</Project>

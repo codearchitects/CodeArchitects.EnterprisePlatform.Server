@@ -1,0 +1,831 @@
+{
+  "version": 1,
+  "parameters": "--vulnerable --include-transitive",
+  "sources": [
+    "https://api.nuget.org/v3/index.json",
+    "https://devops.codearchitects.com:444/Code%20Architects/_packaging/ca-esp7-nuget/nuget/v3/index.json"
+  ],
+  "projects": [
+    {
+      "path": "src/Infrastructure/CodeArchitects.Platform.Infrastructure.csproj"
+    },
+    {
+      "path": "src/Common/CodeArchitects.Platform.Common.csproj"
+    },
+    {
+      "path": "tests/Common.UnitTests/CodeArchitects.Platform.Common.UnitTests.csproj"
+    },
+    {
+      "path": "src/Data/CodeArchitects.Platform.Data.csproj"
+    },
+    {
+      "path": "src/Data.EntityFrameworkCore/CodeArchitects.Platform.Data.EntityFrameworkCore.csproj"
+    },
+    {
+      "path": "src/Application/CodeArchitects.Platform.Application.csproj"
+    },
+    {
+      "path": "tests/Application.UnitTests/CodeArchitects.Platform.Application.UnitTests.csproj"
+    },
+    {
+      "path": "src/Dapr.AspNetCore/CodeArchitects.Platform.Dapr.AspNetCore.csproj"
+    },
+    {
+      "path": "src/Messaging/CodeArchitects.Platform.Messaging.csproj"
+    },
+    {
+      "path": "src/Messaging.Dapr/CodeArchitects.Platform.Messaging.Dapr.csproj"
+    },
+    {
+      "path": "src/Messaging.Dapr.AspNetCore/CodeArchitects.Platform.Messaging.Dapr.AspNetCore.csproj"
+    },
+    {
+      "path": "tests/Messaging.UnitTests/CodeArchitects.Platform.Messaging.UnitTests.csproj"
+    },
+    {
+      "path": "src/Messaging.AspNetCore/CodeArchitects.Platform.Messaging.AspNetCore.csproj"
+    },
+    {
+      "path": "tests/Messaging.AspNetCore.UnitTests/CodeArchitects.Platform.Messaging.AspNetCore.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Messaging.Dapr.UnitTests/CodeArchitects.Platform.Messaging.Dapr.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Messaging.Dapr.AspNetCore.UnitTests/CodeArchitects.Platform.Messaging.Dapr.AspNetCore.UnitTests.csproj"
+    },
+    {
+      "path": "src/Infrastructure.Dapr/CodeArchitects.Platform.Infrastructure.Dapr.csproj"
+    },
+    {
+      "path": "src/Infrastructure.Dapr.AspNetCore/CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.csproj"
+    },
+    {
+      "path": "tests/Infrastructure.Dapr.UnitTests/CodeArchitects.Platform.Infrastructure.Dapr.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Infrastructure.Dapr.AspNetCore.UnitTests/CodeArchitects.Platform.Infrastructure.Dapr.AspNetCore.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Messaging.Dapr.AspNetCore.IntegrationTests/CodeArchitects.Platform.Messaging.Dapr.AspNetCore.IntegrationTests.csproj"
+    },
+    {
+      "path": "tests/Messaging.Dapr.AspNetCore.IntegrationTests/Publisher/Publisher.csproj"
+    },
+    {
+      "path": "tests/Messaging.Dapr.AspNetCore.IntegrationTests/Subscriber/Subscriber.csproj"
+    },
+    {
+      "path": "tests/Dapr.AspNetCore.UnitTests/CodeArchitects.Platform.Dapr.AspNetCore.UnitTests.csproj"
+    },
+    {
+      "path": "src/Extensions/CodeArchitects.Platform.Extensions.csproj"
+    },
+    {
+      "path": "src/Data.AdoNet/CodeArchitects.Platform.Data.AdoNet.csproj"
+    },
+    {
+      "path": "tests/Data.UnitTests/CodeArchitects.Platform.Data.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Data.AdoNet.UnitTests/CodeArchitects.Platform.Data.AdoNet.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Data.EntityFrameworkCore.UnitTests/CodeArchitects.Platform.Data.EntityFrameworkCore.UnitTests.csproj"
+    },
+    {
+      "path": "src/Data.EntityFrameworkCore.Shared/CodeArchitects.Platform.Data.EntityFrameworkCore.Shared.csproj"
+    },
+    {
+      "path": "src/Data.EntityFrameworkCore5/CodeArchitects.Platform.Data.EntityFrameworkCore5.csproj"
+    },
+    {
+      "path": "src/Data.AutoMapper/CodeArchitects.Platform.Data.AutoMapper.csproj",
+      "frameworks": [
+        {
+          "framework": "netstandard2.1",
+          "topLevelPackages": [
+            {
+              "id": "AutoMapper",
+              "requestedVersion": "10.0.0",
+              "resolvedVersion": "10.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-rvv3-g6hj-g44x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net10.0",
+          "topLevelPackages": [
+            {
+              "id": "AutoMapper",
+              "requestedVersion": "14.0.0",
+              "resolvedVersion": "14.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-rvv3-g6hj-g44x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "topLevelPackages": [
+            {
+              "id": "AutoMapper",
+              "requestedVersion": "14.0.0",
+              "resolvedVersion": "14.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-rvv3-g6hj-g44x"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "topLevelPackages": [
+            {
+              "id": "AutoMapper",
+              "requestedVersion": "14.0.0",
+              "resolvedVersion": "14.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-rvv3-g6hj-g44x"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/Data.EntityFrameworkCore.DependencyInjection/CodeArchitects.Platform.Data.EntityFrameworkCore.DependencyInjection.csproj"
+    },
+    {
+      "path": "src/Data.EntityFrameworkCore5.DependencyInjection/CodeArchitects.Platform.Data.EntityFrameworkCore5.DependencyInjection.csproj"
+    },
+    {
+      "path": "src/Emit/CodeArchitects.Platform.Emit.csproj"
+    },
+    {
+      "path": "tests/Data.AdoNet.FunctionalTests/CodeArchitects.Platform.Data.AdoNet.FunctionalTests.csproj"
+    },
+    {
+      "path": "tests/Data.IntegrationTests/CodeArchitects.Platform.Data.IntegrationTests.csproj"
+    },
+    {
+      "path": "src/Data.AdoNet.PostgreSQL/CodeArchitects.Platform.Data.AdoNet.PostgreSQL.csproj"
+    },
+    {
+      "path": "src/Data.AdoNet.Oracle/CodeArchitects.Platform.Data.AdoNet.Oracle.csproj"
+    },
+    {
+      "path": "tests/Data.EntityFrameworkCore.FunctionalTests/CodeArchitects.Platform.Data.EntityFrameworkCore.FunctionalTests.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "transitivePackages": [
+            {
+              "id": "SQLitePCLRaw.lib.e_sqlite3",
+              "resolvedVersion": "2.1.11",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "SQLitePCLRaw.lib.e_sqlite3",
+              "resolvedVersion": "2.1.4",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "SQLitePCLRaw.lib.e_sqlite3",
+              "resolvedVersion": "2.1.6",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "transitivePackages": [
+            {
+              "id": "SQLitePCLRaw.lib.e_sqlite3",
+              "resolvedVersion": "2.1.10",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-2m69-gcr7-jv3q"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/Data.AdoNet.DependencyInjection/CodeArchitects.Platform.Data.AdoNet.DependencyInjection.csproj"
+    },
+    {
+      "path": "src/Data.AdoNet.SQLServer/CodeArchitects.Platform.Data.AdoNet.SQLServer.csproj"
+    },
+    {
+      "path": "src/Actors/CodeArchitects.Platform.Actors.csproj"
+    },
+    {
+      "path": "src/Actors.Dapr/CodeArchitects.Platform.Actors.Dapr.csproj"
+    },
+    {
+      "path": "src/Actors.Dapr.AspNetCore/CodeArchitects.Platform.Actors.Dapr.AspNetCore.csproj"
+    },
+    {
+      "path": "tests/Actors.UnitTests/CodeArchitects.Platform.Actors.UnitTests.csproj"
+    },
+    {
+      "path": "src/Actors.Analyzer/CodeArchitects.Platform.Actors.Analyzer.csproj"
+    },
+    {
+      "path": "src/Common.Analyzer/CodeArchitects.Platform.Common.Analyzer.csproj"
+    },
+    {
+      "path": "tests/Actors.Analyzer.FunctionalTests/CodeArchitects.Platform.Actors.Analyzer.FunctionalTests.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/Common.Analyzer.FunctionalTests/CodeArchitects.Platform.Common.Analyzer.FunctionalTests.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "transitivePackages": [
+            {
+              "id": "NuGet.Common",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Packaging",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Critical",
+                  "advisoryurl": "https://github.com/advisories/GHSA-68w7-72jg-6qpp"
+                }
+              ]
+            },
+            {
+              "id": "NuGet.Protocol",
+              "resolvedVersion": "5.6.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-g3q9-xf95-8hp5"
+                },
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6qmf-mmc7-6c2p"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/Actors.Dapr.UnitTests/CodeArchitects.Platform.Actors.Dapr.UnitTests.csproj"
+    },
+    {
+      "path": "tests/Actors.TestModel/CodeArchitects.Platform.Actors.TestModel.csproj"
+    },
+    {
+      "path": "tests/Actors.Dapr.AspNetCore.IntegrationTests/CodeArchitects.Platform.Actors.Dapr.AspNetCore.IntegrationTests.csproj"
+    },
+    {
+      "path": "tests/Actors.Dapr.AspNetCore.IntegrationTests/ActorApp/ActorApp.csproj"
+    },
+    {
+      "path": "tests/Actors.FunctionalTests/CodeArchitects.Platform.Actors.FunctionalTests.csproj"
+    },
+    {
+      "path": "src/Data.MongoDB/CodeArchitects.Platform.Data.MongoDB.csproj",
+      "frameworks": [
+        {
+          "framework": "netstandard2.1",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/Data.MongoDB.UnitTests/CodeArchitects.Platform.Data.MongoDB.UnitTests.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/Data.MongoDB.IntegrationTests/CodeArchitects.Platform.Data.MongoDB.IntegrationTests.csproj",
+      "frameworks": [
+        {
+          "framework": "net10.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "framework": "net9.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/Data.MongoDB.DependencyInjection/CodeArchitects.Platform.Data.MongoDB.DependencyInjection.csproj",
+      "frameworks": [
+        {
+          "framework": "net7.0",
+          "transitivePackages": [
+            {
+              "id": "SharpCompress",
+              "resolvedVersion": "0.30.1",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-6c8g-7p36-r338"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/Data.AdoNet.MySQL/CodeArchitects.Platform.Data.AdoNet.MySQL.csproj"
+    },
+    {
+      "path": "src/GraphQL/CodeArchitects.Platform.GraphQL.csproj"
+    },
+    {
+      "path": "src/GraphQL.Analyzer/CodeArchitects.Platform.GraphQL.Analyzer.csproj"
+    },
+    {
+      "path": "tests/GraphQL.UnitTests/CodeArchitects.Platform.GraphQL.UnitTests.csproj"
+    },
+    {
+      "path": "tests/GraphQL.Analyzer.FunctionalTests/CodeArchitects.Platform.GraphQL.Analyzer.FunctionalTests.csproj"
+    },
+    {
+      "path": "benchmarks/CodeArchitects.Platform.GraphQL.Benchmarks/CodeArchitects.Platform.GraphQL.Benchmarks.csproj"
+    },
+    {
+      "path": "src/GraphQL.ChilliCream/CodeArchitects.Platform.GraphQL.ChilliCream.csproj"
+    },
+    {
+      "path": "tests/GraphQL.ChilliCream.UnitTests/CodeArchitects.Platform.GraphQL.ChilliCream.UnitTests.csproj"
+    },
+    {
+      "path": "tests/PolicyManager.IntegrationTests/CodeArchitects.Platform.PolicyManager.IntegrationTests.csproj"
+    },
+    {
+      "path": "tests/PolicyManager.UnitTests/CodeArchitects.Platform.PolicyManager.UnitTests.csproj"
+    },
+    {
+      "path": "src/PolicyManager/CodeArchitects.Platform.PolicyManager.csproj"
+    },
+    {
+      "path": "src/PolicyManager.DependencyInjection/CodeArchitects.Platform.PolicyManager.DependencyInjection.csproj"
+    },
+    {
+      "path": "tests/Shared.UnitTests/CodeArchitects.Platform.Shared.UnitTests.csproj"
+    },
+    {
+      "path": "src/Data.Mapster/CodeArchitects.Platform.Data.Mapster.csproj"
+    }
+  ]
+}
