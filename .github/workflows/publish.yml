@@ -118,7 +118,9 @@ jobs:
         run: dotnet restore CodeArchitects.Platform.sln
 
       - name: Build
-        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore -p:Version=${{ steps.meta.outputs.version }}
+        # -m:1 serializes the build to avoid an intermittent CS0006 race between
+        # multi-targeted ProjectReferences (see ci.yml for details).
+        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore -m:1 -p:Version=${{ steps.meta.outputs.version }}
 
       - name: Pack (all packable projects under src/)
         shell: bash
