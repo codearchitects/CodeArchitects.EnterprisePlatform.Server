@@ -28,7 +28,10 @@ jobs:
         run: dotnet restore CodeArchitects.Platform.sln
 
       - name: Build
-        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore
+        # -m:1 (single MSBuild node) serializes the build so multi-targeted
+        # ProjectReferences build in dependency order, avoiding an intermittent
+        # CS0006 "metadata file could not be found" race under parallel builds.
+        run: dotnet build CodeArchitects.Platform.sln --configuration Release --no-restore -m:1
 
       - name: Test (unit & functional)
         shell: bash
