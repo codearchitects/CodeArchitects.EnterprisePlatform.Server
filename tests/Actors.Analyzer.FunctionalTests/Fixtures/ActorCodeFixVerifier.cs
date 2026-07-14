@@ -65,7 +65,8 @@ internal class ActorCodeFixVerifier
 
   private static string NormalizeLineEndings(string source)
   {
-    return source.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
+    // Keep a stable newline convention for verifier snapshots across TFMs and OSes.
+    return source.Replace("\r\n", "\n").Replace("\r", "\n");
   }
 
   public static Task Verify(Action<ActorCodeFixVerifier> specification, CancellationToken cancellationToken = default)

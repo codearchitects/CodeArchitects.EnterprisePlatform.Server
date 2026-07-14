@@ -1,5 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
@@ -12,6 +14,21 @@ internal class ActorCodeFixTest : CSharpCodeFixTest<ActorDiagnosticAnalyzer, Act
   public ActorCodeFixTest()
   {
     ActorTest.SetupTestState(TestState);
+
+    const string editorConfig = """
+      root = true
+
+      [*]
+      end_of_line = lf
+      """;
+
+    TestState.AnalyzerConfigFiles.Add(("/.editorconfig", editorConfig));
+    FixedState.AnalyzerConfigFiles.Add(("/.editorconfig", editorConfig));
+
+    SolutionTransforms.Add((solution, _) => NormalizeSolutionLineEndings(solution));
+
+    SolutionTransforms.Add((solution, projectId) =>
+      solution.WithOptions(solution.Options.WithChangedOption(FormattingOptions.NewLine, LanguageNames.CSharp, "\n")));
   }
 
   public void ModifyCompilationOptions(Func<CompilationOptions, CompilationOptions> optionsTransform)
@@ -32,5 +49,28 @@ internal class ActorCodeFixTest : CSharpCodeFixTest<ActorDiagnosticAnalyzer, Act
     }
     
     return ActorTest.GetProjectCompilation(originalCompilation, cancellationToken);
+  }
+
+  private static Solution NormalizeSolutionLineEndings(Solution solution)
+  {
+    foreach (DocumentId documentId in solution.Projects.SelectMany(project => project.DocumentIds))
+    {
+      Document? document = solution.GetDocument(documentId);
+      if (document is null)
+      {
+        continue;
+      }
+
+      SourceText? sourceText = document.GetTextAsync().GetAwaiter().GetResult();
+      string normalized = sourceText.ToString().Replace("\r\n", "\n").Replace("\r", "\n");
+      if (normalized == sourceText.ToString())
+      {
+        continue;
+      }
+
+      solution = solution.WithDocumentText(documentId, SourceText.From(normalized, sourceText.Encoding));
+    }
+
+    return solution;
   }
 }
