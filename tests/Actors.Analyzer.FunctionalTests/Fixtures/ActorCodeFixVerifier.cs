@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace CodeArchitects.Platform.Actors.Analyzer.Fixtures;
@@ -48,17 +48,25 @@ internal class ActorCodeFixVerifier
 
   private static void AddSource(SolutionState state, string source, DiagnosticResult[] diagnostics, string? fileName = null)
   {
+    string normalizedSource = NormalizeLineEndings(source);
+
     if (fileName is not null)
     {
-      state.Sources.Add((fileName, source));
+      state.Sources.Add((fileName, normalizedSource));
     }
     else
     {
-      state.Sources.Add(source);
+      state.Sources.Add(normalizedSource);
     }
 
     string path = state.Sources[^1].filename;
     state.ExpectedDiagnostics.AddRange(diagnostics.Select(diagnostic => diagnostic.WithDefaultPath(path)));
+  }
+
+  private static string NormalizeLineEndings(string source)
+  {
+    // Keep a stable newline convention for verifier snapshots across TFMs and OSes.
+    return source.Replace("\r\n", "\n").Replace("\r", "\n");
   }
 
   public static Task Verify(Action<ActorCodeFixVerifier> specification, CancellationToken cancellationToken = default)

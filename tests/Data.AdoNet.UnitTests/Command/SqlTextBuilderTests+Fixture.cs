@@ -1,4 +1,4 @@
-﻿using CodeArchitects.Platform.Data.AdoNet.Fixtures;
+using CodeArchitects.Platform.Data.AdoNet.Fixtures;
 using CodeArchitects.Platform.Data.AdoNet.Fixtures.Models;
 using CodeArchitects.Platform.Data.AdoNet.Model;
 using CodeArchitects.Platform.Data.AdoNet.MySQL.Command;
@@ -36,10 +36,15 @@ public partial class SqlTextBuilderTests
           return queryCompiler(root, sqlBuilder);
         });
 
-      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new SQLServerSyntaxProvider()), Root, ExpectedTextSQLServer };
-      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new PostgreSQLSyntaxProvider()), Root, ExpectedTextPostgreSQL };
-      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new OracleSyntaxProvider()), Root, ExpectedTextOracle };
-      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new MySQLSyntaxProvider()), Root, ExpectedTextMySQL };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new SQLServerSyntaxProvider()), Root, NormalizeLineEndings(ExpectedTextSQLServer) };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new PostgreSQLSyntaxProvider()), Root, NormalizeLineEndings(ExpectedTextPostgreSQL) };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new OracleSyntaxProvider()), Root, NormalizeLineEndings(ExpectedTextOracle) };
+      yield return new object[] { new SqlTextBuilder(cacheMock.Object, new MySQLSyntaxProvider()), Root, NormalizeLineEndings(ExpectedTextMySQL) };
+    }
+
+    private static string NormalizeLineEndings(string text)
+    {
+      return text.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
     }
   }
 
