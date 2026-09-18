@@ -3,6 +3,9 @@ using CodeArchitects.Platform.Data.MongoDB.Filters;
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 using CodeArchitects.Platform.Data.MongoDB.Serialization;
+using CodeArchitects.Platform.Data.MongoDB.Transactions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Reflection;
@@ -16,6 +19,7 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
   private string? _databaseName;
   private MongoDatabaseSettings? _settings;
   private Type? _seedType;
+  private readonly MongoDBOptions _options = new();
 
   public MongoDBConfigurationBuilder()
   {
@@ -54,8 +58,18 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
     // cache collections for the lifetime of the application instead of per request.
     services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(_databaseName, _settings));
     services.AddSingleton<ICollectionProvider, CollectionProvider>();
+    services.AddSingleton(_options);
+    services.AddSingleton<ITransactionCapabilityProbe>(sp => new TransactionCapabilityProbe(
+      sp.GetRequiredService<IMongoDatabase>(),
+      Logger<TransactionCapabilityProbe>(sp)));
 
-    services.AddScoped<StateManager>();
+    // Explicit factory: ILogger<T> is only registered when the application calls AddLogging,
+    // so fall back to NullLogger instead of making the whole registration fail.
+    services.AddScoped(sp => new StateManager(
+      sp.GetRequiredService<IMongoClient>(),
+      sp.GetRequiredService<ITransactionCapabilityProbe>(),
+      sp.GetRequiredService<MongoDBOptions>(),
+      Logger<StateManager>(sp)));
     services.AddScoped<IDataContext, DataContext>();
     services.AddScoped<IStateManager>(sp => sp.GetRequiredService<StateManager>());
     services.AddScoped<IUnitOfWorkManager>(sp => sp.GetRequiredService<StateManager>());
@@ -65,6 +79,13 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
   public IMongoDBConfigurationBuilderWithDatabase AddEntitiesFrom(Assembly assembly)
   {
     _entityAssemblies.Add(assembly);
+    return this;
+  }
+
+  public IMongoDBConfigurationBuilderWithDatabase UseTransactions(TransactionMode mode, TransactionOptions? options = null)
+  {
+    _options.TransactionMode = mode;
+    _options.TransactionOptions = options;
     return this;
   }
 
@@ -97,5 +118,11 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
 
     _seedType = seedType;
     return this;
+  }
+
+  private static ILogger<T> Logger<T>(IServiceProvider services)
+  {
+    ILoggerFactory? factory = services.GetService<ILoggerFactory>();
+    return factory is null ? NullLogger<T>.Instance : new Logger<T>(factory);
   }
 }

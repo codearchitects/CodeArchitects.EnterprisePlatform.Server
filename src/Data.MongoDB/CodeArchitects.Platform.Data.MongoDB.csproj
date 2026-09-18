@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
+    <!-- Explicit: the driver only brings 2.0.0 transitively. -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <!--
       Pin patched Snappier to override the vulnerable 1.0.0 pulled transitively by MongoDB.Driver

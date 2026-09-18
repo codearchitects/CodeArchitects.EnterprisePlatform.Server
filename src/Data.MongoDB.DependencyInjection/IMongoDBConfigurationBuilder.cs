@@ -57,4 +57,12 @@ public interface IMongoDBConfigurationBuilderWithDatabase
   /// <param name="assembly">The source assembly.</param>
   /// <returns>And <see cref="IMongoDBConfigurationBuilderWithDatabase"/> for further MongoDB database configuration.</returns>
   IMongoDBConfigurationBuilderWithDatabase AddEntitiesFrom(Assembly assembly);
+
+  /// <summary>
+  /// Specifies how the provider behaves when an operation needs a MongoDB transaction.
+  /// </summary>
+  /// <param name="mode">The transaction mode. Defaults to <see cref="TransactionMode.Required"/>.</param>
+  /// <param name="options">Read/write concern and timeout applied to the transactions.</param>
+  /// <returns>An <see cref="IMongoDBConfigurationBuilderWithDatabase"/> for further MongoDB database configuration.</returns>
+  IMongoDBConfigurationBuilderWithDatabase UseTransactions(TransactionMode mode, TransactionOptions? options = null);
 }
