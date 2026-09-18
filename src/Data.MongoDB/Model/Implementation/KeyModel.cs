@@ -1,18 +1,16 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 
-internal class KeyModel : IKeyModel
+internal class KeyModel(string name, Type type) : IKeyModel
 {
-  public KeyModel(string name, Type type)
-  {
-    Name = name;
-    Type = type;
-  }
+  public const string IdElementName = "_id";
 
-  public string Name { get; }
+  public string Name { get; } = name;
 
-  public Type Type { get; }
+  public Type Type { get; } = type;
+
+  public string ElementName => IdElementName;
 
   public static KeyModel Create(PropertyInfo propertyInfo)
   {

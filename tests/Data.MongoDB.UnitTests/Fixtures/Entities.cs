@@ -37,7 +37,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
     Type type = typeof(EntityWithIdProperty);
 
     return Mock.Of<IEntityModel>(model =>
@@ -51,7 +52,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
 
     return Mock.Of<IEntityModel>(model =>
       model.CollectionName == "Entities" &&
@@ -64,7 +66,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Identifier" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
     Type type = typeof(EntityWithBsonIdAttribute);
 
     return Mock.Of<IEntityModel>(model =>
@@ -83,7 +86,8 @@ internal static class KeyModels
   {
     return Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
   }
 }
 

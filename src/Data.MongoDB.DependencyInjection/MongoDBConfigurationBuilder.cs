@@ -3,7 +3,6 @@ using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 using CodeArchitects.Platform.Data.MongoDB.Query;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.MongoDB.DependencyInjection;
@@ -28,15 +27,13 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
     if (_databaseName is null)
       throw new InvalidOperationException("Database was not configured.");
 
-    DataModel dataModel = new();
-    IEnumerable<Type> entityTypes = _entityAssemblies
-      .SelectMany(assebly => assebly.GetTypes())
-      .Where(type => type.IsDefined(typeof(TableAttribute), inherit: true));
-
-    foreach (Type entityType in entityTypes)
+    DataModelBuilder modelBuilder = new();
+    foreach (Assembly entityAssembly in _entityAssemblies)
     {
-      dataModel.AddEntity(entityType);
+      modelBuilder.AddEntitiesFrom(entityAssembly);
     }
+
+    DataModel dataModel = modelBuilder.Build();
 
     if (_seedType is not null)
     {
