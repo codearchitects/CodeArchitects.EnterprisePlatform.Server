@@ -11,7 +11,8 @@ internal sealed class DataModel : IDataModel
     if (entities is null)
       throw new ArgumentNullException(nameof(entities));
 
-    _entities = [with(entities.Count)];
+    // Defensive copy: the model must not change after it has been built.
+    _entities = new Dictionary<Type, EntityModel>(entities.Count);
     foreach (KeyValuePair<Type, EntityModel> entity in entities)
     {
       _entities.Add(entity.Key, entity.Value);

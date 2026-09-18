@@ -1,6 +1,8 @@
-﻿using CodeArchitects.Platform.Data.MongoDB.Model;
+﻿using CodeArchitects.Platform.Data.MongoDB.Collections;
+using CodeArchitects.Platform.Data.MongoDB.Filters;
+using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
-using CodeArchitects.Platform.Data.MongoDB.Query;
+using CodeArchitects.Platform.Data.MongoDB.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using System.Reflection;
@@ -35,18 +37,23 @@ internal class MongoDBConfigurationBuilder : IMongoDBConfigurationBuilder, IMong
 
     DataModel dataModel = modelBuilder.Build();
 
+    // Must run before any document is serialized, and exactly once per process.
+    MongoDBSerializationInitializer.EnsureInitialized();
+
     if (_seedType is not null)
     {
       services.AddScoped(typeof(DataSeed), _seedType);
     }
 
-    services.AddSingleton<IPredicateTemplateProvider, PredicateTemplateProvider>();
-    services.AddSingleton<IPredicateProvider, PredicateProvider>();
+    services.AddSingleton<IFilterProvider, FilterProvider>();
 
     services.AddSingleton<IDataModel>(dataModel);
 
     services.AddSingleton<IMongoClient>(_client);
-    services.AddScoped(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(_databaseName, _settings));
+    // IMongoDatabase is thread-safe and immutable: a singleton lets CollectionProvider
+    // cache collections for the lifetime of the application instead of per request.
+    services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(_databaseName, _settings));
+    services.AddSingleton<ICollectionProvider, CollectionProvider>();
 
     services.AddScoped<StateManager>();
     services.AddScoped<IDataContext, DataContext>();
