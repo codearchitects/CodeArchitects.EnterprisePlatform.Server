@@ -23,8 +23,9 @@ internal class MongoDBConfigurationBuilder :
   private readonly List<Action<ConventionPack>> _conventionConfigurators = new();
   private readonly MongoDBOptions _options = new();
 
+  private readonly List<Type> _seedTypes = new();
+
   private Func<IServiceProvider, IMongoClient>? _clientFactory;
-  private Type? _seedType;
 
   #region Client
 
@@ -124,7 +125,27 @@ internal class MongoDBConfigurationBuilder :
     if (!seedType.IsSubclassOf(typeof(DataSeed)))
       throw new ArgumentException($"Type '{seedType}' does not extend '{nameof(DataSeed)}'.");
 
-    _seedType = seedType;
+    if (!_seedTypes.Contains(seedType))
+    {
+      _seedTypes.Add(seedType);
+    }
+
+    return this;
+  }
+
+  public IMongoDBConfigurationBuilderWithDatabase AddSeedsFrom(Assembly assembly)
+  {
+    if (assembly is null)
+      throw new ArgumentNullException(nameof(assembly));
+
+    foreach (Type type in assembly.GetTypes())
+    {
+      if (type.IsClass && !type.IsAbstract && !type.IsGenericTypeDefinition && type.IsSubclassOf(typeof(DataSeed)))
+      {
+        UseSeed(type);
+      }
+    }
+
     return this;
   }
 
@@ -180,11 +201,13 @@ internal class MongoDBConfigurationBuilder :
     // The provider-agnostic contract must resolve too: generated code depends on it.
     services.AddScoped<Data.IDataContext>(sp => sp.GetRequiredService<DataContext>());
 
-    services.AddScoped<ISeeder, Seeder>();
+    services.AddScoped<Seeder>();
+    services.AddScoped<ISeeder>(sp => sp.GetRequiredService<Seeder>());
 
-    if (_seedType is not null)
+    // One registration per seed: GetServices<DataSeed>() then returns them all.
+    foreach (Type seedType in _seedTypes)
     {
-      services.AddScoped(typeof(DataSeed), _seedType);
+      services.AddScoped(typeof(DataSeed), seedType);
     }
   }
 

@@ -1,4 +1,5 @@
 using CodeArchitects.Platform.Common.CodeAnalysis;
+using CodeArchitects.Platform.Data;
 using CodeArchitects.Platform.Data.MongoDB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
@@ -105,9 +106,16 @@ public interface IMongoDBConfigurationBuilderWithDatabase
   IMongoDBConfigurationBuilderWithDatabase ConfigureConventions(Action<ConventionPack> configure);
 
   /// <summary>
-  /// Specifies the seed type to use for seeding the database.
+  /// Adds a seed type to apply when the database is seeded.
   /// </summary>
   /// <param name="seedType">The seed type. It must extend <see cref="DataSeed"/>.</param>
   /// <returns>An <see cref="IMongoDBConfigurationBuilderWithDatabase"/> for further MongoDB database configuration.</returns>
   IMongoDBConfigurationBuilderWithDatabase UseSeed(Type seedType);
+
+  /// <summary>
+  /// Adds every concrete <see cref="CodeArchitects.Platform.Data.DataSeed"/> of an assembly.
+  /// </summary>
+  /// <param name="assembly">The source assembly.</param>
+  /// <returns>An <see cref="IMongoDBConfigurationBuilderWithDatabase"/> for further MongoDB database configuration.</returns>
+  IMongoDBConfigurationBuilderWithDatabase AddSeedsFrom(Assembly assembly);
 }

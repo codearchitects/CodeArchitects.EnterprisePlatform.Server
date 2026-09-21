@@ -214,6 +214,73 @@ public class DataMongoDBServiceCollectionExtensionsTests
   }
 
   [Fact]
+  public void AddData_ShouldRegisterEverySeed_WhenSeveralAreConfigured()
+  {
+    // Arrange
+    using ServiceProvider provider = BuildProvider(builder => builder
+      .UseSeed<TestSeed>()
+      .UseSeed<OtherTestSeed>());
+    using IServiceScope scope = provider.CreateScope();
+
+    // Act
+    DataSeed[] seeds = [.. scope.ServiceProvider.GetServices<DataSeed>()];
+
+    // Assert
+    seeds.Should().HaveCount(2);
+  }
+
+  [Fact]
+  public void UseSeed_ShouldIgnoreDuplicates()
+  {
+    // Arrange
+    using ServiceProvider provider = BuildProvider(builder => builder
+      .UseSeed<TestSeed>()
+      .UseSeed<TestSeed>());
+    using IServiceScope scope = provider.CreateScope();
+
+    // Act
+    DataSeed[] seeds = [.. scope.ServiceProvider.GetServices<DataSeed>()];
+
+    // Assert
+    // Registering the same seed twice would apply it twice within one commit.
+    seeds.Should().ContainSingle();
+  }
+
+  [Fact]
+  public void AddSeedsFrom_ShouldDiscoverConcreteSeeds()
+  {
+    // Arrange
+    MongoDBConfigurationBuilder builder = new();
+    builder.UseClient(_client.Object).UseDatabase("tests").AddEntity<DiscoverableEntity>();
+
+    // Act
+    builder.AddSeedsFrom(typeof(DiscoverableSeed).Assembly);
+
+    ServiceCollection services = new();
+    builder.AddServices(services);
+    using ServiceProvider provider = services.BuildServiceProvider();
+    using IServiceScope scope = provider.CreateScope();
+
+    // Assert
+    scope.ServiceProvider.GetServices<DataSeed>()
+      .Should().ContainSingle(seed => seed is DiscoverableSeed);
+  }
+
+  [Fact]
+  public void SeedMongo_ShouldNotThrow_WhenNoSeedIsRegistered()
+  {
+    // Arrange
+    using ServiceProvider provider = BuildProvider();
+
+    // Act
+    Action act = provider.SeedMongo;
+
+    // Assert
+    // Nothing to do is not an error: it is logged and skipped.
+    act.Should().NotThrow();
+  }
+
+  [Fact]
   public void UseSeed_ShouldThrow_WhenTheTypeIsNotADataSeed()
   {
     // Arrange
@@ -229,6 +296,13 @@ public class DataMongoDBServiceCollectionExtensionsTests
   #endregion
 
   private sealed class TestSeed : DataSeed
+  {
+    public override void Seed(ISeeder seeder)
+    {
+    }
+  }
+
+  private sealed class OtherTestSeed : DataSeed
   {
     public override void Seed(ISeeder seeder)
     {
