@@ -12,6 +12,7 @@
 
   <ItemGroup>
 		<PackageReference Include="FluentAssertions" Version="6.10.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
 		<PackageReference Include="Moq" Version="4.18.4" />
 		<!-- Pin patched Snappier (GHSA-pggp-6c3x-2xmx). SharpCompress has no patched release and is
@@ -30,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Data.MongoDB\CodeArchitects.Platform.Data.MongoDB.csproj" />
+    <ProjectReference Include="..\..\src\Data.MongoDB.DependencyInjection\CodeArchitects.Platform.Data.MongoDB.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

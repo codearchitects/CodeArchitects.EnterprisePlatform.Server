@@ -129,3 +129,25 @@ internal static class PredicateTemplates
       parameters: entityParameter);
   }
 }
+
+/// <summary>
+/// Public, attributed and concrete: the only shape AddEntitiesFrom discovers.
+/// </summary>
+/// <remarks>The attribute is qualified because xUnit also defines a CollectionAttribute.</remarks>
+[CodeArchitects.Platform.Data.MongoDB.Collection("discoveredEntities")]
+public class DiscoverableEntity
+{
+  public Guid Id { get; set; }
+}
+
+/// <summary>
+/// Mapped to the same collection as <see cref="DiscoverableEntity"/>, to exercise the
+/// collision check performed when the model is built.
+/// </summary>
+/// <remarks>Internal on purpose: AddEntitiesFrom must not discover it, otherwise every
+/// assembly scan in these tests would collide.</remarks>
+[CodeArchitects.Platform.Data.MongoDB.Collection("discoveredEntities")]
+internal class CollidingEntity
+{
+  public Guid Id { get; set; }
+}
