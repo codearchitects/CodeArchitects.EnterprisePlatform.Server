@@ -1,16 +1,16 @@
-# DAL con MongoDB
+# DAL with MongoDB
 
-> **Nota.** I pacchetti `CodeArchitects.Platform.Data.MongoDB` e
-> `CodeArchitects.Platform.Data.MongoDB.DependencyInjection` sono marcati `[Experimental]`: è
-> molto probabile che verranno introdotte breaking changes tra il rilascio di una versione e la successiva.
-> Non è stato ancora raggiunto un livello di maturità pari agli altri Data Provider attualmente supportati. 
+> **Note.** The `CodeArchitects.Platform.Data.MongoDB` and
+> `CodeArchitects.Platform.Data.MongoDB.DependencyInjection` packages are marked `[Experimental]`:
+> breaking changes are very likely to be introduced between one version and the next.
+> They have not yet reached the same level of maturity as the other currently supported Data Providers.
 
-MongoDB è un database documentale: non ha tabelle né foreign key, e garantisce atomicità sul
-**singolo documento**. Il provider MongoDB del DAL CAEP espone gli stessi `IRepository`,
-`IUnitOfWork` e `IDataContext` degli altri provider, ma alcune semantiche cambiano di conseguenza.
-Questa pagina descrive quelle differenze.
+MongoDB is a document database: it has no tables or foreign keys, and guarantees atomicity for a
+**single document**. The CAEP MongoDB provider exposes the same `IRepository`, `IUnitOfWork`, and
+`IDataContext` as the other providers, but some semantics consequently differ.
+This page describes those differences.
 
-## Configurazione
+## Configuration
 
 ```csharp
 builder.Services.AddData(cfg => cfg
@@ -19,50 +19,50 @@ builder.Services.AddData(cfg => cfg
     .AddEntitiesFrom(typeof(Product).Assembly));
 ```
 
-`AddData` vive nel namespace `Microsoft.Extensions.DependencyInjection`, come per gli altri
-provider: in un `Program.cs` non serve alcun `using` aggiuntivo.
+`AddData` lives in the `Microsoft.Extensions.DependencyInjection` namespace, as with the other
+providers: no additional `using` directive is required in `Program.cs`.
 
-La configurazione è **validata subito**, senza contattare il server. Client mancante, database
-mancante, modello vuoto, chiave non risolvibile o due entità mappate sulla stessa collection
-fanno fallire l'avvio con un messaggio esplicito, non una `NullReferenceException` alla prima
-richiesta.
+The configuration is **validated immediately**, without contacting the server. A missing client,
+missing database, empty model, unresolvable key, or two entities mapped to the same collection
+causes startup to fail with an explicit message, rather than a `NullReferenceException` on the
+first request.
 
 ### Client
 
 ```csharp
-// dalla connection string
+// from the connection string
 .UseConnectionString(connectionString)
 
-// intervenendo sulle impostazioni derivate dalla connection string
+// modifying the settings derived from the connection string
 .UseConnectionString(connectionString, settings => settings.RetryWrites = true)
 
-// fornendo il client
+// providing the client
 .UseClient(client)
 .UseClient(sp => sp.GetRequiredService<IMongoClient>())
 ```
 
-`UseClient` accetta `IMongoClient`, non `MongoClient`: nel driver 3.x la classe concreta è
-`sealed`, quindi l'interfaccia è l'unico modo per decorare o sostituire il client.
+`UseClient` accepts `IMongoClient`, not `MongoClient`: in driver 3.x the concrete class is
+`sealed`, so the interface is the only way to decorate or replace the client.
 
-### Opzioni
+### Options
 
 ```csharp
 builder.Services.AddData(cfg => cfg
     .UseConnectionString(connectionString)
     .UseDatabase("store")
     .AddEntitiesFrom(typeof(Product).Assembly)
-    .AddEntity<LegacyDocument>()                              // registrazione esplicita
+    .AddEntity<LegacyDocument>()                              // explicit registration
     .UseTransactions(TransactionMode.Required)                // default
     .UseGuidRepresentation(GuidRepresentation.Standard)       // default
     .ConfigureConventions(pack => pack.Add(new CamelCaseElementNameConvention()))
     .UseSeed<ApplicationDataSeed>());
 ```
 
-## Entità e convenzioni
+## Entities and conventions
 
-### Nome della collection
+### Collection name
 
-Un'entità è una classe **pubblica, concreta e non generica** marcata con `[Collection]`:
+An entity is a **public, concrete, non-generic** class marked with `[Collection]`:
 
 ```csharp
 using CodeArchitects.Platform.Data.MongoDB;
@@ -76,79 +76,78 @@ public class Product
 }
 ```
 
-`[Table]` è accettato come alternativa, per retro-compatibilità. Senza attributo il nome è quello
-del tipo, invariato: nessuna pluralizzazione e nessuna trasformazione di case. `AddEntity<T>()`
-registra un tipo anche se non ha attributo.
+`[Table]` is accepted as an alternative for backward compatibility. Without an attribute, the name
+is the type name unchanged: there is no pluralization or case transformation. `AddEntity<T>()`
+registers a type even if it has no attribute.
 
-> L'attributo si chiama `Collection` come quello di xUnit: in un progetto di test che importa
-> entrambi va qualificato (`[CodeArchitects.Platform.Data.MongoDB.Collection("...")]`).
+> The attribute is called `Collection`, like the xUnit one: in a test project that imports both,
+> it must be qualified (`[CodeArchitects.Platform.Data.MongoDB.Collection("...")]`).
 
-### Chiave
+### Key
 
-La chiave è **sempre** mappata sull'elemento `_id` ed è risolta in quest'ordine:
+The key is **always** mapped to the `_id` element and is resolved in this order:
 
-1. proprietà marcata `[BsonId]`;
-2. proprietà `Id`;
-3. proprietà `<NomeTipo>Id`.
+1. property marked `[BsonId]`;
+2. `Id` property;
+3. `<TypeName>Id` property.
 
-Tipi supportati: `Guid`, `string`, `ObjectId`, `int`, `long`. Le chiavi composite non sono
-supportate.
+Supported types: `Guid`, `string`, `ObjectId`, `int`, `long`. Composite keys are not supported.
 
-La generazione del valore non è a carico del provider: se la chiave è `default` al momento
-dell'insert, il valore viene delegato al driver per `ObjectId` e `string`, mentre per `Guid` e per
-gli interi va valorizzata dal dominio — com'è nella pipeline CAEP.
+Value generation is not handled by the provider: if the key is `default` at insert time, value
+generation is delegated to the driver for `ObjectId` and `string`, while `Guid` and integer keys
+must be assigned by the domain, as in the CAEP pipeline.
 
-## Aggregati, documenti incorporati e riferimenti
+## Aggregates, embedded documents, and references
 
-> **L'unità di consistenza è il documento.** Un aggregate root corrisponde a un documento; tutto
-> l'aggregato vive dentro quel documento. Le operazioni sull'aggregate root sono quindi atomiche
-> **per costruzione**, senza transazioni.
+> **The document is the unit of consistency.** An aggregate root corresponds to a document; the
+> entire aggregate lives inside that document. Operations on the aggregate root are therefore
+> atomic **by construction**, without transactions.
 
-Questo cambia il modo di modellare le associazioni rispetto ai provider relazionali:
+This changes how associations are modeled compared with relational providers:
 
-| Associazione | Rappresentazione |
+| Association | Representation |
 |---|---|
-| Intra-aggregato (1:1 e 1:N) | sotto-documento o array di sotto-documenti **incorporati** |
-| Inter-aggregato (1:1, N:1, 1:N) | campo contenente la **chiave** dell'altro aggregato |
-| Molti-a-molti | array di chiavi sul lato proprietario; nessuna collection di giunzione |
+| Intra-aggregate (1:1 and 1:N) | embedded sub-document or array of **embedded** sub-documents |
+| Inter-aggregate (1:1, N:1, 1:N) | field containing the other aggregate's **key** |
+| Many-to-many | array of keys on the owning side; no junction collection |
 
 ```csharp
 [Collection("carts")]
 public class Cart
 {
   public Guid Id { get; set; }
-  public List<CartItem> Items { get; set; } = [];   // intra-aggregato: incorporato
-  public Guid CustomerId { get; set; }              // inter-aggregato: riferimento
+  public List<CartItem> Items { get; set; } = [];   // intra-aggregate: embedded
+  public Guid CustomerId { get; set; }              // inter-aggregate: reference
 }
 
-public class CartItem          // nessun [Collection], nessun Id: non è un'entità
+public class CartItem          // no [Collection], no Id: not an entity
 {
   public string? Sku { get; set; }
   public int Quantity { get; set; }
 }
 ```
 
-Le entità incorporate **non hanno una collection propria** e non sono raggiungibili da un
-repository dedicato: un'entità che deve avere un repository è per definizione un aggregate root.
+Embedded entities **do not have their own collection** and cannot be reached through a dedicated
+repository: an entity that needs a repository is, by definition, an aggregate root.
 
-Le scritture seguono la semantica già documentata nel [DAL](dataaccesslayer.md#associazioni-e-aggregati):
-`Insert` e `Update` sull'aggregate root scrivono l'intero documento, incorporati compresi, mentre
-le entità inter-aggregato non vengono scritte — viene persistito solo il riferimento. `Remove`
-cancella il documento e con esso gli incorporati; **non** esiste cascata attraverso i riferimenti,
-perché MongoDB non ha un `delete behavior`: resta responsabilità applicativa.
+Writes follow the semantics already documented in the [DAL](dataaccesslayer.md#associazioni-e-aggregati):
+`Insert` and `Update` on the aggregate root write the entire document, including embedded entities,
+while inter-aggregate entities are not written, only the reference is persisted. `Remove` deletes
+the document and its embedded entities; there is **no** cascade through references, because MongoDB
+has no `delete behavior`: this remains the application's responsibility.
 
-`DBRef` non è supportato di proposito: non è risolvibile lato server in una pipeline `$lookup` e
-mette il nome della collection dentro il dato.
+`DBRef` is intentionally not supported: it cannot be resolved server-side in a `$lookup` pipeline
+and puts the collection name into the data.
 
-## Unit of work e transazioni
+## Unit of work and transactions
 
-L'uso di `IUnitOfWorkManager` e `IUnitOfWork` è identico agli altri provider
-([DAL](dataaccesslayer.md#il-pattern-unit-of-work)). Le differenze sono due.
+The use of `IUnitOfWorkManager` and `IUnitOfWork` is identical to the other providers
+([DAL](dataaccesslayer.md#il-pattern-unit-of-work)). There are two differences.
 
-**Le scritture sono differite.** Dentro la UnitOfWork le operazioni si accumulano e vengono
-applicate al `SaveAsync` (o al `Dispose` con `autoSave: true`), tutte in **un'unica transazione**
-MongoDB. Ne consegue che una lettura effettuata dentro il contesto della UnitOfWork **non vede** le scritture
-ancora non committate.
+**Writes are deferred.** Within the UnitOfWork, operations accumulate and are applied on
+`SaveAsync` (or on `Dispose` with `autoSave: true`), all in **a single** MongoDB transaction.
+Consequently, a read performed within the UnitOfWork context **does not see** writes that have not
+yet been committed.
 
 ```csharp
 await using (IUnitOfWork uow = _uowManager.Begin())
@@ -156,49 +155,48 @@ await using (IUnitOfWork uow = _uowManager.Begin())
   await _cartRepo.UpdateAsync(cart);
   await _productRepo.UpdateAsync(product);
 
-  await uow.SaveAsync();   // una sola transazione: o entrambe, o nessuna
+  await uow.SaveAsync();   // one transaction: both or neither
 }
 ```
 
-**Le transazioni richiedono un replica set.** MongoDB non le supporta su un server standalone. Il
-comportamento è governato da `UseTransactions`:
+**Transactions require a replica set.** MongoDB does not support them on a standalone server. The
+behavior is governed by `UseTransactions`:
 
-| Modalità | Comportamento su topologia non compatibile |
+| Mode | Behavior on an incompatible topology |
 |---|---|
-| `Required` (default) | solleva `TransactionsNotSupportedException` |
-| `WhenSupported` | esegue senza atomicità ed emette un warning sul logger |
-| `Disabled` | non usa mai transazioni |
+| `Required` (default) | throws `TransactionsNotSupportedException` |
+| `WhenSupported` | runs without atomicity and emits a warning to the logger |
+| `Disabled` | never uses transactions |
 
-Una scrittura su un singolo documento **fuori** da contesto di una UnitOfWork non apre alcuna transazione:
-è già atomica. `InsertMany` e `UpdateMany` invece la aprono sempre, perché coinvolgono più
-documenti.
+A write to a single document **outside** a UnitOfWork does not open a transaction: it is already
+atomic. `InsertMany` and `UpdateMany`, however, always open one because they involve multiple
+documents.
 
-## Semantica delle operazioni
+## Operation semantics
 
-| Metodo | Comportamento | Eccezione |
+| Method | Behavior | Exception |
 |---|---|---|
-| `FindAsync(key)` | filtro su `_id` | — (`null` se assente) |
-| `FindAsync(key, include)` | **non supportato** | `NotSupportedException` |
-| `InsertAsync` | `insertOne` | `MongoWriteException` su chiave duplicata |
-| `InsertManyAsync` | `insertMany` ordinata, in transazione | `MongoBulkWriteException` |
-| `UpdateAsync` | sostituisce l'intero documento | `DBConcurrencyException` se non esiste |
-| `UpdateManyAsync` | `bulkWrite` ordinata, in transazione | `DBConcurrencyException` se qualcuno non esiste |
-| `UpsertAsync` | sostituisce o inserisce | `DBConcurrencyException` se non applicato |
-| `RemoveAsync` | `deleteOne` | `DBConcurrencyException` se non esiste |
+| `FindAsync(key)` | filter on `_id` | — (`null` if absent) |
+| `FindAsync(key, include)` | **not supported** | `NotSupportedException` |
+| `InsertAsync` | `insertOne` | `MongoWriteException` on duplicate key |
+| `InsertManyAsync` | ordered `insertMany`, in a transaction | `MongoBulkWriteException` |
+| `UpdateAsync` | replaces the entire document | `DBConcurrencyException` if it does not exist |
+| `UpdateManyAsync` | ordered `bulkWrite`, in a transaction | `DBConcurrencyException` if any do not exist |
+| `UpsertAsync` | replaces or inserts | `DBConcurrencyException` if not applied |
+| `RemoveAsync` | `deleteOne` | `DBConcurrencyException` if it does not exist |
 
-Due punti che sorprendono chi arriva dai provider relazionali:
+Two points may surprise users coming from relational providers:
 
-- **`UpdateAsync` sostituisce l'intero documento**, non i soli campi modificati: non esiste change
-  tracking. Per un aggiornamento parziale si usa direttamente `Collection.UpdateOneAsync` con la
-  sessione corrente.
-- **Un aggiornamento che non cambia nulla è un successo.** Il criterio è «il documento esiste», non
-  «il documento è stato riscritto».
+- **`UpdateAsync` replaces the entire document**, not only the modified fields: there is no change
+  tracking. For a partial update, use `Collection.UpdateOneAsync` directly with the current session.
+- **An update that changes nothing is successful.** The criterion is "the document exists", not
+  "the document was rewritten".
 
 ## Repository
 
-### Repository diretto
+### Direct repository
 
-L'entità di dominio è il documento. Da usare quando il modello di dominio è serializzabile 1:1.
+The domain entity is the document. Use this when the domain model is serializable 1:1.
 
 ```csharp
 using CodeArchitects.Platform.Data.MongoDB;
@@ -210,7 +208,7 @@ public class ProductRepository : MongoDBRepository<Product, Guid>, IProductRepos
   public async Task<IEnumerable<Product>> GetTopSellingProductsAsync(int count, CancellationToken ct = default)
   {
     return await Collection
-      .Find(Session, Builders<Product>.Filter.Empty)   // Session: partecipa all'unità di lavoro
+      .Find(Session, Builders<Product>.Filter.Empty)   // Session: participates in the unit of work
       .SortByDescending(product => product.SaleCount)
       .Limit(count)
       .ToListAsync(ct);
@@ -218,16 +216,16 @@ public class ProductRepository : MongoDBRepository<Product, Guid>, IProductRepos
 }
 ```
 
-La classe base espone `Collection` (`IMongoCollection<TEntity>`), `Database` e **`Session`**.
+The base class exposes `Collection` (`IMongoCollection<TEntity>`), `Database`, and **`Session`**.
 
-> Passare `Session` alle query personalizzate non è opzionale: un'operazione eseguita senza sessione
-> gira su una sessione implicita, quindi **fuori** dalla transazione dell'unità di lavoro in corso.
+> Passing `Session` to custom queries is not optional: an operation executed without a session runs
+> on an implicit session, and therefore **outside** the transaction of the current unit of work.
 
-### Repository mapped
+### Mapped repository
 
-Quando il documento deve divergere dal dominio — denormalizzazione, campi tecnici, nomi diversi,
-versionamento dello schema — si usa `MongoDBMappedRepository<TDocument, TEntity, TKey>`.
-`[Collection]` sta sul **documento**, mai sull'entità di dominio.
+When the document must differ from the domain, for example for denormalization, technical fields,
+different names, or schema versioning, use `MongoDBMappedRepository<TDocument, TEntity, TKey>`.
+`[Collection]` belongs on the **document**, never on the domain entity.
 
 ```csharp
 [Collection("products")]
@@ -247,22 +245,22 @@ public class ProductRepository : MongoDBMappedRepository<ProductDocument, Produc
 }
 ```
 
-La classe base espone `Collection` e il suo alias `Documents`, entrambi di tipo
+The base class exposes `Collection` and its `Documents` alias, both of type
 `IMongoCollection<TDocument>`.
 
-Il mapping può essere delegato a Mapster con un `TypeAdapterConfig` bidirezionale, come descritto
-in [DAL – Mapped repository](dataaccesslayer.md#mapped-repository):
+Mapping can be delegated to Mapster with a bidirectional `TypeAdapterConfig`, as described in
+[DAL – Mapped repository](dataaccesslayer.md#mapped-repository):
 
 ```csharp
 config.NewConfig<Product, ProductDocument>().TwoWays();
 ```
 
-> L'estensione `PreserveTracking` di `CodeArchitects.Platform.Data.Mapster` **non ha effetto** su
-> questo provider: MongoDB non ha change tracking.
+> The `PreserveTracking` extension from `CodeArchitects.Platform.Data.Mapster` has **no effect** on
+> this provider: MongoDB has no change tracking.
 
 ## Seeding
 
-Il seeding usa la stessa `DataSeed` degli altri provider.
+Seeding uses the same `DataSeed` as the other providers.
 
 ```csharp
 [SeedOrder(1)]
@@ -274,27 +272,27 @@ public class CategorySeed : DataSeed
 }
 ```
 
-Registrazione e applicazione:
+Registration and application:
 
 ```csharp
 builder.Services.AddData(cfg => cfg
     // ...
     .UseSeed<CategorySeed>()
-    .AddSeedsFrom(typeof(CategorySeed).Assembly));   // oppure per scansione
+    .AddSeedsFrom(typeof(CategorySeed).Assembly));   // or by scanning
 
 WebApplication app = builder.Build();
-app.Services.SeedMongo();                             // oppure await SeedMongoAsync()
+app.Services.SeedMongo();                             // or await SeedMongoAsync()
 ```
 
-- L'**ordine** è deterministico: `[SeedOrder]` (assente ⇒ `0`), a parità di ordine il nome del tipo.
-- Il seeding è **idempotente per collection**: un seed è applicato solo a una collection vuota.
-- Tutti i seed sono committati **in un'unica transazione**: un seeding interrotto non lascia il
-  database popolato a metà. Richiede quindi un replica set.
+- The **order** is deterministic: `[SeedOrder]` (missing ⇒ `0`), then the type name for equal order.
+- Seeding is **idempotent per collection**: a seed is applied only to an empty collection.
+- All seeds are committed **in a single transaction**: interrupted seeding does not leave the
+  database partially populated. It therefore requires a replica set.
 
 ## Testing
 
-Gli integration test del provider usano [Testcontainers](https://dotnet.testcontainers.org/) con un
-replica set a nodo singolo, indispensabile per le transazioni:
+The provider's integration tests use [Testcontainers](https://dotnet.testcontainers.org/) with a
+single-node replica set, which is required for transactions:
 
 ```csharp
 MongoDbContainer container = new MongoDbBuilder()
@@ -303,21 +301,21 @@ MongoDbContainer container = new MongoDbBuilder()
   .Build();
 ```
 
-## Limiti noti
+## Known limitations
 
-Non ancora supportati, in ordine di impatto:
+Not yet supported, in order of impact:
 
-- **`Include`** — sia sulle navigazioni incorporate (dove sarebbe un no-op) sia sui riferimenti
-  inter-aggregato. Solleva `NotSupportedException`.
-- **Concorrenza ottimistica** — nessun token di versione.
-- **Multitenancy e soft delete** — disponibili sul provider EF Core, non qui.
-- **Change tracking** — non ha corrispettivo nel modello ad aggregati.
-- **Chiavi composite**, **gestione degli indici**, **database multipli** con contesto tipizzato.
-- **Interceptor** sulle operazioni.
+- **`Include`** — both for embedded navigations (where it would be a no-op) and inter-aggregate
+  references. Throws `NotSupportedException`.
+- **Optimistic concurrency** — no version token.
+- **Multitenancy and soft delete** — available in the EF Core provider, not here.
+- **Change tracking** — has no equivalent in the aggregate-based model.
+- **Composite keys**, **index management**, **multiple databases** with a typed context.
+- **Interceptors** for operations.
 
-## Pacchetti
+## Packages
 
 - [`CodeArchitects.Platform.Data.MongoDB`](https://www.nuget.org/packages/CodeArchitects.Platform.Data.MongoDB)
 - [`CodeArchitects.Platform.Data.MongoDB.DependencyInjection`](https://www.nuget.org/packages/CodeArchitects.Platform.Data.MongoDB.DependencyInjection)
 
-Richiedono **MongoDB Server 4.4 o superiore** (requisito del driver 3.x).
+They require **MongoDB Server 4.4 or later** (a requirement of driver 3.x).
