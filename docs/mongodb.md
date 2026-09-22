@@ -1,10 +1,9 @@
 # DAL con MongoDB
 
 > **Nota.** I pacchetti `CodeArchitects.Platform.Data.MongoDB` e
-> `CodeArchitects.Platform.Data.MongoDB.DependencyInjection` sono marcati `[Experimental]`: la
-> superficie pubblica può cambiare fra due versioni minori. Le funzionalità non ancora supportate
-> sono elencate in [Limiti noti](#limiti-noti); l'architettura di riferimento completa è in
-> [`docs/design/mongodb-provider.md`](design/mongodb-provider.md).
+> `CodeArchitects.Platform.Data.MongoDB.DependencyInjection` sono marcati `[Experimental]`: è
+> molto probabile che verranno introdotte breaking changes tra il rilascio di una versione e la successiva.
+> Non è stato ancora raggiunto un livello di maturità pari agli altri Data Provider attualmente supportati. 
 
 MongoDB è un database documentale: non ha tabelle né foreign key, e garantisce atomicità sul
 **singolo documento**. Il provider MongoDB del DAL CAEP espone gli stessi `IRepository`,
@@ -146,9 +145,9 @@ mette il nome della collection dentro il dato.
 L'uso di `IUnitOfWorkManager` e `IUnitOfWork` è identico agli altri provider
 ([DAL](dataaccesslayer.md#il-pattern-unit-of-work)). Le differenze sono due.
 
-**Le scritture sono differite.** Dentro un'unità di lavoro le operazioni si accumulano e vengono
+**Le scritture sono differite.** Dentro la UnitOfWork le operazioni si accumulano e vengono
 applicate al `SaveAsync` (o al `Dispose` con `autoSave: true`), tutte in **un'unica transazione**
-MongoDB. Ne consegue che una lettura effettuata dentro l'unità di lavoro **non vede** le scritture
+MongoDB. Ne consegue che una lettura effettuata dentro il contesto della UnitOfWork **non vede** le scritture
 ancora non committate.
 
 ```csharp
@@ -170,12 +169,7 @@ comportamento è governato da `UseTransactions`:
 | `WhenSupported` | esegue senza atomicità ed emette un warning sul logger |
 | `Disabled` | non usa mai transazioni |
 
-Il default è `Required` perché l'unità di lavoro è una **promessa di atomicità**: eseguirla senza
-garanzie, in silenzio, è peggio di un errore esplicito. Per lo sviluppo locale su istanza
-standalone si usa `Disabled`; il `docker-compose` di un servizio che usa l'unità di lavoro dovrebbe
-però prevedere un replica set a nodo singolo.
-
-Una scrittura su un singolo documento **fuori** da un'unità di lavoro non apre alcuna transazione:
+Una scrittura su un singolo documento **fuori** da contesto di una UnitOfWork non apre alcuna transazione:
 è già atomica. `InsertMany` e `UpdateMany` invece la aprono sempre, perché coinvolgono più
 documenti.
 
@@ -204,7 +198,7 @@ Due punti che sorprendono chi arriva dai provider relazionali:
 
 ### Repository diretto
 
-L'entità di dominio **è** il documento. Da usare quando il modello di dominio è serializzabile 1:1.
+L'entità di dominio è il documento. Da usare quando il modello di dominio è serializzabile 1:1.
 
 ```csharp
 using CodeArchitects.Platform.Data.MongoDB;

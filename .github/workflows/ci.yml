@@ -45,6 +45,26 @@ jobs:
             echo "::endgroup::"
           done
 
+  mongodb-integration-tests:
+    name: MongoDB integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Test (MongoDB integration)
+        run: >
+          dotnet test tests/Data.MongoDB.IntegrationTests/CodeArchitects.Platform.Data.MongoDB.IntegrationTests.csproj
+          --configuration Release --framework net8.0 --verbosity normal
+
   security:
     name: Security & SBOM
     runs-on: ubuntu-latest
