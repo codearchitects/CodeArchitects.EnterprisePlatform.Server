@@ -1,70 +1,126 @@
-﻿using CodeArchitects.Platform.Data.MongoDB.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Mongo2Go;
 using MongoDB.Driver;
+using Testcontainers.MongoDb;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Fixtures;
 
-public sealed class TestFixture : IDisposable
+/// <summary>
+/// Starts two MongoDB deployments: a single-node replica set, which supports transactions, and a
+/// standalone server, which does not. The second one is what makes the behaviour of
+/// <see cref="TransactionMode"/> verifiable.
+/// </summary>
+public sealed class TestFixture : IAsyncLifetime
 {
-  private const string s_databaseName = "customers";
+  private const string DatabaseName = "customers";
+  private const string Image = "mongo:7.0";
 
-  private readonly MongoDbRunner _runner;
-  private readonly IServiceProvider _services;
-  private readonly IDataContext _context;
+  private readonly MongoDbContainer _replicaSet = new MongoDbBuilder()
+    .WithImage(Image)
+    .WithReplicaSet()
+    .Build();
 
-  public TestFixture()
+  private readonly MongoDbContainer _standalone = new MongoDbBuilder()
+    .WithImage(Image)
+    .Build();
+
+  private ServiceProvider _services = default!;
+  private ServiceProvider _standaloneServices = default!;
+
+  public async Task InitializeAsync()
   {
-    _runner = MongoDbRunner.Start(singleNodeReplSet: true);
+    await Task.WhenAll(_replicaSet.StartAsync(), _standalone.StartAsync());
 
-    _services = new ServiceCollection()
+    _services = BuildServices(_replicaSet.GetConnectionString());
+    _standaloneServices = BuildServices(_standalone.GetConnectionString());
+  }
+
+  public async Task DisposeAsync()
+  {
+    await _services.DisposeAsync();
+    await _standaloneServices.DisposeAsync();
+    await _replicaSet.DisposeAsync();
+    await _standalone.DisposeAsync();
+  }
+
+  private static ServiceProvider BuildServices(string connectionString) =>
+    new ServiceCollection()
       .AddData(options => options
-        .UseConnectionString(_runner.ConnectionString)
-        .UseDatabase(s_databaseName)
-        .AddEntitiesFrom(typeof(Customer).Assembly))
-      .BuildServiceProvider();
-    _context = _services.GetRequiredService<IDataContext>();
-  }
+        .UseConnectionString(connectionString)
+        .UseDatabase(DatabaseName)
+        .AddEntitiesFrom(typeof(Customer).Assembly)
+        .UseTransactions(TransactionMode.Required))
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
-  public MongoDBRepository<TEntity, TKey> CreateRepository<TEntity, TKey>()
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    return new MongoDBRepository<TEntity, TKey>(_context);
-  }
+  /// <summary>
+  /// A scope against the replica set: every test works in its own scope, as a request would.
+  /// </summary>
+  public TestScope CreateScope() => new(_services.CreateScope());
 
-  public MongoDBRepository<TEntity, TKey> CreateRepository<TEntity, TKey>(IEnumerable<TEntity> seed)
-    where TEntity : class
-    where TKey : IEquatable<TKey>
-  {
-    Seeder seeder = new(_context);
-    seeder.Seed(seed);
-    return new MongoDBRepository<TEntity, TKey>(_context);
-  }
+  /// <summary>
+  /// A scope against the standalone server, where transactions are unavailable.
+  /// </summary>
+  public TestScope CreateStandaloneScope() => new(_standaloneServices.CreateScope());
 
+  /// <summary>
+  /// Reads a collection outside any provider scope, to assert on what was really persisted.
+  /// </summary>
   public IMongoCollection<TEntity> GetCollection<TEntity>()
     where TEntity : class
   {
-    return _context.GetCollection<TEntity>();
+    using TestScope scope = CreateScope();
+    string name = scope.Context.GetCollection<TEntity>().CollectionNamespace.CollectionName;
+
+    return _services.GetRequiredService<IMongoDatabase>().GetCollection<TEntity>(name);
   }
 
-  public IUnitOfWorkManager GetUnitOfWorkManager()
+  /// <summary>
+  /// Seeds through the real seeding path: enqueue on the state manager, then commit.
+  /// </summary>
+  public async Task SeedAsync<TEntity>(IEnumerable<TEntity> entities)
+    where TEntity : class
   {
-    return _services.GetRequiredService<IUnitOfWorkManager>();
-  }
-
-  public void Dispose()
-  {
-    _runner.Dispose();
+    using TestScope scope = CreateScope();
+    await scope.Seeder.ApplyAsync([new InlineSeed<TEntity>(entities)]);
   }
 
   public async Task ResetAsync()
   {
-    IMongoDatabase database = _context.Database;
-    IAsyncCursor<string> collectionNames = await database.ListCollectionNamesAsync();
-    await collectionNames.ForEachAsync(async collection =>
-    {
-      await database.DropCollectionAsync(collection);
-    });
+    IMongoDatabase database = _services.GetRequiredService<IMongoDatabase>();
+    IAsyncCursor<string> names = await database.ListCollectionNamesAsync();
+
+    await names.ForEachAsync(collection => database.DropCollectionAsync(collection));
   }
+
+  private sealed class InlineSeed<TEntity>(IEnumerable<TEntity> entities) : DataSeed
+    where TEntity : class
+  {
+    public override void Seed(ISeeder seeder) => seeder.Seed(entities);
+  }
+}
+
+/// <summary>
+/// One dependency-injection scope, with the services a test needs.
+/// </summary>
+public sealed class TestScope : IDisposable
+{
+  private readonly IServiceScope _scope;
+
+  internal TestScope(IServiceScope scope) => _scope = scope;
+
+  public IDataContext Context => _scope.ServiceProvider.GetRequiredService<IDataContext>();
+
+  public IUnitOfWorkManager UnitOfWorkManager => _scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
+
+  internal Seeder Seeder => _scope.ServiceProvider.GetRequiredService<Seeder>();
+
+  public MongoDBRepository<TEntity, TKey> Repository<TEntity, TKey>()
+    where TEntity : class
+    where TKey : IEquatable<TKey>
+    => new(Context);
+
+  public IMongoCollection<TEntity> Collection<TEntity>()
+    where TEntity : class
+    => Context.GetCollection<TEntity>();
+
+  public void Dispose() => _scope.Dispose();
 }

@@ -37,5 +37,11 @@ public class MongoDBRepository<TEntity, TKey> : Repository<TEntity, TKey>
   /// </summary>
   protected IMongoCollection<TEntity> Collection => Context.GetCollection<TEntity>();
 
+  /// <summary>
+  /// The session of the current scope. Pass it to custom queries so that they take part in the
+  /// same unit of work.
+  /// </summary>
+  protected IClientSessionHandle Session => Context.Session;
+
   private protected override Data.IDataContext DataContext => Context;
 }

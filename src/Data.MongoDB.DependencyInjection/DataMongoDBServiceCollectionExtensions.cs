@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using CodeArchitects.Platform.Data.MongoDB.DependencyInjection;
 
-namespace CodeArchitects.Platform.Data.MongoDB.DependencyInjection;
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Methods for adding the MongoDB data context to the application services.
@@ -14,7 +14,13 @@ public static class DataMongoDBServiceCollectionExtensions
   /// <param name="configure">The MongoDB configuration.</param>
   /// <returns>The same <see cref="IServiceCollection"/> instance.</returns>
   /// <exception cref="ArgumentNullException"></exception>
-  public static IServiceCollection AddData(this IServiceCollection services, Func<IMongoDBConfigurationBuilder, IMongoDBConfigurationBuilderWithDatabase> configure)
+  /// <exception cref="InvalidOperationException">
+  /// The configuration is incomplete, or the entity model is empty or inconsistent. The check is
+  /// performed eagerly, without contacting the server.
+  /// </exception>
+  public static IServiceCollection AddData(
+    this IServiceCollection services,
+    Func<IMongoDBConfigurationBuilder, IMongoDBConfigurationBuilderWithDatabase> configure)
   {
     if (services is null)
       throw new ArgumentNullException(nameof(services));

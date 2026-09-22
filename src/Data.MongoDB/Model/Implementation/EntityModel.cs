@@ -1,48 +1,48 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 
-internal class EntityModel : IEntityModel
+internal class EntityModel(string tableName, Type type, IKeyModel key) : IEntityModel
 {
-  public EntityModel(string tableName, Type type, IKeyModel key)
-  {
-    CollectionName = tableName;
-    Type = type;
-    Key = key;
-  }
+  private static readonly HashSet<Type> s_supportedKeyTypes =
+  [
+    typeof(Guid), typeof(string), typeof(ObjectId), typeof(int), typeof(long)
+  ];
 
-  public string CollectionName { get; }
-  public Type Type { get; }
-  public IKeyModel Key { get; }
+  public string CollectionName { get; } = tableName;
+  public Type Type { get; } = type;
+  public IKeyModel Key { get; } = key;
 
   public static EntityModel Create(Type type)
   {
-    string collectionName = type.GetCustomAttribute<TableAttribute>(inherit: false)?.Name ?? type.Name;
-    PropertyInfo propertyInfo = GetIdPropertyInfo(type);
+    string collectionName = type.GetCustomAttribute<CollectionAttribute>(inherit: false)?.Name
+      ?? type.GetCustomAttribute<TableAttribute>(inherit: false)?.Name
+      ?? type.Name;
 
-    KeyModel key = KeyModel.Create(propertyInfo);
+    PropertyInfo key = ResolveKey(type);
 
-    return new EntityModel(collectionName, type, key);
+    if (!s_supportedKeyTypes.Contains(Nullable.GetUnderlyingType(key.PropertyType) ?? key.PropertyType))
+      throw new InvalidOperationException($"The type of the id property '{key.Name}' in type '{type}' is not supported. Supported types are: {string.Join(", ", s_supportedKeyTypes.Select(t => t.Name))}.");
+
+    return new EntityModel(collectionName, type, KeyModel.Create(key));
   }
 
-  private static PropertyInfo GetIdPropertyInfo(Type type)
+  private static PropertyInfo ResolveKey(Type type)
   {
-    return type.GetProperty("Id", BindingFlags.Instance | BindingFlags.Public) ?? GetPropertyInfoFromAttribute(type);
-  }
+    PropertyInfo[] properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+    PropertyInfo[] bsonId = [.. properties.Where(p => p.IsDefined(typeof(BsonIdAttribute), inherit: false))];
 
-  private static PropertyInfo GetPropertyInfoFromAttribute(Type type)
-  {
-    try
-    {
-      return type
-        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-        .Single(property => property.IsDefined(typeof(BsonIdAttribute), inherit: false));
-    }
-    catch
-    {
-      throw new InvalidOperationException($"Cannot determine the id property of type '{type}'.");
-    }
+    if (bsonId.Length > 1)
+      throw new InvalidOperationException($"Type '{type}' has multiple properties marked with [BsonId].");
+
+    if (bsonId.Length == 1)
+      return bsonId[0];
+
+    return properties.FirstOrDefault(p => p.Name == "Id")
+      ?? properties.FirstOrDefault(p => p.Name == type.Name + "Id")
+      ?? throw new InvalidOperationException($"Cannot determine the id property of type '{type}'.");
   }
 }

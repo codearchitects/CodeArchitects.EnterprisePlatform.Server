@@ -37,7 +37,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
     Type type = typeof(EntityWithIdProperty);
 
     return Mock.Of<IEntityModel>(model =>
@@ -51,7 +52,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
 
     return Mock.Of<IEntityModel>(model =>
       model.CollectionName == "Entities" &&
@@ -64,7 +66,8 @@ internal static class Models
   {
     IKeyModel keyModel = Mock.Of<IKeyModel>(model =>
       model.Name == "Identifier" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
     Type type = typeof(EntityWithBsonIdAttribute);
 
     return Mock.Of<IEntityModel>(model =>
@@ -83,7 +86,8 @@ internal static class KeyModels
   {
     return Mock.Of<IKeyModel>(model =>
       model.Name == "Id" &&
-      model.Type == typeof(Guid));
+      model.Type == typeof(Guid) &&
+      model.ElementName == "_id");
   }
 }
 
@@ -124,4 +128,26 @@ internal static class PredicateTemplates
           propertyName: keyName)),
       parameters: entityParameter);
   }
+}
+
+/// <summary>
+/// Public, attributed and concrete: the only shape AddEntitiesFrom discovers.
+/// </summary>
+/// <remarks>The attribute is qualified because xUnit also defines a CollectionAttribute.</remarks>
+[CodeArchitects.Platform.Data.MongoDB.Collection("discoveredEntities")]
+public class DiscoverableEntity
+{
+  public Guid Id { get; set; }
+}
+
+/// <summary>
+/// Mapped to the same collection as <see cref="DiscoverableEntity"/>, to exercise the
+/// collision check performed when the model is built.
+/// </summary>
+/// <remarks>Internal on purpose: AddEntitiesFrom must not discover it, otherwise every
+/// assembly scan in these tests would collide.</remarks>
+[CodeArchitects.Platform.Data.MongoDB.Collection("discoveredEntities")]
+internal class CollidingEntity
+{
+  public Guid Id { get; set; }
 }

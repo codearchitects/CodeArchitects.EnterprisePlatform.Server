@@ -1,24 +1,25 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 
-internal class DataModel : IDataModel
+internal sealed class DataModel : IDataModel
 {
   private readonly Dictionary<Type, EntityModel> _entities;
 
-  public DataModel()
+  public DataModel(IReadOnlyDictionary<Type, EntityModel> entities)
   {
-    _entities = new();
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    // Defensive copy: the model must not change after it has been built.
+    _entities = new Dictionary<Type, EntityModel>(entities.Count);
+    foreach (KeyValuePair<Type, EntityModel> entity in entities)
+    {
+      _entities.Add(entity.Key, entity.Value);
+    }
   }
 
   public IReadOnlyCollection<IEntityModel> Entities => _entities.Values;
-
-  public void AddEntity(Type entityType)
-  {
-    EntityModel entity = EntityModel.Create(entityType);
-
-    _entities.Add(entity.Type, entity);
-  }
 
   public bool TryGetEntity(Type entityType, [NotNullWhen(true)] out IEntityModel? entity)
   {

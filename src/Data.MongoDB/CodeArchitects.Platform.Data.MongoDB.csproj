@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
+    <!-- Explicit: the driver only brings Logging.Abstractions 2.0.0 transitively. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <!--
       Pin patched Snappier to override the vulnerable 1.0.0 pulled transitively by MongoDB.Driver
