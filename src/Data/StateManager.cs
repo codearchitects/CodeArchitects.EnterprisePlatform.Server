@@ -42,6 +42,14 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 
   protected abstract Task SaveCoreAsync(CancellationToken cancellationToken);
 
+  /// <summary>
+  /// Called when a unit of work ends without saving: a provider that queues its writes drops
+  /// them here, so that a later save in the same scope cannot commit them.
+  /// </summary>
+  protected virtual void DiscardPending()
+  {
+  }
+
   private sealed class UnitOfWork : IUnitOfWork
   {
     private readonly StateManager _manager;
@@ -73,7 +81,11 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
 
       _isDisposed = true;
       _manager._current = null;
-      return new(_autoSave ? _manager.SaveCoreAsync(_cancellationToken) : Task.CompletedTask);
+      if (_autoSave)
+        return new(_manager.SaveCoreAsync(_cancellationToken));
+
+      _manager.DiscardPending();
+      return new(Task.CompletedTask);
     }
 
     public void Dispose()
@@ -86,6 +98,10 @@ internal abstract class StateManager : IStateManager, IUnitOfWorkManager
       if (_autoSave)
       {
         _manager.SaveCore();
+      }
+      else
+      {
+        _manager.DiscardPending();
       }
     }
   }

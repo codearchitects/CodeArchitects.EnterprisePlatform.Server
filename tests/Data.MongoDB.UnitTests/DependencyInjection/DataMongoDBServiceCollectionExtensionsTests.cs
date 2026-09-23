@@ -4,6 +4,7 @@ using CodeArchitects.Platform.Data.MongoDB.Fixtures;
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Transactions;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace CodeArchitects.Platform.Data.MongoDB.DependencyInjection;
@@ -78,6 +79,47 @@ public class DataMongoDBServiceCollectionExtensionsTests
 
     // Assert
     act.Should().Throw<InvalidOperationException>().WithMessage("*AddEntitiesFrom*");
+  }
+
+  [Fact]
+  public void AddData_ShouldSucceed_WhenCalledAgainWithTheSameSerializationSettings()
+  {
+    // Arrange
+    using ServiceProvider first = BuildProvider();
+
+    // Act
+    Action act = () => BuildProvider().Dispose();
+
+    // Assert
+    act.Should().NotThrow();
+  }
+
+  [Fact]
+  public void AddData_ShouldThrow_WhenALaterCallAsksForADifferentGuidRepresentation()
+  {
+    // Arrange
+    // The serialization settings are process-wide: make sure they are already applied, with the
+    // default representation, whatever test ran first.
+    using ServiceProvider first = BuildProvider();
+
+    // Act
+    Action act = () => BuildProvider(builder => builder.UseGuidRepresentation(GuidRepresentation.CSharpLegacy));
+
+    // Assert
+    act.Should().Throw<InvalidOperationException>().WithMessage("*GuidRepresentation.CSharpLegacy*");
+  }
+
+  [Fact]
+  public void AddData_ShouldThrow_WhenALaterCallConfiguresConventions()
+  {
+    // Arrange
+    using ServiceProvider first = BuildProvider();
+
+    // Act
+    Action act = () => BuildProvider(builder => builder.ConfigureConventions(_ => { }));
+
+    // Assert
+    act.Should().Throw<InvalidOperationException>().WithMessage("*ConfigureConventions*");
   }
 
   [Fact]
@@ -168,6 +210,28 @@ public class DataMongoDBServiceCollectionExtensionsTests
 
     // Assert
     first.Should().NotBeNull().And.BeSameAs(second);
+  }
+
+  [Fact]
+  public void AddData_ShouldLetARepositoryBeResolvedThroughTheCaepAbstraction()
+  {
+    // Arrange
+    using ServiceProvider provider = new ServiceCollection()
+      .AddData(options => options
+        .UseClient(_client.Object)
+        .UseDatabase("tests")
+        .AddEntity<DiscoverableEntity>())
+      .AddScoped<IRepository<DiscoverableEntity, Guid>, MongoDBRepository<DiscoverableEntity, Guid>>()
+      .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+    using IServiceScope scope = provider.CreateScope();
+
+    // Act
+    IRepository<DiscoverableEntity, Guid> repository =
+      scope.ServiceProvider.GetRequiredService<IRepository<DiscoverableEntity, Guid>>();
+
+    // Assert
+    // The constructor depends on the MongoDB IDataContext: AddData alone must satisfy it.
+    repository.Should().BeOfType<MongoDBRepository<DiscoverableEntity, Guid>>();
   }
 
   [Fact]

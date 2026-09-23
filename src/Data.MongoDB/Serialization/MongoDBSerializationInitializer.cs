@@ -18,33 +18,56 @@ internal static class MongoDBSerializationInitializer
 {
   private const string ConventionPackName = "CodeArchitects.Platform.Data.MongoDB";
 
-  private static int s_initialized;
+  private static readonly object s_lock = new();
+
+  private static GuidRepresentation? s_guidRepresentation;
 
   public static void EnsureInitialized(
     GuidRepresentation guidRepresentation = GuidRepresentation.Standard,
     IReadOnlyList<Action<ConventionPack>>? conventionConfigurators = null)
   {
-    // AddData may be called more than once (multiple databases): only the first call registers.
-    if (Interlocked.CompareExchange(ref s_initialized, 1, 0) != 0)
-      return;
-
-    // Driver 3.x has no implicit Guid representation: without this, serializing a Guid key
-    // throws "GuidSerializer cannot serialize a Guid when GuidRepresentation is Unspecified".
-    BsonSerializer.RegisterSerializer(new GuidSerializer(guidRepresentation));
-
-    ConventionPack pack = new()
+    lock (s_lock)
     {
-      new IgnoreExtraElementsConvention(true)
-    };
-
-    if (conventionConfigurators is not null)
-    {
-      foreach (Action<ConventionPack> configure in conventionConfigurators)
+      if (s_guidRepresentation is GuidRepresentation applied)
       {
-        configure(pack);
+        EnsureCompatible(applied, guidRepresentation, conventionConfigurators);
+        return;
       }
-    }
 
-    ConventionRegistry.Register(ConventionPackName, pack, _ => true);
+      BsonSerializer.RegisterSerializer(new GuidSerializer(guidRepresentation));
+
+      ConventionPack pack =
+      [
+        new IgnoreExtraElementsConvention(true)
+      ];
+
+      if (conventionConfigurators is not null)
+      {
+        foreach (Action<ConventionPack> configure in conventionConfigurators)
+        {
+          configure(pack);
+        }
+      }
+
+      ConventionRegistry.Register(ConventionPackName, pack, _ => true);
+
+      s_guidRepresentation = guidRepresentation;
+    }
+  }
+
+  private static void EnsureCompatible(
+    GuidRepresentation applied,
+    GuidRepresentation requested,
+    IReadOnlyList<Action<ConventionPack>>? conventionConfigurators)
+  {
+    if (requested != applied)
+      throw new InvalidOperationException(
+        $"The MongoDB serialization was already initialized with GuidRepresentation.{applied}: GuidRepresentation.{requested} cannot be applied.");
+
+    if (conventionConfigurators is { Count: > 0 })
+      throw new InvalidOperationException(
+        "The MongoDB conventions were already registered by a previous AddData call and cannot be " +
+        "changed, because the convention registry is shared by the whole process. Call " +
+        "ConfigureConventions only in the first AddData call.");
   }
 }
