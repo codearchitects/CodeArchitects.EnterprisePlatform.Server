@@ -133,6 +133,12 @@ internal sealed class StateManager : Data.StateManager, IStateManager, IDisposab
     return (batch, requiresTransaction);
   }
 
+  protected override void DiscardPending()
+  {
+    _executions.Clear();
+    _requiresTransaction = false;
+  }
+
   private bool ShouldUseTransaction(int executionCount, bool requiresTransaction)
   {
     if (_options.TransactionMode == TransactionMode.Disabled)

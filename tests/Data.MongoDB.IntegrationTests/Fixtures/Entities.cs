@@ -35,6 +35,17 @@ public class CartItem
   public static CartItem One() => s_faker.Generate();
 }
 
+/// <summary>
+/// Holds a navigation typed as another aggregate root: including it would ask the provider to
+/// resolve a reference between collections, which it does not do.
+/// </summary>
+[CodeArchitects.Platform.Data.MongoDB.Collection("invoices")]
+public class Invoice
+{
+  public Guid Id { get; set; }
+  public Customer? Customer { get; set; }
+}
+
 /// <summary>The persisted shape: only this one is registered in the model.</summary>
 [CodeArchitects.Platform.Data.MongoDB.Collection("orders")]
 public class OrderDocument

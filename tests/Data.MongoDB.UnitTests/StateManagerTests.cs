@@ -140,6 +140,51 @@ public class StateManagerTests
     executions.Should().Be(0);
   }
 
+  [Theory]
+  [InlineData(false)]
+  [InlineData(true)]
+  public async Task Save_ShouldNotCommitTheOperationsOfAUnitOfWork_ThatEndedWithoutSaving(bool async)
+  {
+    // Arrange
+    StateManager sut = CreateSut();
+    List<string> executed = new();
+    Execution Named(string name) =>
+      new(_ => executed.Add(name), (_, _) => { executed.Add(name); return Task.CompletedTask; });
+
+    IUnitOfWork unitOfWork = sut.Begin();
+    sut.AddExecution(Named("abandoned"), requiresTransaction: false);
+
+    // Act
+    if (async)
+      await unitOfWork.DisposeAsync();
+    else
+      unitOfWork.Dispose();
+
+    sut.AddExecution(Named("later"), requiresTransaction: false);
+    sut.Save();
+
+    // Assert
+    // Leaving the unit of work without Save is its rollback: the queued write must be dropped,
+    // not committed by the next Save of the scope.
+    executed.Should().Equal("later");
+  }
+
+  [Fact]
+  public void Save_ShouldCommitTheOperationsOfAUnitOfWork_WhenItEndsWithAutoSave()
+  {
+    // Arrange
+    StateManager sut = CreateSut();
+    int executions = 0;
+    IUnitOfWork unitOfWork = sut.Begin(autoSave: true);
+    sut.AddExecution(new Execution(_ => executions++, (_, _) => { executions++; return Task.CompletedTask; }), false);
+
+    // Act
+    unitOfWork.Dispose();
+
+    // Assert
+    executions.Should().Be(1);
+  }
+
   [Fact]
   public void Dispose_ShouldReleaseTheSession()
   {

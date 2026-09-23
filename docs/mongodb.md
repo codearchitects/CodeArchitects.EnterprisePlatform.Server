@@ -174,23 +174,66 @@ documents.
 
 ## Operation semantics
 
+Every row applies to both the synchronous and the asynchronous variant: they run the same driver
+operation, on the same session, with the same success criterion and the same exceptions.
+
 | Method | Behavior | Exception |
 |---|---|---|
-| `FindAsync(key)` | filter on `_id` | — (`null` if absent) |
-| `FindAsync(key, include)` | **not supported** | `NotSupportedException` |
-| `InsertAsync` | `insertOne` | `MongoWriteException` on duplicate key |
-| `InsertManyAsync` | ordered `insertMany`, in a transaction | `MongoBulkWriteException` |
-| `UpdateAsync` | replaces the entire document | `DBConcurrencyException` if it does not exist |
-| `UpdateManyAsync` | ordered `bulkWrite`, in a transaction | `DBConcurrencyException` if any do not exist |
-| `UpsertAsync` | replaces or inserts | `DBConcurrencyException` if not applied |
-| `RemoveAsync` | `deleteOne` | `DBConcurrencyException` if it does not exist |
+| `Find(key)` | filter on `_id` | — (`null` if absent) |
+| `Find(key, include)` | as `Find(key)`: embedded navigations are already loaded, see below | `NotSupportedException` for references to other collections |
+| `Insert` | `insertOne` | `MongoWriteException` on duplicate key |
+| `InsertMany` | ordered `insertMany`, in a transaction | `MongoBulkWriteException` on duplicate key |
+| `Update` | replaces the entire document | `DBConcurrencyException` if it does not exist |
+| `UpdateMany` | ordered `bulkWrite` of replacements, in a transaction | `DBConcurrencyException` if any do not exist |
+| `Upsert` | replaces or inserts | `DBConcurrencyException` if not applied |
+| `Remove(entity)` / `Remove(key)` | `deleteOne` | `DBConcurrencyException` if it does not exist |
 
-Two points may surprise users coming from relational providers:
+Some points may surprise users coming from relational providers:
 
-- **`UpdateAsync` replaces the entire document**, not only the modified fields: there is no change
+- **`Update` replaces the entire document**, not only the modified fields: there is no change
   tracking. For a partial update, use `Collection.UpdateOneAsync` directly with the current session.
-- **An update that changes nothing is successful.** The criterion is "the document exists", not
-  "the document was rewritten".
+- **An update or upsert that changes nothing is successful.** The criterion is "the document
+  exists", not "the document was rewritten".
+- **`InsertMany` and `UpdateMany` with an empty sequence do nothing**: no round-trip and no
+  transaction, so they succeed on a standalone server too. A `null` element in the sequence throws
+  `ArgumentException`.
+- **Duplicate keys** surface as the driver's own `MongoWriteException` / `MongoBulkWriteException`,
+  unchanged, as the ADO.NET provider does with the database exceptions. In a transaction, nothing
+  of the failed commit is persisted.
+- **Unacknowledged writes** (write concern `w: 0`) are not checked: the server returns no counts,
+  so a missing document cannot be told apart from a successful write, and no
+  `DBConcurrencyException` is raised.
+- **Cancellation.** Outside a unit of work the token reaches the driver. Inside a unit of work an
+  operation is only queued: its token is checked when it is queued (an operation already cancelled
+  is not queued and throws `OperationCanceledException`), while the commit is governed by the token
+  passed to `SaveAsync`.
+
+### Include
+
+The provider behaves as EF Core does with owned types. **Embedded navigations are always loaded**
+with the document, so including them is accepted and has no effect. This keeps provider-agnostic
+code, such as generated code that calls `Include`, working unchanged on MongoDB.
+
+```csharp
+// all valid, and equivalent to FindAsync(id): Items and their children are in the document
+await cartRepository.FindAsync(id, include => include.Include(cart => cart.Items));
+await cartRepository.FindAsync(id, include => include
+  .Include(cart => cart.Items, items => items.Include(item => item.Discount)));
+await cartRepository.FindAsync(id, include => include.Include("Items.Discount"));
+```
+
+Every navigation in the path is validated **before** the query, so the outcome does not depend
+on whether the document exists. A request the provider cannot satisfy is never ignored:
+
+| Request | Exception |
+|---|---|
+| navigation to an entity stored in **another collection** (a type with `[Collection]` / `[Table]`) | `NotSupportedException` |
+| member that is **not persisted** (for example `[BsonIgnore]`) | `NotSupportedException` |
+| member that does not exist, a scalar value, or an expression that is not a member access (a filtered include such as `x => x.Items.Where(...)`) | `InvalidOperationException` |
+
+References between collections are only keys, and the provider does not resolve them, as the
+EF Core providers for document databases also do. Load the referenced aggregate from its own
+repository, or query its collection from a specialized repository, passing `Session`.
 
 ## Repository
 
@@ -220,6 +263,16 @@ The base class exposes `Collection` (`IMongoCollection<TEntity>`), `Database`, a
 
 > Passing `Session` to custom queries is not optional: an operation executed without a session runs
 > on an implicit session, and therefore **outside** the transaction of the current unit of work.
+
+The repository is registered and consumed through the CAEP abstractions, like the repositories of
+the other providers: `AddData` registers the MongoDB `IDataContext` the constructor needs.
+
+```csharp
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// a plain repository, without specialized queries
+builder.Services.AddScoped<IRepository<Category, Guid>, MongoDBRepository<Category, Guid>>();
+```
 
 ### Mapped repository
 
@@ -305,8 +358,8 @@ MongoDbContainer container = new MongoDbBuilder()
 
 Not yet supported, in order of impact:
 
-- **`Include`** — both for embedded navigations (where it would be a no-op) and inter-aggregate
-  references. Throws `NotSupportedException`.
+- **`Include` of references between collections** and **filtered includes** — see
+  [Include](#include). Embedded navigations are supported.
 - **Optimistic concurrency** — no version token.
 - **Multitenancy and soft delete** — available in the EF Core provider, not here.
 - **Change tracking** — has no equivalent in the aggregate-based model.

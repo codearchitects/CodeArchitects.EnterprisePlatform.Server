@@ -16,6 +16,10 @@ internal static class StateManagerExtensions
     bool requiresTransaction,
     CancellationToken cancellationToken)
   {
+    // Inside a unit of work the operation is only queued and this token never reaches the
+    // driver: an operation already cancelled by its caller must not be committed later.
+    cancellationToken.ThrowIfCancellationRequested();
+
     stateManager.AddExecution(execution, requiresTransaction);
 
     return stateManager.SaveAsync(cancellationToken);

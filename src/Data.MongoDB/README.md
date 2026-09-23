@@ -80,8 +80,9 @@ Seeding is idempotent per collection and commits every seed in a single transact
 
 ## Not supported yet
 
-`Include`, optimistic concurrency, multitenancy, soft delete, change tracking, composite keys and
-index management. See [the documentation](../../docs/mongodb.md) for the full list.
+`Include` of references between collections (embedded navigations are supported and already
+loaded with the document), optimistic concurrency, multitenancy, soft delete, change tracking,
+composite keys and index management. See [the documentation](../../docs/mongodb.md) for the full list.
 
 ## Related packages
 

@@ -2,6 +2,7 @@ using CodeArchitects.Platform.Data.MongoDB.Collections;
 using CodeArchitects.Platform.Data.MongoDB.Filters;
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
+using CodeArchitects.Platform.Data.MongoDB.Navigation;
 using CodeArchitects.Platform.Data.Navigation;
 using MongoDB.Driver;
 using System.Data;
@@ -61,14 +62,28 @@ internal class DataContext : IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw IncludeNotSupported<TEntity>();
+    ValidateInclude(includeAction);
+
+    return Find<TEntity, TKey>(key);
   }
 
   public Task<TEntity?> FindAsync<TEntity, TKey>(TKey key, IncludeAction<TEntity> includeAction, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    throw IncludeNotSupported<TEntity>();
+    ValidateInclude(includeAction);
+
+    return FindAsync<TEntity, TKey>(key, cancellationToken);
+  }
+
+  private void ValidateInclude<TEntity>(IncludeAction<TEntity> includeAction)
+    where TEntity : class
+  {
+    if (includeAction is null)
+      throw new ArgumentNullException(nameof(includeAction));
+
+    _ = EnsureEntity<TEntity>();
+    includeAction(new EmbeddedIncluder<TEntity>(_model));
   }
 
   #endregion
@@ -93,14 +108,14 @@ internal class DataContext : IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    _stateManager.Execute(InsertManyExecution<TEntity, TKey>(entities), requiresTransaction: true);
+    ExecuteMany(entities, InsertManyExecution<TEntity, TKey>);
   }
 
   public Task InsertManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    return _stateManager.ExecuteAsync(InsertManyExecution<TEntity, TKey>(entities), requiresTransaction: true, cancellationToken);
+    return ExecuteManyAsync(entities, InsertManyExecution<TEntity, TKey>, cancellationToken);
   }
 
   private Execution InsertExecution<TEntity, TKey>(TEntity entity)
@@ -118,16 +133,11 @@ internal class DataContext : IDataContext
       (session, cancellationToken) => collection.InsertOneAsync(session, entity, cancellationToken: cancellationToken));
   }
 
-  private Execution InsertManyExecution<TEntity, TKey>(IEnumerable<TEntity> entities)
+  private Execution InsertManyExecution<TEntity, TKey>(TEntity[] documents)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (entities is null)
-      throw new ArgumentNullException(nameof(entities));
-
-    _ = EnsureEntity<TEntity>();
     IMongoCollection<TEntity> collection = _collections.GetCollection<TEntity>();
-    TEntity[] documents = entities as TEntity[] ?? entities.ToArray();
 
     InsertManyOptions options = new() { IsOrdered = true };
 
@@ -158,14 +168,14 @@ internal class DataContext : IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    _stateManager.Execute(UpdateManyExecution<TEntity, TKey>(entities), requiresTransaction: true);
+    ExecuteMany(entities, UpdateManyExecution<TEntity, TKey>);
   }
 
   public Task UpdateManyAsync<TEntity, TKey>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    return _stateManager.ExecuteAsync(UpdateManyExecution<TEntity, TKey>(entities), requiresTransaction: true, cancellationToken);
+    return ExecuteManyAsync(entities, UpdateManyExecution<TEntity, TKey>, cancellationToken);
   }
 
   private Execution UpdateExecution<TEntity, TKey>(TEntity entity)
@@ -185,40 +195,25 @@ internal class DataContext : IDataContext
         await collection.ReplaceOneAsync(session, filter, entity, cancellationToken: cancellationToken), entityModel, entity));
   }
 
-  private Execution UpdateManyExecution<TEntity, TKey>(IEnumerable<TEntity> entities)
+  private Execution UpdateManyExecution<TEntity, TKey>(TEntity[] documents)
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (entities is null)
-      throw new ArgumentNullException(nameof(entities));
-
     IEntityModel entityModel = EnsureEntity<TEntity>();
     IMongoCollection<TEntity> collection = _collections.GetCollection<TEntity>();
 
     // A single BulkWrite instead of N ReplaceOne: one round-trip, and an aggregate
     // MatchedCount to verify that every document existed.
-    ReplaceOneModel<TEntity>[] requests = entities
+    ReplaceOneModel<TEntity>[] requests = documents
       .Select(entity => new ReplaceOneModel<TEntity>(_filters.ByEntity<TEntity, TKey>(entityModel, entity), entity))
       .ToArray();
 
     BulkWriteOptions options = new() { IsOrdered = true };
 
     return new Execution(
-      session =>
-      {
-        if (requests.Length == 0)
-          return;
-
-        EnsureAllUpdated(collection.BulkWrite(session, requests, options), requests.Length, entityModel);
-      },
-      async (session, cancellationToken) =>
-      {
-        if (requests.Length == 0)
-          return;
-
-        EnsureAllUpdated(
-          await collection.BulkWriteAsync(session, requests, options, cancellationToken), requests.Length, entityModel);
-      });
+      session => EnsureAllUpdated(collection.BulkWrite(session, requests, options), requests.Length, entityModel),
+      async (session, cancellationToken) => EnsureAllUpdated(
+        await collection.BulkWriteAsync(session, requests, options, cancellationToken), requests.Length, entityModel));
   }
 
   #endregion
@@ -357,12 +352,43 @@ internal class DataContext : IDataContext
     return entityModel;
   }
 
-  private static NotSupportedException IncludeNotSupported<TEntity>()
+  private void ExecuteMany<TEntity>(IEnumerable<TEntity> entities, Func<TEntity[], Execution> execution)
+    where TEntity : class
   {
-    return new NotSupportedException(
-      $"The MongoDB provider does not support Find/FindAsync with Include yet (entity '{typeof(TEntity).Name}'). " +
-      "Intra-aggregate associations are already embedded in the document and need no Include; " +
-      "for inter-aggregate references, query the target collection explicitly.");
+    TEntity[] documents = ToBatch(entities);
+    if (documents.Length == 0)
+      return;
+
+    _stateManager.Execute(execution(documents), requiresTransaction: true);
+  }
+
+  private Task ExecuteManyAsync<TEntity>(
+    IEnumerable<TEntity> entities,
+    Func<TEntity[], Execution> execution,
+    CancellationToken cancellationToken)
+    where TEntity : class
+  {
+    TEntity[] documents = ToBatch(entities);
+    if (documents.Length == 0)
+      return Task.CompletedTask;
+
+    return _stateManager.ExecuteAsync(execution(documents), requiresTransaction: true, cancellationToken);
+  }
+
+  private TEntity[] ToBatch<TEntity>(IEnumerable<TEntity> entities)
+    where TEntity : class
+  {
+    if (entities is null)
+      throw new ArgumentNullException(nameof(entities));
+
+    _ = EnsureEntity<TEntity>();
+    TEntity[] documents = [.. entities];
+
+    int index = Array.FindIndex(documents, document => document is null);
+    if (index >= 0)
+      throw new ArgumentException($"The element at index {index} is null.", nameof(entities));
+
+    return documents;
   }
 
   /// <summary>
@@ -373,7 +399,7 @@ internal class DataContext : IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (result.IsAcknowledged && result.MatchedCount > 0)
+    if (!result.IsAcknowledged || result.MatchedCount > 0)
       return;
 
     throw new DBConcurrencyException(
@@ -383,7 +409,7 @@ internal class DataContext : IDataContext
 
   private static void EnsureAllUpdated(BulkWriteResult result, int expected, IEntityModel entityModel)
   {
-    if (result.IsAcknowledged && result.MatchedCount == expected)
+    if (!result.IsAcknowledged || result.MatchedCount == expected)
       return;
 
     throw new DBConcurrencyException(
@@ -396,7 +422,7 @@ internal class DataContext : IDataContext
     where TEntity : class
     where TKey : IEquatable<TKey>
   {
-    if (result.IsAcknowledged && (result.MatchedCount > 0 || result.UpsertedId is not null))
+    if (!result.IsAcknowledged || result.MatchedCount > 0 || result.UpsertedId is not null)
       return;
 
     throw new DBConcurrencyException(
@@ -406,7 +432,7 @@ internal class DataContext : IDataContext
 
   private static void EnsureRemoved(DeleteResult result, IEntityModel entityModel, object? key)
   {
-    if (result.IsAcknowledged && result.DeletedCount > 0)
+    if (!result.IsAcknowledged || result.DeletedCount > 0)
       return;
 
     throw new DBConcurrencyException(

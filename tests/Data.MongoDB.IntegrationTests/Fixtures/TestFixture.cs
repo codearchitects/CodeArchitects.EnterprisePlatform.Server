@@ -49,6 +49,7 @@ public sealed class TestFixture : IAsyncLifetime
         .UseDatabase(DatabaseName)
         .AddEntitiesFrom(typeof(Customer).Assembly)
         .UseTransactions(TransactionMode.Required))
+      .AddScoped<IRepository<Customer, Guid>, MongoDBRepository<Customer, Guid>>()
       .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
   /// <summary>
@@ -112,6 +113,10 @@ public sealed class TestScope : IDisposable
   public IUnitOfWorkManager UnitOfWorkManager => _scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
 
   internal Seeder Seeder => _scope.ServiceProvider.GetRequiredService<Seeder>();
+
+  public TService Get<TService>()
+    where TService : notnull
+    => _scope.ServiceProvider.GetRequiredService<TService>();
 
   public MongoDBRepository<TEntity, TKey> Repository<TEntity, TKey>()
     where TEntity : class
