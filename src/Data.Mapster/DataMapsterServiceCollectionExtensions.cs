@@ -61,7 +61,8 @@ public static class DataMapsterServiceCollectionExtensions
   /// <exception cref="InvalidOperationException">The mapping configuration is invalid.</exception>
   public static IServiceCollection AddDataMapster(this IServiceCollection services, params Assembly[] assemblies)
   {
-    ArgumentNullException.ThrowIfNull(assemblies);
+    if (assemblies is null)
+      throw new ArgumentNullException(nameof(assemblies));
     if (assemblies.Length == 0)
       throw new ArgumentException("At least one assembly to scan for IRegister implementations is required.", nameof(assemblies));
 
