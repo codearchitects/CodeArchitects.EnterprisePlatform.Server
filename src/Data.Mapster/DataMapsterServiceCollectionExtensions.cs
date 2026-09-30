@@ -21,8 +21,10 @@ public static class DataMapsterServiceCollectionExtensions
   /// <exception cref="InvalidOperationException">The mapping configuration is invalid.</exception>
   public static IServiceCollection AddDataMapster(this IServiceCollection services, Action<TypeAdapterConfig> configure)
   {
-    ArgumentNullException.ThrowIfNull(services);
-    ArgumentNullException.ThrowIfNull(configure);
+    if (services is null)
+      throw new ArgumentNullException(nameof(services));
+    if (configure is null)
+      throw new ArgumentNullException(nameof(configure));
 
     TypeAdapterConfig config = new()
     {
