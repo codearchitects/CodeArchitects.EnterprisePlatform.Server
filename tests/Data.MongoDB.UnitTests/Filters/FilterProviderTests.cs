@@ -51,6 +51,21 @@ public class FilterProviderTests
   }
 
   [Fact]
+  public void ById_ShouldRenderTheKeyAsItIsStored_WhenTheKeyHasAnotherRepresentation()
+  {
+    // Arrange
+    // The key is a string in the class and an ObjectId in the document.
+    ObjectId key = ObjectId.GenerateNewId();
+    IEntityModel model = Model.Implementation.EntityModel.Create(typeof(NoteDocument));
+
+    // Act
+    BsonDocument filter = Render(_sut.ById<NoteDocument, string>(model, key.ToString()));
+
+    // Assert
+    filter["_id"].Should().Be(new BsonObjectId(key));
+  }
+
+  [Fact]
   public void ByEntity_ShouldFilterOnTheEntityKey()
   {
     // Arrange

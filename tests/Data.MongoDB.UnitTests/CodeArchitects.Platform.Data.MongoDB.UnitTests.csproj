@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Data.MongoDB\CodeArchitects.Platform.Data.MongoDB.csproj" />
     <ProjectReference Include="..\..\src\Data.MongoDB.DependencyInjection\CodeArchitects.Platform.Data.MongoDB.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\Data.MongoDB.Mapster\CodeArchitects.Platform.Data.MongoDB.Mapster.csproj" />
   </ItemGroup>
 
 </Project>
