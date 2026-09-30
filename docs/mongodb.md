@@ -277,18 +277,195 @@ builder.Services.AddScoped<IRepository<Category, Guid>, MongoDBRepository<Catego
 ### Mapped repository
 
 When the document must differ from the domain, for example for denormalization, technical fields,
-different names, or schema versioning, use `MongoDBMappedRepository<TDocument, TEntity, TKey>`.
-`[Collection]` belongs on the **document**, never on the domain entity.
+different names, value objects, or schema versioning, use a mapped repository. `[Collection]` belongs
+on the **document**, never on the domain entity: only the document is registered in the model, and
+`Collection` / `Documents` are typed `IMongoCollection<TDocument>`.
+
+| Base class | Package | Mapping |
+|---|---|---|
+| `MongoDBMappedRepository<TDocument, TEntity, TKey>` | `CodeArchitects.Platform.Data.MongoDB` | written by hand, overriding `TableToEntity` and `EntityToTable` |
+| `MongoDBMapsterRepository<TDocument, TEntity, TKey>` | `CodeArchitects.Platform.Data.MongoDB.Mapster` | Mapster, with rules registered through `AddDataMapster` |
+
+The direct repository and the hand-written mapped repository do not depend on Mapster: only the
+`.Mapster` package brings it in.
+
+#### With Mapster
+
+```bash
+dotnet add package CodeArchitects.Platform.Data.MongoDB.Mapster
+```
 
 ```csharp
-[Collection("products")]
-public class ProductDocument
+builder.Services
+  .AddData(cfg => cfg
+    .UseConnectionString(connectionString)
+    .UseDatabase("store")
+    .AddEntitiesFrom(typeof(PurchaseOrderDocument).Assembly))
+  .AddDataMapster(typeof(PurchaseOrderMapping).Assembly)   // or AddDataMapster(config => ...)
+  // a plain repository...
+  .AddScoped<IRepository<Ticket, string>, MongoDBMapsterRepository<TicketDocument, Ticket, string>>()
+  // ...or a specialized one, derived from MongoDBMapsterRepository
+  .AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+```
+
+`AddDataMapster` builds a dedicated `TypeAdapterConfig`, never `TypeAdapterConfig.GlobalSettings`,
+and registers a scoped `IDataMapper` on it, leaving the application's own `IMapper` and `TypeAdapterConfig`
+alone. It is called once, with every rule of the data layer. The configuration is **strict**, and every
+rule is **compiled at registration**,
+so a mapping error makes startup fail with an explicit `InvalidOperationException` instead of surfacing
+on the first request:
+
+- every pair of types needs a rule, nested types included (`RequireExplicitMapping`);
+- every destination member needs a source or an explicit `Ignore` (`RequireDestinationMemberSource`).
+  This also applies to the rules reversed by `TwoWays()`, where Mapster would otherwise skip the check.
+  Only the members configured **after** `TwoWays()` are reversed;
+- the repository constructor checks that both directions, `TEntity → TDocument` and
+  `TDocument → TEntity`, have a rule.
+
+Both settings can be relaxed inside `AddDataMapster(config => ...)`. The repository then compiles the
+implicit mapping of its two types when it is created, so an invalid one still fails early.
+
+#### Example
+
+The domain aggregate uses value objects, an embedded collection and a reference to another aggregate.
+The document renames and flattens fields and adds a technical one.
+
+```csharp
+public sealed record PurchaseOrderNumber(string Value);
+public sealed record Money(decimal Amount, string Currency);
+public sealed record Address(string Street, string City, string PostalCode, string Country);
+public sealed record OrderLine(Guid ProductId, int Quantity, Money UnitPrice);
+
+public class PurchaseOrder                       // domain: no [Collection]
 {
   public Guid Id { get; set; }
-  public string? Code { get; set; }
-  public decimal Amount { get; set; }
+  public PurchaseOrderNumber Number { get; set; }
+  public Money Total { get; set; }
+  public Address ShippingAddress { get; set; }
+  public List<OrderLine> Lines { get; set; } = [];
+  public Guid CustomerId { get; set; }           // reference to another aggregate: its key only
 }
 
+[Collection("purchase_orders")]
+public class PurchaseOrderDocument               // persistence
+{
+  public Guid Id { get; set; }
+  public string Code { get; set; }               // PurchaseOrderNumber
+  public decimal TotalAmount { get; set; }       // Money, flattened
+  public string TotalCurrency { get; set; }
+  public AddressDocument Shipping { get; set; }  // embedded sub-document
+  public List<OrderLineDocument> Lines { get; set; } = [];
+  public Guid CustomerId { get; set; }
+  public int SchemaVersion { get; set; }         // technical: written, never read into the domain
+}
+```
+
+```csharp
+public sealed class PurchaseOrderMapping : IRegister
+{
+  public void Register(TypeAdapterConfig config)
+  {
+    // single-value value object <-> scalar
+    config.NewConfig<PurchaseOrderNumber, string>().MapWith(number => number.Value);
+    config.NewConfig<string, PurchaseOrderNumber>().MapWith(value => new PurchaseOrderNumber(value));
+
+    // immutable value object: shared as it is instead of copied
+    config.NewConfig<Money, Money>().MapWith(money => money);
+
+    config.NewConfig<PurchaseOrder, PurchaseOrderDocument>()
+      .Map(document => document.Code, order => order.Number)
+      .Map(document => document.TotalAmount, order => order.Total.Amount)
+      .Map(document => document.TotalCurrency, order => order.Total.Currency)
+      .Map(document => document.Shipping, order => order.ShippingAddress)
+      .Map(document => document.SchemaVersion, _ => 2);
+
+    config.NewConfig<PurchaseOrderDocument, PurchaseOrder>()
+      .Map(order => order.Number, document => document.Code)
+      .Map(order => order.Total, document => new Money(document.TotalAmount, document.TotalCurrency))
+      .Map(order => order.ShippingAddress, document => document.Shipping);
+
+    // one rule per nested pair, in both directions
+    config.NewConfig<Address, AddressDocument>()
+      .Map(document => document.Line1, address => address.Street)
+      .Map(document => document.Zip, address => address.PostalCode)
+      .Map(document => document.CountryCode, address => address.Country);
+    config.NewConfig<AddressDocument, Address>()
+      .MapWith(document => new Address(document.Line1, document.City, document.Zip, document.CountryCode));
+    // ... OrderLine <-> OrderLineDocument likewise
+
+    // same shape except for one member: one rule, reversed by TwoWays
+    config.NewConfig<Ticket, TicketDocument>()
+      .TwoWays()
+      .Map(document => document.Subject, ticket => ticket.Title);
+  }
+}
+```
+
+The complete example, with its tests against a real server, is in
+`tests/Data.MongoDB.IntegrationTests` (`Fixtures/PurchaseOrders.cs` and `MapsterRepositoryTests.cs`).
+
+#### Behavior
+
+**Operations.** Every operation maps between the two models and then runs the same `IDataContext`
+operation as the direct repository, on the document. Transactions, deferral inside a unit of work,
+`DBConcurrencyException`, empty batches, and cancellation follow [Operation semantics](#operation-semantics)
+and [Unit of work and transactions](#unit-of-work-and-transactions) unchanged.
+
+**Checked mapping.** A `null` entity throws `ArgumentNullException`, a `null` element of a batch
+throws `ArgumentException` with its index, and a mapping that returns `null` throws
+`InvalidOperationException`. `InsertMany` and `UpdateMany` map the whole batch **before** writing or
+queuing anything: an element that fails to map is named by its index, and nothing of the batch reaches
+the database or the unit of work.
+
+**Keys.** The document key follows the usual [rules](#key). On the domain entity the repository looks
+for `Id`, then `<TypeName>Id`, of the repository key type:
+
+- on every write, if the entity has a key and the mapped document has a different one,
+  `InvalidOperationException` is thrown: the mapping lost or changed the identity;
+- on `Insert` and `InsertMany`, an empty document key is generated as the driver would (for example an
+  `ObjectId`, also for a `string` key marked `[BsonRepresentation(BsonType.ObjectId)]`) and written back
+  to the entity, even through a private setter. The entity has its identity as soon as the operation is
+  issued, also inside a unit of work where the write is deferred to the commit.
+
+If the domain entity has no key the convention can find, these checks are skipped.
+
+**Aggregates, embedded documents, and references.** An aggregate maps to one document: its parts map
+to embedded sub-documents and arrays, with one rule per nested pair. A reference to another aggregate
+is persisted as its key. If the domain holds the other aggregate as an object, map its key on the way
+out and `Ignore` the object on the way back, then load it from its own repository: strict mode forces
+that choice to be written down.
+
+**Queries and filters.** Custom queries are written on the **document**, with `Documents`, `Session`
+and `Builders<TDocument>`, and their results are mapped with `ToEntities` / `ToEntitiesAsync`:
+
+```csharp
+public class PurchaseOrderRepository(IDataContext context, IDataMapper mapper)
+  : MongoDBMapsterRepository<PurchaseOrderDocument, PurchaseOrder, Guid>(context, mapper), IPurchaseOrderRepository
+{
+  public Task<List<PurchaseOrder>> FindByCustomerAsync(Guid customerId, CancellationToken ct = default) =>
+    ToEntitiesAsync(
+      Documents.Find(Session, document => document.CustomerId == customerId).SortBy(document => document.Code),
+      ct);
+}
+```
+
+A predicate on the domain entity cannot be translated to the document: Mapster maps objects, not
+expressions, and a renamed or flattened member has no field to compare with. The repository therefore
+offers no API that accepts one. An untranslatable query fails to compile instead of returning wrong
+results at runtime. `ToEntity`, `ToDocument` and `ToEntities(IEnumerable<TDocument>)` are also
+available to derived repositories.
+
+**Include.** `Find(key, include)` throws `NotSupportedException`, as in the mapped repositories of
+the other providers. The include is written on the domain entity, which is not part of the model, so
+it cannot be validated against the document. It is not needed either: the document is loaded whole, so
+`Find(key)` already returns the embedded parts of the aggregate.
+
+#### Hand-written mapping
+
+Without Mapster, derive from `MongoDBMappedRepository` and write the two mappings. Every behavior above
+applies in the same way.
+
+```csharp
 public class ProductRepository : MongoDBMappedRepository<ProductDocument, Product, Guid>, IProductRepository
 {
   public ProductRepository(IDataContext context) : base(context) { }
@@ -296,16 +473,6 @@ public class ProductRepository : MongoDBMappedRepository<ProductDocument, Produc
   protected override Product TableToEntity(ProductDocument document) => /* ... */;
   protected override ProductDocument EntityToTable(Product entity) => /* ... */;
 }
-```
-
-The base class exposes `Collection` and its `Documents` alias, both of type
-`IMongoCollection<TDocument>`.
-
-Mapping can be delegated to Mapster with a bidirectional `TypeAdapterConfig`, as described in
-[DAL – Mapped repository](dataaccesslayer.md#mapped-repository):
-
-```csharp
-config.NewConfig<Product, ProductDocument>().TwoWays();
 ```
 
 > The `PreserveTracking` extension from `CodeArchitects.Platform.Data.Mapster` has **no effect** on
@@ -370,5 +537,6 @@ Not yet supported, in order of impact:
 
 - [`CodeArchitects.Platform.Data.MongoDB`](https://www.nuget.org/packages/CodeArchitects.Platform.Data.MongoDB)
 - [`CodeArchitects.Platform.Data.MongoDB.DependencyInjection`](https://www.nuget.org/packages/CodeArchitects.Platform.Data.MongoDB.DependencyInjection)
+- [`CodeArchitects.Platform.Data.MongoDB.Mapster`](https://www.nuget.org/packages/CodeArchitects.Platform.Data.MongoDB.Mapster), optional: mapped repository based on Mapster
 
 They require **MongoDB Server 4.4 or later** (a requirement of driver 3.x).

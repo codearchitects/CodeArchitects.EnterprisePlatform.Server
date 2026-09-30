@@ -130,6 +130,27 @@ public class RepositoryTests(TestFixture fixture) : TestBase(fixture)
     await act.Should().ThrowAsync<NotSupportedException>().WithMessage("*Invoice.Customer*");
   }
 
+  [Theory]
+  [InlineData(false)]
+  [InlineData(true)]
+  public async Task Find_ShouldMatchTheKey_WhenItIsStoredWithAnotherRepresentation(bool async)
+  {
+    // Arrange
+    // A string key stored as an ObjectId: the filter must compare it as an ObjectId.
+    TicketDocument expected = new() { Subject = "subject" };
+    using TestScope scope = _fixture.CreateScope();
+    MongoDBRepository<TicketDocument, string> repository = scope.Repository<TicketDocument, string>();
+    await repository.InsertAsync(expected);
+
+    // Act
+    TicketDocument? ticket = await Run(async,
+      () => repository.Find(expected.Id!),
+      () => repository.FindAsync(expected.Id!));
+
+    // Assert
+    ticket.Should().BeEquivalentTo(expected);
+  }
+
   #endregion
 
   #region Insert

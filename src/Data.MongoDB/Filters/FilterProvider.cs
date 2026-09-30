@@ -1,5 +1,6 @@
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Filters;
@@ -17,7 +18,30 @@ internal sealed class FilterProvider : IFilterProvider
     if (model is null)
       throw new ArgumentNullException(nameof(model));
 
-    return Builders<TEntity>.Filter.Eq(model.Key.ElementName, key);
+    return Builders<TEntity>.Filter.Eq(
+      new StringFieldDefinition<TEntity, TKey>(model.Key.ElementName, KeySerializer<TEntity, TKey>.Get(model)), key);
+  }
+
+  private static class KeySerializer<TEntity, TKey>
+  {
+    private static volatile Holder? s_holder;
+
+    public static IBsonSerializer<TKey>? Get(IEntityModel model) => (s_holder ??= new Holder(Resolve(model))).Serializer;
+
+    private static IBsonSerializer<TKey>? Resolve(IEntityModel model)
+    {
+      if (BsonSerializer.LookupSerializer<TEntity>() is not IBsonDocumentSerializer serializer ||
+          !serializer.TryGetMemberSerializationInfo(model.Key.Name, out BsonSerializationInfo info) ||
+          info.ElementName != model.Key.ElementName)
+        return null;
+
+      return info.Serializer as IBsonSerializer<TKey>;
+    }
+
+    private sealed class Holder(IBsonSerializer<TKey>? serializer)
+    {
+      public IBsonSerializer<TKey>? Serializer { get; } = serializer;
+    }
   }
 
   public FilterDefinition<TEntity> ByEntity<TEntity, TKey>(IEntityModel model, TEntity entity)

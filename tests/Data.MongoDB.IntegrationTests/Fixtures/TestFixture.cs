@@ -1,3 +1,4 @@
+using CodeArchitects.Platform.Data.MongoDB.Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
@@ -50,6 +51,9 @@ public sealed class TestFixture : IAsyncLifetime
         .AddEntitiesFrom(typeof(Customer).Assembly)
         .UseTransactions(TransactionMode.Required))
       .AddScoped<IRepository<Customer, Guid>, MongoDBRepository<Customer, Guid>>()
+      .AddDataMapster(typeof(PurchaseOrderMapping).Assembly)
+      .AddScoped<PurchaseOrderRepository>()
+      .AddScoped<IRepository<Ticket, string>, MongoDBMapsterRepository<TicketDocument, Ticket, string>>()
       .BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true });
 
   /// <summary>

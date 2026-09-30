@@ -56,7 +56,11 @@ transaction of the unit of work in progress.
 
 For a custom document↔domain mapping, derive from `MongoDBMappedRepository<TDocument, TEntity, TKey>`,
 which exposes `Collection` (and its alias `Documents`) typed on the *document*. Put `[Collection]`
-on the document, never on the domain entity.
+on the document, never on the domain entity. Mapping is checked (a `null` result or a lost key throws),
+batches are mapped before anything is written, and a key generated on insert is written back to the
+entity. To map with Mapster instead of by hand, use
+[`CodeArchitects.Platform.Data.MongoDB.Mapster`](../Data.MongoDB.Mapster): this package has no Mapster
+dependency.
 
 ## Aggregates
 

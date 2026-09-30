@@ -15,12 +15,24 @@ dotnet add package CodeArchitects.Platform.Data.Mapster
 
 ## Features
 
+- `AddDataMapster` registers a dedicated configuration and a scoped `IDataMapper` for the data layer, separate from the
+  application's own `IMapper` and `TypeAdapterConfig`. It can be called once.
+  The configuration is strict: every pair of types needs a rule, and every destination member needs a
+  source, also in the rules reversed by `TwoWays()`. Every rule is compiled at registration, so a mapping
+  error fails startup with an explicit `InvalidOperationException`.
+
+  ```csharp
+  builder.Services.AddDataMapster(typeof(ProductMapping).Assembly);   // scans IRegister implementations
+  builder.Services.AddDataMapster(config => config.NewConfig<Product, ProductTable>().TwoWays());
+  ```
+
 - `MapsterTracking` and `TrackingMappingExpressionExtensions` — change-tracking-aware mappings so that
   mapping table records to entities plays well with the ORM's tracking.
 
 ## Related packages
 
 - [`CodeArchitects.Platform.Data`](../Data) — DAL abstractions
+- [`CodeArchitects.Platform.Data.MongoDB.Mapster`](../Data.MongoDB.Mapster) — MongoDB mapped repository based on Mapster
 - [`CodeArchitects.Platform.Data.AutoMapper`](../Data.AutoMapper) — legacy AutoMapper integration (maintenance only)
 
 ## License

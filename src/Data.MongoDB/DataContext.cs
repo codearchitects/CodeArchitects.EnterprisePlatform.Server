@@ -9,7 +9,7 @@ using System.Data;
 
 namespace CodeArchitects.Platform.Data.MongoDB;
 
-internal class DataContext : IDataContext
+internal class DataContext : IDataContext, IEntityModelResolver
 {
   private readonly IStateManager _stateManager;
   private readonly IFilterProvider _filters;
@@ -341,6 +341,8 @@ internal class DataContext : IDataContext
       requiresTransaction,
       cancellationToken);
   }
+
+  IEntityModel IEntityModelResolver.GetEntityModel<TEntity>() => EnsureEntity<TEntity>();
 
   private IEntityModel EnsureEntity<TEntity>()
   {

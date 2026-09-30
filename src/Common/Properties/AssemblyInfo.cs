@@ -17,6 +17,7 @@
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.EntityFrameworkCore.Shared")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.MongoDB")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.MongoDB.DependencyInjection")]
+[assembly: InternalsVisibleTo("CodeArchitects.Platform.Data.MongoDB.Mapster")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.Emit")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL")]
 [assembly: InternalsVisibleTo("CodeArchitects.Platform.GraphQL.ChilliCream")]
