@@ -1,5 +1,4 @@
-﻿using CodeArchitects.Platform.Common.CodeAnalysis;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
 namespace CodeArchitects.Platform.Data.MongoDB;
 
@@ -8,7 +7,6 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// </summary>
 /// <typeparam name="TEntity">The entity type.</typeparam>
 /// <typeparam name="TKey">The entity key type.</typeparam>
-[Experimental]
 public class MongoDBRepository<TEntity, TKey> : Repository<TEntity, TKey>
   where TEntity : class
   where TKey : IEquatable<TKey>

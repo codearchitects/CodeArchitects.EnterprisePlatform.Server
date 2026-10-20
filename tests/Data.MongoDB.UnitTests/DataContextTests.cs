@@ -317,6 +317,8 @@ public class DataContextTests
 
     public IClientSessionHandle Session { get; } = session;
 
+    public Task<IClientSessionHandle> GetSessionAsync(CancellationToken cancellationToken) => Task.FromResult(Session);
+
     public int QueuedCount { get; private set; }
 
     public void AddExecution(Execution execution, bool requiresTransaction)

@@ -62,14 +62,15 @@ Il metodo `GetTopSellingProducts` recupera gli N (parametro `count`) prodotti pi
 
 Dall'interfaccia dei repository non si evince né il provider di database, né l'ORM utilizzato per accedervi, in quanto questi, essendo dettagli implementativi, saranno utilizzati dalle classi che forniranno l'implementazione dei metodi.
 
-Al momento, sono disponibili due implementazioni del repository (e del resto del DAL):
+Al momento, sono disponibili tre implementazioni del repository (e del resto del DAL):
 
 - CodeArchitects.Platform.Data.EntityFrameworkCore: implementazione del DAL che utilizza Entity Framework Core 7.
 - CodeArchitects.Platform.Data.AdoNet: implementazione del DAL che utilizza direttamente ADO.NET, da utilizzare tipicamente in congiunzione con Dapper.
+- CodeArchitects.Platform.Data.MongoDB: implementazione del DAL per MongoDB, basata sul driver ufficiale MongoDB .NET (vedi [DAL con MongoDB](mongodb.md)).
 
 > Nota: Entity Framework Core 7 richiede l'utilizzo di .NET 6 o superiore. Per progetti .NET Core 3.1 e .NET 5, esiste il pacchetto CodeArchitects.Platform.Data.EntityFrameworkCore che utilizza Entity Framework Core 5 ed è compatibile con .NET Core 3.1 e versioni superiori.
 
-Queste due librerie forniscono l'implementazione di `IRepository<TEntity, TKey>` che potrà essere utilizzata come classe base per l'implementazione dei repository specializzati. Ad esempio, nel caso di `IProductRepository`, si ha il seguente schema:
+Queste librerie forniscono l'implementazione di `IRepository<TEntity, TKey>` che potrà essere utilizzata come classe base per l'implementazione dei repository specializzati. Ad esempio, nel caso di `IProductRepository`, si ha il seguente schema:
 
 ![Generic repository](images/genericrepository.png)
 

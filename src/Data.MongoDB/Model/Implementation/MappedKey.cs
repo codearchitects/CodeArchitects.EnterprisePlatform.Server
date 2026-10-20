@@ -39,8 +39,8 @@ internal static class MappedKey<TDocument, TEntity, TKey>
   {
     BsonMemberMap? idMemberMap = BsonClassMap.LookupClassMap(typeof(TDocument)).IdMemberMap;
 
-    // The driver only generates the key of the member it maps to _id: when the provider resolved
-    // a different member (the <TypeName>Id convention), there is nothing the driver would do.
+    // The driver only generates the key of the member it maps to _id: AddData maps the resolved
+    // key there, so a different member only appears when the class map was built by hand.
     if (idMemberMap?.IdGenerator is null || idMemberMap.MemberName != documentModel.Key.Name)
       return;
 

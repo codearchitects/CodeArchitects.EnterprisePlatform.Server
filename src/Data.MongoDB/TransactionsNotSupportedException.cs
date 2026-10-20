@@ -1,12 +1,9 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
-
 namespace CodeArchitects.Platform.Data.MongoDB;
 
 /// <summary>
 /// Thrown when an operation requires a MongoDB transaction but the current deployment
 /// cannot provide one.
 /// </summary>
-[Experimental]
 public class TransactionsNotSupportedException : NotSupportedException
 {
   private const string DefaultMessage =

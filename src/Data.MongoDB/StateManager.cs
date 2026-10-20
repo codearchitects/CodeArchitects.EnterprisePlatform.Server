@@ -43,6 +43,13 @@ internal sealed class StateManager : Data.StateManager, IStateManager, IDisposab
     }
   }
 
+  public async Task<IClientSessionHandle> GetSessionAsync(CancellationToken cancellationToken)
+  {
+    EnsureNotDisposed();
+
+    return _session ??= await _client.StartSessionAsync(cancellationToken: cancellationToken);
+  }
+
   public void AddExecution(Execution execution, bool requiresTransaction)
   {
     EnsureNotDisposed();
@@ -61,7 +68,8 @@ internal sealed class StateManager : Data.StateManager, IStateManager, IDisposab
     (List<Execution> batch, bool requiresTransaction) = Drain();
     IClientSessionHandle session = Session;
 
-    if (!ShouldUseTransaction(batch.Count, requiresTransaction))
+    if (!NeedsTransaction(batch.Count, requiresTransaction) ||
+        !CanUseTransaction(_probe.AreTransactionsSupported(), batch.Count))
     {
       foreach (Execution execution in batch)
       {
@@ -91,9 +99,10 @@ internal sealed class StateManager : Data.StateManager, IStateManager, IDisposab
       return;
 
     (List<Execution> batch, bool requiresTransaction) = Drain();
-    IClientSessionHandle session = Session;
+    IClientSessionHandle session = await GetSessionAsync(cancellationToken);
 
-    if (!ShouldUseTransaction(batch.Count, requiresTransaction))
+    if (!NeedsTransaction(batch.Count, requiresTransaction) ||
+        !CanUseTransaction(await _probe.AreTransactionsSupportedAsync(cancellationToken), batch.Count))
     {
       foreach (Execution execution in batch)
       {
@@ -139,17 +148,23 @@ internal sealed class StateManager : Data.StateManager, IStateManager, IDisposab
     _requiresTransaction = false;
   }
 
-  private bool ShouldUseTransaction(int executionCount, bool requiresTransaction)
+  private bool NeedsTransaction(int executionCount, bool requiresTransaction)
   {
     if (_options.TransactionMode == TransactionMode.Disabled)
       return false;
 
     // A write on a single document is already atomic in MongoDB: wrapping it in a transaction
     // would add two round-trips and transactional locks for no additional guarantee.
-    if (executionCount <= 1 && !requiresTransaction)
-      return false;
+    return executionCount > 1 || requiresTransaction;
+  }
 
-    if (_probe.AreTransactionsSupported())
+  /// <summary>
+  /// Decides what to do with a batch that needs a transaction, once the topology is known: only
+  /// called then, so that the topology is not even consulted for a batch that does not need one.
+  /// </summary>
+  private bool CanUseTransaction(bool transactionsSupported, int executionCount)
+  {
+    if (transactionsSupported)
       return true;
 
     if (_options.TransactionMode == TransactionMode.Required)

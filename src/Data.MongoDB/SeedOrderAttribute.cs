@@ -1,5 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
-
 namespace CodeArchitects.Platform.Data.MongoDB;
 
 /// <summary>
@@ -10,15 +8,10 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// full name of the type, so the sequence is deterministic even when no order is declared —
 /// neither assembly scanning nor service resolution guarantees a stable order by itself.
 /// </remarks>
-/// <remarks>
-/// Initializes a new instance of the <see cref="SeedOrderAttribute"/> class.
-/// </remarks>
 /// <param name="order">The order, lowest first.</param>
-[Experimental]
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class SeedOrderAttribute(int order) : Attribute
 {
-
   /// <summary>
   /// The order in which the seed is applied, lowest first.
   /// </summary>

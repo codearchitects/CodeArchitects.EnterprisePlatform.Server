@@ -101,3 +101,13 @@ public sealed class CustomerSeed : DataSeed
 
   public override void Seed(ISeeder seeder) => seeder.Seed(Customers);
 }
+
+/// <summary>Keyed by the &lt;TypeName&gt;Id convention: the key is still stored in _id.</summary>
+[CodeArchitects.Platform.Data.MongoDB.Collection("suppliers")]
+public class Supplier
+{
+  public Guid SupplierId { get; set; }
+  public string? Name { get; set; }
+
+  public static Supplier One() => new() { SupplierId = Guid.NewGuid(), Name = $"Supplier {Random.Shared.Next(1000, 9999)}" };
+}

@@ -1,4 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using CodeArchitects.Platform.Data.MongoDB.Model.Implementation;
 using CodeArchitects.Platform.Data.Navigation;
@@ -13,7 +12,6 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// <typeparam name="TDocument">The document type stored in the collection.</typeparam>
 /// <typeparam name="TEntity">The domain entity type.</typeparam>
 /// <typeparam name="TKey">The entity key type.</typeparam>
-[Experimental]
 public abstract class MongoDBMappedRepository<TDocument, TEntity, TKey> : MappedRepository<TDocument, TEntity, TKey>
   where TDocument : class
   where TEntity : class

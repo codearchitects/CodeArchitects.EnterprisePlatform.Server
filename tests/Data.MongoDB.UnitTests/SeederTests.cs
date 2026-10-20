@@ -8,15 +8,17 @@ public class SeederTests
 {
   private readonly Mock<ICollectionProvider> _collections = new();
   private readonly Mock<IStateManager> _stateManager = new();
+  private readonly Mock<IMongoDatabase> _database = new();
 
   public SeederTests()
   {
     _collections
       .Setup(collections => collections.GetCollection<DiscoverableEntity>())
-      .Returns(Mock.Of<IMongoCollection<DiscoverableEntity>>());
+      .Returns(Mock.Of<IMongoCollection<DiscoverableEntity>>(collection =>
+        collection.CollectionNamespace == new CollectionNamespace("test", "discoverable")));
   }
 
-  private Seeder CreateSut() => new(_collections.Object, _stateManager.Object);
+  private Seeder CreateSut() => new(_collections.Object, _stateManager.Object, _database.Object);
 
   #region Ordering
 

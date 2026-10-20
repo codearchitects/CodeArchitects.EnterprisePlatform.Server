@@ -14,8 +14,6 @@ fields, value objects, technical fields, schema versioning.
 dotnet add package CodeArchitects.Platform.Data.MongoDB.Mapster
 ```
 
-> The package is marked `[Experimental]`, like the MongoDB provider it builds on.
-
 ## Setup
 
 ```csharp

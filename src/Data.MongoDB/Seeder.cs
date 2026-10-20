@@ -1,4 +1,5 @@
 using CodeArchitects.Platform.Data.MongoDB.Collections;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Reflection;
 
@@ -8,10 +9,16 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// Applies the registered <see cref="DataSeed"/> instances, in a deterministic order and
 /// idempotently.
 /// </summary>
-internal sealed class Seeder(ICollectionProvider collections, IStateManager stateManager) : ISeeder
+internal sealed class Seeder(ICollectionProvider collections, IStateManager stateManager, IMongoDatabase database) : ISeeder
 {
+  /// <summary>
+  /// Holds one document per seeded collection, written in the same transaction as the seed.
+  /// </summary>
+  internal const string MarkerCollectionName = "__caep_seeding";
+
   private readonly ICollectionProvider _collections = collections;
   private readonly IStateManager _stateManager = stateManager;
+  private readonly IMongoDatabase _database = database;
 
   /// <summary>
   /// Applies every seed and commits them as a single unit.
@@ -42,9 +49,15 @@ internal sealed class Seeder(ICollectionProvider collections, IStateManager stat
       return;
 
     IMongoCollection<TEntity> collection = _collections.GetCollection<TEntity>();
+    IMongoCollection<BsonDocument> markers = _database.GetCollection<BsonDocument>(MarkerCollectionName);
 
     CountOptions countOptions = new() { Limit = 1 };
     InsertManyOptions insertOptions = new() { IsOrdered = true };
+
+    FilterDefinition<BsonDocument> marker =
+      Builders<BsonDocument>.Filter.Eq("_id", collection.CollectionNamespace.CollectionName);
+    UpdateDefinition<BsonDocument> claim = Builders<BsonDocument>.Update.CurrentDate("seededAt");
+    UpdateOptions claimOptions = new() { IsUpsert = true };
 
     _stateManager.AddExecution(new Execution(
       session =>
@@ -52,6 +65,8 @@ internal sealed class Seeder(ICollectionProvider collections, IStateManager stat
         if (collection.CountDocuments(session, FilterDefinition<TEntity>.Empty, countOptions) > 0)
           return;
 
+        // Before the insert, so that a concurrent seed conflicts as early as possible.
+        markers.UpdateOne(session, marker, claim, claimOptions);
         collection.InsertMany(session, documents, insertOptions);
       },
       async (session, cancellationToken) =>
@@ -62,6 +77,7 @@ internal sealed class Seeder(ICollectionProvider collections, IStateManager stat
         if (count > 0)
           return;
 
+        await markers.UpdateOneAsync(session, marker, claim, claimOptions, cancellationToken);
         await collection.InsertManyAsync(session, documents, insertOptions, cancellationToken);
       }),
       requiresTransaction: true);

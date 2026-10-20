@@ -1,4 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data;
 using CodeArchitects.Platform.Data.MongoDB;
 using MongoDB.Bson;
@@ -11,7 +10,6 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// An object used to configure the MongoDB client.
 /// </summary>
-[Experimental]
 public interface IMongoDBConfigurationBuilder
 {
   /// <summary>
@@ -48,7 +46,6 @@ public interface IMongoDBConfigurationBuilder
 /// <summary>
 /// An object used to configure the MongoDB database.
 /// </summary>
-[Experimental]
 public interface IMongoDBConfigurationBuilderWithClient
 {
   /// <summary>
@@ -63,7 +60,6 @@ public interface IMongoDBConfigurationBuilderWithClient
 /// <summary>
 /// An object used to configure the MongoDB model and behaviour.
 /// </summary>
-[Experimental]
 public interface IMongoDBConfigurationBuilderWithDatabase
 {
   /// <summary>
@@ -101,6 +97,11 @@ public interface IMongoDBConfigurationBuilderWithDatabase
   /// <summary>
   /// Adds conventions to the pack the provider registers for its entities.
   /// </summary>
+  /// <remarks>
+  /// The convention registry of the driver is process-wide: the pack applies to every class the
+  /// driver serializes in the process, not only to the entities of the model, and only the first
+  /// <c>AddData</c> call can configure it.
+  /// </remarks>
   /// <param name="configure">Applied to the provider convention pack.</param>
   /// <returns>An <see cref="IMongoDBConfigurationBuilderWithDatabase"/> for further MongoDB database configuration.</returns>
   IMongoDBConfigurationBuilderWithDatabase ConfigureConventions(Action<ConventionPack> configure);

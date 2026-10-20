@@ -52,9 +52,10 @@ internal class DataContext : IDataContext, IEntityModelResolver
     where TKey : IEquatable<TKey>
   {
     IEntityModel entityModel = EnsureEntity<TEntity>();
+    IClientSessionHandle session = await _stateManager.GetSessionAsync(cancellationToken);
 
     return await _collections.GetCollection<TEntity>()
-      .Find(Session, _filters.ById<TEntity, TKey>(entityModel, key))
+      .Find(session, _filters.ById<TEntity, TKey>(entityModel, key))
       .FirstOrDefaultAsync(cancellationToken);
   }
 
@@ -336,7 +337,9 @@ internal class DataContext : IDataContext, IEntityModelResolver
 
     return _stateManager.ExecuteAsync(
       new Execution(
-        session => execution(session, CancellationToken.None).GetAwaiter().GetResult(),
+        // Only reached when the unit of work is saved synchronously. The operation runs on the
+        // thread pool, so that waiting for it cannot deadlock on the caller's synchronization context.
+        session => Task.Run(() => execution(session, CancellationToken.None)).GetAwaiter().GetResult(),
         execution),
       requiresTransaction,
       cancellationToken);

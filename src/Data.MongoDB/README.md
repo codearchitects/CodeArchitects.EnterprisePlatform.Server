@@ -13,7 +13,6 @@ through the same Repository/Unit of Work API as the relational providers.
 dotnet add package CodeArchitects.Platform.Data.MongoDB
 ```
 
-> The package is marked `[Experimental]`: its public surface may change between minor versions.
 > Requires **MongoDB Server 4.4 or later** (a requirement of driver 3.x).
 
 ## Declaring an entity
@@ -80,7 +79,9 @@ public class CategorySeed : DataSeed
 app.Services.SeedMongo();   // or await app.Services.SeedMongoAsync()
 ```
 
-Seeding is idempotent per collection and commits every seed in a single transaction.
+Seeding is idempotent per collection and commits every seed in a single transaction. With
+transactions it is also safe when several instances start together: a marker per collection, in the
+`__caep_seeding` collection, makes concurrent seeds conflict, so only one of them is applied.
 
 ## Not supported yet
 

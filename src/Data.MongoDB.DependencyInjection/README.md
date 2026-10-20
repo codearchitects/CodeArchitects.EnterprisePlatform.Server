@@ -52,6 +52,11 @@ MongoDB provides them only on a replica set or a sharded cluster: with the defau
 operation fails explicitly on a standalone server, `WhenSupported` degrades with a warning, and
 `Disabled` never opens one (local development).
 
+A client passed to `UseClient(client)` stays owned by the application and is not disposed with the
+container; one built from the connection string or by a factory is. A Guid serializer the
+application registered earlier is kept, unless it writes binary Guids with a representation other
+than the configured one, in which case `AddData` fails.
+
 ## Related packages
 
 - [`CodeArchitects.Platform.Data.MongoDB`](../Data.MongoDB) — MongoDB implementation
