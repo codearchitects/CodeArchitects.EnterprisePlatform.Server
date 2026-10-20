@@ -9,6 +9,8 @@ namespace CodeArchitects.Platform.Data.MongoDB.Serialization;
 
 public class MongoDBSerializationInitializerTests
 {
+  static MongoDBSerializationInitializerTests() => MongoDBSerializationInitializer.EnsureInitialized();
+
   // The class map registry is process-wide: every key test uses types of its own, never
   // serialized anywhere else, and none is marked [Collection] so assembly discovery skips them.
   public class KeyedByTypeName
