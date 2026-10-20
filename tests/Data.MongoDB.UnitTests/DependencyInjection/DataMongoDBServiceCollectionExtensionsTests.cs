@@ -213,6 +213,40 @@ public class DataMongoDBServiceCollectionExtensionsTests
   }
 
   [Fact]
+  public void Dispose_ShouldNotDisposeTheClient_WhenTheApplicationSuppliedIt()
+  {
+    // Arrange
+    ServiceProvider provider = BuildProvider();
+    provider.GetRequiredService<IMongoClient>().Should().BeSameAs(_client.Object);
+
+    // Act
+    provider.Dispose();
+
+    // Assert
+    // The application owns the client it passed in, and may still use it or share it.
+    _client.Verify(client => client.Dispose(), Times.Never);
+  }
+
+  [Fact]
+  public void Dispose_ShouldDisposeTheClient_WhenTheContainerCreatedIt()
+  {
+    // Arrange
+    ServiceProvider provider = new ServiceCollection()
+      .AddData(options => options
+        .UseClient(_ => _client.Object)
+        .UseDatabase("tests")
+        .AddEntity<DiscoverableEntity>())
+      .BuildServiceProvider();
+    provider.GetRequiredService<IMongoClient>();
+
+    // Act
+    provider.Dispose();
+
+    // Assert
+    _client.Verify(client => client.Dispose(), Times.Once);
+  }
+
+  [Fact]
   public void AddData_ShouldLetARepositoryBeResolvedThroughTheCaepAbstraction()
   {
     // Arrange

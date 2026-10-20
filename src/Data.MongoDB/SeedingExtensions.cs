@@ -1,4 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -7,7 +6,6 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// <summary>
 /// Entry points for applying the configured <see cref="DataSeed"/> instances.
 /// </summary>
-[Experimental]
 public static class SeedingExtensions
 {
   /// <summary>

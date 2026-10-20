@@ -25,6 +25,7 @@ internal class MongoDBConfigurationBuilder :
 
   private readonly List<Type> _seedTypes = new();
 
+  private IMongoClient? _client;
   private Func<IServiceProvider, IMongoClient>? _clientFactory;
 
   #region Client
@@ -53,15 +54,15 @@ internal class MongoDBConfigurationBuilder :
 
   public IMongoDBConfigurationBuilderWithClient UseClient(IMongoClient client)
   {
-    if (client is null)
-      throw new ArgumentNullException(nameof(client));
-
-    return UseClient(_ => client);
+    _client = client ?? throw new ArgumentNullException(nameof(client));
+    _clientFactory = null;
+    return this;
   }
 
   public IMongoDBConfigurationBuilderWithClient UseClient(Func<IServiceProvider, IMongoClient> factory)
   {
     _clientFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+    _client = null;
     return this;
   }
 
@@ -138,7 +139,7 @@ internal class MongoDBConfigurationBuilder :
     if (assembly is null)
       throw new ArgumentNullException(nameof(assembly));
 
-    foreach (Type type in assembly.GetTypes())
+    foreach (Type type in DataModelBuilder.GetLoadableTypes(assembly))
     {
       if (type.IsClass && !type.IsAbstract && !type.IsGenericTypeDefinition && type.IsSubclassOf(typeof(DataSeed)))
       {
@@ -155,7 +156,7 @@ internal class MongoDBConfigurationBuilder :
   {
     // 1. Configuration validation. Everything verifiable without touching the server fails here,
     //    while the stack trace still points at the composition code.
-    if (_clientFactory is null)
+    if (_client is null && _clientFactory is null)
       throw new InvalidOperationException(
         "The MongoDB client was not configured. Use UseConnectionString(connectionString) or UseClient(client).");
 
@@ -167,15 +168,21 @@ internal class MongoDBConfigurationBuilder :
 
     // 3. Global serialization setup: must run before any document is serialized, once per process.
     MongoDBSerializationInitializer.EnsureInitialized(_options.GuidRepresentation, _conventionConfigurators);
+    MongoDBSerializationInitializer.MapKeys(dataModel);
 
     // 4. Service registrations.
-    Func<IServiceProvider, IMongoClient> clientFactory = _clientFactory;
-
     services.AddSingleton(_options);
     services.AddSingleton<IDataModel>(dataModel);
     services.AddSingleton<IFilterProvider, FilterProvider>();
 
-    services.AddSingleton(clientFactory);
+    if (_client is not null)
+    {
+      services.AddSingleton(_client);
+    }
+    else
+    {
+      services.AddSingleton(_clientFactory!);
+    }
     // IMongoDatabase is thread-safe and immutable: a singleton lets CollectionProvider
     // cache collections for the lifetime of the application instead of per request.
     services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>()

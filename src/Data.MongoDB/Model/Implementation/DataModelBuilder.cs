@@ -33,7 +33,7 @@ internal sealed class DataModelBuilder
     if (assembly is null)
       throw new ArgumentNullException(nameof(assembly));
 
-    foreach (Type type in assembly.GetTypes())
+    foreach (Type type in GetLoadableTypes(assembly))
     {
       if (IsEntityCandidate(type) && (filter?.Invoke(type) ?? true))
       {
@@ -42,6 +42,21 @@ internal sealed class DataModelBuilder
     }
 
     return this;
+  }
+
+  /// <summary>
+  /// Returns the types of an assembly that can be loaded.
+  /// </summary>
+  internal static IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+  {
+    try
+    {
+      return assembly.GetTypes();
+    }
+    catch (ReflectionTypeLoadException exception)
+    {
+      return exception.Types.OfType<Type>();
+    }
   }
 
   public DataModel Build()

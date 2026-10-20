@@ -15,6 +15,9 @@ public class StateManagerTests
     _client
       .Setup(client => client.StartSession(It.IsAny<ClientSessionOptions>(), It.IsAny<CancellationToken>()))
       .Returns(_session.Object);
+    _client
+      .Setup(client => client.StartSessionAsync(It.IsAny<ClientSessionOptions>(), It.IsAny<CancellationToken>()))
+      .ReturnsAsync(_session.Object);
   }
 
   private StateManager CreateSut(TransactionMode mode = TransactionMode.Required) =>
@@ -103,6 +106,63 @@ public class StateManagerTests
 
     // Assert
     sessions.Should().ContainSingle();
+  }
+
+  [Fact]
+  public async Task SaveAsync_ShouldStartTheSessionAndProbeTheTopologyWithoutBlocking()
+  {
+    // Arrange
+    _probe.Setup(probe => probe.AreTransactionsSupportedAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false);
+    StateManager sut = CreateSut(TransactionMode.WhenSupported);
+    List<IClientSessionHandle> sessions = new();
+    sut.AddExecution(Recording(sessions), requiresTransaction: true);
+
+    // Act
+    await sut.SaveAsync(CancellationToken.None);
+
+    // Assert
+    // The first session of a client and the handshake can both wait for the server: on the
+    // asynchronous path neither may hold a thread.
+    sessions.Should().ContainSingle().Which.Should().BeSameAs(_session.Object);
+    _client.Verify(
+      client => client.StartSession(It.IsAny<ClientSessionOptions>(), It.IsAny<CancellationToken>()),
+      Times.Never);
+    _probe.Verify(probe => probe.AreTransactionsSupported(), Times.Never);
+    _probe.Verify(probe => probe.AreTransactionsSupportedAsync(It.IsAny<CancellationToken>()), Times.Once);
+  }
+
+  [Fact]
+  public async Task SaveAsync_ShouldThrow_WhenATransactionIsRequiredButTheTopologyDoesNotSupportIt()
+  {
+    // Arrange
+    _probe.Setup(probe => probe.AreTransactionsSupportedAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false);
+    StateManager sut = CreateSut(TransactionMode.Required);
+    List<IClientSessionHandle> sessions = new();
+    sut.AddExecution(Recording(sessions), requiresTransaction: true);
+
+    // Act
+    Func<Task> act = () => sut.SaveAsync(CancellationToken.None);
+
+    // Assert
+    await act.Should().ThrowAsync<TransactionsNotSupportedException>();
+    sessions.Should().BeEmpty();
+  }
+
+  [Fact]
+  public async Task GetSessionAsync_ShouldReturnTheSessionOfTheScope()
+  {
+    // Arrange
+    StateManager sut = CreateSut();
+
+    // Act
+    IClientSessionHandle first = await sut.GetSessionAsync(CancellationToken.None);
+    IClientSessionHandle second = await sut.GetSessionAsync(CancellationToken.None);
+
+    // Assert
+    first.Should().BeSameAs(_session.Object).And.BeSameAs(second).And.BeSameAs(sut.Session);
+    _client.Verify(
+      client => client.StartSessionAsync(It.IsAny<ClientSessionOptions>(), It.IsAny<CancellationToken>()),
+      Times.Once);
   }
 
   [Fact]

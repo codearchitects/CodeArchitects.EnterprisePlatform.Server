@@ -1,5 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
-
 namespace CodeArchitects.Platform.Data.MongoDB;
 
 /// <summary>
@@ -9,7 +7,6 @@ namespace CodeArchitects.Platform.Data.MongoDB;
 /// MongoDB transactions require a replica set or a sharded cluster; they are not available
 /// on a standalone server.
 /// </remarks>
-[Experimental]
 public enum TransactionMode
 {
   /// <summary>

@@ -1,4 +1,3 @@
-using CodeArchitects.Platform.Common.CodeAnalysis;
 using CodeArchitects.Platform.Data.Mapster;
 using Mapster;
 using Mapster.Models;
@@ -14,7 +13,6 @@ namespace CodeArchitects.Platform.Data.MongoDB.Mapster;
 /// <typeparam name="TDocument">The document type stored in the collection.</typeparam>
 /// <typeparam name="TEntity">The domain entity type.</typeparam>
 /// <typeparam name="TKey">The entity key type.</typeparam>
-[Experimental]
 public class MongoDBMapsterRepository<TDocument, TEntity, TKey> : MongoDBMappedRepository<TDocument, TEntity, TKey>
   where TDocument : class
   where TEntity : class

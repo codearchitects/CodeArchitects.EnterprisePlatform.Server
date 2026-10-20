@@ -12,6 +12,13 @@ internal interface IStateManager : Data.IStateManager
   IClientSessionHandle Session { get; }
 
   /// <summary>
+  /// Returns <see cref="Session"/>, starting it without blocking when it does not exist yet: the
+  /// first session of the client can wait for the server to be discovered.
+  /// </summary>
+  /// <param name="cancellationToken">A token to cancel the start of the session.</param>
+  Task<IClientSessionHandle> GetSessionAsync(CancellationToken cancellationToken);
+
+  /// <summary>
   /// Records a pending write.
   /// </summary>
   /// <param name="execution">The operation, in both its synchronous and asynchronous form.</param>

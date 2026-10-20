@@ -1,10 +1,5 @@
 # DAL with MongoDB
 
-> **Note.** The `CodeArchitects.Platform.Data.MongoDB` and
-> `CodeArchitects.Platform.Data.MongoDB.DependencyInjection` packages are marked `[Experimental]`:
-> breaking changes are very likely to be introduced between one version and the next.
-> They have not yet reached the same level of maturity as the other currently supported Data Providers.
-
 MongoDB is a document database: it has no tables or foreign keys, and guarantees atomicity for a
 **single document**. The CAEP MongoDB provider exposes the same `IRepository`, `IUnitOfWork`, and
 `IDataContext` as the other providers, but some semantics consequently differ.
@@ -44,6 +39,10 @@ first request.
 `UseClient` accepts `IMongoClient`, not `MongoClient`: in driver 3.x the concrete class is
 `sealed`, so the interface is the only way to decorate or replace the client.
 
+The client is a singleton. A client built from the connection string, or returned by the factory, is
+owned by the container and disposed with it; a client passed to `UseClient(client)` belongs to the
+application, which disposes it.
+
 ### Options
 
 ```csharp
@@ -57,6 +56,16 @@ builder.Services.AddData(cfg => cfg
     .ConfigureConventions(pack => pack.Add(new CamelCaseElementNameConvention()))
     .UseSeed<ApplicationDataSeed>());
 ```
+
+The serializers and conventions are process-wide, so they are registered by the first `AddData`
+call. They apply to **every class the driver serializes in the process**, not only to the entities
+of the model: the provider's own convention (unknown elements are ignored when reading, instead of
+failing) and those added with `ConfigureConventions` affect any other code of the application that
+uses the MongoDB driver directly. They cannot be limited to the model, because the embedded types
+of an aggregate, which must follow the same conventions, are not known in advance. If the application has already registered a Guid serializer, `AddData` keeps it when it stores
+Guids as binary with the configured representation, or in another format (a string, for example);
+a binary serializer with a different representation makes `AddData` fail, asking for the matching
+`UseGuidRepresentation`.
 
 ## Entities and conventions
 
@@ -90,6 +99,11 @@ The key is **always** mapped to the `_id` element and is resolved in this order:
 1. property marked `[BsonId]`;
 2. `Id` property;
 3. `<TypeName>Id` property.
+
+The driver maps only `Id`, `id` and `_id` on its own: `AddData` maps a `<TypeName>Id` key to `_id`
+too, for every registered entity. A class map created before `AddData`, registered by the
+application or frozen by serializing the type, cannot be changed any more: it must already map the
+key to `_id` (with `MapIdMember` or `[BsonId]`), otherwise `AddData` fails.
 
 Supported types: `Guid`, `string`, `ObjectId`, `int`, `long`. Composite keys are not supported.
 
@@ -167,6 +181,14 @@ behavior is governed by `UseTransactions`:
 | `Required` (default) | throws `TransactionsNotSupportedException` |
 | `WhenSupported` | runs without atomicity and emits a warning to the logger |
 | `Disabled` | never uses transactions |
+
+The topology is detected with the `hello` handshake the first time a transaction is needed, and a
+definitive answer (replica set, `mongos`, standalone) is kept for the lifetime of the process. A
+`mongod` started with `--replSet` but not yet initiated (`rs.initiate`), or a failed handshake, is
+not cached: that operation is treated as unsupported, and the next one probes again. With
+`directConnection=true` the driver does not wait for a primary, so a service started together with a
+fresh replica set can hit that window: drop `directConnection` when the member's advertised host is
+reachable from the service, or wait for the set to be initiated before starting it.
 
 A write to a single document **outside** a UnitOfWork does not open a transaction: it is already
 atomic. `InsertMany` and `UpdateMany`, however, always open one because they involve multiple
@@ -263,6 +285,30 @@ The base class exposes `Collection` (`IMongoCollection<TEntity>`), `Database`, a
 
 > Passing `Session` to custom queries is not optional: an operation executed without a session runs
 > on an implicit session, and therefore **outside** the transaction of the current unit of work.
+
+A custom **write** that must follow the unit of work, being deferred to the commit like the generic
+operations, goes through `Context.ExecuteAsync`, which hands it the session to use:
+
+```csharp
+public Task IncrementSaleCountAsync(Guid id, CancellationToken ct = default) =>
+  Context.ExecuteAsync(
+    (session, token) => Collection.UpdateOneAsync(
+      session,
+      Builders<Product>.Filter.Eq(product => product.Id, id),
+      Builders<Product>.Update.Inc(product => product.SaleCount, 1),
+      cancellationToken: token),
+    cancellationToken: ct);
+```
+
+The operation can run **more than once**. On a transient error (a write conflict, a primary
+election) the driver aborts the transaction and runs the whole batch again, as the MongoDB
+specification requires. Everything done against the database through `session` is rolled back
+before the retry. Anything else is not: the operation must not send messages, call external
+services, or change in-memory state that a second run would apply twice.
+
+**One operation at a time per scope.** Every operation of a scope runs on the same session, and a
+MongoDB session is not thread-safe. As with a `DbContext`, do not run the operations of one scope
+concurrently (for example with `Task.WhenAll`): await each one before starting the next.
 
 The repository is registered and consumed through the CAEP abstractions, like the repositories of
 the other providers: `AddData` registers the MongoDB `IDataContext` the constructor needs.
@@ -508,6 +554,12 @@ app.Services.SeedMongo();                             // or await SeedMongoAsync
 - Seeding is **idempotent per collection**: a seed is applied only to an empty collection.
 - All seeds are committed **in a single transaction**: interrupted seeding does not leave the
   database partially populated. It therefore requires a replica set.
+- Seeding is **safe when several instances start together**. Together with the documents, a seed
+  writes a marker for its collection to the `__caep_seeding` collection, in the same transaction.
+  When two instances seed the same empty collection at the same time, the marker makes their
+  transactions conflict. The second one is retried, finds the collection already seeded and skips
+  it, even when each instance generates different keys. Without transactions (`WhenSupported` on a
+  standalone server, or `Disabled`) there is no such protection: seed from a single instance.
 
 ## Testing
 
