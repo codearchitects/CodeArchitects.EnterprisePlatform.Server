@@ -2,15 +2,12 @@ using CodeArchitects.Platform.Data.MongoDB.Fixtures;
 using CodeArchitects.Platform.Data.MongoDB.Model;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using CodeArchitects.Platform.Data.MongoDB.Serialization;
 using MongoDB.Driver;
 
 namespace CodeArchitects.Platform.Data.MongoDB.Filters;
 
 public class FilterProviderTests
 {
-  static FilterProviderTests() => MongoDBSerializationInitializer.EnsureInitialized();
-
   private readonly FilterProvider _sut = new();
 
   private static BsonDocument Render<TEntity>(FilterDefinition<TEntity> filter)
