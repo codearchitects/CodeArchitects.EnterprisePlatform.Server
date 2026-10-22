@@ -1,23 +1,23 @@
-# DAL con Entity Framework Core 7
+# DAL with Entity Framework Core 7
 
-Per utilizzare Entity Framework Core come ORM, impostare appropriatamente il valore del campo `data.orm` dello yml.
+To use Entity Framework Core as the ORM, set the `data.orm` field of the yml accordingly.
 
 ```yml
 data:
   orm: EntityFrameworkCore
 ```
 
-## Configurazione
+## Configuration
 
-Per utilizzare le funzionalità della libreria CodeArchitects.Platform.Data.EntityFrameworkCore all'interno di un'applicazione ASP.NET Core, è necessario configurare il container di Dependency Injection attraverso gli appositi metodi.
+To use the features of the CodeArchitects.Platform.Data.EntityFrameworkCore library in an ASP.NET Core application, configure the Dependency Injection container through the dedicated methods.
 
-In particolare, dopo aver abilitato l'uso di EFCore attraverso
+In particular, after enabling EFCore with
 
 ```cs
 services.AddDbContext<MyDbContext>(...);
 ```
 
-è necessario configurare l'intero DAL tramite il seguente metodo:
+configure the whole DAL with the following method:
 
 ```cs
 services.AddData<MyDbContext>();
@@ -25,13 +25,13 @@ services.AddData<MyDbContext>();
 
 ## Seeding
 
-Per effettuare il seeding del database, è sufficiente utilizzare l'overload di `AddData` che consente di specificare ulteriori opzioni e successivamente utilizzare il metodo `UseSeed`:
+To seed the database, use the `AddData` overload that accepts additional options and then call the `UseSeed` method:
 
 ```cs
 services.AddData<MyDbContext>(options => options.UseSeed<MyDataSeed>());
 ```
 
-per poi effettuare il seeding tramite il metodo di estensione `Seed`, tipicamente dopo la chiamata al metodo `Migrate` (o `EnsureCreated` se non si utilizzano le migrazioni).
+then run the seeding with the `Seed` extension method, typically after the call to `Migrate` (or `EnsureCreated` if you do not use migrations).
 
 ```cs
 using (IServiceScope scope = app.ApplicationServices.CreateScope())
@@ -44,28 +44,28 @@ using (IServiceScope scope = app.ApplicationServices.CreateScope())
 
 ## CAEP extensions
 
-L'estensione CAEP per EFCore permette di abilitare una serie di funzionalità, tra cui:
+The CAEP extension for EFCore enables a set of features, including:
 
 - Multitenancy
 - Soft delete
 
-Per utilizzare questa estensione, utilizzare il metodo di estensione `UseCaep` del `DbContextOptionsBuilder` all'interno della chiamata ad `AddDbContext` (o all'interno del metodo `OnConfiguring` di `DbContext`).
+To use this extension, call the `UseCaep` extension method of `DbContextOptionsBuilder` inside the call to `AddDbContext` (or inside the `OnConfiguring` method of the `DbContext`).
 
 ```cs
 services.AddDbContext<MyDbContext>(options => options
   .UseSqlServer(...)
-  .UseCaep()); // Da inserire dopo la chiamata all'estensione del provider (UseSqlServer in questo caso)
+  .UseCaep()); // Must come after the call to the provider extension (UseSqlServer in this case)
 ```
 
 ## Multitenancy
 
-Il multi-tenancy è un concetto utilizzato per descrivere la capacità di un'applicazione web di fornire servizi a più clienti (noti come "tenant") all'interno di un'unica istanza di software. Ciò significa che un'unica versione dell'applicazione è in grado di gestire dati e configurazioni per più clienti, utilizzando meccanismi di isolamento per garantire che i dati e le configurazioni dei singoli tenant non si interfaccino tra loro.
+Multi-tenancy describes the ability of a web application to serve multiple customers (known as "tenants") from a single software instance. A single version of the application manages data and configuration for many customers, using isolation mechanisms to ensure that the data and configuration of each tenant do not interfere with one another.
 
-Il multi-tenancy può essere implementato in diversi modi, a seconda delle esigenze dell'applicazione. Ad esempio, può essere realizzato utilizzando database separati per ogni tenant (separate database), oppure utilizzando schemi separati all'interno dello stesso database (shared database, separate schema) per isolare i dati dei tenant.
+Multi-tenancy can be implemented in several ways, depending on the needs of the application. For example, it can use a separate database for each tenant (separate database), or separate schemas within the same database (shared database, separate schema) to isolate tenant data.
 
-Quando non è possibile adottare nessuna delle due soluzioni, è necessario utilizzare meccanismi di isolamento a livello di codice per garantire che le azioni di un tenant non interferiscano con gli altri.
+When neither solution is possible, code-level isolation mechanisms are needed to ensure that the actions of one tenant do not interfere with the others.
 
-Per abilitare la separazione a livello di codice, si può usare l'estensione `UseMultitenancy` all'interno di `UseCaep`:
+To enable code-level separation, use the `UseMultitenancy` extension inside `UseCaep`:
 
 ```cs
 services.AddDbContext<MyContext>(options => options
@@ -73,7 +73,7 @@ services.AddDbContext<MyContext>(options => options
   .UseCaep(caep => caep.UseMultitenancy()));
 ```
   
-Per indicare che un'entità è multi-tenant è sufficiente utilizzare il metodo di estensione `IsMultiTenant` all'interno del metodo `OnModelCreating`. Supponendo di avere la seguente entità:
+To mark an entity as multi-tenant, use the `IsMultiTenant` extension method inside the `OnModelCreating` method. Given the following entity:
 
 ```cs
 public class MyEntity
@@ -84,7 +84,7 @@ public class MyEntity
 }
 ```
 
-Si avrebbe:
+you would write:
 
 ```cs
 modelBuilder.Entity<MyEntity>(entity =>
@@ -93,15 +93,15 @@ modelBuilder.Entity<MyEntity>(entity =>
 });
 ```
 
-Una volta fatto ciò, le query effettuate su questa entità saranno automaticamente filtrate secondo il tenant dell'utente corrente.
+From then on, queries on this entity are automatically filtered by the tenant of the current user.
 
-> Nota: Di default, è necessario utilizzare l'interfaccia IIdentityProfile per recuperare il tenant id dai claims dell'utente corrente.
+> Note: By default, the IIdentityProfile interface must be used to retrieve the tenant id from the claims of the current user.
 
 ## Soft delete
 
-Il soft delete è un meccanismo che consente di eliminare logicamente un record dal database senza eliminarlo fisicamente. Invece di eliminare fisicamente il record dal database, viene impostato un indicatore che segnala che il record è stato eliminato. Questo meccanismo consente di mantenere una traccia dei record eliminati e di poterli eventualmente ripristinare in futuro. Il soft delete può essere implementato utilizzando una colonna di stato (ad esempio, una colonna `IsDeleted` con valori `true` e `false`).
+Soft delete is a mechanism that removes a record from the database logically, without deleting it physically. Instead of physically deleting the record, a flag is set to indicate that the record has been deleted. This keeps track of deleted records and makes it possible to restore them later. Soft delete can be implemented with a status column (for example, an `IsDeleted` column with values `true` and `false`).
 
-Per abilitare il meccanismo di soft delete, utilizzare il metodo `UseSoftDelete` all'interno di `UseCaep`:
+To enable soft delete, use the `UseSoftDelete` method inside `UseCaep`:
 
 ```cs
 services.AddDbContext<MyContext>(options => options
@@ -109,7 +109,7 @@ services.AddDbContext<MyContext>(options => options
   .UseCaep(caep => caep.UseSoftDelete()));
 ```
 
-Nel metodo `OnModelCreating`, utilizzare il metodo `IsSoftDelete` per marcare la proprietà da utilizzare come colonna di stato:
+In the `OnModelCreating` method, use the `IsSoftDelete` method to mark the property to use as the status column:
 
 ```cs
 modelBuilder.Entity<MyEntity>(entity =>
@@ -118,13 +118,13 @@ modelBuilder.Entity<MyEntity>(entity =>
 });
 ```
 
-## Associazioni
+## Associations
 
-I tipi di associazione vengono definite attraverso i metodi di estensione `Aggregate()` e `Associate()`, da usare in congiunzione con le fluent API di configurazione di EFCore.
+Association types are defined with the `Aggregate()` and `Associate()` extension methods, used together with the EFCore fluent configuration API.
 
-### Configurazione associazione uno-a-uno, intra-aggregato
+### Configuring a one-to-one, intra-aggregate association
 
-Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e facenti parte dello stesso aggregato, con `Customer` come Aggregate Root.
+Suppose we have the entities `Customer` and `Address`, in a one-to-one relationship and part of the same aggregate, with `Customer` as the Aggregate Root.
 
 ```cs
 public class Customer
@@ -140,7 +140,7 @@ public class Address
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -154,7 +154,7 @@ associations:
       navigation: Customer
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyDbContext : DbContext
@@ -173,9 +173,9 @@ public class MyDbContext : DbContext
 }
 ```
 
-### Configurazione associazione uno-a-uno, inter-aggregato
+### Configuring a one-to-one, inter-aggregate association
 
-Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e non facenti parte dello stesso aggregato.
+Suppose we have the entities `Customer` and `Address`, in a one-to-one relationship and not part of the same aggregate.
 
 ```cs
 public class Customer
@@ -191,7 +191,7 @@ public class Address
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -205,7 +205,7 @@ associations:
       navigation: Customer
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyDbContext : DbContext
@@ -224,9 +224,9 @@ public class MyDbContext : DbContext
 }
 ```
 
-### Configurazione associazione uno-a-molti, intra-aggregato
+### Configuring a one-to-many, intra-aggregate association
 
-Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e facenti parte dello stesso aggregato, con `Cart` come Aggregate Root.
+Suppose we have the entities `Cart` and `Product`, in a one-to-many relationship and part of the same aggregate, with `Cart` as the Aggregate Root.
 
 ```cs
 public class Cart
@@ -242,7 +242,7 @@ public class Product
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -256,7 +256,7 @@ associations:
       navigation: Cart
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyDbContext : DbContext
@@ -274,9 +274,9 @@ public class MyDbContext : DbContext
 }
 ```
 
-### Configurazione associazione uno-a-molti, inter-aggregato
+### Configuring a one-to-many, inter-aggregate association
 
-Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e non facenti parte dello stesso aggregato.
+Suppose we have the entities `Cart` and `Product`, in a one-to-many relationship and not part of the same aggregate.
 
 ```cs
 public class Cart
@@ -292,7 +292,7 @@ public class Product
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -306,7 +306,7 @@ associations:
       navigation: Cart
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyDbContext : DbContext
@@ -324,9 +324,9 @@ public class MyDbContext : DbContext
 }
 ```
 
-### Configurazione associazione molti-a-molti
+### Configuring a many-to-many association
 
-Supponiamo di avere le entità `Student` e `Teacher`, in relazione molti-a-molti.
+Suppose we have the entities `Student` and `Teacher`, in a many-to-many relationship.
 
 ```cs
 public class Student
@@ -342,7 +342,7 @@ public class Teacher
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -356,7 +356,7 @@ associations:
       navigation: Students
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyDbContext : DbContext
