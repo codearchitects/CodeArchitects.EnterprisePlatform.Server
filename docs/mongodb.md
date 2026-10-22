@@ -144,7 +144,7 @@ public class CartItem          // no [Collection], no Id: not an entity
 Embedded entities **do not have their own collection** and cannot be reached through a dedicated
 repository: an entity that needs a repository is, by definition, an aggregate root.
 
-Writes follow the semantics already documented in the [DAL](dataaccesslayer.md#associazioni-e-aggregati):
+Writes follow the semantics already documented in the [DAL](dataaccesslayer.md#associations-and-aggregates):
 `Insert` and `Update` on the aggregate root write the entire document, including embedded entities,
 while inter-aggregate entities are not written, only the reference is persisted. `Remove` deletes
 the document and its embedded entities; there is **no** cascade through references, because MongoDB
@@ -156,7 +156,7 @@ and puts the collection name into the data.
 ## Unit of work and transactions
 
 The use of `IUnitOfWorkManager` and `IUnitOfWork` is identical to the other providers
-([DAL](dataaccesslayer.md#il-pattern-unit-of-work)). There are two differences.
+([DAL](dataaccesslayer.md#the-unit-of-work-pattern)). There are two differences.
 
 **Writes are deferred.** Within the UnitOfWork, operations accumulate and are applied on
 `SaveAsync` (or on `Dispose` with `autoSave: true`), all in **a single** MongoDB transaction.

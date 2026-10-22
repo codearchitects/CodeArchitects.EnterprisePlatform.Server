@@ -1,19 +1,19 @@
 # ADO.NET
 
-Per utilizzare Dapper come ORM, che a sua volta utilizza l'implementazione ADO.NET del repository, impostare appropriatamente il valore del campo `data.orm` dello yml.
+To use Dapper as the ORM, which in turn uses the ADO.NET implementation of the repository, set the `data.orm` field of the yml accordingly.
 
 ```yml
 data:
   orm: Dapper
 ```
 
-## Entità
+## Entities
 
-Il DAL ADO.NET utilizza la classe base `ModelConfiguration` per la configurazione di entità e relazioni. Per configurare il modello relazionale, è necessario estendere questa classe e dichiarare le entità e le relazioni tra di esse.
+The ADO.NET DAL uses the `ModelConfiguration` base class to configure entities and relationships. To configure the relational model, extend this class and declare the entities and the relationships between them.
 
-Per quanto riguarda le entità, esse si dichiarano utilizzando il metodo `Entity` che accetta come parametro di tipo l'entità e come parametro una lambda che configura le proprietà dell'entità.
+Entities are declared with the `Entity` method, which takes the entity as its type parameter and, as its argument, a lambda that configures the entity's properties.
 
-Ad esempio, supponiamo di avere un'entità modellata dal seguente yml:
+For example, suppose we have an entity modelled by the following yml:
 
 ```yml
 entities:
@@ -30,7 +30,7 @@ entities:
         description: Category description
 ```
 
-Questo, oltre a generare l'entità in sé, grazie alla flag `useRepository`, genererà la seguente configurazione:
+Besides generating the entity itself, thanks to the `useRepository` flag this generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
@@ -39,19 +39,19 @@ public class MyModelConfiguration : ModelConfiguration
   {
     Entity<Category>(builder =>
     {
-      // configurazione
+      // configuration
     });
   }
 }
 ```
 
-## Associazioni
+## Associations
 
-Le associazioni vengono definite attraverso i metodi `Aggregate` e `Associate`, che accettano come parametri di tipo le due entità da mettere in relazione e come parametro una lambda che configura la relazione tramite un'API fluent.
+Associations are defined with the `Aggregate` and `Associate` methods, which take the two entities to relate as type parameters and, as their argument, a lambda that configures the relationship through a fluent API.
 
-### Configurazione associazione uno-a-uno, intra-aggregato
+### Configuring a one-to-one, intra-aggregate association
 
-Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e facenti parte dello stesso aggregato, con `Customer` come Aggregate Root.
+Suppose we have the entities `Customer` and `Address`, in a one-to-one relationship and part of the same aggregate, with `Customer` as the Aggregate Root.
 
 ```cs
 public class Customer
@@ -67,7 +67,7 @@ public class Address
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -81,7 +81,7 @@ associations:
       navigation: Customer
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
@@ -96,9 +96,9 @@ public class MyModelConfiguration : ModelConfiguration
 }
 ```
 
-### Configurazione associazione uno-a-uno, inter-aggregato
+### Configuring a one-to-one, inter-aggregate association
 
-Supponiamo di avere le entità `Customer` e `Address`, in relazione uno-a-uno e non facenti parte dello stesso aggregato.
+Suppose we have the entities `Customer` and `Address`, in a one-to-one relationship and not part of the same aggregate.
 
 ```cs
 public class Customer
@@ -114,7 +114,7 @@ public class Address
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -128,7 +128,7 @@ associations:
       navigation: Customer
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
@@ -143,9 +143,9 @@ public class MyModelConfiguration : ModelConfiguration
 }
 ```
 
-### Configurazione associazione uno-a-molti, intra-aggregato
+### Configuring a one-to-many, intra-aggregate association
 
-Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e facenti parte dello stesso aggregato, con `Cart` come Aggregate Root.
+Suppose we have the entities `Cart` and `Product`, in a one-to-many relationship and part of the same aggregate, with `Cart` as the Aggregate Root.
 
 ```cs
 public class Cart
@@ -161,7 +161,7 @@ public class Product
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -175,7 +175,7 @@ associations:
       navigation: Cart
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
@@ -190,9 +190,9 @@ public class MyModelConfiguration : ModelConfiguration
 }
 ```
 
-### Configurazione associazione uno-a-molti, inter-aggregato
+### Configuring a one-to-many, inter-aggregate association
 
-Supponiamo di avere le entità `Cart` e `Product`, in relazione uno-a-molti e non facenti parte dello stesso aggregato.
+Suppose we have the entities `Cart` and `Product`, in a one-to-many relationship and not part of the same aggregate.
 
 ```cs
 public class Cart
@@ -208,7 +208,7 @@ public class Product
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -222,7 +222,7 @@ associations:
       navigation: Cart
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
@@ -237,9 +237,9 @@ public class MyModelConfiguration : ModelConfiguration
 }
 ```
 
-### Configurazione associazione molti-a-molti
+### Configuring a many-to-many association
 
-Supponiamo di avere le entità `Student` e `Teacher`, in relazione molti-a-molti.
+Suppose we have the entities `Student` and `Teacher`, in a many-to-many relationship.
 
 ```cs
 public class Student
@@ -255,7 +255,7 @@ public class Teacher
 }
 ```
 
-La relazione è modellabile con il seguente yml:
+The association can be modelled with the following yml:
 
 ```yml
 associations:
@@ -269,7 +269,7 @@ associations:
       navigation: Students
 ```
 
-Che genererà la seguente configurazione:
+This generates the following configuration:
 
 ```cs
 public class MyModelConfiguration : ModelConfiguration
